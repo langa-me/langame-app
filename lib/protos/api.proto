@@ -1,0 +1,19 @@
+syntax = "proto3";
+package api;
+
+message LangameUser {
+  string username = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string picture = 4;
+  // i.e. Facebook, Google, Apple...
+  repeated string linked_accounts = 5;
+  string email = 6;
+  string phone_number = 7;
+  bool email_verified = 8;
+}
+
+message Interest {
+  string value = 1;
+  repeated Interest sub_interests = 2;
+}

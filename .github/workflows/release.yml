@@ -1,0 +1,20 @@
+
+name: Flutter release CI
+
+on:
+  push:
+    branches:
+      - disabled
+
+jobs:
+  build:
+    # This job will run on ubuntu virtual machine
+    runs-on: ubuntu-latest
+    steps:
+
+      # Setup Java environment in order to build the Android app.
+      - uses: actions/checkout@v1
+
+# TODO
+# https://joshuamdeguzman.com/continuous-delivery-for-flutter-using-fastlane-and-github-actions-pt-2-android/
+# https://joshuamdeguzman.com/continuous-delivery-for-flutter-using-fastlane-and-github-actions-pt-3-ios/
