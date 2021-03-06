@@ -71,6 +71,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0-nullsafety.1"
+  cloud_firestore:
+    dependency: "direct main"
+    description:
+      name: cloud_firestore
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.16.0+1"
+  cloud_firestore_platform_interface:
+    dependency: transitive
+    description:
+      name: cloud_firestore_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.2"
+  cloud_firestore_web:
+    dependency: transitive
+    description:
+      name: cloud_firestore_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0+2"
   collection:
     dependency: transitive
     description:
@@ -235,13 +256,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  get_it:
+  fluttertoast:
     dependency: "direct main"
     description:
-      name: get_it
+      name: fluttertoast
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.4"
+    version: "7.1.8"
   google_fonts:
     dependency: "direct main"
     description:
@@ -333,13 +354,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.3"
-  liquid_swipe:
-    dependency: "direct main"
-    description:
-      name: liquid_swipe
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.5.0"
   logger:
     dependency: transitive
     description:

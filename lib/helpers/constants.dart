@@ -2,8 +2,6 @@
 // to understand how to use the FlexColorScheme package demonstrated in
 // the examples.
 
-import 'package:flutter/material.dart';
-
 /// Layout constants and strings used in the example application
 class AppConst {
   // This class is not meant to be instantiated or extended; this constructor
@@ -35,6 +33,9 @@ class AppConst {
 
   // The width of the side menu when rail sized, only used by example 5.
   static const double shrinkWidth = 60;
+
+  // Whether to log debug settings events
+  static const bool debugSettings = false;
 }
 
 /// Fonts assets used in this application,
@@ -56,11 +57,10 @@ class AppFont {
   static const String fontRoboto = 'Roboto';
 }
 
-/// Fonts assets used in this application,
-class AppConf {
+class AppText {
   // This class is not meant to be instantiated or extended; this constructor
   // prevents instantiation and extension.
-  AppConf._();
+  AppText._();
 
-  static ThemeMode themeMode = ThemeMode.light;
+  // TODO https://flutter.dev/docs/development/accessibility-and-localization/internationalization#:~:text=platform%20might%20require.-,Setting%20up%20an%20internationalized%20app%3A%20the%20Flutter_localizations%20package,include%20a%20package%20called%20flutter_localizations%20.
 }

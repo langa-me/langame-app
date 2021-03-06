@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/services/storage/storage_service.dart';
 import 'package:langame/services/storage/storage_service_fake.dart';
 import 'package:langame/services/storage/storage_service_implementation.dart';
@@ -10,18 +11,21 @@ class SettingProvider extends ChangeNotifier {
   ThemeMode _theme = ThemeMode.system;
   ThemeMode get theme => _theme;
 
-  Future set(ThemeMode t) async {
-    var f = _api.saveTheme(t);
+  setTheme(t) {
+    if (AppConst.debugSettings) print('set theme $t');
+    _theme = t;
     notifyListeners();
+    _api.saveTheme(t);
+  }
+
+  Future load() async {
+    final f = _api.getTheme();
+    f.then(setTheme);
     return f;
   }
 
-  SettingProvider({bool fake = true}) {
+  SettingProvider({bool fake = false}) {
     _fake = fake;
     _api = _fake ? FakeStorageService() : StorageServiceImpl();
-    // Only fetch from preferences at boot
-    _api
-        .getTheme()
-        .then((value) => _theme = value != null ? value : ThemeMode.system);
   }
 }

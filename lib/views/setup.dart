@@ -8,9 +8,8 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:langame/protos/api.pb.dart';
 import 'package:langame/providers/interest_provider.dart';
 import 'package:langame/views/random_temporary.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../getit.dart';
 
 /// Setup the app for the user (interests, friends...)
 class Setup extends StatefulWidget {
@@ -19,13 +18,14 @@ class Setup extends StatefulWidget {
 }
 
 class _SetupState extends State with AfterLayoutMixin {
-  final provider = getIt<InterestProvider>();
   List<Widget> interests = [];
   List<StaggeredTile> interestsTiles = [];
   final controller = PageController(initialPage: 0, viewportFraction: 0.9);
 
   @override
   void afterFirstLayout(BuildContext context) {
+    final provider = Provider.of<InterestProvider>(context, listen: false);
+
     provider.getAllInterests();
     interests.clear();
     interestsTiles.clear();

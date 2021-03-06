@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/src/material/app.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'storage_service.dart';
@@ -14,14 +15,20 @@ class StorageServiceImpl implements StorageService {
   static const sharedPrefThemeKey = 'theme_key';
   @override
   Future<ThemeMode> getTheme() async {
+    // var x = await SharedPreferences.getInstance();
+    // await x.clear();
     String data = await _getStringFromPreferences(sharedPrefThemeKey);
-    return Future<ThemeMode>.value(jsonDecode(data));
+    if (data == '') return null;
+    Map<String, dynamic> decoded = jsonDecode(data);
+    if (AppConst.debugSettings) print('loaded preferences $decoded');
+    return Future<ThemeMode>.value(ThemeMode.values[decoded['themeMode']]);
   }
 
   @override
   Future saveTheme(ThemeMode data) {
-    String jsonString = jsonEncode(data);
+    String jsonString = jsonEncode({'themeMode': data.index});
     _saveToPreferences(sharedPrefThemeKey, jsonString);
+    if (AppConst.debugSettings) print('saved preferences $jsonString');
     return null;
   }
 
