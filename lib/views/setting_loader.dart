@@ -1,3 +1,6 @@
+import 'package:async/async.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/providers/setting_provider.dart';
 import 'package:provider/provider.dart';
@@ -13,9 +16,15 @@ class _SettingLoaderState extends State<SettingLoader> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SettingProvider>(context, listen: false);
+    FutureGroup f = FutureGroup();
+    f.add(provider.load());
+    f.add(Firebase.initializeApp());
+    // Just initializing Firebase Functions
+    f.future.then((value) => FirebaseFunctions.instance);
+    f.close();
     return Scaffold(
         body: FutureBuilder(
-            future: provider.load(),
+            future: f.future,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               List<Widget> children;
               if (snapshot.hasData) {

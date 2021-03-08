@@ -8,26 +8,21 @@ class FakeAuthenticationApi implements AuthenticationApi {
   @override
   Future<LangameUser> loginWithApple() {
     return Future<LangameUser>.value(Random().nextDouble() > 0.5
-        ? LangameUser(
-            username: 'SteveJobs', firstName: 'Steve', lastName: 'Jobs')
+        ? LangameUser(displayName: 'SteveJobs')
         : null);
   }
 
   @override
   Future<LangameUser> loginWithFacebook() {
     return Future<LangameUser>.value(Random().nextDouble() > 0.5
-        ? LangameUser(
-            username: 'MarkZuckerberg',
-            firstName: 'Mark',
-            lastName: 'Zuckerberg')
+        ? LangameUser(displayName: 'MarkZuckerberg')
         : null);
   }
 
   @override
   Future<LangameUser> loginWithGoogle() {
     return Future<LangameUser>.value(Random().nextDouble() > 0.5
-        ? LangameUser(
-            username: 'LarryPage', firstName: 'Larry', lastName: 'Page')
+        ? LangameUser(displayName: 'LarryPage')
         : null);
   }
 }

@@ -1,5 +1,26 @@
-# langame
+# Langame Flutter
+
+## Installation
 
 ```bash
-protc --dart_out=. ./YourFile.proto
+flutter pub get
+```
+
+## Usage
+
+### Emulator
+
+Get your local laptop IP for the client:
+```bash
+ip a
+```
+
+Export emulator data:
+```bash
+firebase emulators:export ../data
+```
+
+Import emulator data:
+```bash
+firebase emulators:start --import ../data
 ```

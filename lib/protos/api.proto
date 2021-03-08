@@ -1,16 +1,14 @@
 syntax = "proto3";
 package api;
 
+// see https://github.com/firebase/firebase-admin-node/blob/master/src/auth/index.ts#L195
 message LangameUser {
-  string username = 1;
-  string first_name = 2;
-  string last_name = 3;
-  string picture = 4;
-  // i.e. Facebook, Google, Apple...
-  repeated string linked_accounts = 5;
-  string email = 6;
-  string phone_number = 7;
-  bool email_verified = 8;
+  string uid = 1;
+  string email = 2;
+  string display_name = 3;
+  bool email_verified = 4;
+  string phone_number = 5;
+  string photo_url = 6;
 }
 
 message Interest {

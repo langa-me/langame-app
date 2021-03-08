@@ -13,6 +13,7 @@ dependencies:
   firebase_core: "^0.7.0"
   firebase_auth: "^0.20.1"
   cloud_firestore: "^0.16.0+1"
+  cloud_functions: "^0.9.0"
   google_sign_in: "^4.5.1"
   flutter_facebook_auth: "^1.0.0"
   sign_in_with_apple: "^2.5.2"
