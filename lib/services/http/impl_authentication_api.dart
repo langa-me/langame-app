@@ -48,7 +48,7 @@ class ImplAuthenticationApi implements AuthenticationApi {
   }
 
   @override
-  Future<LangameUser> loginWithApple() async {
+  Future<LangameUser?> loginWithApple() async {
     // To prevent replay attacks with the credential returned from Apple, we
     // include a nonce in the credential request. When signing in in with
     // Firebase, the nonce in the id token returned by Apple, is expected to
@@ -78,13 +78,13 @@ class ImplAuthenticationApi implements AuthenticationApi {
   }
 
   @override
-  Future<LangameUser> loginWithFacebook() async {
+  Future<LangameUser?> loginWithFacebook() async {
     // Trigger the sign-in flow
-    final AccessToken result = await FacebookAuth.instance.login();
-    if (FacebookAuth.instance.isLogged != null) {
+    final AccessToken result = (await FacebookAuth.instance.login())!;
+    if (result != null) {
       // Create a credential from the access token
       final OAuthCredential facebookAuthCredential =
-          FacebookAuthProvider.credential(result.token);
+          FacebookAuthProvider.credential(result.token!);
 
       await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
       final data = await FacebookAuth.instance.getUserData();
@@ -110,9 +110,9 @@ class ImplAuthenticationApi implements AuthenticationApi {
   }
 
   @override
-  Future<LangameUser> loginWithGoogle() async {
+  Future<LangameUser?> loginWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount googleUser = (await GoogleSignIn().signIn())!;
 
     // If Google Auth cancelled
     if (googleUser == null) return null;

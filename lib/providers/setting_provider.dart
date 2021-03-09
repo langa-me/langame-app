@@ -7,7 +7,7 @@ import 'package:langame/services/storage/storage_service_implementation.dart';
 class SettingProvider extends ChangeNotifier {
   /// Defines whether it's fake API or real
   bool _fake = true;
-  StorageService _api;
+  late StorageService _api;
   ThemeMode _theme = ThemeMode.system;
   ThemeMode get theme => _theme;
 
@@ -20,12 +20,16 @@ class SettingProvider extends ChangeNotifier {
 
   Future load() async {
     final f = _api.getTheme();
-    f.then(setTheme);
+    f.then((t) {
+      if (t != null) {
+        setTheme(t);
+      }
+    });
     return f;
   }
 
   SettingProvider({bool fake = false}) {
     _fake = fake;
-    _api = _fake ? FakeStorageService() : StorageServiceImpl();
+    this._api = _fake ? FakeStorageService() : StorageServiceImpl();
   }
 }

@@ -9,7 +9,7 @@ import 'package:langame/services/http/interest_api.dart';
 class InterestProvider extends ChangeNotifier {
   /// Defines whether it's fake API or real
   bool _fake = true;
-  InterestApi _api;
+  late InterestApi _api;
   final _streamController = StreamController<Interest>();
 
   Stream<Interest> get interestsStream {

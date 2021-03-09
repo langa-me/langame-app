@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>596120869120-v3lj63tls8qs255lb9trlg331or2dh71.apps.googleusercontent.com</string>
+	<string>596120869120-2bj788qithm2aqpvc20abq1rcg66l7tq.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.596120869120-v3lj63tls8qs255lb9trlg331or2dh71</string>
+	<string>com.googleusercontent.apps.596120869120-2bj788qithm2aqpvc20abq1rcg66l7tq</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>596120869120-u22ntimqd3av2aagi0u703tter17ii0g.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>langa.me</string>
+	<string>me.langa</string>
 	<key>PROJECT_ID</key>
 	<string>louis030195-256110</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:596120869120:ios:31bbc7026cdad442687be5</string>
+	<string>1:596120869120:ios:fc894b909252f81d687be5</string>
 </dict>
 </plist>

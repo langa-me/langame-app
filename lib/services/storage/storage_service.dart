@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 abstract class StorageService {
   Future saveTheme(ThemeMode data);
 
-  Future<ThemeMode> getTheme();
+  Future<ThemeMode?> getTheme();
   //
   // Future saveFavoriteCurrencies(List<Currency> data);
   //

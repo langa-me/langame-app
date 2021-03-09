@@ -14,7 +14,7 @@ import 'storage_service.dart';
 class StorageServiceImpl implements StorageService {
   static const sharedPrefThemeKey = 'theme_key';
   @override
-  Future<ThemeMode> getTheme() async {
+  Future<ThemeMode?> getTheme() async {
     // var x = await SharedPreferences.getInstance();
     // await x.clear();
     String data = await _getStringFromPreferences(sharedPrefThemeKey);
@@ -25,11 +25,10 @@ class StorageServiceImpl implements StorageService {
   }
 
   @override
-  Future saveTheme(ThemeMode data) {
+  Future saveTheme(ThemeMode data) async {
     String jsonString = jsonEncode({'themeMode': data.index});
     _saveToPreferences(sharedPrefThemeKey, jsonString);
     if (AppConst.debugSettings) print('saved preferences $jsonString');
-    return null;
   }
 
   //

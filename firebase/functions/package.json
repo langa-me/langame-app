@@ -4,7 +4,7 @@
   "scripts": {
     "lint": "eslint .",
     "serve": "npm build -- --watch | firebase emulators:start",
-    "deploy": "firebase deploy --only functions",
+    "deploy": "firebase deploy --only functions --debug",
     "logs": "firebase functions:log"
   },
   "engines": {
@@ -17,6 +17,7 @@
     "protobufjs": "^6.10.2"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.6.0",
     "eslint-config-google": "^0.14.0",
     "firebase-functions-test": "^0.2.0"

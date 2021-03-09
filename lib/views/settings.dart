@@ -13,7 +13,7 @@ class SettingsTwo extends StatefulWidget {
 // theme definitions. The HomePage just contains UI to visually show what the
 // defined example looks like in an application and with commonly used Widgets.
 class _SettingsTwoState extends State<SettingsTwo> {
-  final FlexSchemeData flexSchemeData = FlexColor.schemes[FlexScheme.mandyRed];
+  final FlexSchemeData flexSchemeData = FlexColor.schemes[FlexScheme.mandyRed]!;
 
   @override
   Widget build(BuildContext context) {

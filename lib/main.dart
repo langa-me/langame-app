@@ -1,7 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/interest_provider.dart';
@@ -46,7 +45,6 @@ class _MyAppState extends State<MyApp> {
                 visualDensity: FlexColorScheme.comfortablePlatformDensity)
             .toTheme,
         home: SettingLoader(),
-        builder: EasyLoading.init(),
       );
     });
   }

@@ -2,11 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:langame/models/type_login.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/views/random_temporary.dart';
-import 'package:langame/views/setup.dart';
 import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
@@ -63,22 +61,22 @@ class _LoginState extends State<Login> {
             child: Container(
                 width: 200,
                 height: 150,
-                child: SvgPicture.asset('images/chat-flat.svg')),
+                child: Image.asset('images/chat-flat.png')),
           ),
         ),
         Row(children: logins, mainAxisAlignment: MainAxisAlignment.center),
         kReleaseMode
             ? Scaffold()
             : Column(children: [
-                ElevatedButton(
-                  child: Text('Setup', style: ts),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => Setup()),
-                    );
-                  },
-                ),
+                // ElevatedButton(
+                //   child: Text('Setup', style: ts),
+                //   onPressed: () {
+                //     Navigator.pushReplacement(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => Setup()),
+                //     );
+                //   },
+                // ),
                 ElevatedButton(
                   child: Text('RandomTemporary', style: ts),
                   onPressed: () {

@@ -12,8 +12,8 @@ enum LoginStatus { cancelled, failed, succeed }
 class AuthenticationProvider extends ChangeNotifier {
   /// Defines whether it's fake API or real
   bool _fake = true;
-  AuthenticationApi _api;
-  LangameUser _user;
+  late AuthenticationApi _api;
+  late LangameUser _user;
   LangameUser get user {
     return _user;
   }
@@ -21,7 +21,7 @@ class AuthenticationProvider extends ChangeNotifier {
   // TODO: better errors than boolean
   Future<LoginStatus> loginWithFacebook() async {
     try {
-      _user = await _api.loginWithFacebook();
+      _user = (await _api.loginWithFacebook())!;
     } on GetUserException {
       return LoginStatus.failed;
     }
@@ -32,7 +32,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LoginStatus> loginWithGoogle() async {
     try {
-      _user = await _api.loginWithGoogle();
+      _user = (await _api.loginWithGoogle())!;
     } on GetUserException {
       return LoginStatus.failed;
     }
@@ -43,7 +43,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LoginStatus> loginWithApple() async {
     try {
-      _user = await _api.loginWithApple();
+      _user = (await _api.loginWithApple())!;
     } on GetUserException {
       return LoginStatus.failed;
     }

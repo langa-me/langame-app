@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: lib/protos/api.proto
 //
-// @dart = 2.7
+// @dart = 2.12
 // ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
 
 import 'dart:core' as $core;
@@ -22,12 +22,12 @@ class LangameUser extends $pb.GeneratedMessage {
 
   LangameUser._() : super();
   factory LangameUser({
-    $core.String uid,
-    $core.String email,
-    $core.String displayName,
-    $core.bool emailVerified,
-    $core.String phoneNumber,
-    $core.String photoUrl,
+    $core.String? uid,
+    $core.String? email,
+    $core.String? displayName,
+    $core.bool? emailVerified,
+    $core.String? phoneNumber,
+    $core.String? photoUrl,
   }) {
     final _result = create();
     if (uid != null) {
@@ -69,7 +69,7 @@ class LangameUser extends $pb.GeneratedMessage {
   static $pb.PbList<LangameUser> createRepeated() => $pb.PbList<LangameUser>();
   @$core.pragma('dart2js:noInline')
   static LangameUser getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LangameUser>(create);
-  static LangameUser _defaultInstance;
+  static LangameUser? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get uid => $_getSZ(0);
@@ -135,8 +135,8 @@ class Interest extends $pb.GeneratedMessage {
 
   Interest._() : super();
   factory Interest({
-    $core.String value,
-    $core.Iterable<Interest> subInterests,
+    $core.String? value,
+    $core.Iterable<Interest>? subInterests,
   }) {
     final _result = create();
     if (value != null) {
@@ -166,7 +166,7 @@ class Interest extends $pb.GeneratedMessage {
   static $pb.PbList<Interest> createRepeated() => $pb.PbList<Interest>();
   @$core.pragma('dart2js:noInline')
   static Interest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Interest>(create);
-  static Interest _defaultInstance;
+  static Interest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get value => $_getSZ(0);
