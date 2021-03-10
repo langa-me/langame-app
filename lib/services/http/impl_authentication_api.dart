@@ -40,7 +40,7 @@ class ImplAuthenticationApi implements AuthenticationApi {
     const maxAttempts = 5;
     var attempts = 0;
     Map<String, dynamic>? resultsAsMap = await run();
-    while (resultsAsMap == null || attempts > maxAttempts) {
+    while (resultsAsMap == null && attempts > maxAttempts) {
       resultsAsMap = await run();
       attempts++;
       print('attempt n°$attempts/$maxAttempts');
