@@ -53,7 +53,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   /// Create an authentication provider, and
-  AuthenticationProvider({bool fake = true, bool emulator = true}) {
+  AuthenticationProvider({bool fake = false, bool emulator = false}) {
     _fake = fake;
     // Emulator overcome fake api
     if (emulator) {

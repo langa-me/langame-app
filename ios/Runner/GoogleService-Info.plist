@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>596120869120-2bj788qithm2aqpvc20abq1rcg66l7tq.apps.googleusercontent.com</string>
+	<string>909899959016-uk3c4h89ipocrkv7dbd1utv70lmjlac8.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.596120869120-2bj788qithm2aqpvc20abq1rcg66l7tq</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>596120869120-u22ntimqd3av2aagi0u703tter17ii0g.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.909899959016-uk3c4h89ipocrkv7dbd1utv70lmjlac8</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDSq5pb10RU3mpwgVt3MFfKehqbZyy8m0o</string>
+	<string>AIzaSyCi38oki09o787cSrAq6qHvRFoFay_bGx4</string>
 	<key>GCM_SENDER_ID</key>
-	<string>596120869120</string>
+	<string>909899959016</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>me.langa</string>
 	<key>PROJECT_ID</key>
-	<string>louis030195-256110</string>
+	<string>langame-86ac4</string>
 	<key>STORAGE_BUCKET</key>
-	<string>louis030195-256110.appspot.com</string>
+	<string>langame-86ac4.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:596120869120:ios:fc894b909252f81d687be5</string>
+	<string>1:909899959016:ios:f97b19b04fbab446c0575d</string>
 </dict>
 </plist>

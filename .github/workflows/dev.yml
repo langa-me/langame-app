@@ -32,8 +32,8 @@ jobs:
       # Run widget tests for our flutter project.
 #      - run: flutter test
 
-#      - name: Setup tmate session
-#        uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
       # Build apk.
       - run: flutter build apk

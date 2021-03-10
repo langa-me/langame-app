@@ -20,21 +20,33 @@ class ImplAuthenticationApi implements AuthenticationApi {
 
     const errorCause = 'could not get user';
     final run = () async {
-      final results = await callable();
-      if (results.data['statusCode'] != 200) throw GetUserException(errorCause);
-      return Map<String, dynamic>.from(results.data['result']);
+      HttpsCallableResult? results;
+      try {
+        results = await callable();
+        if (results.data['statusCode'] != 200 ||
+            results.data['result']['uid'] == null)
+          throw GetUserException(errorCause);
+        return Map<String, dynamic>.from(results.data['result']);
+      } on FirebaseFunctionsException catch (e) {
+        // Do clever things with e
+        print('$results $e');
+      } catch (e) {
+        print('$results $e');
+        // Do other things that might be thrown that I have overlooked
+      }
     };
 
     const delay = const Duration(milliseconds: 200);
     const maxAttempts = 5;
     var attempts = 0;
-    var resultsAsMap = await run();
-    while (resultsAsMap['uid'] == null || attempts > maxAttempts) {
+    Map<String, dynamic>? resultsAsMap = await run();
+    while (resultsAsMap == null || attempts > maxAttempts) {
       resultsAsMap = await run();
       attempts++;
+      print('attempt n°$attempts/$maxAttempts');
       await Future.delayed(delay);
     }
-    if (resultsAsMap['uid'] == null) {
+    if (resultsAsMap == null) {
       throw GetUserException(errorCause);
     }
     return LangameUser(
