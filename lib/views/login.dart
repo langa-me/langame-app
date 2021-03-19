@@ -59,9 +59,7 @@ class _LoginState extends State<Login> {
           padding: const EdgeInsets.only(top: 60.0),
           child: Center(
             child: Container(
-                width: 200,
-                height: 150,
-                child: Image.asset('images/chat-flat.png')),
+                width: 200, height: 150, child: Image.asset('images/logo.png')),
           ),
         ),
         Row(children: logins, mainAxisAlignment: MainAxisAlignment.center),
@@ -93,14 +91,19 @@ class _LoginState extends State<Login> {
   }
 
   Future handleOnPressedLogin(
-      Future<LoginStatus> Function() fn, String entity) async {
-    switch (await fn()) {
+      Future<LoginResponse> Function() fn, String entity) async {
+    var res = await fn();
+    print('${res.status} ${res.errorMessage}');
+
+    switch (res.status) {
       case LoginStatus.cancelled:
         break;
       case LoginStatus.failed:
+        final msg = 'failed to login to $entity, ${res.errorMessage}';
+        print(msg);
         final snackBar = SnackBar(
           behavior: SnackBarBehavior.floating,
-          content: Text('failed to login to $entity'),
+          content: Text(msg),
           action: SnackBarAction(
             label: 'dismiss',
             onPressed: () {},

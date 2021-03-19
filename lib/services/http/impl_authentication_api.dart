@@ -6,15 +6,15 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:langame/api/api.pb.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/protos/api.pb.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'authentication_api.dart';
 
 // TODO: ABSOLUTELY TEST
 class ImplAuthenticationApi implements AuthenticationApi {
-  Future<LangameUser> getUser({double timeout = 5}) async {
+  Future<LangameUser> getUser(String uid, {double timeout = 5}) async {
     HttpsCallable callable =
         FirebaseFunctions.instance.httpsCallable('getUser');
 
@@ -22,25 +22,30 @@ class ImplAuthenticationApi implements AuthenticationApi {
     final run = () async {
       HttpsCallableResult? results;
       try {
-        results = await callable();
+        results = await callable.call(<String, dynamic>{
+          'uid': uid,
+        });
+        print(results.data);
+        print(results.data['result']['uid'] == null);
         if (results.data['statusCode'] != 200 ||
-            results.data['result']['uid'] == null)
-          throw GetUserException(errorCause);
+            results.data['result']['uid'] == null) return null;
         return Map<String, dynamic>.from(results.data['result']);
       } on FirebaseFunctionsException catch (e) {
-        // Do clever things with e
-        print('$results $e');
+        print(e);
+
+        throw GetUserException('$errorCause, err: ${e.message}');
       } catch (e) {
-        print('$results $e');
-        // Do other things that might be thrown that I have overlooked
+        print(e);
+
+        throw GetUserException('$errorCause, err: ${e.toString()}');
       }
     };
-
+    print('yolo');
     const delay = const Duration(milliseconds: 200);
     const maxAttempts = 5;
     var attempts = 0;
     Map<String, dynamic>? resultsAsMap = await run();
-    while (resultsAsMap == null && attempts > maxAttempts) {
+    while (resultsAsMap == null && attempts < maxAttempts) {
       resultsAsMap = await run();
       attempts++;
       print('attempt n°$attempts/$maxAttempts');
@@ -92,7 +97,7 @@ class ImplAuthenticationApi implements AuthenticationApi {
   @override
   Future<LangameUser?> loginWithFacebook() async {
     // Trigger the sign-in flow
-    final AccessToken result = (await FacebookAuth.instance.login())!;
+    final AccessToken? result = await FacebookAuth.instance.login();
     if (result != null) {
       // Create a credential from the access token
       final OAuthCredential facebookAuthCredential =
@@ -124,7 +129,7 @@ class ImplAuthenticationApi implements AuthenticationApi {
   @override
   Future<LangameUser?> loginWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount googleUser = (await GoogleSignIn().signIn())!;
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     // If Google Auth cancelled
     if (googleUser == null) return null;
@@ -140,9 +145,12 @@ class ImplAuthenticationApi implements AuthenticationApi {
     );
 
     // Once signed in, return the UserCredential
-    await FirebaseAuth.instance.signInWithCredential(credential);
+    final UserCredential u =
+        await FirebaseAuth.instance.signInWithCredential(credential);
 
-    return getUser();
+    if (u.user == null) return null;
+
+    return getUser(u.user!.uid);
   }
 
   /// Generates a cryptographically secure random nonce, to be included in a
@@ -160,5 +168,11 @@ class ImplAuthenticationApi implements AuthenticationApi {
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
     return digest.toString();
+  }
+
+  @override
+  Future<List<Friend>> getFriends(String uid) {
+    // TODO: implement getFriends
+    throw UnimplementedError();
   }
 }

@@ -1,6 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/protos/api.pb.dart';
+import 'package:langame/api/api.pb.dart';
+import 'package:langame/providers/profile_provider.dart';
+import 'package:langame/views/settings.dart';
+import 'package:provider/provider.dart';
+
+import 'image.dart';
 
 class Profile extends StatefulWidget {
   final LangameUser _user;
@@ -17,37 +22,51 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme colorScheme = theme.colorScheme;
     final Color appBarColor = theme.appBarTheme.color ?? theme.primaryColor;
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final provider = Provider.of<ProfileProvider>(context, listen: false);
     return Column(children: [
       ClipRRect(
-        borderRadius: BorderRadius.circular(100.0),
+        borderRadius: BorderRadius.circular(10.0),
         child: Container(
-          color: theme.appBarTheme.color!.withOpacity(0.8),
+          color: appBarColor.withOpacity(0.9),
+          height: 500,
+          width: 400,
+          padding: EdgeInsets.all(24),
           child: SizedBox(
-            height: 500,
-            width: 400,
-            child: Align(
-                alignment: Alignment.topCenter,
-                child: Column(
-                    // crossAxisAlignment: CrossAxisAlignment.center,
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      InkWell(
-                          onTap: () {},
-                          child: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              _user.photoUrl,
-                            ),
-                            radius: 50.0,
-                          )),
-                      Text(
-                        _user.displayName,
-                        style: theme.appBarTheme.textTheme!.headline4,
-                      )
-                    ])),
+            child: Stack(children: [
+              Align(
+                  alignment: Alignment.topRight,
+                  child: Material(
+                      child: IconButton(
+                    icon: Icon(Icons.settings),
+                    color: theme.appBarTheme.actionsIconTheme!.color,
+                    onPressed: () {
+                      provider.profileShown = false;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SettingsTwo()),
+                      );
+                    },
+                  ))),
+              Align(
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Material(
+                          child: InkWell(
+                            onTap: () {},
+                            child: buildRoundedNetworkImage(_user.photoUrl),
+                          ),
+                        ),
+                        Text(
+                          _user.displayName,
+                          style: theme.appBarTheme.textTheme!.headline4,
+                        )
+                      ]))
+            ]),
           ),
         ),
       ),

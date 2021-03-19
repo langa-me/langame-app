@@ -4,7 +4,7 @@
   "scripts": {
     "lint": "eslint .",
     "serve": "npm build -- --watch | firebase emulators:start",
-    "deploy": "firebase deploy --only functions --debug",
+    "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
   "engines": {

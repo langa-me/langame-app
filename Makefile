@@ -1,3 +1,4 @@
 proto:
-	rm -rf lib/protos/*.dart
-	protoc --dart_out=. lib/protos/api.proto
+	rm -rf lib/api/api.pb*
+	protoc --dart_out=lib api/api.proto
+	cp api/api.proto firebase/functions

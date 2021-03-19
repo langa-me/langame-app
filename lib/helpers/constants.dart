@@ -36,6 +36,11 @@ class AppConst {
 
   // Whether to log debug settings events
   static const bool debugSettings = false;
+
+  /// Define App ID and Token
+  static const agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
+  static const agoraToken =
+      '00604dbfdb7d4a349bf9b02758aabd97c78IACDZaxW7iTSrSlwDDVVj+Hu14xkzq/Rz+C6W+3XeI88wCFlc4wAAAAAEABfjXZE77pVYAEAAQDuulVg';
 }
 
 /// Fonts assets used in this application,

@@ -10,17 +10,22 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
+
+  # Firebase
   firebase_core: "^1.0.1"
   firebase_auth: "^1.0.1"
   cloud_firestore: "^1.0.1"
   cloud_functions: "^1.0.0"
+  firebase_messaging: "^9.0.0"
   google_sign_in: "^5.0.0"
   flutter_facebook_auth: "^3.0.0-nullsafety.1"
   sign_in_with_apple: "^3.0.0"
   crypto: "^3.0.0"
+
+
   provider: "^5.0.0"
   http: "^0.13.0"
-  after_layout: "^1.0.7+2"
+  after_layout: "^1.1.0"
   flutter_staggered_grid_view: "^0.3.4"
   flutter_sound: "^8.0.0+2"
   permission_handler: "^6.0.1"
@@ -31,16 +36,19 @@ dependencies:
   flutter_launcher_icons: "^0.9.0"
   async: "^2.4.0"
   fluttertoast: "^7.1.6"
+  agora_rtc_engine: "^3.3.1"
+  table_calendar: "3.0.0-nullsafety.1"
   flutter:
     sdk: flutter
 
 flutter_icons:
-  image_path_android: "images/chat-flat.png"
-  image_path_ios: "images/chat-flat.png"
+  image_path_android: "images/logo.png"
+  image_path_ios: "images/logo.png"
   android: true # can specify file name here e.g. "ic_launcher"
   ios: true # can specify file name here e.g. "My-Launcher-Icon"
 
 dev_dependencies:
+  test: ^1.16.8
   change_app_package_name: ^0.1.2
 
 #  flutter_test:

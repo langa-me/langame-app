@@ -6,7 +6,7 @@
 // import 'package:flutter/widgets.dart';
 // import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 // import 'package:langame/protos/api.pb.dart';
-// import 'package:langame/providers/interest_provider.dart';
+// import 'package:langame/providers/topic_provider.dart';
 // import 'package:provider/provider.dart';
 //
 // /// Setup the app for the user (interests, friends...)

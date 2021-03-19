@@ -3,8 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/providers/interest_provider.dart';
+import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/providers/setting_provider.dart';
+import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/views/setting_loader.dart';
 import 'package:provider/provider.dart';
 
@@ -14,8 +15,9 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => SettingProvider()),
-        ChangeNotifierProvider(create: (context) => InterestProvider()),
+        ChangeNotifierProvider(create: (context) => TopicProvider()),
         ChangeNotifierProvider(create: (context) => AuthenticationProvider()),
+        ChangeNotifierProvider(create: (context) => ProfileProvider()),
       ],
       child: MyApp(),
     ),
@@ -37,12 +39,14 @@ class _MyAppState extends State<MyApp> {
         theme: FlexColorScheme.light(
                 scheme: FlexScheme.ebonyClay,
                 fontFamily: AppFont.mainFont,
-                visualDensity: FlexColorScheme.comfortablePlatformDensity)
+                visualDensity: FlexColorScheme.comfortablePlatformDensity,
+                background: Colors.transparent)
             .toTheme,
         darkTheme: FlexColorScheme.dark(
                 scheme: FlexScheme.ebonyClay,
                 fontFamily: AppFont.mainFont,
-                visualDensity: FlexColorScheme.comfortablePlatformDensity)
+                visualDensity: FlexColorScheme.comfortablePlatformDensity,
+                background: Colors.transparent)
             .toTheme,
         home: SettingLoader(),
       );

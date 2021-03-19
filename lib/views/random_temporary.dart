@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:langame/protos/api.pb.dart';
+import 'package:langame/api/api.pb.dart';
+import 'package:langame/api/extension.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/views/profile.dart';
-import 'package:langame/views/settings.dart';
 import 'package:provider/provider.dart';
 
 import 'image.dart';
 import 'overlay.dart';
+import 'topic.dart';
 
 class RandomTemporary extends StatefulWidget {
   @override
@@ -15,75 +17,80 @@ class RandomTemporary extends StatefulWidget {
 
 /// Main page of Langame (temporary name...)
 class _RandomTemporaryState extends State<RandomTemporary> {
-  late LangameUser _user;
-  bool _showProfile = false;
+  LangameUser? _user;
+
   @override
   Widget build(BuildContext context) {
-    final items = List<String>.generate(10000, (i) => "Friend $i");
-
+    // final provider = Provider.of<ProfileProvider>(context, listen: false);
     return Scaffold(
-      appBar: AppBar(
-          leading:
-              Consumer<AuthenticationProvider>(builder: (context, a, child) {
-            // print('user ${a.user}');
-            _user = a.user;
-            return InkWell(
-                onTap: () {
-                  setState(() {
-                    _showProfile = !_showProfile;
-                  });
-                },
-                child: buildRoundedNetworkImage(a.user.photoUrl));
-          }),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                setState(() {
-                  _showProfile = false;
-                });
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsTwo()),
-                );
-              },
-            ),
-          ]),
-      body: AnchoredOverlay(
-          showOverlay: _showProfile,
-          overlayBuilder: (context, offset) {
-            return CenterAbout(
-              position: Offset(offset.dx, offset.dy),
-              child: Dismissible(
-                  direction: DismissDirection.vertical,
-                  key: const Key('key'),
-                  onDismissed: (_) {
-                    setState(() {
-                      _showProfile = false;
-                    });
+        appBar: AppBar(actions: <Widget>[
+          Consumer2<AuthenticationProvider, ProfileProvider>(builder:
+              (context, authenticationProvider, profileProvider, child) {
+            _user = authenticationProvider.user;
+            if (_user != null) {
+              return InkWell(
+                  onTap: () {
+                    profileProvider.profileShown =
+                        !profileProvider.profileShown;
                   },
-                  child: Column(children: [
-                    Profile(_user),
-                  ])),
-            );
-          },
-          child: GestureDetector(
+                  child: buildRoundedNetworkImage(_user!.photoUrl));
+            } else {
+              return IconButton(
+                  icon: Icon(Icons.account_circle), onPressed: () {});
+            }
+          })
+        ]),
+        body: Consumer<ProfileProvider>(
+            builder: (context, profileProvider, child) {
+          return AnchoredOverlay(
+            showOverlay: profileProvider.profileShown,
+            overlayBuilder: (context, offset) {
+              return CenterAbout(
+                position: Offset(offset.dx, offset.dy),
+                child: Dismissible(
+                    direction: DismissDirection.vertical,
+                    key: const Key('key'),
+                    onDismissed: (_) {
+                      profileProvider.profileShown = false;
+                    },
+                    child: Column(children: [
+                      _user != null ? Profile(_user!) : Scaffold(),
+                    ])),
+              );
+            },
+            child: GestureDetector(
               onTap: () {
-                setState(() {
-                  _showProfile = false;
-                });
+                profileProvider.profileShown = false;
               },
-              child: ListView.builder(
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: buildRoundedNetworkImage(
-                        'https://c.files.bbci.co.uk/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg'),
-                    title: Text('${items[index]}'),
-                  );
-                },
-              ))),
-      // child: Image.network('https://picsum.photos/250?image=9')),
-    );
+              child: Consumer<AuthenticationProvider>(
+                  builder: (context, a, child) {
+                return ListView.builder(
+                  itemCount: a.friends.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => TopicView()),
+                        );
+                      },
+                      leading: InkWell(
+                          onTap: () {
+                            print('should show profile');
+                          },
+                          child: buildRoundedNetworkImage(
+                              a.friends[index].friend.photoUrl,
+                              size: 50)),
+                      trailing: IconButton(
+                          icon: Icon(Icons.whatshot_rounded), onPressed: () {}),
+                      title: Text('${a.friends[index].friend.displayName}'),
+                      tileColor: a.friends[index].relation.toColor(),
+                    );
+                  },
+                );
+              }),
+            ),
+          );
+        }));
   }
 }

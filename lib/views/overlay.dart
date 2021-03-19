@@ -47,7 +47,7 @@ class OverlayBuilder extends StatefulWidget {
 }
 
 class _OverlayBuilderState extends State<OverlayBuilder> {
-  late OverlayEntry overlayEntry;
+  OverlayEntry? overlayEntry;
 
   @override
   void initState() {
@@ -87,17 +87,20 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     overlayEntry = new OverlayEntry(
       builder: widget.overlayBuilder,
     );
-    addToOverlay(overlayEntry);
+    addToOverlay(overlayEntry!);
   }
 
   void addToOverlay(OverlayEntry entry) async {
     print('addToOverlay');
-    Overlay.of(context)!.insert(entry);
+    Overlay.of(context)?.insert(entry);
   }
 
   void hideOverlay() {
     print('hideOverlay');
-    overlayEntry.remove();
+    if (overlayEntry != null) {
+      overlayEntry!.remove();
+      overlayEntry = null;
+    }
   }
 
   void syncWidgetAndOverlay() {

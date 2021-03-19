@@ -1,0 +1,39 @@
+syntax = "proto3";
+package api;
+
+// see https://github.com/firebase/firebase-admin-node/blob/master/src/auth/index.ts#L195
+message LangameUser {
+  string uid = 1;
+  string email = 2;
+  string display_name = 3;
+  bool email_verified = 4;
+  string phone_number = 5;
+  string photo_url = 6;
+}
+
+message TopicGroup {
+  string name = 1;
+  repeated string topics = 2;
+}
+
+message UserFriends {
+  string uid = 1;
+  repeated Friend friends = 2;
+}
+
+message Friend {
+  LangameUser friend = 1;
+  Relation relation = 2;
+}
+
+/// Evaluated relationship between users using AI + heuristics
+message Relation {
+  enum Level {
+    BAD = 0;
+    AVERAGE = 1;
+    GREAT = 2;
+  }
+  Level level = 1;
+  // Langame played together
+//  int64 interactions = 1;
+}
