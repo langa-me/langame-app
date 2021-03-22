@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:langame/api/api.pb.dart';
 
-extension relationToColor on Relation {
+extension relationExtensions on RelationLevel {
   Color? toColor() {
-    switch (this.level) {
-      case Relation_Level.BAD:
+    switch (this) {
+      case RelationLevel.BAD:
         return Colors.red;
-      case Relation_Level.AVERAGE:
+      case RelationLevel.AVERAGE:
         return Colors.yellow;
-      case Relation_Level.GREAT:
+      case RelationLevel.GREAT:
         return Colors.green;
     }
   }

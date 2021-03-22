@@ -21,6 +21,7 @@ class LangameUser extends $pb.GeneratedMessage {
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'emailVerified')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'phoneNumber')
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'photoUrl')
+    ..e<LangameUser_Status>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: LangameUser_Status.OFFLINE, valueOf: LangameUser_Status.valueOf, enumValues: LangameUser_Status.values)
     ..hasRequiredFields = false
   ;
 
@@ -32,6 +33,7 @@ class LangameUser extends $pb.GeneratedMessage {
     $core.bool? emailVerified,
     $core.String? phoneNumber,
     $core.String? photoUrl,
+    LangameUser_Status? status,
   }) {
     final _result = create();
     if (uid != null) {
@@ -51,6 +53,9 @@ class LangameUser extends $pb.GeneratedMessage {
     }
     if (photoUrl != null) {
       _result.photoUrl = photoUrl;
+    }
+    if (status != null) {
+      _result.status = status;
     }
     return _result;
   }
@@ -128,6 +133,15 @@ class LangameUser extends $pb.GeneratedMessage {
   $core.bool hasPhotoUrl() => $_has(5);
   @$pb.TagNumber(6)
   void clearPhotoUrl() => clearField(6);
+
+  @$pb.TagNumber(7)
+  LangameUser_Status get status => $_getN(6);
+  @$pb.TagNumber(7)
+  set status(LangameUser_Status v) { setField(7, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasStatus() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearStatus() => clearField(7);
 }
 
 class TopicGroup extends $pb.GeneratedMessage {
@@ -185,137 +199,27 @@ class TopicGroup extends $pb.GeneratedMessage {
   $core.List<$core.String> get topics => $_getList(1);
 }
 
-class UserFriends extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserFriends', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'uid')
-    ..pc<Friend>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'friends', $pb.PbFieldType.PM, subBuilder: Friend.create)
-    ..hasRequiredFields = false
-  ;
-
-  UserFriends._() : super();
-  factory UserFriends({
-    $core.String? uid,
-    $core.Iterable<Friend>? friends,
-  }) {
-    final _result = create();
-    if (uid != null) {
-      _result.uid = uid;
-    }
-    if (friends != null) {
-      _result.friends.addAll(friends);
-    }
-    return _result;
-  }
-  factory UserFriends.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory UserFriends.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  UserFriends clone() => UserFriends()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  UserFriends copyWith(void Function(UserFriends) updates) => super.copyWith((message) => updates(message as UserFriends)) as UserFriends; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static UserFriends create() => UserFriends._();
-  UserFriends createEmptyInstance() => create();
-  static $pb.PbList<UserFriends> createRepeated() => $pb.PbList<UserFriends>();
-  @$core.pragma('dart2js:noInline')
-  static UserFriends getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UserFriends>(create);
-  static UserFriends? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get uid => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set uid($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasUid() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearUid() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.List<Friend> get friends => $_getList(1);
-}
-
-class Friend extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Friend', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api'), createEmptyInstance: create)
-    ..aOM<LangameUser>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'friend', subBuilder: LangameUser.create)
-    ..aOM<Relation>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'relation', subBuilder: Relation.create)
-    ..hasRequiredFields = false
-  ;
-
-  Friend._() : super();
-  factory Friend({
-    LangameUser? friend,
-    Relation? relation,
-  }) {
-    final _result = create();
-    if (friend != null) {
-      _result.friend = friend;
-    }
-    if (relation != null) {
-      _result.relation = relation;
-    }
-    return _result;
-  }
-  factory Friend.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Friend.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  Friend clone() => Friend()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  Friend copyWith(void Function(Friend) updates) => super.copyWith((message) => updates(message as Friend)) as Friend; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static Friend create() => Friend._();
-  Friend createEmptyInstance() => create();
-  static $pb.PbList<Friend> createRepeated() => $pb.PbList<Friend>();
-  @$core.pragma('dart2js:noInline')
-  static Friend getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Friend>(create);
-  static Friend? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  LangameUser get friend => $_getN(0);
-  @$pb.TagNumber(1)
-  set friend(LangameUser v) { setField(1, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasFriend() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearFriend() => clearField(1);
-  @$pb.TagNumber(1)
-  LangameUser ensureFriend() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  Relation get relation => $_getN(1);
-  @$pb.TagNumber(2)
-  set relation(Relation v) { setField(2, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasRelation() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearRelation() => clearField(2);
-  @$pb.TagNumber(2)
-  Relation ensureRelation() => $_ensure(1);
-}
-
 class Relation extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Relation', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api'), createEmptyInstance: create)
-    ..e<Relation_Level>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: Relation_Level.BAD, valueOf: Relation_Level.valueOf, enumValues: Relation_Level.values)
+    ..aOM<LangameUser>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'firstUser', subBuilder: LangameUser.create)
+    ..aOM<LangameUser>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'secondUser', subBuilder: LangameUser.create)
+    ..e<RelationLevel>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: RelationLevel.BAD, valueOf: RelationLevel.valueOf, enumValues: RelationLevel.values)
     ..hasRequiredFields = false
   ;
 
   Relation._() : super();
   factory Relation({
-    Relation_Level? level,
+    LangameUser? firstUser,
+    LangameUser? secondUser,
+    RelationLevel? level,
   }) {
     final _result = create();
+    if (firstUser != null) {
+      _result.firstUser = firstUser;
+    }
+    if (secondUser != null) {
+      _result.secondUser = secondUser;
+    }
     if (level != null) {
       _result.level = level;
     }
@@ -343,12 +247,153 @@ class Relation extends $pb.GeneratedMessage {
   static Relation? _defaultInstance;
 
   @$pb.TagNumber(1)
-  Relation_Level get level => $_getN(0);
+  LangameUser get firstUser => $_getN(0);
   @$pb.TagNumber(1)
-  set level(Relation_Level v) { setField(1, v); }
+  set firstUser(LangameUser v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasLevel() => $_has(0);
+  $core.bool hasFirstUser() => $_has(0);
   @$pb.TagNumber(1)
-  void clearLevel() => clearField(1);
+  void clearFirstUser() => clearField(1);
+  @$pb.TagNumber(1)
+  LangameUser ensureFirstUser() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  LangameUser get secondUser => $_getN(1);
+  @$pb.TagNumber(2)
+  set secondUser(LangameUser v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasSecondUser() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSecondUser() => clearField(2);
+  @$pb.TagNumber(2)
+  LangameUser ensureSecondUser() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  RelationLevel get level => $_getN(2);
+  @$pb.TagNumber(3)
+  set level(RelationLevel v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasLevel() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearLevel() => clearField(3);
+}
+
+class LangameNotification extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LangameNotification', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+    ..aOM<LangameUser>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sender', subBuilder: LangameUser.create)
+    ..e<LangameNotification_Type>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: LangameNotification_Type.INVITATION, valueOf: LangameNotification_Type.valueOf, enumValues: LangameNotification_Type.values)
+    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'background')
+    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topic')
+    ..e<RelationLevel>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'relation', $pb.PbFieldType.OE, defaultOrMaker: RelationLevel.BAD, valueOf: RelationLevel.valueOf, enumValues: RelationLevel.values)
+    ..hasRequiredFields = false
+  ;
+
+  LangameNotification._() : super();
+  factory LangameNotification({
+    $core.String? id,
+    LangameUser? sender,
+    LangameNotification_Type? type,
+    $core.bool? background,
+    $core.String? topic,
+    RelationLevel? relation,
+  }) {
+    final _result = create();
+    if (id != null) {
+      _result.id = id;
+    }
+    if (sender != null) {
+      _result.sender = sender;
+    }
+    if (type != null) {
+      _result.type = type;
+    }
+    if (background != null) {
+      _result.background = background;
+    }
+    if (topic != null) {
+      _result.topic = topic;
+    }
+    if (relation != null) {
+      _result.relation = relation;
+    }
+    return _result;
+  }
+  factory LangameNotification.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory LangameNotification.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  LangameNotification clone() => LangameNotification()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  LangameNotification copyWith(void Function(LangameNotification) updates) => super.copyWith((message) => updates(message as LangameNotification)) as LangameNotification; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static LangameNotification create() => LangameNotification._();
+  LangameNotification createEmptyInstance() => create();
+  static $pb.PbList<LangameNotification> createRepeated() => $pb.PbList<LangameNotification>();
+  @$core.pragma('dart2js:noInline')
+  static LangameNotification getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LangameNotification>(create);
+  static LangameNotification? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  LangameUser get sender => $_getN(1);
+  @$pb.TagNumber(2)
+  set sender(LangameUser v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasSender() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSender() => clearField(2);
+  @$pb.TagNumber(2)
+  LangameUser ensureSender() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  LangameNotification_Type get type => $_getN(2);
+  @$pb.TagNumber(3)
+  set type(LangameNotification_Type v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasType() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearType() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get background => $_getBF(3);
+  @$pb.TagNumber(4)
+  set background($core.bool v) { $_setBool(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasBackground() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearBackground() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get topic => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set topic($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasTopic() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearTopic() => clearField(5);
+
+  @$pb.TagNumber(6)
+  RelationLevel get relation => $_getN(5);
+  @$pb.TagNumber(6)
+  set relation(RelationLevel v) { setField(6, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasRelation() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearRelation() => clearField(6);
 }
 

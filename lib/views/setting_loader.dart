@@ -2,6 +2,7 @@ import 'package:async/async.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/setting_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +16,7 @@ class SettingLoader extends StatefulWidget {
 class _SettingLoaderState extends State<SettingLoader> {
   @override
   Widget build(BuildContext context) {
+    AppSize(context);
     final provider = Provider.of<SettingProvider>(context, listen: false);
     FutureGroup f = FutureGroup();
     f.add(provider.load());

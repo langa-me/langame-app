@@ -1,196 +1,57 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:langame/api/api.pb.dart';
 import 'package:langame/helpers/functional.dart';
+import 'package:langame/models/errors.dart';
+import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
-import 'package:langame/views/schedule.dart';
+import 'package:langame/views/friends.dart';
+import 'package:provider/provider.dart';
 
 class TopicView extends StatefulWidget {
+  final LangameUser _user;
+  TopicView(this._user);
+
   @override
-  _TopicState createState() => _TopicState();
+  _TopicState createState() => _TopicState(_user);
 }
 
 class _TopicState extends State<TopicView> with AfterLayoutMixin<TopicView> {
-  late Future<Talks> _data;
   List<Widget> topicGroups = [];
-  TopicProvider provider = TopicProvider();
-  @override
-  void initState() {
-    super.initState();
-    provider.getAllTopics(); // TODO: doesn't load
+  late TopicProvider provider;
+  LangameUser _user;
 
-    // _data = _fetchTalks();
-  }
+  _TopicState(this._user);
 
   @override
   void afterFirstLayout(BuildContext context) {
-    // provider = Provider.of<TopicProvider>(context);
-
-    provider.topicStream.listen((event) {
-      topicGroups.add(TopicGroupCard(event));
-    });
+    Provider.of<TopicProvider>(context, listen: false).getAllTopics();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(), body: ListView(children: topicGroups));
-    // provider = Provider.of<TopicProvider>(context);
-    // return FutureBuilder<void>(
-    //     future: provider.getAllTopics(),
-    //     builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-    //       return StreamProvider<TopicGroup>.value(
-    //         value: provider.topicStream,
-    //         initialData: TopicGroup(),
-    //         child: Consumer<TopicGroup>(
-    //           builder: (context, TopicGroup data, w) {
-    //             print('doc: $data');
-    //             return Align(child: TopicGroupCard(data));
-    //           },
-    //         ),
-    //       );
-    //     });
-    // return StreamBuilder(
-    //     stream: provider.topicStream,
-    //     builder: (BuildContext context, AsyncSnapshot<TopicGroup> snapshot) {
-    //       List<Widget> children = <Widget>[];
-    //       if (snapshot.hasData) {
-    //         print(snapshot.data);
-    //         snapshot.data ?? children.add(TopicGroupCard(snapshot.data!));
-    //         print(children);
-    //       } else if (snapshot.hasError) {
-    //         children = <Widget>[
-    //           Icon(
-    //             Icons.error_outline,
-    //             color: Colors.red,
-    //             size: 60,
-    //           ),
-    //           Padding(
-    //             padding: const EdgeInsets.only(top: 16),
-    //             child: Text('Error: ${snapshot.error}'),
-    //           )
-    //         ];
-    //       } else {
-    //         children = <Widget>[
-    //           SizedBox(
-    //             child: CircularProgressIndicator(),
-    //             width: 60,
-    //             height: 60,
-    //           ),
-    //           const Padding(
-    //             padding: EdgeInsets.only(top: 16),
-    //             child: Text('Loading topics...'),
-    //           )
-    //         ];
-    //       }
-    //       return Center(
-    //         child: Column(
-    //           mainAxisAlignment: MainAxisAlignment.center,
-    //           crossAxisAlignment: CrossAxisAlignment.center,
-    //           children: children,
-    //         ),
-    //       );
-    //     });
-    // Column(children: [
-    //   Text('Recommendations'),
-    //   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-    //     _buildActionButton(theme, 'Philosophy'),
-    //     _buildActionButton(theme, 'Trans-humanism'),
-    //     _buildActionButton(theme, 'BCI'),
-    //   ]),
-    //   Text('Life'),
-    //   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-    //     _buildActionButton(theme, 'Philosophy'),
-    //     _buildActionButton(theme, 'Trans-humanism'),
-    //     _buildActionButton(theme, 'BCI'),
-    //   ]),
-    //   Text('Personal'),
-    //   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-    //     _buildActionButton(theme, 'Philosophy'),
-    //     _buildActionButton(theme, 'Philosophy'),
-    //     _buildActionButton(theme, 'Philosophy'),
-    //   ]),
-    // ]),
-    // );
-    // return FutureBuilder<Talks>(
-    //   future: _data,
-    //   builder: (context, snapshot) {
-    //     Widget? child;
-    //     if (snapshot.hasData) {
-    //       final d = snapshot.data!.basic
-    //           .map((e) => _buildActionButton(theme, e))
-    //           .toList();
-    //       child = ListView.builder(
-    //         itemCount: d.length,
-    //         itemBuilder: (context, index) {
-    //           return d[index];
-    //         },
-    //       );
-    //     } else if (snapshot.hasError) {
-    //       debugPrint("${snapshot.error}");
-    //     } else {
-    //       child = CircularProgressIndicator();
-    //     }
-    //     return Scaffold(
-    //       appBar: AppBar(),
-    //       body: child,
-    //     );
-    //   },
-    // );
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Send Langame to ${_user.displayName}'),
+        ),
+        body: Consumer<TopicProvider>(
+          builder: (context, t, child) {
+            return ListView(
+                children: t.topicGroups
+                    .map((e) => TopicGroupCard(e, _user))
+                    .toList());
+          },
+        ));
+
+    // return Scaffold(appBar: AppBar(), body: ListView(children: topicGroups));
   }
-
-  Future<Talks> _fetchTalks() async {
-    final res = await get(Uri.https('raw.githubusercontent.com',
-        'louis030195/big-talks/main/docs/big-talks.json'));
-
-    print(res.body);
-    if (res.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      return Talks.fromJson(jsonDecode(res.body));
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load talks');
-    }
-  }
-}
-
-class Talks {
-  List<String> basic = <String>[];
-
-  factory Talks.fromJson(Map<String, dynamic> json) {
-    return Talks(
-      List<String>.from(json['basic']),
-    );
-  }
-
-  Talks(this.basic);
-}
-
-Widget _buildActionButton(BuildContext context, ThemeData theme, String text) {
-  return TextButton(
-      style: ButtonStyle(
-          textStyle:
-              MaterialStateProperty.all<TextStyle>(theme.textTheme.button!),
-          backgroundColor: MaterialStateProperty.all<Color>(
-              Color((Random().nextDouble() * 0xFFFFFF).toInt())
-                  .withOpacity(0.5))),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ScheduleView()),
-        );
-      },
-      child: Text(text));
 }
 
 class TopicGroupCard extends StatelessWidget {
-  const TopicGroupCard(this.topicGroup);
+  const TopicGroupCard(this.topicGroup, this.user);
   final TopicGroup topicGroup;
+  final LangameUser user;
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -208,26 +69,16 @@ class TopicGroupCard extends StatelessWidget {
                           .topicGroup
                           .topics
                           .asChunk(
-                              3) // TODO: too big topics may depasser screen
+                              2) // TODO: too big topics may depasser screen
                           .map((e) => Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: e
                                     .map((e) =>
-                                        _buildActionButton(context, theme, e))
-                                    .intersperse(SizedBox(width: 20))
+                                        _buildButton(context, theme, e, user))
+                                    .intersperse(SizedBox(width: 5))
                                     .toList(),
                               ))
-                          .toList()
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: this
-                      //       .topicGroup
-                      //       .topics
-                      //       .map((e) => _buildActionButton(context, theme, e))
-                      //       .intersperse(SizedBox(width: 20))
-                      //       .toList(),
-                      // )
-                      ),
+                          .toList()),
                 ]),
                 decoration: BoxDecoration(
                   borderRadius:
@@ -236,4 +87,42 @@ class TopicGroupCard extends StatelessWidget {
               ))),
     );
   }
+
+  Widget _buildButton(
+      BuildContext context, ThemeData theme, String text, LangameUser user) {
+    return OutlinedButton.icon(
+        style: theme.textButtonTheme.style,
+        onPressed: () {
+          // TODO: send message to X, I send you a Langame
+          // and also make an api call or message triggered
+          // piece of code that find appropriate question
+          var messageProvider =
+              Provider.of<AuthenticationProvider>(context, listen: false);
+          messageProvider.send(text).then((e) {
+            final snackBar =
+                SnackBar(content: Text('Sent $text to ${user.displayName}'));
+
+            // Find the ScaffoldMessenger in the widget tree
+            // and use it to show a SnackBar.
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => FriendsView()),
+            );
+          }).catchError((err) {
+            final snackBar = SnackBar(
+                content: Text(
+                    'Failed to send $text to ${user.displayName}, ${(err as SendLangameException).cause}'));
+
+            // Find the ScaffoldMessenger in the widget tree
+            // and use it to show a SnackBar.
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }, test: (e) => e is SendLangameException);
+        },
+        icon: Icon(Icons.autorenew_outlined),
+        label: Text(text));
+  }
 }
+
+void clickTopic(String topic) {}

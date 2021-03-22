@@ -9,31 +9,42 @@ message LangameUser {
   bool email_verified = 4;
   string phone_number = 5;
   string photo_url = 6;
+  Status status = 7;
+  enum Status {
+    OFFLINE = 0;
+    ONLINE = 1;
+  }
 }
 
 message TopicGroup {
   string name = 1;
-  repeated string topics = 2;
-}
-
-message UserFriends {
-  string uid = 1;
-  repeated Friend friends = 2;
-}
-
-message Friend {
-  LangameUser friend = 1;
-  Relation relation = 2;
+  repeated string topics = 2; // TODO: maybe enum ? but if collaborative mode?
 }
 
 /// Evaluated relationship between users using AI + heuristics
 message Relation {
-  enum Level {
-    BAD = 0;
-    AVERAGE = 1;
-    GREAT = 2;
-  }
-  Level level = 1;
+  LangameUser first_user = 1;
+  LangameUser second_user = 2;
+  RelationLevel level = 3;
   // Langame played together
-//  int64 interactions = 1;
+  //  int64 interactions = 1;
+
+}
+
+enum RelationLevel { // TODO: temporary
+  BAD = 0;
+  AVERAGE = 1;
+  GREAT = 2;
+}
+
+message LangameNotification {
+  string id = 1;
+  LangameUser sender = 2;
+  Type type = 3;
+  bool background = 4;
+  string topic = 5;
+  RelationLevel relation = 6;
+  enum Type {
+    INVITATION = 0;
+  }
 }

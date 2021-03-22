@@ -38,6 +38,9 @@ dependencies:
   fluttertoast: "^7.1.6"
   agora_rtc_engine: "^3.3.1"
   table_calendar: "3.0.0-nullsafety.1"
+  badges: "2.0.0-nullsafety.1"
+  uuid: "^3.0.2"
+  quiver: "^3.0.0"
   flutter:
     sdk: flutter
 

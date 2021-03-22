@@ -1,6 +1,5 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/setting_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -21,11 +20,9 @@ class _SettingsTwoState extends State<SettingsTwo> {
       appBar: AppBar(),
       body: Container(
         child: ListView(
-          padding: const EdgeInsets.all(AppConst.edgePadding),
           children: <Widget>[
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: AppConst.edgePadding),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Consumer<SettingProvider>(builder: (context, s, child) {
                 return FlexThemeModeSwitch(
                   themeMode: s.theme,

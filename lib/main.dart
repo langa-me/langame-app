@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/providers/setting_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
@@ -18,6 +19,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => TopicProvider()),
         ChangeNotifierProvider(create: (context) => AuthenticationProvider()),
         ChangeNotifierProvider(create: (context) => ProfileProvider()),
+        ChangeNotifierProvider(create: (context) => FirestoreProvider()),
       ],
       child: MyApp(),
     ),

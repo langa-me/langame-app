@@ -1,12 +1,9 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/api/api.pb.dart';
+import 'package:langame/helpers/string.dart';
 import 'package:langame/models/errors.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -14,7 +11,7 @@ import 'authentication_api.dart';
 
 // TODO: ABSOLUTELY TEST
 class ImplAuthenticationApi implements AuthenticationApi {
-  Future<LangameUser> getUser(String uid, {double timeout = 5}) async {
+  Future<LangameUser?> getUser(String uid, {double timeout = 5}) async {
     HttpsCallable callable =
         FirebaseFunctions.instance.httpsCallable('getUser');
 
@@ -22,29 +19,22 @@ class ImplAuthenticationApi implements AuthenticationApi {
     final run = () async {
       HttpsCallableResult? results;
       try {
-        results = await callable.call(<String, dynamic>{
-          'uid': uid,
-        });
-        print(results.data);
-        print(results.data['result']['uid'] == null);
+        results = await callable.call();
         if (results.data['statusCode'] != 200 ||
-            results.data['result']['uid'] == null) return null;
+            results.data['result']['uid'] == null)
+          throw GetUserException('$errorCause');
         return Map<String, dynamic>.from(results.data['result']);
       } on FirebaseFunctionsException catch (e) {
-        print(e);
-
         throw GetUserException('$errorCause, err: ${e.message}');
       } catch (e) {
-        print(e);
-
         throw GetUserException('$errorCause, err: ${e.toString()}');
       }
     };
-    print('yolo');
     const delay = const Duration(milliseconds: 200);
     const maxAttempts = 5;
     var attempts = 0;
     Map<String, dynamic>? resultsAsMap = await run();
+    // Few re-tries because Firebase after auth hook need to be executed before
     while (resultsAsMap == null && attempts < maxAttempts) {
       resultsAsMap = await run();
       attempts++;
@@ -66,12 +56,14 @@ class ImplAuthenticationApi implements AuthenticationApi {
 
   @override
   Future<LangameUser?> loginWithApple() async {
+    throw UnimplementedError('nop');
+
     // To prevent replay attacks with the credential returned from Apple, we
     // include a nonce in the credential request. When signing in in with
     // Firebase, the nonce in the id token returned by Apple, is expected to
     // match the sha256 hash of `rawNonce`.
-    final rawNonce = _generateNonce();
-    final nonce = _sha256ofString(rawNonce);
+    final rawNonce = generateNonce();
+    final nonce = sha256ofString(rawNonce);
 
     // Request credential for the currently signed in Apple account.
     final appleCredential = await SignInWithApple.getAppleIDCredential(
@@ -91,11 +83,12 @@ class ImplAuthenticationApi implements AuthenticationApi {
     // Sign in the user with Firebase. If the nonce we generated earlier does
     // not match the nonce in `appleCredential.identityToken`, sign in will fail.
     await FirebaseAuth.instance.signInWithCredential(oauthCredential);
-    throw UnimplementedError('nop');
   }
 
   @override
   Future<LangameUser?> loginWithFacebook() async {
+    throw UnimplementedError('nop');
+
     // Trigger the sign-in flow
     final AccessToken? result = await FacebookAuth.instance.login();
     if (result != null) {
@@ -153,26 +146,26 @@ class ImplAuthenticationApi implements AuthenticationApi {
     return getUser(u.user!.uid);
   }
 
-  /// Generates a cryptographically secure random nonce, to be included in a
-  /// credential request.
-  String _generateNonce([int length = 32]) {
-    final charset =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-    final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
-  }
-
-  /// Returns the sha256 hash of [input] in hex notation.
-  String _sha256ofString(String input) {
-    final bytes = utf8.encode(input);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
   @override
-  Future<List<Friend>> getFriends(String uid) {
-    // TODO: implement getFriends
+  Future<List<Relation>> getFriends(String uid) async {
     throw UnimplementedError();
+    // TODO: just search firestore and filter relation for this user
+    // HttpsCallable callable =
+    //     FirebaseFunctions.instance.httpsCallable('getUserFriends');
+    // try {
+    //   final HttpsCallableResult results = await callable.call();
+    //   if (results.data['statusCode'] != 200 ||
+    //       results.data['result']['uid'] == null)
+    //     throw GetUserFriendsException('could not find any friends');
+    //   var friends =
+    //       Map<String, dynamic>.from(results.data['result'])['friends'];
+    //   if (friends == null) // TODO: may just be no friend!
+    //     throw GetUserFriendsException('could not find any friends');
+    //   return UserFriends(uid: uid, friends: friends);
+    // } on FirebaseFunctionsException catch (e) {
+    //   throw GetUserFriendsException('err: ${e.message}');
+    // } catch (e) {
+    //   throw GetUserFriendsException('err: ${e.toString()}');
+    // }
   }
 }

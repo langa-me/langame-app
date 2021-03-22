@@ -69,6 +69,7 @@ exports.getUserFriends = functions.https.onCall(async (data, context) => {
   if (context.auth === null) {
     return {result: null, statusCode: 401};
   }
+  // Retrieve the user
   const readResult = await admin.firestore().collection("users")
     .doc(context.auth.uid).get();
   console.log("get", context.auth.uid, {
@@ -81,13 +82,14 @@ exports.getUserFriends = functions.https.onCall(async (data, context) => {
   return {
     result:
       {
-        "uid": readResult.get("uid"),
-        "email": readResult.get("email"),
-        "displayName": readResult.get("displayName"),
-        "emailVerified": readResult.get("emailVerified"),
-        "phoneNumber": readResult.get("phoneNumber"),
-        "photoUrl": readResult.get("photoUrl"),
+        "friends": readResult.get("friends"),
       },
     statusCode: 200,
   };
+});
+
+exports.sendLangame = functions.https.onCall(async (data, context) => {
+  // TODO: cloud messaging
+  // TODO: firestore append notification
+  //
 });
