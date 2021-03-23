@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/src/material/app.dart';
+import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

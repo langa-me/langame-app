@@ -1,4 +1,4 @@
-import 'package:langame/api/api.pb.dart';
+import 'package:langame/models/topic.dart';
 
 import 'topic_api.dart';
 

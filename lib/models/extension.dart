@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:langame/api/api.pb.dart';
+import 'package:langame/models/user.dart';
 
 extension relationExtensions on RelationLevel {
   Color? toColor() {

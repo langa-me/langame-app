@@ -1,8 +1,9 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/api/api.pb.dart';
 import 'package:langame/helpers/functional.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/topic.dart';
+import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/views/friends.dart';

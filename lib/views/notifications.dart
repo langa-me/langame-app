@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:langame/api/extension.dart';
+import 'package:langame/models/extension.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/views/langame.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +17,9 @@ class _NotificationsViewState extends State<NotificationsView> {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Notifications')),
+      appBar: AppBar(
+          title: Text('Notifications'),
+          backgroundColor: theme.colorScheme.primary),
       body: Consumer<AuthenticationProvider>(
         builder: (BuildContext context, p, c) {
           return ListView.builder(
@@ -54,10 +56,10 @@ class _NotificationsViewState extends State<NotificationsView> {
       child: Card(
         child: ListTile(
           leading: buildCroppedRoundedNetworkImage(
-              p.notifications[i].sender.photoUrl),
-          title: Text(p.notifications[i].sender.displayName),
+              p.notifications[i].relation.other.photoUrl!),
+          title: Text(p.notifications[i].relation.other.displayName!),
           subtitle: Text(p.notifications[i].topic),
-          tileColor: Color.lerp(p.notifications[i].relation.toColor(),
+          tileColor: Color.lerp(p.notifications[i].relation.level.toColor(),
               theme.colorScheme.primary, 0.5),
           onTap: () {
             Navigator.pushReplacement(

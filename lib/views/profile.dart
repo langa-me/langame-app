@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/api/api.pb.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/user.dart';
 import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/views/settings.dart';
 import 'package:provider/provider.dart';
@@ -56,10 +56,10 @@ class _ProfileState extends State<Profile> {
                       // crossAxisAlignment: CrossAxisAlignment.center,
                       // mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        buildCroppedRoundedNetworkImage(_user.photoUrl,
+                        buildCroppedRoundedNetworkImage(_user.photoUrl!,
                             width: AppSize.blockSizeHorizontal * 30),
                         Text(
-                          _user.displayName,
+                          _user.displayName!,
                           style: theme.appBarTheme.textTheme!.headline4,
                         )
                       ]))

@@ -4,8 +4,9 @@ import 'dart:collection';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/api/api.pb.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/notification.dart';
+import 'package:langame/models/user.dart';
 import 'package:langame/services/http/authentication_api.dart';
 import 'package:langame/services/http/fake_authentication_api.dart';
 import 'package:langame/services/http/fake_message_api.dart';
@@ -23,21 +24,26 @@ class LoginResponse {
 enum LoginStatus { cancelled, failed, succeed }
 
 class AuthenticationProvider extends ChangeNotifier {
+  /// Authentication, relations, users ///
+
   /// Defines whether it's fake API or real
   bool _fakeAuthenticationApi = true;
   late AuthenticationApi _authenticationApi;
+  late Stream<User?> _firebaseUserStream;
   LangameUser? _user;
-
   LangameUser? get user {
+    // TODO: pipe firebase stream to langame user stream
     return _user;
   }
 
-  List<Relation> _relations = <Relation>[];
+  LangameUserRelations? _relations;
 
   /// Known people = friends, only this use relations
-  List<Relation> get relations {
+  LangameUserRelations? get relations {
     return _relations;
   }
+
+  /// Messages, notifications ///
 
   /// Defines whether it's fake API or real
   bool _fakeMessageApi = true;
@@ -72,39 +78,73 @@ class AuthenticationProvider extends ChangeNotifier {
     return f;
   }
 
-  Future<LoginResponse> _loginWith(Future<LangameUser?> Function() fn) async {
+  Future<LoginResponse> _loginWith(OAuthCredential credential) async {
     try {
-      _user = await fn();
-    } on GetUserException catch (e) {
+      _firebaseUserStream =
+          await _authenticationApi.loginWithFirebase(credential);
+    } on FirebaseAuthException catch (e) {
+      return LoginResponse(LoginStatus.failed, errorMessage: e.code);
+    } on FirebaseSignInException catch (e) {
       return LoginResponse(LoginStatus.failed, errorMessage: e.cause);
+    } catch (e) {
+      return LoginResponse(LoginStatus.failed, errorMessage: e.toString());
     }
-    if (_user == null) return LoginResponse(LoginStatus.cancelled);
+    User? u = await _firebaseUserStream.first;
+    if (u == null)
+      return LoginResponse(LoginStatus.failed,
+          errorMessage: 'failed to get user from Firebase');
+    LangameUser? langameUser = await _authenticationApi.getLangameUser(u.uid);
+    try {
+      if (langameUser == null) await _authenticationApi.addLangameUser(u);
+    } on AddUserException catch (e) {
+      LoginResponse(LoginStatus.failed, errorMessage: e.cause);
+    } catch (e) {
+      LoginResponse(LoginStatus.failed, errorMessage: e.toString());
+    }
     // Once authenticated, get friends
-    var getFriendsResponse = await getFriends();
+    var getRelationsResponse = await getRelations();
     // If it failed, return
-    if (getFriendsResponse.status != LoginStatus.succeed)
-      return getFriendsResponse;
+    if (getRelationsResponse.status != LoginStatus.succeed)
+      return getRelationsResponse;
     // Otherwise update UI and return succeed
     notifyListeners();
     return LoginResponse(LoginStatus.succeed);
   }
 
+  Future<LoginResponse> loginWithApple() async {
+    return _authenticationApi
+        .loginWithApple()
+        .then(_loginWith)
+        .catchError(() => LoginResponse(LoginStatus.cancelled),
+            test: (e) => e is AppleSignInException)
+        .catchError((err) =>
+            LoginResponse(LoginStatus.failed, errorMessage: err.cause));
+  }
+
   Future<LoginResponse> loginWithFacebook() async {
-    return _loginWith(_authenticationApi.loginWithFacebook);
+    return _authenticationApi
+        .loginWithFacebook()
+        .then(_loginWith)
+        .catchError(() => LoginResponse(LoginStatus.cancelled),
+            test: (e) => e is FacebookSignInException)
+        .catchError((err) =>
+            LoginResponse(LoginStatus.failed, errorMessage: err.cause));
   }
 
   Future<LoginResponse> loginWithGoogle() async {
-    return _loginWith(_authenticationApi.loginWithGoogle);
+    return _authenticationApi
+        .loginWithGoogle()
+        .then(_loginWith)
+        .catchError(() => LoginResponse(LoginStatus.cancelled),
+            test: (e) => e is GoogleSignInException)
+        .catchError((err) =>
+            LoginResponse(LoginStatus.failed, errorMessage: err.cause));
   }
 
-  Future<LoginResponse> loginWithApple() async {
-    return _loginWith(_authenticationApi.loginWithApple);
-  }
-
-  Future<LoginResponse> getFriends() async {
+  Future<LoginResponse> getRelations() async {
     if (_user != null) {
       try {
-        _relations = (await _authenticationApi.getFriends(_user!.uid));
+        _relations = (await _authenticationApi.getRelations(_user!));
         return LoginResponse(LoginStatus.succeed);
       } on GetUserFriendsException catch (e) {
         return LoginResponse(LoginStatus.failed, errorMessage: e.cause);
@@ -115,7 +155,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   /// Create an authentication provider, and
   AuthenticationProvider(
-      {bool fakeAuthentication = true,
+      {bool fakeAuthentication = false,
       bool fakeMessage = true,
       bool emulator = false}) {
     _fakeAuthenticationApi = fakeAuthentication;

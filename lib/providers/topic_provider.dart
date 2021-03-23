@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:langame/api/api.pb.dart';
+import 'package:langame/models/topic.dart';
 import 'package:langame/services/http/fake_topic_api.dart';
 import 'package:langame/services/http/impl_topic_api.dart';
 import 'package:langame/services/http/topic_api.dart';

@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:langame/api/api.pb.dart';
+import 'package:langame/models/notification.dart';
 import 'package:langame/services/http/message_api.dart';
 
 class ImplMessageApi extends MessageApi {
@@ -15,24 +14,24 @@ class ImplMessageApi extends MessageApi {
   @override
   void receive() {
     throw UnimplementedError();
-    // https://firebase.flutter.dev/docs/messaging/usage#handling-messages
-    Future<void> _firebaseMessagingBackgroundHandler(
-        RemoteMessage message) async {
-      print("background message: ${message.toString()}");
-      // TODO: get user from message.senderId
-      add(LangameNotification(
-          type: LangameNotification_Type.INVITATION, background: false));
-    }
-
-    Future<void> _firebaseMessagingForegroundHandler(
-        RemoteMessage message) async {
-      print('foreground message: ${message.toString()}');
-      add(LangameNotification(
-          type: LangameNotification_Type.INVITATION, background: true));
-    }
-
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
+    // // https://firebase.flutter.dev/docs/messaging/usage#handling-messages
+    // Future<void> _firebaseMessagingBackgroundHandler(
+    //     RemoteMessage message) async {
+    //   print("background message: ${message.toString()}");
+    //   // TODO: get user from message.senderId
+    //   add(LangameNotification(
+    //       type: LangameNotification_Type.INVITATION, background: false));
+    // }
+    //
+    // Future<void> _firebaseMessagingForegroundHandler(
+    //     RemoteMessage message) async {
+    //   print('foreground message: ${message.toString()}');
+    //   add(LangameNotification(
+    //       type: LangameNotification_Type.INVITATION, background: true));
+    // }
+    //
+    // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
   }
 
   @override

@@ -17,7 +17,9 @@ class _SettingsTwoState extends State<SettingsTwo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
       body: Container(
         child: ListView(
           children: <Widget>[

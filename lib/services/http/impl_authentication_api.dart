@@ -1,171 +1,129 @@
-import 'package:cloud_functions/cloud_functions.dart';
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:langame/api/api.pb.dart';
-import 'package:langame/helpers/string.dart';
+import 'package:http/http.dart';
 import 'package:langame/models/errors.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:langame/models/user.dart';
 
 import 'authentication_api.dart';
 
 // TODO: ABSOLUTELY TEST
 class ImplAuthenticationApi implements AuthenticationApi {
-  Future<LangameUser?> getUser(String uid, {double timeout = 5}) async {
-    HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('getUser');
-
-    const errorCause = 'could not get user';
-    final run = () async {
-      HttpsCallableResult? results;
-      try {
-        results = await callable.call();
-        if (results.data['statusCode'] != 200 ||
-            results.data['result']['uid'] == null)
-          throw GetUserException('$errorCause');
-        return Map<String, dynamic>.from(results.data['result']);
-      } on FirebaseFunctionsException catch (e) {
-        throw GetUserException('$errorCause, err: ${e.message}');
-      } catch (e) {
-        throw GetUserException('$errorCause, err: ${e.toString()}');
-      }
-    };
-    const delay = const Duration(milliseconds: 200);
-    const maxAttempts = 5;
-    var attempts = 0;
-    Map<String, dynamic>? resultsAsMap = await run();
-    // Few re-tries because Firebase after auth hook need to be executed before
-    while (resultsAsMap == null && attempts < maxAttempts) {
-      resultsAsMap = await run();
-      attempts++;
-      print('attempt n°$attempts/$maxAttempts');
-      await Future.delayed(delay);
-    }
-    if (resultsAsMap == null) {
-      throw GetUserException(errorCause);
-    }
-    return LangameUser(
-      uid: resultsAsMap['uid'],
-      email: resultsAsMap['email'],
-      displayName: resultsAsMap['displayName'],
-      emailVerified: resultsAsMap['emailVerified'],
-      phoneNumber: resultsAsMap['phoneNumber'],
-      photoUrl: resultsAsMap['photoUrl'],
-    );
-  }
+  GoogleSignInAccount? _google;
+  // FacebookUser? _facebook;
+  // AppleUser? _apple;
+  String kFirestoreUsersCollection = 'users';
 
   @override
-  Future<LangameUser?> loginWithApple() async {
+  Future<OAuthCredential> loginWithApple() async {
     throw UnimplementedError('nop');
-
-    // To prevent replay attacks with the credential returned from Apple, we
-    // include a nonce in the credential request. When signing in in with
-    // Firebase, the nonce in the id token returned by Apple, is expected to
-    // match the sha256 hash of `rawNonce`.
-    final rawNonce = generateNonce();
-    final nonce = sha256ofString(rawNonce);
-
-    // Request credential for the currently signed in Apple account.
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: nonce,
-    );
-
-    // Create an `OAuthCredential` from the credential returned by Apple.
-    final oauthCredential = OAuthProvider("apple.com").credential(
-      idToken: appleCredential.identityToken,
-      rawNonce: rawNonce,
-    );
-
-    // Sign in the user with Firebase. If the nonce we generated earlier does
-    // not match the nonce in `appleCredential.identityToken`, sign in will fail.
-    await FirebaseAuth.instance.signInWithCredential(oauthCredential);
   }
 
   @override
-  Future<LangameUser?> loginWithFacebook() async {
+  Future<OAuthCredential> loginWithFacebook() async {
+    // TODO: https://developers.facebook.com/docs/permissions/reference/user_friends
     throw UnimplementedError('nop');
-
-    // Trigger the sign-in flow
-    final AccessToken? result = await FacebookAuth.instance.login();
-    if (result != null) {
-      // Create a credential from the access token
-      final OAuthCredential facebookAuthCredential =
-          FacebookAuthProvider.credential(result.token!);
-
-      await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
-      final data = await FacebookAuth.instance.getUserData();
-      // final users = FirebaseFirestore.instance.collection('users');
-      // final firestoreUser = await users.doc(data['email']).get();
-      // TODO: call cloud function, get langame user return
-      print(data);
-      return null;
-      // if (firestoreUser.exists) {
-      //   // TODO: not really beautiful (string -> map -> string -> object)
-      //   return LangameUser.fromJson(jsonEncode(firestoreUser.data()));
-      // }
-      // // https://developers.facebook.com/docs/permissions/reference
-      // final newUser = LangameUser(
-      //     username: data['username'],
-      //     firstName: data['first_name'],
-      //     lastName: data['last_name'],
-      //     email: data['email']);
-      // await users.add(newUser.writeToJsonMap());
-      // return newUser;
-    }
-    return null;
   }
 
   @override
-  Future<LangameUser?> loginWithGoogle() async {
+  Future<OAuthCredential> loginWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount? googleUser = await GoogleSignIn(scopes: <String>[
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly'
+    ]).signIn();
 
     // If Google Auth cancelled
-    if (googleUser == null) return null;
+    if (googleUser == null)
+      throw GoogleSignInException('authentication likely have been cancelled');
+
+    _google = googleUser;
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
 
     // Create a new credential
-    final OAuthCredential credential = GoogleAuthProvider.credential(
+    return GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-
-    // Once signed in, return the UserCredential
-    final UserCredential u =
-        await FirebaseAuth.instance.signInWithCredential(credential);
-
-    if (u.user == null) return null;
-
-    return getUser(u.user!.uid);
   }
 
   @override
-  Future<List<Relation>> getFriends(String uid) async {
-    throw UnimplementedError();
-    // TODO: just search firestore and filter relation for this user
-    // HttpsCallable callable =
-    //     FirebaseFunctions.instance.httpsCallable('getUserFriends');
-    // try {
-    //   final HttpsCallableResult results = await callable.call();
-    //   if (results.data['statusCode'] != 200 ||
-    //       results.data['result']['uid'] == null)
-    //     throw GetUserFriendsException('could not find any friends');
-    //   var friends =
-    //       Map<String, dynamic>.from(results.data['result'])['friends'];
-    //   if (friends == null) // TODO: may just be no friend!
-    //     throw GetUserFriendsException('could not find any friends');
-    //   return UserFriends(uid: uid, friends: friends);
-    // } on FirebaseFunctionsException catch (e) {
-    //   throw GetUserFriendsException('err: ${e.message}');
-    // } catch (e) {
-    //   throw GetUserFriendsException('err: ${e.toString()}');
-    // }
+  Future<Stream<User?>> loginWithFirebase(OAuthCredential credential) async {
+    var f = Future.value(FirebaseAuth.instance.authStateChanges());
+    f.then((value) {
+      FirebaseAuth.instance.signInWithCredential(credential);
+    });
+    return f;
+  }
+
+  @override
+  Future<LangameUserRelations> getRelations(LangameUser user) async {
+    // var appleRelations =
+    //     _apple != null ? await _getAppleRelations(_apple!) : <Relation>[];
+    // var facebookRelations = _facebook != null
+    //     ? await _getFacebookRelations(_facebook!)
+    //     : <Relation>[];
+    // TODO: merge somehow the three
+    var googleRelations =
+        _google != null ? await _getGoogleRelations(_google!) : <Relation>[];
+    return LangameUserRelations(user, googleRelations);
+  }
+
+  // Future<List<Relation>> _getAppleRelations(AppleUser user) async {
+  //   throw UnimplementedError();
+  // }
+  //
+  // Future<List<Relation>> _getFacebookRelations(FacebookUser user) async {
+  //   throw UnimplementedError();
+  // }
+
+  Future<List<Relation>> _getGoogleRelations(GoogleSignInAccount user) async {
+    var result = <Relation>[];
+    final Response response = await get(
+      Uri.parse('https://people.googleapis.com/v1/people/me/connections'
+          '?requestMask.includeField=person.names'),
+      headers: await user.authHeaders,
+    );
+    if (response.statusCode != 200) {
+      print('People API ${response.statusCode} response: ${response.body}');
+      return result;
+    }
+    final Map<String, dynamic> data = json.decode(response.body);
+    final List<dynamic>? connections = data['connections'];
+    if (connections == null) return result;
+    var contacts = connections.where((c) => c['names'] != null);
+    // TODO: check if contact already has an account on the app (firestore) using email
+    result.addAll(contacts
+        .where((c) => c['displayName'] != null)
+        .map((c) => Relation(LangameUser(displayName: c))));
+    return result;
+  }
+
+  /// Query Firestore with [uid] looking for a LangameUser
+  /// Throw GetUserException if it does not exist
+  /// TODO: might use a transaction?
+  Future<LangameUser?> getLangameUser(String uid) async {
+    CollectionReference users =
+        FirebaseFirestore.instance.collection(kFirestoreUsersCollection);
+    DocumentSnapshot doc = await users.doc(uid).get();
+    if (!doc.exists) return null;
+    var data = doc.data();
+    if (data == null) return null;
+    return LangameUser.fromJson(data);
+  }
+
+  Future<LangameUser> addLangameUser(User user) async {
+    CollectionReference users =
+        FirebaseFirestore.instance.collection(kFirestoreUsersCollection);
+    LangameUser langameUser = LangameUser.fromFirebaseUser(user);
+    return users
+        .add(langameUser.toJson())
+        .then((value) => langameUser)
+        .catchError((err) => throw AddUserException(err.toString()));
   }
 }

@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:langame/api/api.pb.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/notification.dart';
+import 'package:langame/models/user.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/services/http/fake_authentication_api.dart';
 import 'package:langame/services/http/message_api.dart';
@@ -35,22 +36,20 @@ class FakeMessageApi extends MessageApi {
 
   LangameNotification _fakeNotification() {
     var r = Random().nextDouble();
-    var sender = r < 0.3
-        ? getLarryPage()
-        : r < 0.6
-            ? getMarkZuckerberg()
-            : getSteveJobs();
+    var sender = faang.pickAny();
+
     return LangameNotification(
-        id: uuid.v4(),
-        sender: sender,
-        type: LangameNotification_Type.INVITATION,
-        background: r > 0.5,
-        topic: hardcodedTopics.pickAny(),
-        relation: r < 0.3
-            ? RelationLevel.GREAT
-            : r < 0.6
-                ? RelationLevel.AVERAGE
-                : RelationLevel.BAD);
+      uuid.v4(),
+      Relation(sender!,
+          level: <RelationLevel>[
+            RelationLevel.GREAT,
+            RelationLevel.AVERAGE,
+            RelationLevel.BAD
+          ].pickAny()!),
+      hardcodedTopics.pickAny()!,
+      type: LangameNotificationType.INVITATION,
+      background: r > 0.5,
+    );
   }
 
   @override

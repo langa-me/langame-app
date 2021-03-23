@@ -11,10 +11,17 @@ message LangameUser {
   string phone_number = 5;
   string photo_url = 6;
   Status status = 7;
+  // Twitter-like tag i.e. @steveTheApple
+  string tag = 8;
   enum Status {
     OFFLINE = 0;
     ONLINE = 1;
   }
+}
+
+message LangameUserRelation {
+    LangameUser user = 1;
+    repeated Relation relations = 2;
 }
 
 message TopicGroup {
@@ -24,12 +31,10 @@ message TopicGroup {
 
 /// Evaluated relationship between users using AI + heuristics
 message Relation {
-  LangameUser first_user = 1;
-  LangameUser second_user = 2;
-  RelationLevel level = 3;
+  LangameUser other = 1;
+  RelationLevel level = 2;
   // Langame played together
   //  int64 interactions = 1;
-
 }
 
 enum RelationLevel { // TODO: temporary
@@ -40,11 +45,10 @@ enum RelationLevel { // TODO: temporary
 
 message LangameNotification {
   string id = 1;
-  LangameUser sender = 2;
+  Relation relation = 2;
   Type type = 3;
   bool background = 4;
   string topic = 5;
-  RelationLevel relation = 6;
   enum Type {
     INVITATION = 0;
   }

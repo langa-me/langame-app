@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:langame/api/api.pb.dart';
+import 'package:langame/models/notification.dart';
 
 abstract class MessageApi {
   MessageApi(this.add) {
