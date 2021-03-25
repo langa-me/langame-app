@@ -20,7 +20,7 @@ admin.initializeApp();
 //   return null;
 // };
 //
-// exports.onAuthCreate = functions.auth.user().onCreate(async (user) => {
+// exports.onAuthCreate = functions.auth.user().onCreate(async (user) => { // TODO: send mail
 //   const userDoc = {
 //     "uid": user.uid,
 //     "email": user.email,
@@ -93,3 +93,7 @@ admin.initializeApp();
 //   // TODO: firestore append notification
 //   //
 // });
+
+if (process.env.FUNCTIONS_EMULATOR && process.env.FIRESTORE_EMULATOR_HOST) {
+  // TODO: prepopulate firestore emulator from 'yourproject/src/sample_data.json
+}

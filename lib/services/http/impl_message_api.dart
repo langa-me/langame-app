@@ -13,7 +13,7 @@ class ImplMessageApi extends MessageApi {
 
   @override
   void receive() {
-    throw UnimplementedError();
+    // throw UnimplementedError();
     // // https://firebase.flutter.dev/docs/messaging/usage#handling-messages
     // Future<void> _firebaseMessagingBackgroundHandler(
     //     RemoteMessage message) async {
@@ -35,8 +35,13 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  void get() {
+  void stopReceiving() {
     throw UnimplementedError();
+  }
+
+  @override
+  void get() {
+    // throw UnimplementedError();
   }
 
   @override

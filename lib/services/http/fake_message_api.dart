@@ -13,6 +13,7 @@ import 'package:uuid/uuid.dart';
 class FakeMessageApi extends MessageApi {
   FakeMessageApi(Function(LangameNotification) add) : super(add);
   var uuid = Uuid();
+  Timer? _timer;
   @override
   Future send(String topic) async {
     if (Random().nextDouble() > 0.5) throw SendLangameException('FAIL');
@@ -23,10 +24,15 @@ class FakeMessageApi extends MessageApi {
     var r = Random();
     var delay = Duration(seconds: 5 + r.nextInt(10));
 
-    Timer.periodic(delay, (timer) {
+    _timer = Timer.periodic(delay, (timer) {
       add(_fakeNotification());
       delay = Duration(seconds: 5 + r.nextInt(10));
     });
+  }
+
+  @override
+  void stopReceiving() {
+    _timer?.cancel();
   }
 
   @override

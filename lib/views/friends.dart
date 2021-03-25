@@ -43,7 +43,7 @@ class _FriendsViewState extends State<FriendsView> {
   void initState() {
     super.initState();
     controller = FloatingSearchBarController();
-    filteredSearchHistory = filterSearchTerms(filter: null);
+    filterSearchTerms(filter: null).then((v) => filteredSearchHistory);
   }
 
   @override
@@ -96,9 +96,12 @@ class _FriendsViewState extends State<FriendsView> {
   }
 
   Widget _buildBody(ThemeData theme) {
+    /// Friends tab
     if (_selectedIndex == 1) {
       return _buildSearchFriends();
     }
+
+    /// Home tab
     return Consumer<ProfileProvider>(
         builder: (context, profileProvider, child) {
       return AnchoredOverlay(
@@ -122,10 +125,24 @@ class _FriendsViewState extends State<FriendsView> {
             profileProvider.profileShown = false;
           },
           child: Consumer<AuthenticationProvider>(builder: (context, a, child) {
+            var noLangameRelations = Center(
+                // TODO: animate search, show random ppl
+                child: Text('No friends on Langame yet?\nInvite them!',
+                    style: theme.textTheme.headline5,
+                    textAlign: TextAlign.center));
+            if (a.relations == null) {
+              return noLangameRelations;
+            }
+            // Filter-out external relations
+            var langameRelations =
+                a.relations!.relations.where((e) => e.other.isALangameUser);
+            if (langameRelations.length == 0) {
+              return noLangameRelations;
+            }
             return ListView.separated(
               separatorBuilder: (BuildContext context, int index) {
                 return SizedBox(height: 4);
-              }, // TODO: if relations null do ..
+              },
               itemCount: a.relations!.relations.length,
               padding: EdgeInsets.all(4.0),
               itemBuilder: (context, index) {
@@ -138,19 +155,25 @@ class _FriendsViewState extends State<FriendsView> {
     });
   }
 
-  List<String> filterSearchTerms({
+  Future<List<String>> filterSearchTerms({
     String? filter,
-  }) {
+  }) async {
     if (filter != null && filter.isNotEmpty) {
-      return _searchHistory.reversed
-          .where((term) => term.startsWith(filter))
-          .toList();
-    } else {
-      return _searchHistory.reversed.toList();
+      List<LangameUser> r =
+          await Provider.of<AuthenticationProvider>(context, listen: false)
+              .getLangameUsersStartingWithTag(filter);
+      return r.map((e) => e.tag!).toList();
     }
+    return _searchHistory.reversed.toList();
+    //   return _searchHistory.reversed
+    //       .where((term) => term.startsWith(filter))
+    //       .toList();
+    // } else {
+    //   return _searchHistory.reversed.toList();
+    // }
   }
 
-  void addSearchTerm(String term) {
+  void addSearchTerm(String term) async {
     if (_searchHistory.contains(term)) {
       putSearchTermFirst(term);
       return;
@@ -161,12 +184,12 @@ class _FriendsViewState extends State<FriendsView> {
       _searchHistory.removeRange(0, _searchHistory.length - historyLength);
     }
 
-    filteredSearchHistory = filterSearchTerms();
+    filteredSearchHistory = await filterSearchTerms();
   }
 
-  void deleteSearchTerm(String term) {
+  void deleteSearchTerm(String term) async {
     _searchHistory.removeWhere((t) => t == term);
-    filteredSearchHistory = filterSearchTerms();
+    filteredSearchHistory = await filterSearchTerms();
   }
 
   void putSearchTermFirst(String term) {
@@ -193,8 +216,10 @@ class _FriendsViewState extends State<FriendsView> {
         FloatingSearchBarAction.searchToClear(),
       ],
       onQueryChanged: (query) {
-        setState(() {
-          filteredSearchHistory = filterSearchTerms(filter: query);
+        filterSearchTerms(filter: query).then((v) {
+          setState(() {
+            filteredSearchHistory = v;
+          });
         });
       },
       onSubmitted: (query) {
@@ -315,11 +340,8 @@ class _FriendsViewState extends State<FriendsView> {
           onTap: () {
             print('should show profile');
           },
-          child: buildCroppedRoundedNetworkImage(o.photoUrl!)),
-      trailing: IconButton(
-          icon:
-              Icon(Icons.whatshot_rounded, color: theme.colorScheme.secondary),
-          onPressed: () {}),
+          child: buildCroppedRoundedNetworkImage(o.photoUrl ??
+              'https://c.files.bbci.co.uk/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg')),
       title: Row(children: [
         CustomPaint(painter: o.status == Status.ONLINE ? DrawCircle() : null),
         SizedBox(width: 10),

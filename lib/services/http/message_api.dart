@@ -10,6 +10,7 @@ abstract class MessageApi {
   Function(LangameNotification) add;
   Future send(String topic);
   void receive();
+  void stopReceiving();
   void get();
   Future<void> delete(LangameNotification n);
 }

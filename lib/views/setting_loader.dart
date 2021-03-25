@@ -1,6 +1,4 @@
 import 'package:async/async.dart';
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/setting_provider.dart';
@@ -20,9 +18,8 @@ class _SettingLoaderState extends State<SettingLoader> {
     final provider = Provider.of<SettingProvider>(context, listen: false);
     FutureGroup f = FutureGroup();
     f.add(provider.load());
-    f.add(Firebase.initializeApp());
     // Just initializing Firebase Functions
-    f.future.then((value) => FirebaseFunctions.instance);
+    // f.future.then((value) => FirebaseFunctions.instance);
     f.close();
     return Scaffold(
         body: FutureBuilder(

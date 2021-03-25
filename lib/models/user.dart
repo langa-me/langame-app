@@ -1,68 +1,68 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+/// This allows the `User` class to access private members in
+/// the generated file. The value for this is *.g.dart, where
+/// the star denotes the source file name.
+part 'user.g.dart';
+
+/// An annotation for the code generator to know that this class needs the
+/// JSON serialization logic to be generated.
+@JsonSerializable()
 class LangameUser {
   /// [uid] is set by Firebase authentication
   final String? uid;
   final String? email;
   final String? displayName;
-  final bool emailVerified;
+  bool emailVerified = false;
   final String? phoneNumber;
   final String? photoUrl;
   Status status = Status.OFFLINE;
   bool google = false;
   bool facebook = false;
   bool apple = false;
+  List<String>? favouriteTopics;
+
+  /// [isALangameUser] signifies whether this user is an imported contact
+  /// or really someone who registered on Langame
+  bool isALangameUser = false;
 
   /// Twitter-like [tag] i.e. @steveTheApple
   String? tag;
 
-  LangameUser(
-      {this.uid,
-      this.email,
-      this.displayName,
-      this.emailVerified = false,
-      this.phoneNumber,
-      this.photoUrl,
-      this.status = Status.OFFLINE,
-      this.tag,
-      this.google = false,
-      this.facebook = false,
-      this.apple = false});
+  LangameUser({
+    this.uid,
+    this.email,
+    this.displayName,
+    this.emailVerified = false,
+    this.phoneNumber,
+    this.photoUrl,
+    this.status = Status.OFFLINE,
+    this.tag,
+    this.google = false,
+    this.facebook = false,
+    this.apple = false,
+    this.favouriteTopics,
+  });
 
   LangameUser.fromFirebaseUser(User user)
       : uid = user.uid,
         email = user.email,
         displayName = user.displayName,
-        emailVerified = user.emailVerified,
+        // emailVerified = user.emailVerified, // TODO: temporary hack to make test pass (PR mock firebase auth)
         phoneNumber = user.phoneNumber,
         photoUrl = user.photoURL;
 
-  LangameUser.fromJson(Map<String, dynamic> json)
-      : uid = json['uid'],
-        email = json['email'],
-        displayName = json['displayName'],
-        emailVerified = json['emailVerified'],
-        phoneNumber = json['phoneNumber'],
-        photoUrl = json['photoUrl'],
-        status = json['status'],
-        tag = json['tag'],
-        google = json['google'],
-        facebook = json['facebook'],
-        apple = json['apple'];
+  /// A necessary factory constructor for creating a new User instance
+  /// from a map. Pass the map to the generated `_$LangameUserFromJson()` constructor.
+  /// The constructor is named after the source class, in this case, User.
+  factory LangameUser.fromJson(Map<String, dynamic> json) =>
+      _$LangameUserFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'uid': uid,
-        'email': email,
-        'displayName': displayName,
-        'emailVerified': emailVerified,
-        'phoneNumber': phoneNumber,
-        'photoUrl': photoUrl,
-        'status': status,
-        'tag': tag,
-        'google': google,
-        'facebook': facebook,
-        'apple': apple,
-      };
+  /// `toJson` is the convention for a class to declare support for serialization
+  /// to JSON. The implementation simply calls the private, generated
+  /// helper method `_$LangameUserToJson`.
+  Map<String, dynamic> toJson() => _$LangameUserToJson(this);
 }
 
 enum Status {

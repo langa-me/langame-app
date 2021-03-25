@@ -1,22 +1,31 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/services/http/authentication_api.dart';
 
+// TODO: move somewhere in helpers or something
 LangameUser getSteveJobs() => LangameUser(
+    tag: 'steveApp',
     uid: 's',
     displayName: 'Steve Jobs',
     photoUrl:
         'https://www.journaldugeek.com/content/uploads/2019/07/stevejobs.jpg');
+
 LangameUser getMarkZuckerberg() => LangameUser(
+    tag: 'markBook',
     uid: 'm',
     displayName: 'Mark Zuckerberg',
     photoUrl:
         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Mark_Zuckerberg_F8_2019_Keynote_%2832830578717%29_%28cropped%29.jpg/1200px-Mark_Zuckerberg_F8_2019_Keynote_%2832830578717%29_%28cropped%29.jpg');
+
 LangameUser getLarryPage() => LangameUser(
+    tag: 'larryGo',
     uid: 'l',
     displayName: 'Larry Page',
     photoUrl:
@@ -25,10 +34,17 @@ LangameUser getLarryPage() => LangameUser(
 List<LangameUser> faang = [getSteveJobs(), getMarkZuckerberg(), getLarryPage()];
 
 /// FakeAuthenticationApi returns fake auth data with 50% chance of returning a null value (fail)
-class FakeAuthenticationApi implements AuthenticationApi {
+class FakeAuthenticationApi extends AuthenticationApi {
   final steve = getSteveJobs();
   final mark = getMarkZuckerberg();
   final larry = getLarryPage();
+
+  FakeAuthenticationApi(
+      FirebaseAuth firebaseAuth,
+      FirebaseFunctions firebaseFunctions,
+      FirebaseFirestore firebaseFirestore,
+      GoogleSignIn googleSignIn)
+      : super(firebaseAuth, firebaseFunctions, firebaseFirestore, googleSignIn);
 
   @override
   Future<OAuthCredential> loginWithApple() async {
@@ -77,5 +93,13 @@ class FakeAuthenticationApi implements AuthenticationApi {
   @override
   Future<LangameUser?> getLangameUser(String uid) async {
     return faang.pickAny();
+  }
+
+  @override
+  Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
+    return faang
+        .where((e) => e.tag != null)
+        .where((e) => e.tag!.startsWith(tag))
+        .toList();
   }
 }

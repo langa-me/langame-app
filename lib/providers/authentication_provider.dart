@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
@@ -14,23 +16,23 @@ import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
 import 'package:langame/services/http/message_api.dart';
 
-class LoginResponse {
-  final LoginStatus status;
+class LangameResponse {
+  final LangameStatus status;
   final String? errorMessage;
 
-  LoginResponse(this.status, {this.errorMessage});
+  LangameResponse(this.status, {this.errorMessage});
 }
 
-enum LoginStatus { cancelled, failed, succeed }
+enum LangameStatus { cancelled, failed, succeed }
 
 class AuthenticationProvider extends ChangeNotifier {
   /// Authentication, relations, users ///
 
   /// Defines whether it's fake API or real
-  bool _fakeAuthenticationApi = true;
-  late AuthenticationApi _authenticationApi;
+  late final AuthenticationApi authenticationApi;
   late Stream<User?> _firebaseUserStream;
   LangameUser? _user;
+
   LangameUser? get user {
     // TODO: pipe firebase stream to langame user stream
     return _user;
@@ -46,8 +48,7 @@ class AuthenticationProvider extends ChangeNotifier {
   /// Messages, notifications ///
 
   /// Defines whether it's fake API or real
-  bool _fakeMessageApi = true;
-  late MessageApi _messageApi;
+  late final MessageApi messageApi;
 
   /// In-memory local notifications
   List<LangameNotification> _notifications =
@@ -59,6 +60,7 @@ class AuthenticationProvider extends ChangeNotifier {
   // ignore: close_sinks
   final _notificationsStream =
       StreamController<LangameNotification>.broadcast();
+
   Stream<LangameNotification> get notificationsStream {
     return _notificationsStream.stream.asBroadcastStream();
   }
@@ -69,111 +71,151 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future send(String topic) async => _messageApi.send(topic);
-  void getNotifications() => _messageApi.get();
+  Future send(String topic) async => messageApi.send(topic);
+
+  void getNotifications() => messageApi.get();
+
   Future<void> deleteNotification(LangameNotification n) {
-    var f = _messageApi.delete(n);
+    var f = messageApi.delete(n);
     f.then(
         (value) => _notifications.removeWhere((element) => element.id == n.id));
     return f;
   }
 
-  Future<LoginResponse> _loginWith(OAuthCredential credential) async {
+  void stopNotifications() => messageApi.stopReceiving();
+
+  Future<LangameResponse> _loginWith(OAuthCredential credential) async {
     try {
       _firebaseUserStream =
-          await _authenticationApi.loginWithFirebase(credential);
+          await authenticationApi.loginWithFirebase(credential);
     } on FirebaseAuthException catch (e) {
-      return LoginResponse(LoginStatus.failed, errorMessage: e.code);
+      return LangameResponse(LangameStatus.failed, errorMessage: e.code);
     } on FirebaseSignInException catch (e) {
-      return LoginResponse(LoginStatus.failed, errorMessage: e.cause);
+      return LangameResponse(LangameStatus.failed, errorMessage: e.cause);
     } catch (e) {
-      return LoginResponse(LoginStatus.failed, errorMessage: e.toString());
+      return LangameResponse(LangameStatus.failed, errorMessage: e.toString());
     }
-    User? u = await _firebaseUserStream.first;
-    if (u == null)
-      return LoginResponse(LoginStatus.failed,
-          errorMessage: 'failed to get user from Firebase');
-    LangameUser? langameUser = await _authenticationApi.getLangameUser(u.uid);
+    User? u;
+
     try {
-      if (langameUser == null) await _authenticationApi.addLangameUser(u);
-    } on AddUserException catch (e) {
-      LoginResponse(LoginStatus.failed, errorMessage: e.cause);
+      u = await _firebaseUserStream.first;
+      if (u == null)
+        throw GetUserException(cause: 'failed to get user from Firebase');
     } catch (e) {
-      LoginResponse(LoginStatus.failed, errorMessage: e.toString());
+      return LangameResponse(LangameStatus.failed, errorMessage: e.toString());
     }
+
+    LangameUser? langameUser = await authenticationApi.getLangameUser(u.uid);
+    try {
+      if (langameUser == null)
+        langameUser = await authenticationApi.addLangameUser(u);
+    } on AddUserException catch (e) {
+      LangameResponse(LangameStatus.failed, errorMessage: e.cause);
+    } catch (e) {
+      LangameResponse(LangameStatus.failed, errorMessage: e.toString());
+    }
+    // Set the user
+    _user = langameUser;
     // Once authenticated, get friends
-    var getRelationsResponse = await getRelations();
+    // var getRelationsResponse = await getRelations();
     // If it failed, return
-    if (getRelationsResponse.status != LoginStatus.succeed)
-      return getRelationsResponse;
+    // if (getRelationsResponse.status != LoginStatus.succeed)
+    //   return getRelationsResponse;
     // Otherwise update UI and return succeed
     notifyListeners();
-    return LoginResponse(LoginStatus.succeed);
+    return LangameResponse(LangameStatus.succeed);
   }
 
-  Future<LoginResponse> loginWithApple() async {
-    return _authenticationApi
+  Future<LangameResponse> loginWithApple() async {
+    return authenticationApi
         .loginWithApple()
         .then(_loginWith)
-        .catchError(() => LoginResponse(LoginStatus.cancelled),
+        .catchError(() => LangameResponse(LangameStatus.cancelled),
             test: (e) => e is AppleSignInException)
-        .catchError((err) =>
-            LoginResponse(LoginStatus.failed, errorMessage: err.cause));
+        .catchError(
+            (err) =>
+                LangameResponse(LangameStatus.failed, errorMessage: err.cause),
+            test: (e) => e is GetUserException)
+        .catchError((err) => LangameResponse(LangameStatus.failed,
+            errorMessage: err.toString()));
   }
 
-  Future<LoginResponse> loginWithFacebook() async {
-    return _authenticationApi
+  Future<LangameResponse> loginWithFacebook() async {
+    return authenticationApi
         .loginWithFacebook()
         .then(_loginWith)
-        .catchError(() => LoginResponse(LoginStatus.cancelled),
+        .catchError(() => LangameResponse(LangameStatus.cancelled),
             test: (e) => e is FacebookSignInException)
-        .catchError((err) =>
-            LoginResponse(LoginStatus.failed, errorMessage: err.cause));
+        .catchError(
+            (err) =>
+                LangameResponse(LangameStatus.failed, errorMessage: err.cause),
+            test: (e) => e is GetUserException)
+        .catchError((err) => LangameResponse(LangameStatus.failed,
+            errorMessage: err.toString()));
   }
 
-  Future<LoginResponse> loginWithGoogle() async {
-    return _authenticationApi
+  Future<LangameResponse> loginWithGoogle() async {
+    return authenticationApi
         .loginWithGoogle()
         .then(_loginWith)
-        .catchError(() => LoginResponse(LoginStatus.cancelled),
+        .catchError((err) => LangameResponse(LangameStatus.cancelled),
             test: (e) => e is GoogleSignInException)
-        .catchError((err) =>
-            LoginResponse(LoginStatus.failed, errorMessage: err.cause));
+        .catchError(
+            (err) =>
+                LangameResponse(LangameStatus.failed, errorMessage: err.cause),
+            test: (e) => e is GetUserException)
+        .catchError((err) => LangameResponse(LangameStatus.failed,
+            errorMessage: err.toString()));
   }
 
-  Future<LoginResponse> getRelations() async {
+  Future<LangameResponse> getRelations() async {
     if (_user != null) {
       try {
-        _relations = (await _authenticationApi.getRelations(_user!));
-        return LoginResponse(LoginStatus.succeed);
+        _relations = (await authenticationApi.getRelations(_user!));
+        return LangameResponse(LangameStatus.succeed);
       } on GetUserFriendsException catch (e) {
-        return LoginResponse(LoginStatus.failed, errorMessage: e.cause);
+        return LangameResponse(LangameStatus.failed, errorMessage: e.cause);
       }
     }
-    return LoginResponse(LoginStatus.failed, errorMessage: 'Not authenticated');
+    return LangameResponse(LangameStatus.failed,
+        errorMessage: 'Not authenticated');
+  }
+
+  Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
+    return await authenticationApi.getLangameUsersStartingWithTag(tag);
   }
 
   /// Create an authentication provider, and
   AuthenticationProvider(
+      FirebaseAuth firebaseAuth,
+      FirebaseFunctions firebaseFunctions,
+      FirebaseFirestore firebaseFirestore,
+      GoogleSignIn googleSignIn,
       {bool fakeAuthentication = false,
       bool fakeMessage = true,
       bool emulator = false}) {
-    _fakeAuthenticationApi = fakeAuthentication;
-    _fakeMessageApi = fakeMessage;
     // Emulator overcome fake api
     if (emulator) {
-      // https://firebase.google.com/docs/emulator-suite
-      // Warning: change local IP accordingly i.e. `ip a`
-      FirebaseAuth.instance.useEmulator('http://192.168.0.24:9099');
-      FirebaseFunctions.instance
-          .useFunctionsEmulator(origin: 'http://192.168.0.24:5001');
-      _authenticationApi = ImplAuthenticationApi();
-      _messageApi = ImplMessageApi(_add);
+      /// https://firebase.google.com/docs/emulator-suite
+      /// Warning: change local IP accordingly i.e. `ip a`
+      /// then from mobile `telnet IP PORT`
+      firebaseAuth.useEmulator('http://192.168.1.102:9099');
+      firebaseFunctions.useFunctionsEmulator(
+          origin: 'http://192.168.1.102:5001');
+      firebaseFirestore.settings = Settings(
+        host: '192.168.1.102:8080',
+        sslEnabled: false,
+      );
+      authenticationApi = ImplAuthenticationApi(
+          firebaseAuth, firebaseFunctions, firebaseFirestore, googleSignIn);
+      messageApi = ImplMessageApi(_add);
       return;
     }
-    _authenticationApi = _fakeAuthenticationApi
-        ? FakeAuthenticationApi()
-        : ImplAuthenticationApi();
-    _messageApi = _fakeMessageApi ? FakeMessageApi(_add) : ImplMessageApi(_add);
+    authenticationApi = fakeAuthentication
+        ? FakeAuthenticationApi(
+            firebaseAuth, firebaseFunctions, firebaseFirestore, googleSignIn)
+        : ImplAuthenticationApi(
+            firebaseAuth, firebaseFunctions, firebaseFirestore, googleSignIn);
+    messageApi = fakeMessage ? FakeMessageApi(_add) : ImplMessageApi(_add);
   }
 }

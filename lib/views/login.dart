@@ -3,10 +3,10 @@ import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/views/buttons/facebook.dart';
 import 'package:langame/views/buttons/google.dart';
+import 'package:langame/views/setup.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/apple.dart';
-import 'friends.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -135,13 +135,13 @@ class _LoginState extends State<Login> {
   }
 
   Future _handleOnPressedLogin(
-      Future<LoginResponse> Function() fn, String entity) async {
+      Future<LangameResponse> Function() fn, String entity) async {
     var res = await fn();
 
     switch (res.status) {
-      case LoginStatus.cancelled:
+      case LangameStatus.cancelled:
         break;
-      case LoginStatus.failed:
+      case LangameStatus.failed:
         final msg = 'failed to login to $entity, ${res.errorMessage}';
         final snackBar = SnackBar(
           behavior: SnackBarBehavior.floating,
@@ -156,10 +156,10 @@ class _LoginState extends State<Login> {
         // it to show a SnackBar.
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         break;
-      case LoginStatus.succeed:
+      case LangameStatus.succeed:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => FriendsView()),
+          MaterialPageRoute(builder: (context) => Setup()),
         );
         break;
     }
