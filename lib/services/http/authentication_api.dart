@@ -1,20 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/models/user.dart';
 
+import 'firebase.dart';
+
 abstract class AuthenticationApi {
-  final FirebaseAuth firebaseAuth;
-  final FirebaseFunctions firebaseFunctions;
-  final FirebaseFirestore firebaseFirestore;
-  final GoogleSignIn googleSignIn;
+  final FirebaseApi firebase;
+  Stream<User?> get authStateChanges;
 
   AuthenticationApi(
-    this.firebaseAuth,
-    this.firebaseFunctions,
-    this.firebaseFirestore,
-    this.googleSignIn,
+    this.firebase,
   );
 
   /// Login with Google, return Google account and credentials
@@ -27,7 +21,10 @@ abstract class AuthenticationApi {
   Future<OAuthCredential> loginWithApple();
 
   /// Login with firebase with previously acquired credential
-  Future<Stream<User?>> loginWithFirebase(OAuthCredential credential);
+  Future<void> loginWithFirebase(OAuthCredential credential);
+
+  /// Login with firebase with previously acquired credential
+  Future<void> logout();
 
   /// Get [LangameUser] from Firestore using Firebase uid
   Future<LangameUser?> getLangameUser(String uid);

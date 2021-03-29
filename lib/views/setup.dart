@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/errors.dart';
 import 'package:langame/models/topic.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -12,6 +13,7 @@ import 'package:langame/views/friends.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
+import 'loaders/loader_circular.dart';
 
 /// Setup the app for the user (topics, friends...)
 class Setup extends StatefulWidget {
@@ -31,6 +33,7 @@ class _SetupState extends State with AfterLayoutMixin {
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<State> _keyLoader = new GlobalKey<State>();
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -50,7 +53,7 @@ class _SetupState extends State with AfterLayoutMixin {
             }),
       ]),
       body: PageView(
-        onPageChanged: (int? i) {
+        onPageChanged: (int? i) async {
           if (i != null && i > 2.0) {
             // Register that this user has already done the setup
             // SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -61,10 +64,28 @@ class _SetupState extends State with AfterLayoutMixin {
                   e.email
                 ]).toList()}');
             // TODO: send mail to everyone "join langame bro"
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => FriendsView()),
-            );
+
+            Future<LangameResponse> f =
+                Provider.of<AuthenticationProvider>(context, listen: false)
+                    .initializeMessageApi();
+            Dialogs.showLoadingDialog(context, _keyLoader);
+
+            f.then((res) {
+              Navigator.of(_keyLoader.currentContext!, rootNavigator: true)
+                  .pop();
+              res.handle(
+                  context,
+                  () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FriendsView(),
+                        ),
+                      ),
+                  'failed to initialize the application, ${res.errorMessage}',
+                  onFailure: () => controller.previousPage(
+                      duration: new Duration(seconds: 1),
+                      curve: Curves.bounceIn));
+            });
           }
         },
         controller: controller,

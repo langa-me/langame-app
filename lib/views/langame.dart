@@ -106,14 +106,14 @@ class _LangameViewState extends State<LangameView> {
 
   Widget _buildVideo(ThemeData theme) {
     // TODO: should really show video :)
-    var p = notification.relation.other.photoUrl == null
-        ? 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
-        : notification.relation.other.photoUrl;
+    // var p = notification.relation.other.photoUrl == null
+    //     ? 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
+    //     : notification.relation.other.photoUrl;
     return Center(
         child: Container(
             margin: EdgeInsets.only(top: AppSize.safeBlockVertical * 5),
             height: AppSize.blockSizeVertical * 50,
             width: AppSize.blockSizeHorizontal * 90,
-            child: buildCroppedRoundedNetworkImage(p!)));
+            child: buildCroppedRoundedNetworkImage(null)));
   }
 }

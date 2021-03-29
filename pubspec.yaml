@@ -16,12 +16,13 @@ dependencies:
   firebase_auth: "^1.0.1"
   cloud_firestore: "^1.0.1"
   cloud_functions: "^1.0.0"
-  firebase_messaging: "^9.0.0"
+  firebase_analytics: 8.0.0-dev.0
+  firebase_messaging: "^9.1.0"
   google_sign_in: "^5.0.0"
   flutter_facebook_auth: "^3.0.0-nullsafety.1"
   sign_in_with_apple: "^3.0.0"
   crypto: "^3.0.0"
-
+  flutter_local_notifications: ^5.0.0
 
   provider: "^5.0.0"
   http: "^0.13.0"
@@ -43,6 +44,8 @@ dependencies:
   quiver: "^3.0.0"
   material_floating_search_bar: "^0.3.3"
   json_annotation: ^4.0.1
+  flutter_app_badger: ^1.2.0
+
   flutter:
     sdk: flutter
 

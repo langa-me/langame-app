@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:langame/models/relation.dart';
 
 /// This allows the `User` class to access private members in
 /// the generated file. The value for this is *.g.dart, where
@@ -11,16 +12,26 @@ part 'user.g.dart';
 @JsonSerializable()
 class LangameUser {
   /// [uid] is set by Firebase authentication
-  final String? uid;
+  final String? uid; // TODO: shouldn't be nullable
   final String? email;
   final String? displayName;
-  bool emailVerified = false;
+  // bool emailVerified = false;
   final String? phoneNumber;
   final String? photoUrl;
-  Status status = Status.OFFLINE;
+
+  /// Is the user [online]?
+  bool online = false;
+
+  /// Google account linked?
   bool google = false;
+
+  /// Facebook account linked?
   bool facebook = false;
+
+  /// Apple account linked?
   bool apple = false;
+
+  /// Favourite topics the user has picked, should impact recommendations
   List<String>? favouriteTopics;
 
   /// [isALangameUser] signifies whether this user is an imported contact
@@ -30,14 +41,17 @@ class LangameUser {
   /// Twitter-like [tag] i.e. @steveTheApple
   String? tag;
 
+  /// Device [tokens] used for Cloud Messaging
+  List<String>? tokens;
+
   LangameUser({
     this.uid,
     this.email,
     this.displayName,
-    this.emailVerified = false,
+    // this.emailVerified = false,
     this.phoneNumber,
     this.photoUrl,
-    this.status = Status.OFFLINE,
+    this.online = false,
     this.tag,
     this.google = false,
     this.facebook = false,
@@ -65,34 +79,11 @@ class LangameUser {
   Map<String, dynamic> toJson() => _$LangameUserToJson(this);
 }
 
-enum Status {
-  OFFLINE,
-  ONLINE,
-}
-
 class LangameUserRelations {
   final LangameUser user;
   final List<Relation> relations;
 
   LangameUserRelations(this.user, this.relations);
-}
-
-/// Evaluated relationship between users using AI + heuristics
-class Relation {
-  final LangameUser other;
-  final RelationLevel level;
-
-  // Langame played together
-  //  int64 interactions = 1;
-
-  Relation(this.other, {this.level = RelationLevel.BAD});
-}
-
-enum RelationLevel {
-  // TODO: temporary
-  BAD,
-  AVERAGE,
-  GREAT,
 }
 
 /// https://pub.dev/packages/flutter_facebook_auth#methods

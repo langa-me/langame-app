@@ -2,29 +2,38 @@ import 'package:cloud_firestore_mocks/cloud_firestore_mocks.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
+import 'package:langame/helpers/fake.dart';
 import 'package:langame/models/user.dart';
+import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 
-import 'helpers.dart';
+import '../mock_firebase_functions.dart';
+import '../mock_firebase_messaging.dart';
 
 void main() {
   group('ImplAuthenticationApi', () {
+    late MockFirebaseMessaging messaging;
     late MockFirebaseAuth auth;
     late MockFirestoreInstance firestore;
     late MockFirebaseFunctions functions;
     late MockGoogleSignIn googleSignIn;
+    late FirebaseApi firebase;
     late ImplAuthenticationApi api;
     setUp(() {
+      messaging = MockFirebaseMessaging();
       auth = MockFirebaseAuth(mockUser: getMockUser());
       firestore = MockFirestoreInstance();
       functions = MockFirebaseFunctions();
       googleSignIn = MockGoogleSignIn();
-      api = ImplAuthenticationApi(auth, functions, firestore, googleSignIn);
+      firebase = FirebaseApi(
+          messaging, firestore, auth, functions, googleSignIn,
+          useEmulator: false);
+      api = ImplAuthenticationApi(firebase);
     });
     test('Should properly authenticate Bob with Google', () async {
       var credential = await api.loginWithGoogle();
-      var stream = await api.loginWithFirebase(credential);
-      var user = await stream.first;
+      await api.loginWithFirebase(credential);
+      var user = await api.authStateChanges.first;
       expect(user!.displayName, getMockUser().displayName);
     });
 

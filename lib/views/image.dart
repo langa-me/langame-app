@@ -6,7 +6,7 @@ Widget buildRoundedNetworkImage(String url, {double size = 100}) {
       child: Image.network(url, width: size, height: size));
 }
 
-Widget buildCroppedRoundedNetworkImage(String url,
+Widget buildCroppedRoundedNetworkImage(String? url,
     {double width = 50, void Function()? onTap}) {
   return Container(
     width: width,
@@ -22,7 +22,8 @@ Widget buildCroppedRoundedNetworkImage(String url,
               image: DecorationImage(
                 fit: BoxFit.fitWidth,
                 alignment: FractionalOffset.topCenter,
-                image: NetworkImage(url),
+                image: NetworkImage(url ??
+                    'https://c.files.bbci.co.uk/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg'),
               ),
             ),
           ),

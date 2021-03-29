@@ -55,7 +55,10 @@ class StretchableButton extends StatelessWidget {
           ),
           child: ElevatedButton(
             onPressed: onPressed,
-            style: Theme.of(context).elevatedButtonTheme.style,
+            style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(splashColor),
+                    backgroundColor: MaterialStateProperty.all(buttonColor))
+                .merge(Theme.of(context).elevatedButtonTheme.style),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: contents,

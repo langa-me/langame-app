@@ -21,9 +21,12 @@ class AppConst {
   static const bool debugSettings = false;
 
   /// Define App ID and Token
-  static const agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
-  static const agoraToken =
+  static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
+  static const String agoraToken =
       '00604dbfdb7d4a349bf9b02758aabd97c78IACDZaxW7iTSrSlwDDVVj+Hu14xkzq/Rz+C6W+3XeI88wCFlc4wAAAAAEABfjXZE77pVYAEAAQDuulVg';
+
+  static const String saveTokenFunction = 'saveToken';
+  static const String sendLangameFunction = 'sendLangame';
 }
 
 /// Fonts assets used in this application,

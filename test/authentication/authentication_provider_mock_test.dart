@@ -2,26 +2,33 @@ import 'package:cloud_firestore_mocks/cloud_firestore_mocks.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
+import 'package:langame/helpers/fake.dart';
+import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/services/http/fake_authentication_api.dart';
+import 'package:langame/services/http/firebase.dart';
 
-import 'helpers.dart';
+import '../mock_firebase_functions.dart';
+import '../mock_firebase_messaging.dart';
 
 void main() {
   group('AuthenticationProvider', () {
+    late MockFirebaseMessaging messaging;
     late MockFirebaseAuth auth;
     late MockFirestoreInstance firestore;
     late MockFirebaseFunctions functions;
     late MockGoogleSignIn googleSignIn;
+    late FirebaseApi firebase;
     late AuthenticationProvider provider;
     setUp(() async {
+      messaging = MockFirebaseMessaging();
       auth = MockFirebaseAuth(mockUser: getMockUser());
       firestore = MockFirestoreInstance();
       functions = MockFirebaseFunctions();
       googleSignIn = MockGoogleSignIn();
-      provider = AuthenticationProvider(
-          auth, functions, firestore, googleSignIn,
-          emulator: false);
+      firebase = FirebaseApi(
+          messaging, firestore, auth, functions, googleSignIn,
+          useEmulator: false);
+      provider = AuthenticationProvider(firebase);
     });
     test('getLangameUsersStartingWithTag should properly find people',
         () async {
@@ -41,7 +48,8 @@ void main() {
       var r = await provider.loginWithGoogle();
       expect(r.status, LangameStatus.succeed);
       expect(r.errorMessage, isNull);
-      expect(provider.user!.displayName, getMockUser().displayName);
+      var u = await provider.user.first;
+      expect(u?.displayName, getMockUser().displayName);
     });
   });
 }

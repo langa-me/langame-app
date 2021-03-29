@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/views/buttons/facebook.dart';
@@ -7,6 +9,7 @@ import 'package:langame/views/setup.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/apple.dart';
+import 'loaders/loader_circular.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -16,6 +19,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final _feedbackFormKey = GlobalKey<FormState>();
   final _feedbackController = TextEditingController();
+  final GlobalKey<State> _keyLoader = new GlobalKey<State>();
 
   @override
   void dispose() {
@@ -27,9 +31,12 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    AppSize(context);
 
     final provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
+    // print(provider.user);
+    // print(FirebaseAuth.instance.currentUser?.displayName);
     var logins = <Widget>[
       FacebookSignInButton(
           onPressed: () async {
@@ -112,8 +119,11 @@ class _LoginState extends State<Login> {
                       _feedbackFormKey.currentState!.validate()) {
                     final p =
                         Provider.of<FirestoreProvider>(context, listen: false);
-                    p.sendFeedback(_feedbackController.text).then((value) {
-                      Navigator.of(context).pop();
+                    var f = p.sendFeedback(_feedbackController.text);
+                    // Quit the window without waiting for api, don't block user...
+                    Navigator.of(context).pop();
+
+                    f.then((value) {
                       // If the form is valid, display a Snackbar.
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text('Thank you!')));
@@ -136,32 +146,18 @@ class _LoginState extends State<Login> {
 
   Future _handleOnPressedLogin(
       Future<LangameResponse> Function() fn, String entity) async {
-    var res = await fn();
-
-    switch (res.status) {
-      case LangameStatus.cancelled:
-        break;
-      case LangameStatus.failed:
-        final msg = 'failed to login to $entity, ${res.errorMessage}';
-        final snackBar = SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text(msg),
-          action: SnackBarAction(
-            label: 'dismiss',
-            onPressed: () {},
-          ),
-        );
-
-        // Find the Scaffold in the widget tree and use
-        // it to show a SnackBar.
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        break;
-      case LangameStatus.succeed:
-        Navigator.pushReplacement(
+    var f = fn();
+    Dialogs.showLoadingDialog(context, _keyLoader);
+    f.then((res) {
+      Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
+      res.handle(
+        context,
+        () => Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Setup()),
-        );
-        break;
-    }
+        ),
+        'failed to login to $entity, ${res.errorMessage}',
+      );
+    }).timeout(const Duration(seconds: 5));
   }
 }

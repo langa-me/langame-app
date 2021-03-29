@@ -1,18 +1,20 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/views/notifications.dart';
 import 'package:langame/views/profile.dart';
+import 'package:langame/views/send_langame.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
+import 'buttons/button.dart';
 import 'image.dart';
 import 'overlay.dart';
 import 'painters/circle.dart';
-import 'topic.dart';
 
 class FriendsView extends StatefulWidget {
   @override
@@ -26,16 +28,14 @@ class _FriendsViewState extends State<FriendsView> {
   int _selectedIndex = 0;
   static const historyLength = 5;
 
-  List<String> _searchHistory = [
-    'fuchsia',
-    'flutter',
-    'widgets',
-    'resocoder',
-  ];
+  List<String> _searchTagHistory = [];
+  List<LangameUser> _searchUserHistory = [];
 
-  List<String> filteredSearchHistory = [];
+  List<String> filteredTagSearchHistory = [];
+  List<LangameUser> filteredUserSearchHistory = [];
 
-  String? selectedTerm;
+  String? selectedTag;
+  LangameUser? selectedUser;
 
   late FloatingSearchBarController controller;
 
@@ -43,7 +43,10 @@ class _FriendsViewState extends State<FriendsView> {
   void initState() {
     super.initState();
     controller = FloatingSearchBarController();
-    filterSearchTerms(filter: null).then((v) => filteredSearchHistory);
+    filterSearchTags(filter: null).then((v) {
+      filteredUserSearchHistory = v;
+      filteredTagSearchHistory = v.map((e) => e.tag!).toList();
+    });
   }
 
   @override
@@ -74,21 +77,21 @@ class _FriendsViewState extends State<FriendsView> {
             );
           }),
           actions: <Widget>[
-            Consumer2<AuthenticationProvider, ProfileProvider>(builder:
-                (context, authenticationProvider, profileProvider, child) {
-              _user = authenticationProvider.user;
-              if (_user != null) {
-                return InkWell(
-                    onTap: () {
-                      profileProvider.profileShown =
-                          !profileProvider.profileShown;
-                    },
-                    child: buildCroppedRoundedNetworkImage(_user!.photoUrl!));
-              } else {
-                return IconButton(
-                    icon: Icon(Icons.account_circle), onPressed: () {});
-              }
-            })
+            // Consumer2<AuthenticationProvider, ProfileProvider>(builder:
+            //     (context, authenticationProvider, profileProvider, child) {
+            //   _user = authenticationProvider.user;
+            //   if (_user != null) {
+            //     return InkWell(
+            //         onTap: () {
+            //           profileProvider.profileShown =
+            //               !profileProvider.profileShown;
+            //         },
+            //         child: buildCroppedRoundedNetworkImage(_user!.photoUrl!));
+            //   } else {
+            //     return IconButton(
+            //         icon: Icon(Icons.account_circle), onPressed: () {});
+            //   }
+            // })
           ]),
       bottomNavigationBar: _buildBottomNavigationBar(theme),
       body: _buildBody(theme),
@@ -116,20 +119,24 @@ class _FriendsViewState extends State<FriendsView> {
                   profileProvider.profileShown = false;
                 },
                 child: Column(children: [
-                  _user != null ? Profile(_user!) : Scaffold(),
+                  _user != null ? Profile(_user!, isSelf: true) : Scaffold(),
                 ])),
           );
         },
         child: GestureDetector(
+          // TODO: maybe pageview instead
+          onHorizontalDragEnd: (details) {
+            _onBottomBarItemTapped(_selectedIndex + 1);
+          },
           onTap: () {
             profileProvider.profileShown = false;
           },
           child: Consumer<AuthenticationProvider>(builder: (context, a, child) {
-            var noLangameRelations = Center(
-                // TODO: animate search, show random ppl
-                child: Text('No friends on Langame yet?\nInvite them!',
-                    style: theme.textTheme.headline5,
-                    textAlign: TextAlign.center));
+            var noLangameRelations = Align(
+              child: Text('No friends on Langame yet?\nInvite them!',
+                  style: theme.textTheme.headline5,
+                  textAlign: TextAlign.center),
+            );
             if (a.relations == null) {
               return noLangameRelations;
             }
@@ -155,60 +162,68 @@ class _FriendsViewState extends State<FriendsView> {
     });
   }
 
-  Future<List<String>> filterSearchTerms({
+  Future<List<LangameUser>> filterSearchTags({
     String? filter,
   }) async {
     if (filter != null && filter.isNotEmpty) {
-      List<LangameUser> r =
-          await Provider.of<AuthenticationProvider>(context, listen: false)
-              .getLangameUsersStartingWithTag(filter);
-      return r.map((e) => e.tag!).toList();
+      return await Provider.of<AuthenticationProvider>(context, listen: false)
+          .getLangameUsersStartingWithTag(filter);
     }
-    return _searchHistory.reversed.toList();
-    //   return _searchHistory.reversed
-    //       .where((term) => term.startsWith(filter))
-    //       .toList();
-    // } else {
-    //   return _searchHistory.reversed.toList();
-    // }
+    return _searchUserHistory.reversed.toList();
   }
 
-  void addSearchTerm(String term) async {
-    if (_searchHistory.contains(term)) {
-      putSearchTermFirst(term);
+  void addSearchTag(String tag) async {
+    if (_searchTagHistory.contains(tag)) {
+      putSearchTagFirst(tag);
       return;
     }
 
-    _searchHistory.add(term);
-    if (_searchHistory.length > historyLength) {
-      _searchHistory.removeRange(0, _searchHistory.length - historyLength);
+    _searchTagHistory.add(tag);
+    _searchUserHistory
+        .add(filteredUserSearchHistory.firstWhere((e) => e.tag == tag));
+    if (_searchTagHistory.length > historyLength) {
+      _searchTagHistory.removeRange(
+          0, _searchTagHistory.length - historyLength);
+      _searchUserHistory.removeRange(
+          0, _searchUserHistory.length - historyLength);
     }
 
-    filteredSearchHistory = await filterSearchTerms();
+    filteredUserSearchHistory = await filterSearchTags();
+    filteredTagSearchHistory =
+        filteredUserSearchHistory.map((e) => e.tag!).toList();
   }
 
-  void deleteSearchTerm(String term) async {
-    _searchHistory.removeWhere((t) => t == term);
-    filteredSearchHistory = await filterSearchTerms();
+  void deleteSearchTag(String tag) async {
+    _searchTagHistory.removeWhere((t) => t == tag);
+    _searchUserHistory.removeWhere((t) => t.tag == tag);
+    filteredUserSearchHistory = await filterSearchTags();
+    filteredTagSearchHistory =
+        filteredUserSearchHistory.map((e) => e.tag!).toList();
   }
 
-  void putSearchTermFirst(String term) {
-    deleteSearchTerm(term);
-    addSearchTerm(term);
+  void putSearchTagFirst(String tag) {
+    deleteSearchTag(tag);
+    addSearchTag(tag);
   }
 
   Widget _buildSearchFriends() {
     return FloatingSearchBar(
+      queryStyle: Theme.of(context).textTheme.headline6,
       controller: controller,
       body: FloatingSearchBarScrollNotifier(
-        child: SearchResultsListView(
-          searchTerm: selectedTerm,
+        child: Container(
+          // Padding top of default FloatingSearchBar height (48) + app size * 5
+          padding: EdgeInsets.only(top: 48 + AppSize.safeBlockVertical * 5),
+          constraints: BoxConstraints.expand(),
+          child: SearchResultsListView(
+            searchUser: selectedUser,
+          ),
         ),
       ),
       transition: CircularFloatingSearchBarTransition(),
       physics: BouncingScrollPhysics(),
       title: Text(
-        selectedTerm ?? 'Search for new faces',
+        selectedTag ?? 'Search for new faces',
         style: Theme.of(context).textTheme.headline6,
       ),
       hint: 'Search and find out...',
@@ -216,16 +231,18 @@ class _FriendsViewState extends State<FriendsView> {
         FloatingSearchBarAction.searchToClear(),
       ],
       onQueryChanged: (query) {
-        filterSearchTerms(filter: query).then((v) {
+        filterSearchTags(filter: query).then((v) {
           setState(() {
-            filteredSearchHistory = v;
+            filteredUserSearchHistory = v;
+            filteredTagSearchHistory =
+                filteredUserSearchHistory.map((e) => e.tag!).toList();
           });
         });
       },
       onSubmitted: (query) {
         setState(() {
-          addSearchTerm(query);
-          selectedTerm = query;
+          addSearchTag(query);
+          selectedTag = query;
         });
         controller.close();
       },
@@ -233,11 +250,14 @@ class _FriendsViewState extends State<FriendsView> {
         return ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Material(
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).brightness == Brightness.light
+                ? Colors.white
+                : Theme.of(context).primaryColor,
             elevation: 4,
             child: Builder(
               builder: (context) {
-                if (filteredSearchHistory.isEmpty && controller.query.isEmpty) {
+                if (filteredTagSearchHistory.isEmpty &&
+                    controller.query.isEmpty) {
                   return Container(
                     height: 56,
                     width: double.infinity,
@@ -246,17 +266,20 @@ class _FriendsViewState extends State<FriendsView> {
                       'Start searching',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                   );
-                } else if (filteredSearchHistory.isEmpty) {
+                } else if (filteredTagSearchHistory.isEmpty) {
                   return ListTile(
-                    title: Text(controller.query),
+                    title: Text(controller.query,
+                        style: Theme.of(context).textTheme.headline6),
                     leading: const Icon(Icons.search),
                     onTap: () {
                       setState(() {
-                        addSearchTerm(controller.query);
-                        selectedTerm = controller.query;
+                        addSearchTag(controller.query);
+                        selectedTag = controller.query;
+                        selectedUser = filteredUserSearchHistory
+                            .firstWhere((e) => e.tag == controller.query);
                       });
                       controller.close();
                     },
@@ -264,10 +287,14 @@ class _FriendsViewState extends State<FriendsView> {
                 } else {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: filteredSearchHistory
+                    children: filteredTagSearchHistory
                         .map(
-                          (term) => ListTile(
-                            title: Text(term,
+                          (tag) => ListTile(
+                            tileColor:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Colors.white
+                                    : Theme.of(context).primaryColor,
+                            title: Text(tag,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context).textTheme.headline6),
@@ -276,14 +303,16 @@ class _FriendsViewState extends State<FriendsView> {
                               icon: const Icon(Icons.clear),
                               onPressed: () {
                                 setState(() {
-                                  deleteSearchTerm(term);
+                                  deleteSearchTag(tag);
                                 });
                               },
                             ),
                             onTap: () {
                               setState(() {
-                                putSearchTermFirst(term);
-                                selectedTerm = term;
+                                putSearchTagFirst(tag);
+                                selectedTag = tag;
+                                selectedUser = filteredUserSearchHistory
+                                    .firstWhere((e) => e.tag == tag);
                               });
                               controller.close();
                             },
@@ -302,6 +331,8 @@ class _FriendsViewState extends State<FriendsView> {
 
   void _onBottomBarItemTapped(int index) {
     setState(() {
+      selectedTag = null;
+      selectedUser = null;
       _selectedIndex = index;
     });
   }
@@ -317,6 +348,7 @@ class _FriendsViewState extends State<FriendsView> {
           label: 'Home',
         ),
         BottomNavigationBarItem(
+          backgroundColor: theme.colorScheme.primary,
           icon: Icon(Icons.search_outlined, color: theme.colorScheme.secondary),
           label: 'Search',
         ),
@@ -333,17 +365,16 @@ class _FriendsViewState extends State<FriendsView> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => TopicView(o)),
+          MaterialPageRoute(builder: (context) => SendLangameView(o)),
         );
       },
       leading: InkWell(
           onTap: () {
             print('should show profile');
           },
-          child: buildCroppedRoundedNetworkImage(o.photoUrl ??
-              'https://c.files.bbci.co.uk/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg')),
+          child: buildCroppedRoundedNetworkImage(o.photoUrl)),
       title: Row(children: [
-        CustomPaint(painter: o.status == Status.ONLINE ? DrawCircle() : null),
+        CustomPaint(painter: o.online ? DrawCircle() : null),
         SizedBox(width: 10),
         Text('${o.displayName}', style: theme.textTheme.button),
       ]),
@@ -354,16 +385,16 @@ class _FriendsViewState extends State<FriendsView> {
 }
 
 class SearchResultsListView extends StatelessWidget {
-  final String? searchTerm;
+  final LangameUser? searchUser;
 
   const SearchResultsListView({
     Key? key,
-    this.searchTerm,
+    this.searchUser,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (searchTerm == null) {
+    if (searchUser == null) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -381,18 +412,37 @@ class SearchResultsListView extends StatelessWidget {
       );
     }
 
-    final fsb = FloatingSearchBar.of(context);
-
-    return ListView(
-      padding:
-          EdgeInsets.only(top: fsb!.style.height + fsb.style.margins.vertical),
-      children: List.generate(
-        50,
-        (index) => ListTile(
-          title: Text('$searchTerm search result'),
-          subtitle: Text(index.toString()),
-        ),
+    return Column(children: [
+      Profile(searchUser!),
+      Spacer(),
+      StretchableButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SendLangameView(searchUser!)),
+          );
+        },
+        borderRadius: 2,
+        splashColor: Theme.of(context).colorScheme.secondaryVariant,
+        buttonPadding: 5,
+        buttonColor: Theme.of(context).colorScheme.secondary,
+        children: [
+          Text('Send a Langame'),
+          Container(
+            margin: EdgeInsets.only(left: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(3),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+            ),
+            child: Image.asset('images/logo.png',
+                width: AppSize.blockSizeHorizontal * 5),
+          ),
+        ],
       ),
-    );
+    ]);
   }
 }

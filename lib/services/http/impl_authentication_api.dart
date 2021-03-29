@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/relation.dart';
 import 'package:langame/models/user.dart';
+import 'package:langame/services/http/firebase.dart';
 
 import 'authentication_api.dart';
 
@@ -15,14 +16,15 @@ class ImplAuthenticationApi extends AuthenticationApi {
   GoogleSignInAccount? _google;
   // FacebookUser? _facebook;
   // AppleUser? _apple;
+  late Stream<User?> _authStateChanges;
+  @override
+  Stream<User?> get authStateChanges => _authStateChanges;
+
   String kFirestoreUsersCollection = 'users';
 
-  ImplAuthenticationApi(
-      FirebaseAuth firebaseAuth,
-      FirebaseFunctions firebaseFunctions,
-      FirebaseFirestore firebaseFirestore,
-      GoogleSignIn googleSignIn)
-      : super(firebaseAuth, firebaseFunctions, firebaseFirestore, googleSignIn);
+  ImplAuthenticationApi(FirebaseApi firebase) : super(firebase) {
+    _authStateChanges = firebase.auth.authStateChanges();
+  }
 
   @override
   Future<OAuthCredential> loginWithApple() async {
@@ -37,12 +39,16 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   @override
   Future<OAuthCredential> loginWithGoogle() async {
+    // await googleSignIn.signOut();
+    // await firebaseAuth.signOut();
     // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    final GoogleSignInAccount? googleUser =
+        await firebase.googleSignIn.signIn();
 
     // If Google Auth cancelled
     if (googleUser == null)
-      throw GoogleSignInException('authentication likely have been cancelled');
+      throw LangameGoogleSignInException(
+          'authentication likely have been cancelled');
 
     _google = googleUser;
 
@@ -58,12 +64,16 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<Stream<User?>> loginWithFirebase(OAuthCredential credential) async {
-    var f = Future.value(firebaseAuth.authStateChanges());
-    f.then((value) {
-      firebaseAuth.signInWithCredential(credential);
-    });
-    return f;
+  Future<void> loginWithFirebase(OAuthCredential credential) async {
+    try {
+      await firebase.auth.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw LangameFirebaseSignInException(
+          cause: 'failed to signInWithCredential ${e.code}');
+    } catch (e) {
+      throw LangameFirebaseSignInException(
+          cause: 'failed to signInWithCredential ${e.toString()}');
+    }
   }
 
   @override
@@ -124,7 +134,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   /// TODO: might use a transaction?
   Future<LangameUser?> getLangameUser(String uid) async {
     CollectionReference users =
-        firebaseFirestore.collection(kFirestoreUsersCollection);
+        firebase.firestore.collection(kFirestoreUsersCollection);
     DocumentSnapshot doc = await users.doc(uid).get();
     if (!doc.exists) return null;
     var data = doc.data();
@@ -134,19 +144,19 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   Future<LangameUser> addLangameUser(User user) async {
     CollectionReference users =
-        firebaseFirestore.collection(kFirestoreUsersCollection);
+        firebase.firestore.collection(kFirestoreUsersCollection);
     LangameUser langameUser = LangameUser.fromFirebaseUser(user);
     return users
         .doc(langameUser.uid)
         .set(langameUser.toJson())
         .then((value) => langameUser)
-        .catchError((err) => throw AddUserException(err.toString()));
+        .catchError((err) => throw LangameAddUserException(err.toString()));
   }
 
   @override
   Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
     CollectionReference users =
-        firebaseFirestore.collection(kFirestoreUsersCollection);
+        firebase.firestore.collection(kFirestoreUsersCollection);
 
     /// Query users with tag starting with [tag]
     QuerySnapshot doc = await users
@@ -157,5 +167,12 @@ class ImplAuthenticationApi extends AuthenticationApi {
         .where((e) => e.data() != null)
         .map((e) => LangameUser.fromJson(e.data()!))
         .toList();
+  }
+
+  @override
+  Future<void> logout() async {
+    if (_google != null) await firebase.googleSignIn.signOut();
+    await firebase.auth.signOut();
+    // TODO: Facebook, Apple
   }
 }

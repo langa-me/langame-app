@@ -3,7 +3,7 @@
   "description": "Firebase & co",
   "scripts": {
     "lint": "eslint .",
-    "serve": "npm build -- --watch | firebase emulators:start",
+    "emu": "npm build -- --watch | firebase emulators:start",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
