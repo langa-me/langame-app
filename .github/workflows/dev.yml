@@ -1,48 +1,48 @@
-#
-#name: Flutter dev CI
-#
-#on:
-#  push:
-#    branches:
-#      - dev
-#
-#jobs:
-#  android-ios:
-#    runs-on: macos-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: actions/setup-java@v1
-#        with:
-#          java-version: '12.x'
-#      - uses: subosito/flutter-action@v1
-#        with:
-#          flutter-version: '2.0.1'
-##          channel: 'beta'
-#      - run: flutter pub get
-#
-#      # Check for any formatting issues in the code.
-#      - run: flutter format --set-exit-if-changed .
-#
-##       Statically analyze the Dart code for any errors.
+
+name: Flutter dev CI
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  android-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - uses: subosito/flutter-action@v1
+        with: # flutter --version
+          flutter-version: '2.0.3'
+#          channel: 'beta'
+      - run: flutter pub get
+
+      # Check for any formatting issues in the code.
+      - run: flutter format --set-exit-if-changed .
+
+#       Statically analyze the Dart code for any errors.
 #      - run: flutter analyze .
-#
-##       Run widget tests for our flutter project.
-#      - run: flutter test
-#
-##      - name: Setup tmate session
-##        uses: mxschmitt/action-tmate@v3
-#
-#      # Build apk.
-#      - run: flutter build apk
-#
-#      - run: flutter build ios --release --no-codesign
-#
-#      # Upload generated apk to the artifacts.
-#      - uses: actions/upload-artifact@v1
-#        with:
-#          name: release-apk
-#          path: build/app/outputs/apk/release/app-release.apk
-#      - uses: actions/upload-artifact@v1
-#        with:
-#          name: release-ios
-#          path: build/app/outputs/ios/release/* # TODO: what's the output name?
+
+#       Run widget tests for our flutter project.
+      - run: flutter test
+
+#      - name: Setup tmate session
+#        uses: mxschmitt/action-tmate@v3
+
+      # Build apk.
+      - run: flutter build apk
+
+      - run: flutter build ios --release --no-codesign
+
+      # Upload generated apk to the artifacts.
+      - uses: actions/upload-artifact@v1
+        with:
+          name: release-apk
+          path: build/app/outputs/apk/release/app-release.apk
+      - uses: actions/upload-artifact@v1
+        with:
+          name: release-ios
+          path: build/app/outputs/ios/release/* # TODO: what's the output name?
