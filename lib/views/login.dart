@@ -17,9 +17,13 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final _feedbackFormKey = GlobalKey<FormState>();
+  final _feedbackFormKey = GlobalKey<FormState>(debugLabel: '_feedbackFormKey');
   final _feedbackController = TextEditingController();
-  final GlobalKey<State> _keyLoader = new GlobalKey<State>();
+  final GlobalKey<State> _keyLoader =
+      GlobalKey<State>(debugLabel: '_keyLoader');
+  final GlobalKey<State> _keySuccess =
+      GlobalKey<State>(debugLabel: '_keySuccess');
+  Future<void>? successDialogFuture;
 
   @override
   void dispose() {
@@ -35,6 +39,28 @@ class _LoginState extends State<Login> {
 
     final provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
+
+    provider.userStream.first.then((user) {
+      if (user == null || successDialogFuture != null) return null;
+      // TODO: store hasdonesetup in firestore instead
+      // var hasDoneSetup = Provider.of<SettingProvider>(context).hasDoneSetup;
+      // // If the already logged has already done the setup
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => hasDoneSetup ? FriendsView() : Setup()),
+      // );
+      successDialogFuture = Dialogs.showSuccessDialog(
+          context, _keySuccess, 'Connected as ${user.displayName}!');
+      Future.delayed(Duration(seconds: 1), () async {
+        Navigator.of(_keySuccess.currentContext ?? context, rootNavigator: true)
+            .pop();
+        successDialogFuture = null;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Setup()),
+        );
+      });
+    });
     // print(provider.user);
     // print(FirebaseAuth.instance.currentUser?.displayName);
     var logins = <Widget>[
@@ -146,18 +172,15 @@ class _LoginState extends State<Login> {
 
   Future _handleOnPressedLogin(
       Future<LangameResponse> Function() fn, String entity) async {
-    var f = fn();
+    var f = fn().timeout(const Duration(seconds: 5));
     Dialogs.showLoadingDialog(context, _keyLoader);
     f.then((res) {
       Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
       res.handle(
         context,
-        () => Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Setup()),
-        ),
-        'failed to login to $entity, ${res.errorMessage}',
+        () => {},
+        'failed to login to $entity, ${res.error.toString()}',
       );
-    }).timeout(const Duration(seconds: 5));
+    });
   }
 }

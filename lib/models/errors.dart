@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-abstract class LangameException implements Exception {
+/// API / service level errors
+class LangameException implements Exception {
   String cause;
   LangameException(this.cause);
 
@@ -48,6 +49,11 @@ class LangameSendLangameException extends LangameException {
   LangameSendLangameException(String cause) : super(cause);
 }
 
+class LangameUpdateProfileException extends LangameException {
+  LangameUpdateProfileException({String cause = kFailedToUpdateProfile})
+      : super(cause);
+}
+
 class LangameMessageException extends LangameException {
   LangameMessageException(String cause) : super(cause);
 }
@@ -57,14 +63,20 @@ class LangameNotAuthenticatedException extends LangameException {
       : super(cause);
 }
 
+class LangameMessagePermissionException extends LangameException {
+  LangameMessagePermissionException(String cause) : super(cause);
+}
+
 const String kUserDoesNotExists = 'user_does_not_exist';
 const String kNotAuthenticated = 'not_authenticated';
+const String kFailedToUpdateProfile = 'failed_to_update_profile';
 
+/// Front-end level responses
 class LangameResponse {
   final LangameStatus status;
-  final String? errorMessage;
+  final Object? error;
 
-  LangameResponse(this.status, {this.errorMessage});
+  LangameResponse(this.status, {this.error});
 
   handle(BuildContext context, Function onSucceed, String failedMessage,
       {Function? onFailure}) {
@@ -83,7 +95,7 @@ class LangameResponse {
 
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         if (onFailure != null) onFailure();
-        if (!kReleaseMode) throw LangameAuthException(failedMessage);
+        if (!kReleaseMode) throw LangameException(failedMessage);
         break;
       case LangameStatus.succeed:
         onSucceed();

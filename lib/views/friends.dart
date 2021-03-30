@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
@@ -77,21 +79,21 @@ class _FriendsViewState extends State<FriendsView> {
             );
           }),
           actions: <Widget>[
-            // Consumer2<AuthenticationProvider, ProfileProvider>(builder:
-            //     (context, authenticationProvider, profileProvider, child) {
-            //   _user = authenticationProvider.user;
-            //   if (_user != null) {
-            //     return InkWell(
-            //         onTap: () {
-            //           profileProvider.profileShown =
-            //               !profileProvider.profileShown;
-            //         },
-            //         child: buildCroppedRoundedNetworkImage(_user!.photoUrl!));
-            //   } else {
-            //     return IconButton(
-            //         icon: Icon(Icons.account_circle), onPressed: () {});
-            //   }
-            // })
+            Consumer2<AuthenticationProvider, ProfileProvider>(builder:
+                (context, authenticationProvider, profileProvider, child) {
+              if (authenticationProvider.user != null) {
+                return InkWell(
+                    onTap: () {
+                      profileProvider.profileShown =
+                          !profileProvider.profileShown;
+                    },
+                    child: buildCroppedRoundedNetworkImage(
+                        authenticationProvider.user!.photoUrl));
+              } else {
+                return IconButton(
+                    icon: Icon(Icons.account_circle), onPressed: () {});
+              }
+            })
           ]),
       bottomNavigationBar: _buildBottomNavigationBar(theme),
       body: _buildBody(theme),

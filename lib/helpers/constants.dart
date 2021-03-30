@@ -27,6 +27,7 @@ class AppConst {
 
   static const String saveTokenFunction = 'saveToken';
   static const String sendLangameFunction = 'sendLangame';
+  static const String updateProfileFunction = 'updateProfile';
 }
 
 /// Fonts assets used in this application,

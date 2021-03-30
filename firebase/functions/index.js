@@ -8,6 +8,45 @@ const admin = require("firebase-admin");
 // Initialize admin firebase
 admin.initializeApp();
 
+const kRecipientDoesNotExist = "recipient does not exist";
+const kInvalidRequest = "invalid request";
+
+/**
+ * Update user profile (Firebase Auth and Firestore LangameUser)
+ * @type {HttpsFunction & Runnable<any>}
+ */
+exports.updateProfile = functions.https.onCall(async (data, context) => {
+  if (context.auth === null) {
+    return {
+      statusCode: 401,
+      errorMessage: "not authenticated",
+    };
+  }
+
+  console.log(data);
+  if (data === null) {
+    return {
+      statusCode: 400,
+      errorMessage: kInvalidRequest,
+    };
+  }
+  return await admin
+      .firestore()
+      .collection("users")
+      .doc(context.auth.uid)
+      .update(data).then((_) => {
+        return {
+          statusCode: 200,
+          errorMessage: null,
+        };
+      }).catch((e) => {
+        return {
+          statusCode: 500,
+          errorMessage: e,
+        };
+      });
+});
+
 /**
  *
  * @type {HttpsFunction & Runnable<any>}
@@ -15,15 +54,19 @@ admin.initializeApp();
 exports.saveToken = functions.https.onCall(async (data, context) => {
   if (context.auth === null) {
     return {
-      result: null,
       statusCode: 401,
       errorMessage: "not authenticated",
+    };
+  }
+  if (data === null) {
+    return {
+      statusCode: 400,
+      errorMessage: kInvalidRequest,
     };
   }
 
   if (!data.tokens) {
     return {
-      result: null,
       statusCode: 400,
       errorMessage: "you must provide token(s)",
     };
@@ -49,7 +92,6 @@ exports.saveToken = functions.https.onCall(async (data, context) => {
       });
 });
 
-const kRecipientDoesNotExist = "recipient does not exist";
 
 /**
  *
@@ -65,6 +107,13 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
       result: null,
       statusCode: 401,
       errorMessage: "not authenticated",
+    };
+  }
+
+  if (data === null) {
+    return {
+      statusCode: 400,
+      errorMessage: kInvalidRequest,
     };
   }
 
@@ -123,21 +172,40 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
     };
   }
 
-  const notificationData = {
+  if (!recipientData.displayName) {
+    return {
+      result: null,
+      statusCode: 500,
+      errorMessage: "recipient has no displayName",
+    };
+  }
+
+  const notificationPayload = {
     data: {
       senderUid: context.auth.uid,
       recipientUid: recipientData.uid,
       topic: data.topic,
     },
+    notification: {
+      // Notification is tagged by sender uid
+      // If specified and a notification with the same tag is a
+      // already being shown, the new notification replaces
+      // the existing one in the notification drawer.
+      // Android only
+      tag: context.auth.uid,
+      body: `${recipientData.displayName} invited you to play ${data.topic}`,
+      title: `Play ${data.topic} with ${recipientData.displayName}?`,
+    },
   };
   const notification = await admin
       .firestore()
       .collection("notifications")
-      .add(notificationData);
-  notificationData.id = notification.id;
+      .add(notificationPayload);
+  notificationPayload.data.id = notification.id;
+
   return admin.messaging().sendToDevice(
       recipientData.tokens,
-      notificationData,
+      notificationPayload,
       {
       // Required for background/quit data-only messages on iOS
         contentAvailable: true,
@@ -145,17 +213,34 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
         priority: "high",
       }
   ).then((res) => {
-    const errors = res.results.filter((e) => e.error !== null);
+    const errors = res.results.filter((e) => e.error !== undefined);
     if (errors.length > 0) {
-      return {result: null, statusCode: 200, errorMessage: errors[0]};
+      console.log(`sendLangame failed:
+      ${errors[0].error.code}, ${errors[0].error.message}`);
+      return {
+        result: null,
+        statusCode: 500,
+        errorMessage: errors[0].error.code,
+      };
     }
-    return {result: notificationData.id, statusCode: 200, errorMessage: null};
+    return {
+      result: notificationPayload.id,
+      statusCode: 200,
+      errorMessage: null,
+    };
+  }).catch((e) => {
+    console.log(`sendLangame failed: ${e}`);
+    return {result: null, statusCode: 500, errorMessage: e.toString()};
   });
 });
 
 if (process.env.FUNCTIONS_EMULATOR && process.env.FIRESTORE_EMULATOR_HOST) {
   const nbUsers = 10;
-  deleteCollection(admin.firestore(), "users", 10_000).then(() => {
+  deleteAllPepes(
+      admin.firestore(),
+      "users",
+      10_000,
+  ).then(() => {
     console.log("Cleared data");
     for (let i = 0; i < nbUsers; i++) {
       const uid = uuidv4();
@@ -188,21 +273,45 @@ if (process.env.FUNCTIONS_EMULATOR && process.env.FIRESTORE_EMULATOR_HOST) {
  */
 function uuidv4() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0; const v = c == "x" ? r : (r & 0x3 | 0x8);
+    const r = Math.random() * 16 | 0;
+    const v = c == "x" ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
 }
 
 /**
  *
- * @param{any} db
+ * @param{FirebaseFirestore.Firestore} db
  * @param{string} collectionPath
  * @param{number} batchSize
  * @return {Promise<void>}
  */
+// eslint-disable-next-line no-unused-vars,require-jsdoc
 async function deleteCollection(db, collectionPath, batchSize) {
   const collectionRef = db.collection(collectionPath);
   const query = collectionRef.orderBy("__name__").limit(batchSize);
+
+  return new Promise((resolve, reject) => {
+    deleteQueryBatch(db, query, resolve).catch(reject);
+  });
+}
+
+/**
+ *
+ * @param{FirebaseFirestore.Firestore} db
+ * @param{string} collectionPath
+ * @param{number} batchSize
+ * @param{string} tag
+ * @return {Promise<void>}
+ */
+async function deleteAllPepes(db,
+    collectionPath,
+    batchSize) {
+  const collectionRef = db.collection(collectionPath);
+  const query = collectionRef
+      .where("photoUrl", "==", "https://c.files.bbci.co.uk/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg")
+      .orderBy("__name__")
+      .limit(batchSize);
 
   return new Promise((resolve, reject) => {
     deleteQueryBatch(db, query, resolve).catch(reject);

@@ -5,7 +5,7 @@ import 'firebase.dart';
 
 abstract class AuthenticationApi {
   final FirebaseApi firebase;
-  Stream<User?> get authStateChanges;
+  Stream<User?> get userChanges;
 
   AuthenticationApi(
     this.firebase,
@@ -38,4 +38,13 @@ abstract class AuthenticationApi {
   /// Find all relations from Google, Facebook, Apple (if connected)
   /// update databases (yes, client-side, easier for now)
   Future<LangameUserRelations> getRelations(LangameUser user);
+
+  /// Update current authenticated user, at the firebase level
+  /// and firestore [LangameUser], throw if not authenticated
+  Future<void> updateProfile(
+      {String? displayName,
+      String? photoURL,
+      String? newEmail,
+      String? tag,
+      List<String>? topics});
 }

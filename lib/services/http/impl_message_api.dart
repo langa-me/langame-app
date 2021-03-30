@@ -5,7 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/firebase_protocol.dart';
+import 'package:langame/models/firebase_functions_protocol.dart';
 import 'package:langame/models/notification.dart';
 import 'package:langame/services/http/message_api.dart';
 
@@ -44,16 +44,11 @@ class ImplMessageApi extends MessageApi {
       sound: true,
     );
     // https://firebase.flutter.dev/docs/messaging/permissions
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional) {
       return LangameResponse(LangameStatus.succeed);
-    } else if (settings.authorizationStatus ==
-        AuthorizationStatus.provisional) {
-      return LangameResponse(LangameStatus.succeed);
-    } else {
-      return LangameResponse(LangameStatus.failed,
-          errorMessage:
-              'Permission declined, application may not work properly, you can change this in settings later');
     }
+    throw LangameMessagePermissionException('Permissions denied');
   }
 
   @override
@@ -72,19 +67,21 @@ class ImplMessageApi extends MessageApi {
           'topic': topic,
         },
       );
-      FirebaseMessageSendLangame response = FirebaseMessageSendLangame.fromJson(
-          Map<String, dynamic>.from(result.data));
+      FirebaseFunctionsResponseSendLangame response =
+          FirebaseFunctionsResponseSendLangame.fromJson(
+              Map<String, dynamic>.from(result.data));
       switch (response.statusCode) {
-        case LangameStatusCode.OK:
+        case FirebaseFunctionsResponseStatusCode.OK:
           break;
-        case LangameStatusCode.BAD_REQUEST:
-          LangameSendLangameException(response.errorMessage ??
-              LangameStatusCode.BAD_REQUEST.toString());
-          break;
-        case LangameStatusCode.UNAUTHORIZED:
-          LangameSendLangameException(response.errorMessage ??
-              LangameStatusCode.UNAUTHORIZED.toString());
-          break;
+        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
+          throw LangameSendLangameException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
+        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
+          throw LangameSendLangameException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
+        case FirebaseFunctionsResponseStatusCode.INTERNAL:
+          throw LangameSendLangameException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
       }
       return response.result;
     } catch (e) {
@@ -112,6 +109,7 @@ class ImplMessageApi extends MessageApi {
         firebase.messaging.onTokenRefresh.listen(_saveTokenToDatabase);
 
     _addCallback = add;
+
     // https://firebase.flutter.dev/docs/messaging/notifications
     _onForegroundMessage =
         FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
@@ -132,6 +130,7 @@ class ImplMessageApi extends MessageApi {
 
   void _add(RemoteMessage m) {
     print("received message ${m.notification?.title}: ${m.notification?.body}");
+    print("${m.data}: ${m.sentTime.toString()}");
     RemoteNotification? notification = m.notification;
     AndroidNotification? android = m.notification?.android;
     if (notification != null && android != null) {
@@ -212,20 +211,20 @@ class ImplMessageApi extends MessageApi {
           'tokens': [token],
         },
       );
-      // TODO: result.data = null
-      FirebaseMessage response =
-          FirebaseMessage.fromJson(Map<String, dynamic>.from(result.data));
+      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
+          Map<String, dynamic>.from(result.data));
       switch (response.statusCode) {
-        case LangameStatusCode.OK:
+        case FirebaseFunctionsResponseStatusCode.OK:
           break;
-        case LangameStatusCode.BAD_REQUEST:
-          LangameMessageException(response.errorMessage ??
-              LangameStatusCode.BAD_REQUEST.toString());
-          break;
-        case LangameStatusCode.UNAUTHORIZED:
-          LangameMessageException(response.errorMessage ??
-              LangameStatusCode.UNAUTHORIZED.toString());
-          break;
+        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
+          throw LangameMessageException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
+        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
+          throw LangameMessageException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
+        case FirebaseFunctionsResponseStatusCode.INTERNAL:
+          throw LangameMessageException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
       }
     } catch (e) {
       throw LangameMessageException(e.toString());

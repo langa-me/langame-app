@@ -32,8 +32,9 @@ class _SetupState extends State with AfterLayoutMixin {
   //
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
-  final _formKey = GlobalKey<FormState>();
-  final GlobalKey<State> _keyLoader = new GlobalKey<State>();
+  final _formKey = GlobalKey<FormState>(debugLabel: '_formKey');
+  final GlobalKey<State> _keyLoader =
+      new GlobalKey<State>(debugLabel: '_keyLoader');
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -81,7 +82,7 @@ class _SetupState extends State with AfterLayoutMixin {
                           builder: (context) => FriendsView(),
                         ),
                       ),
-                  'failed to initialize the application, ${res.errorMessage}',
+                  'failed to initialize the application, ${res.error.toString()}',
                   onFailure: () => controller.previousPage(
                       duration: new Duration(seconds: 1),
                       curve: Curves.bounceIn));

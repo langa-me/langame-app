@@ -47,8 +47,8 @@ void main() {
         () async {
       var r = await provider.loginWithGoogle();
       expect(r.status, LangameStatus.succeed);
-      expect(r.errorMessage, isNull);
-      var u = await provider.user.first;
+      expect(r.error, isNull);
+      var u = await provider.userStream.first;
       expect(u?.displayName, getMockUser().displayName);
     });
   });
