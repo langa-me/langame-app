@@ -1,15 +1,22 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/notification.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/setting_provider.dart';
 import 'package:langame/views/buttons/facebook.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/setup.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/apple.dart';
-import 'loaders/loader_circular.dart';
+import 'friends.dart';
+import 'langame.dart';
+import 'loaders/dialogs.dart';
+import 'notifications.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -40,26 +47,69 @@ class _LoginState extends State<Login> {
     final provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
 
+    // Bunch of spaghetti code to check if it is a new user or already authenticated
     provider.userStream.first.then((user) {
       if (user == null || successDialogFuture != null) return null;
-      // TODO: store hasdonesetup in firestore instead
-      // var hasDoneSetup = Provider.of<SettingProvider>(context).hasDoneSetup;
-      // // If the already logged has already done the setup
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => hasDoneSetup ? FriendsView() : Setup()),
-      // );
+
+      var hasDoneSetup =
+          Provider.of<SettingProvider>(context, listen: false).hasDoneSetup;
+      // Once arriving on login page, if coming from a notification tap coming
+      // from a terminated state (app closed, have notification in bar)
+      // and the user is properly authenticated, will open directly langame view
+      // otherwise it will go to setup or friends according to auth state
       successDialogFuture = Dialogs.showSuccessDialog(
           context, _keySuccess, 'Connected as ${user.displayName}!');
-      Future.delayed(Duration(seconds: 1), () async {
-        Navigator.of(_keySuccess.currentContext ?? context, rootNavigator: true)
-            .pop();
-        successDialogFuture = null;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Setup()),
-        );
-      });
+      if (hasDoneSetup) {
+        var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+        ap.initializeMessageApi(onBackgroundOrForegroundOpened).then((res) {
+          res.handle(
+              context,
+              () {
+                Navigator.of(_keySuccess.currentContext ?? context,
+                        rootNavigator: true)
+                    .pop();
+                successDialogFuture = null;
+                ap.messageApi.getInitialMessage().then((n) {
+                  if (n != null && n is LangameNotificationPlay) {
+                    Navigator.pushReplacement(
+                      context, // opened the terminated app from a notification
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              LangameView(n.senderUid, n.topic, 'Who?')),
+                    );
+                  } else {
+                    // User is not opening the app from a notification
+                    Navigator.pushReplacement(
+                      context, // If the already logged has already done the setup
+                      MaterialPageRoute(builder: (context) => FriendsView()),
+                    );
+                  }
+                });
+              },
+              !kReleaseMode
+                  ? 'failed to initializeMessageApi ${res.error.toString()}'
+                  : Provider.of<FunnyProvider>(context, listen: false)
+                      .getFailingRandom(),
+              onFailure: () {
+                Navigator.of(_keySuccess.currentContext ?? context,
+                        rootNavigator: true)
+                    .pop();
+              });
+        });
+      } else {
+        // User previously authenticated but didn't do setup
+        Future.delayed(Duration(seconds: 1), () {
+          Navigator.of(_keySuccess.currentContext ?? context,
+                  rootNavigator: true)
+              .pop();
+          successDialogFuture = null;
+          // User is not opening the app from a notification
+          Navigator.pushReplacement(
+            context, // If the already logged has already done the setup
+            MaterialPageRoute(builder: (context) => Setup()),
+          );
+        });
+      }
     });
     // print(provider.user);
     // print(FirebaseAuth.instance.currentUser?.displayName);
@@ -179,7 +229,10 @@ class _LoginState extends State<Login> {
       res.handle(
         context,
         () => {},
-        'failed to login to $entity, ${res.error.toString()}',
+        kReleaseMode
+            ? 'failed to login to $entity, ${res.error.toString()}'
+            : Provider.of<FunnyProvider>(context, listen: false)
+                .getFailingRandom(),
       );
     });
   }

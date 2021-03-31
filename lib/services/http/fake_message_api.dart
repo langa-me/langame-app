@@ -11,7 +11,9 @@ import 'package:uuid/uuid.dart';
 import 'firebase.dart';
 
 class FakeMessageApi extends MessageApi {
-  FakeMessageApi(FirebaseApi firebase) : super(firebase);
+  FakeMessageApi(FirebaseApi firebase,
+      void Function(LangameNotification) onBackgroundOrForegroundOpened)
+      : super(firebase, onBackgroundOrForegroundOpened);
   @override
   Future<LangameResponse> initializePermissions() async {
     return LangameResponse(LangameStatus.succeed);
@@ -47,7 +49,7 @@ class FakeMessageApi extends MessageApi {
   }
 
   @override
-  Future listen(Function(LangameNotification p1) add) async {
+  Future listen(void Function(LangameNotification p1) add) async {
     var r = Random();
     var delay = Duration(seconds: 5 + r.nextInt(10));
 
@@ -58,12 +60,24 @@ class FakeMessageApi extends MessageApi {
   }
 
   LangameNotification _fakeNotification() {
-    var r = Random().nextDouble();
     var sender = faang.pickAny();
 
     return LangameNotification(
       uuid.v4(),
       sender!.uid!,
     );
+  }
+
+  @override
+  Future<LangameNotification?> getInitialMessage() {
+    // TODO: implement getInitialMessage
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> sendReadyForLangame(
+      String recipient, String topic, String question) {
+    // TODO: implement sendReadyForLangame
+    throw UnimplementedError();
   }
 }

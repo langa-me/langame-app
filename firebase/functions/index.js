@@ -8,8 +8,10 @@ const admin = require("firebase-admin");
 // Initialize admin firebase
 admin.initializeApp();
 
-const kRecipientDoesNotExist = "recipient does not exist";
+const kUserDoesNotExist = (id) => `user ${id} does not exist`;
 const kInvalidRequest = "invalid request";
+const kUsersCollection = "users";
+const kNotificationsCollection = "notifications";
 
 /**
  * Update user profile (Firebase Auth and Firestore LangameUser)
@@ -32,7 +34,7 @@ exports.updateProfile = functions.https.onCall(async (data, context) => {
   }
   return await admin
       .firestore()
-      .collection("users")
+      .collection(kUsersCollection)
       .doc(context.auth.uid)
       .update(data).then((_) => {
         return {
@@ -75,7 +77,7 @@ exports.saveToken = functions.https.onCall(async (data, context) => {
   // Save user device token(s) to Firestore, used to send notifications
   return await admin
       .firestore()
-      .collection("users")
+      .collection(kUsersCollection)
       .doc(context.auth.uid)
       .update({
         "tokens": admin.firestore.FieldValue.arrayUnion(...data.tokens),
@@ -92,16 +94,7 @@ exports.saveToken = functions.https.onCall(async (data, context) => {
       });
 });
 
-
-/**
- *
- * @type {HttpsFunction & Runnable<any>}
- */
-exports.sendLangame = functions.https.onCall(async (data, context) => {
-  // TODO: cloud messaging
-  // TODO: firestore append notification
-  //
-
+const filterOutSendLangameCalls = (data, context) => {
   if (context.auth === null) {
     return {
       result: null,
@@ -132,54 +125,72 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
       errorMessage: "invalid topic",
     };
   }
+  return 0;
+};
 
+const getUserData = async (id) => {
   const recipient = await admin
       .firestore()
-      .collection("users")
-      .doc(data.recipient)
+      .collection(kUsersCollection)
+      .doc(id)
       .get();
   if (!recipient.exists) {
     return {
       result: null,
       statusCode: 400,
-      errorMessage: kRecipientDoesNotExist,
+      errorMessage: kUserDoesNotExist(id),
     };
   }
 
-  const recipientData = recipient.data();
+  const data = recipient.data();
 
-  if (!recipientData) {
+  if (!data) {
     return {
       result: null,
       statusCode: 400,
-      errorMessage: kRecipientDoesNotExist,
+      errorMessage: kUserDoesNotExist(id),
     };
   }
 
-  if (!recipientData.tokens) {
+  if (!data.tokens) {
     return {
       result: null,
       statusCode: 500,
-      errorMessage: "recipient has no devices (tokens)",
+      errorMessage: `user ${id} has no devices (tokens)`,
     };
   }
 
-  if (!recipientData.uid) {
+  if (!data.uid) {
     return {
       result: null,
       statusCode: 500,
-      errorMessage: "recipient has no uid",
+      errorMessage: `user ${id} has no uid`,
     };
   }
 
-  if (!recipientData.displayName) {
+  if (!data.displayName) {
     return {
       result: null,
       statusCode: 500,
-      errorMessage: "recipient has no displayName",
+      errorMessage: `user ${id} has no displayName`,
     };
   }
+  return data;
+};
 
+/**
+ *
+ * @type {HttpsFunction & Runnable<any>}
+ */
+exports.sendLangame = functions.https.onCall(async (data, context) => {
+  const initialChecks = filterOutSendLangameCalls(data, context);
+  if (initialChecks !== 0) return initialChecks;
+  const recipientData = await getUserData(data.recipient);
+  // Failed ? Return error
+  if (recipientData.statusCode) return recipientData;
+  const senderData = await getUserData(context.auth.uid);
+  // Failed ? Return error
+  if (senderData.statusCode) return senderData;
   const notificationPayload = {
     data: {
       senderUid: context.auth.uid,
@@ -193,13 +204,13 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
       // the existing one in the notification drawer.
       // Android only
       tag: context.auth.uid,
-      body: `${recipientData.displayName} invited you to play ${data.topic}`,
-      title: `Play ${data.topic} with ${recipientData.displayName}?`,
+      body: `${senderData.displayName} invited you to play ${data.topic}`,
+      title: `Play ${data.topic} with ${senderData.displayName}?`,
     },
   };
   const notification = await admin
       .firestore()
-      .collection("notifications")
+      .collection(kNotificationsCollection)
       .add(notificationPayload);
   notificationPayload.data.id = notification.id;
 
@@ -213,24 +224,120 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
         priority: "high",
       }
   ).then((res) => {
-    const errors = res.results.filter((e) => e.error !== undefined);
-    if (errors.length > 0) {
-      console.log(`sendLangame failed:
-      ${errors[0].error.code}, ${errors[0].error.message}`);
-      return {
-        result: null,
-        statusCode: 500,
-        errorMessage: errors[0].error.code,
-      };
-    }
+    res.results.forEach((r, i) => {
+      const t = recipientData.tokens[i];
+      console.warn(`failed ${t}: ${JSON.stringify(r.error)}`);
+      // Invalid token, remove it
+      if (r.error &&
+        r.error.code ===
+        "messaging/registration-token-not-registered" &&
+        t) {
+        admin
+            .firestore()
+            .collection(kUsersCollection)
+            .doc(recipientData.uid)
+            .update({
+              tokens: admin.firestore.FieldValue
+                  .arrayRemove(t),
+            }).then(() => console.warn(`removed invalid token ${t}`))
+            .catch(() => console.error(`failed to remove invalid token ${t}`));
+      }
+    });
     return {
       result: notificationPayload.id,
       statusCode: 200,
       errorMessage: null,
     };
   }).catch((e) => {
-    console.log(`sendLangame failed: ${e}`);
-    return {result: null, statusCode: 500, errorMessage: e.toString()};
+    console.error(`sendLangame failed: ${JSON.stringify(e)}`);
+    return {result: null, statusCode: 500, errorMessage: JSON.stringify(e)};
+  });
+});
+
+
+/**
+ *
+ * @type {HttpsFunction & Runnable<any>}
+ */
+exports.sendReadyForLangame = functions.https.onCall(async (data, context) => {
+  const initialChecks = filterOutSendLangameCalls(data, context);
+  if (initialChecks !== 0) return initialChecks;
+  const recipientData = await getUserData(data.recipient);
+  // Failed ? Return error
+  if (recipientData.statusCode) return recipientData;
+  const senderData = await getUserData(context.auth.uid);
+  // Failed ? Return error
+  if (senderData.statusCode) return senderData;
+
+  if (!data.question) {
+    return {
+      result: null,
+      statusCode: 400,
+      errorMessage: "invalid question",
+    };
+  }
+
+  const notificationPayload = {
+    data: {
+      senderUid: context.auth.uid,
+      recipientUid: recipientData.uid,
+      topic: data.topic,
+      question: data.question,
+    },
+    notification: {
+      // Notification is tagged by sender uid
+      // If specified and a notification with the same tag is a
+      // already being shown, the new notification replaces
+      // the existing one in the notification drawer.
+      // Android only
+      tag: context.auth.uid,
+      body: `${senderData.displayName} is waiting you to play ${data.topic}`,
+      title: `Join ${senderData.displayName} to play ${data.topic} now?`,
+    },
+  };
+  const notification = await admin
+      .firestore()
+      .collection(kNotificationsCollection)
+      .add(notificationPayload);
+  notificationPayload.data.id = notification.id;
+
+  return admin.messaging().sendToDevice(
+      recipientData.tokens,
+      notificationPayload,
+      {
+      // Required for background/quit data-only messages on iOS
+        contentAvailable: true,
+        // Required for background/quit data-only messages on Android
+        priority: "high",
+      }
+  ).then((res) => {
+    res.results.forEach((r, i) => {
+      const t = recipientData.tokens[i];
+      console.warn(`failed ${t}: ${JSON.stringify(r.error)}`);
+      // Invalid token, remove it
+      if (r.error &&
+        r.error.code ===
+        "messaging/registration-token-not-registered" &&
+        t) {
+        admin
+            .firestore()
+            .collection(kUsersCollection)
+            .doc(recipientData.uid)
+            .update({
+              tokens: admin.firestore.FieldValue
+                  .arrayRemove(t),
+            }).then(() => console.warn(`removed invalid token ${t}`))
+            .catch(() => console.error(`failed to remove invalid token ${t}`));
+      }
+    });
+    return {
+      result: notificationPayload.id,
+      statusCode: 200,
+      errorMessage: null,
+    };
+  }).catch((e) => {
+    console.error(`sendLangame failed: ${JSON.stringify(e)}`);
+    return {result: null, statusCode: 500, errorMessage: JSON.stringify(e)};
   });
 });
 
@@ -261,7 +368,9 @@ if (process.env.FUNCTIONS_EMULATOR && process.env.FIRESTORE_EMULATOR_HOST) {
         "tokens": [],
         // "friends": [],
       };
-      admin.firestore().collection("users").doc(userDoc.uid).set(userDoc);
+      admin.firestore()
+          .collection(kUsersCollection)
+          .doc(userDoc.uid).set(userDoc);
     }
     console.log("Generated", nbUsers, "users");
   });

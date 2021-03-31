@@ -29,6 +29,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   LangameUser? _user;
+
   LangameUser? get user {
     return _user;
   }
@@ -66,8 +67,24 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future send(LangameUser recipient, String topic) async =>
+  Future<LangameResponse> send(LangameUser recipient, String topic) async {
+    try {
       await messageApi.send(recipient.uid!, topic);
+    } catch (e) {
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+    return LangameResponse(LangameStatus.succeed);
+  }
+
+  Future<LangameResponse> sendReadyForLangame(
+      String recipientUid, String topic, String question) async {
+    try {
+      await messageApi.sendReadyForLangame(recipientUid, topic, question);
+    } catch (e) {
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+    return LangameResponse(LangameStatus.succeed);
+  }
 
   Future<void> getNotifications() async => await messageApi.fetchAll();
 
@@ -189,7 +206,6 @@ class AuthenticationProvider extends ChangeNotifier {
       } catch (e) {
         print(e.toString());
       }
-      print(langameUser?.tag);
       sink.add(langameUser);
     });
     _userStream = StreamController.broadcast();
@@ -200,10 +216,14 @@ class AuthenticationProvider extends ChangeNotifier {
     });
   }
 
-  Future<LangameResponse> initializeMessageApi({bool fake = false}) async {
+  Future<LangameResponse> initializeMessageApi(
+      void Function(LangameNotification) onBackgroundOrForegroundOpened,
+      {bool fake = false}) async {
     messageApi = fake
-        ? FakeMessageApi(authenticationApi.firebase)
-        : ImplMessageApi(authenticationApi.firebase);
+        ? FakeMessageApi(
+            authenticationApi.firebase, onBackgroundOrForegroundOpened)
+        : ImplMessageApi(
+            authenticationApi.firebase, onBackgroundOrForegroundOpened);
     try {
       await messageApi.initializePermissions();
       await messageApi.listen(_onNotificationHandler);

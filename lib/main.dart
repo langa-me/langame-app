@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/providers/setting_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
@@ -35,14 +36,15 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => SettingProvider()),
-        ChangeNotifierProvider(create: (context) => TopicProvider()),
+        ChangeNotifierProvider(create: (_) => SettingProvider()),
+        ChangeNotifierProvider(create: (_) => TopicProvider()),
         ChangeNotifierProvider(
-          create: (context) => AuthenticationProvider(firebase, fake: false),
+          create: (_) => AuthenticationProvider(firebase, fake: false),
         ),
-        ChangeNotifierProvider(create: (context) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(
             create: (context) => FirestoreProvider(firebase.firestore)),
+        ChangeNotifierProvider(create: (_) => FunnyProvider()),
       ],
       child: MyApp(),
     ),
@@ -87,6 +89,7 @@ class _MyAppState extends State<MyApp> {
             ),
         // home: Scaffold(),
         home: Login(),
+        navigatorKey: AppConst.navKey,
       );
     });
   }

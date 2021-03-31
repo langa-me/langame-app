@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -60,6 +61,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('failed to delete, $err')));
                 });
+                setState(() {});
               },
               child: Card(
                 child: ListTile(
@@ -72,12 +74,17 @@ class _NotificationsViewState extends State<NotificationsView> {
                   // tileColor: Color.lerp(p.notifications[i].relation.level.toColor(),
                   //     theme.colorScheme.primary, 0.5), // TODO
                   onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              LangameView(p.notifications[i])),
-                    );
+                    if (hasTopic) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LangameView(
+                                p.notifications[i].senderUid,
+                                (p.notifications[i] as LangameNotificationPlay)
+                                    .topic,
+                                'Who?')),
+                      );
+                    }
                   },
                 ),
               ),
@@ -87,5 +94,18 @@ class _NotificationsViewState extends State<NotificationsView> {
             print('failed to get user ${p.notifications[i].senderUid}');
           return SizedBox.shrink();
         });
+  }
+}
+
+/// When opened a notification with app on the background, switch to
+/// LangameView, TODO: add buttons on notification "accept" "decline"
+void onBackgroundOrForegroundOpened(LangameNotification n) {
+  if (n is LangameNotificationPlay) {
+    AppConst.navKey.currentState?.pushReplacement(
+      MaterialPageRoute(
+          builder: (context) => LangameView(n.senderUid, n.topic, 'Who?')),
+    );
+  } else {
+    throw UnimplementedError();
   }
 }

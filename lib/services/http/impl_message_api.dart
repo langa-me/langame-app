@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -16,22 +18,60 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel', // id
   'High Importance Notifications', // title
   'This channel is used for important notifications.', // description
-  importance: Importance.high,
+  importance: Importance.max,
 );
 
 class ImplMessageApi extends MessageApi {
   StreamSubscription<String>? _onTokenRefresh;
   StreamSubscription<RemoteMessage>? _onForegroundMessage;
-  StreamSubscription<RemoteMessage>? _backgroundNotificationOpened;
+  StreamSubscription<RemoteMessage>? _onNonTerminatedOpened;
   Function(LangameNotification)? _addCallback;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  ImplMessageApi(FirebaseApi firebase) : super(firebase);
+  ImplMessageApi(FirebaseApi firebase,
+      void Function(LangameNotification) onBackgroundOrForegroundOpened)
+      : super(firebase, onBackgroundOrForegroundOpened);
 
   @override
   Future<LangameResponse> initializePermissions() async {
-    // FirebaseAnalytics analytics = FirebaseAnalytics();
+    /// lot of mess https://pub.dev/packages/flutter_local_notifications#initialisation
+    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    final IOSInitializationSettings initializationSettingsIOS =
+        IOSInitializationSettings();
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsIOS);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (payload) async {
+      print('yaya');
+      print(payload);
+      if (payload == null)
+        throw LangameException('received null payload on notification tap');
+      var pJson = jsonDecode(payload);
+      print(pJson);
+      onBackgroundOrForegroundOpened(pJson['question'] != null
+          ? LangameNotificationReadyToPlay.fromJson(pJson)
+          : LangameNotificationPlay.fromJson(pJson));
+    });
+    print((await flutterLocalNotificationsPlugin.pendingNotificationRequests())
+        .map((e) => e.title));
+
+    if (Platform.isAndroid) {
+      List<ActiveNotification>? r = await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.getActiveNotifications();
+
+      r?.map((e) => print(e.body));
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
+    }
 
     // TODO: should show "we wil ask you permission blabla.."
     NotificationSettings settings = await firebase.messaging.requestPermission(
@@ -41,6 +81,12 @@ class ImplMessageApi extends MessageApi {
       carPlay: false,
       criticalAlert: false,
       provisional: false,
+      sound: true,
+    );
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true, // Required to display a heads up notification
+      badge: true,
       sound: true,
     );
     // https://firebase.flutter.dev/docs/messaging/permissions
@@ -114,12 +160,10 @@ class ImplMessageApi extends MessageApi {
     _onForegroundMessage =
         FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
 
-    Future<void> _backgroundNotificationOpen(RemoteMessage message) async {
-      print('opened background message: ${message.toString()}');
-    }
-
-    _backgroundNotificationOpened = FirebaseMessaging.onMessageOpenedApp
-        .listen(_backgroundNotificationOpen);
+    _onNonTerminatedOpened = FirebaseMessaging.onMessageOpenedApp.listen((m) =>
+        onBackgroundOrForegroundOpened(m.data['question'] == null
+            ? LangameNotificationPlay.fromJson(m.data)
+            : LangameNotificationReadyToPlay.fromJson(m.data)));
     try {
       FirebaseMessaging.onBackgroundMessage(
           _firebaseMessagingBackgroundHandler);
@@ -128,34 +172,36 @@ class ImplMessageApi extends MessageApi {
     }
   }
 
-  void _add(RemoteMessage m) {
-    print("received message ${m.notification?.title}: ${m.notification?.body}");
+  void _add(RemoteMessage m, {bool background = false}) {
+    print("received message ${m.data}");
     print("${m.data}: ${m.sentTime.toString()}");
     RemoteNotification? notification = m.notification;
     AndroidNotification? android = m.notification?.android;
     if (notification != null && android != null) {
       flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channel.description,
-              // TODO add a proper drawable resource to android, for now using
-              //      one that already exists in example app.
-              icon: '@mipmap/ic_launcher',
-            ),
-          ));
-    }
-    if (m.data['id'] == null || m.data['senderUid'] == null) {
-      // TODO: prob sentry whatever
-      return;
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          iOS: IOSNotificationDetails(),
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channel.description,
+            // TODO add a proper drawable resource to android, for now using
+            //      one that already exists in example app.
+            icon: '@mipmap/ic_launcher',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+        ),
+        payload: jsonEncode(m.data),
+      );
     }
     if (_addCallback != null) {
-      _addCallback!(LangameNotification(m.data['id'], m.data['senderUid'],
-          background: true));
+      var n = LangameNotificationPlay.fromJson(m.data);
+      n.background = background;
+      _addCallback!(n);
     }
   }
 
@@ -167,7 +213,7 @@ class ImplMessageApi extends MessageApi {
   // https://firebase.flutter.dev/docs/messaging/usage#handling-messages
   Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
-    _add(message);
+    _add(message, background: true);
   }
 
   @override
@@ -177,7 +223,7 @@ class ImplMessageApi extends MessageApi {
     // TODO: test this hack
     Future<void> _emptyHandler(RemoteMessage message) async {}
     FirebaseMessaging.onBackgroundMessage(_emptyHandler);
-    _backgroundNotificationOpened?.cancel();
+    _onNonTerminatedOpened?.cancel();
   }
 
   @override
@@ -190,8 +236,10 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<void> delete(String id) {
+  Future<void> delete(String id) async {
     throw UnimplementedError();
+    // await flutterLocalNotificationsPlugin.cancel(id);
+    // TODO: delete in firestore
   }
 
   Future<void> _saveTokenToDatabase(String token) async {
@@ -228,6 +276,53 @@ class ImplMessageApi extends MessageApi {
       }
     } catch (e) {
       throw LangameMessageException(e.toString());
+    }
+  }
+
+  @override
+  Future<LangameNotification?> getInitialMessage() async {
+    var m = await firebase.messaging.getInitialMessage();
+    return m != null ? LangameNotification.fromJson(m.data) : null;
+  }
+
+  @override
+  Future<String?> sendReadyForLangame(
+      String recipient, String topic, String question) async {
+    HttpsCallable callable = firebase.functions.httpsCallable(
+      AppConst.sendReadyForLangameFunction,
+      options: HttpsCallableOptions(
+        timeout: Duration(seconds: 10),
+      ),
+    );
+
+    try {
+      final HttpsCallableResult result = await callable.call(
+        <String, dynamic>{
+          'recipient': recipient,
+          'topic': topic,
+          'question': question,
+        },
+      );
+      FirebaseFunctionsResponseSendLangame response =
+          FirebaseFunctionsResponseSendLangame.fromJson(
+        Map<String, dynamic>.from(result.data),
+      );
+      switch (response.statusCode) {
+        case FirebaseFunctionsResponseStatusCode.OK:
+          break;
+        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
+          throw LangameSendReadyForLangameException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
+        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
+          throw LangameSendReadyForLangameException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
+        case FirebaseFunctionsResponseStatusCode.INTERNAL:
+          throw LangameSendReadyForLangameException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
+      }
+      return response.result;
+    } catch (e) {
+      throw LangameSendReadyForLangameException(e.toString());
     }
   }
 }

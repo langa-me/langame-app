@@ -6,7 +6,6 @@ import 'package:langame/helpers/fake.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/services/http/authentication_api.dart';
-import 'package:uuid/uuid.dart';
 
 import 'firebase.dart';
 
@@ -19,7 +18,6 @@ class FakeAuthenticationApi extends AuthenticationApi {
   }
   late StreamController<MockUser?> _userChanges = StreamController.broadcast();
   MockUser _user = getMockUser();
-  Uuid _uuid = Uuid();
   @override
   Stream<User?> get userChanges => _userChanges.stream.asBroadcastStream();
 

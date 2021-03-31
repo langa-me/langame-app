@@ -27,7 +27,7 @@ void main() {
       firebase = FirebaseApi(
           messaging, firestore, auth, functions, googleSignIn,
           useEmulator: false);
-      api = ImplMessageApi(firebase);
+      api = ImplMessageApi(firebase, (n) {});
     });
     test('Should properly authenticate Bob with Google', () async {
       // await api.send('bar', '666');

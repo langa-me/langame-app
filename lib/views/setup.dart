@@ -1,5 +1,6 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -8,12 +9,15 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/topic.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/setting_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/views/friends.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
-import 'loaders/loader_circular.dart';
+import 'loaders/dialogs.dart';
+import 'notifications.dart';
 
 /// Setup the app for the user (topics, friends...)
 class Setup extends StatefulWidget {
@@ -27,6 +31,7 @@ class _SetupState extends State with AfterLayoutMixin {
   List<LangameUser> contactsToInvite = [];
   final controller = PageController(initialPage: 0, viewportFraction: 0.9);
   bool importRelations = false;
+
   // Create a global key that uniquely identifies the Form widget
   // and allows validation of the form.
   //
@@ -68,21 +73,26 @@ class _SetupState extends State with AfterLayoutMixin {
 
             Future<LangameResponse> f =
                 Provider.of<AuthenticationProvider>(context, listen: false)
-                    .initializeMessageApi();
+                    .initializeMessageApi(onBackgroundOrForegroundOpened);
             Dialogs.showLoadingDialog(context, _keyLoader);
 
             f.then((res) {
               Navigator.of(_keyLoader.currentContext!, rootNavigator: true)
                   .pop();
-              res.handle(
+              res.handle(context, () {
+                Provider.of<SettingProvider>(context, listen: false)
+                    .setHasDoneSetup(true);
+                Navigator.pushReplacement(
                   context,
-                  () => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FriendsView(),
-                        ),
-                      ),
-                  'failed to initialize the application, ${res.error.toString()}',
+                  MaterialPageRoute(
+                    builder: (context) => FriendsView(),
+                  ),
+                );
+              },
+                  !kReleaseMode
+                      ? 'failed to initialize the application, ${res.error.toString()}'
+                      : Provider.of<FunnyProvider>(context, listen: false)
+                          .getFailingRandom(),
                   onFailure: () => controller.previousPage(
                       duration: new Duration(seconds: 1),
                       curve: Curves.bounceIn));
@@ -112,8 +122,11 @@ class _SetupState extends State with AfterLayoutMixin {
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           final snackBar = SnackBar(
-                            content: Text(
-                                'Could not import relations! ${snapshot.error.toString()}'),
+                            content: Text(!kReleaseMode
+                                ? 'Could not import relations! ${snapshot.error.toString()}'
+                                : Provider.of<FunnyProvider>(context,
+                                        listen: false)
+                                    .getFailingRandom()),
                           );
 
                           // Find the ScaffoldMessenger in the widget tree

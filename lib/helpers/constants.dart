@@ -23,11 +23,17 @@ class AppConst {
   /// Define App ID and Token
   static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
   static const String agoraToken =
-      '00604dbfdb7d4a349bf9b02758aabd97c78IACDZaxW7iTSrSlwDDVVj+Hu14xkzq/Rz+C6W+3XeI88wCFlc4wAAAAAEABfjXZE77pVYAEAAQDuulVg';
+      '00604dbfdb7d4a349bf9b02758aabd97c78IAAYWHigqe99f/tWT7Q92VvazyCCC+6JmtZevlf7ZI1bviFlc4wAAAAAEAAeXT+coRJmYAEAAQCgEmZg';
+
+  /// Your channel ID
+  static const agoraChannelId = 'foo';
 
   static const String saveTokenFunction = 'saveToken';
   static const String sendLangameFunction = 'sendLangame';
+  static const String sendReadyForLangameFunction = 'sendReadyForLangame';
   static const String updateProfileFunction = 'updateProfile';
+
+  static final navKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
 }
 
 /// Fonts assets used in this application,

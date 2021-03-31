@@ -49,6 +49,10 @@ class LangameSendLangameException extends LangameException {
   LangameSendLangameException(String cause) : super(cause);
 }
 
+class LangameSendReadyForLangameException extends LangameException {
+  LangameSendReadyForLangameException(String cause) : super(cause);
+}
+
 class LangameUpdateProfileException extends LangameException {
   LangameUpdateProfileException({String cause = kFailedToUpdateProfile})
       : super(cause);
