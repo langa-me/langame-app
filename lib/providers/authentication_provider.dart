@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/notification.dart';
@@ -15,6 +16,8 @@ import 'package:langame/services/http/impl_message_api.dart';
 import 'package:langame/services/http/message_api.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
+  FirebaseApi firebase;
+
   /// Authentication, relations, users ///
 
   /// Defines whether it's fake API or real
@@ -70,7 +73,8 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse> send(LangameUser recipient, String topic) async {
     try {
       await messageApi.send(recipient.uid!, topic);
-    } catch (e) {
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -80,7 +84,8 @@ class AuthenticationProvider extends ChangeNotifier {
       String recipientUid, String topic, String question) async {
     try {
       await messageApi.sendReadyForLangame(recipientUid, topic, question);
-    } catch (e) {
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -90,8 +95,10 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<void> deleteNotification(String id) {
     var f = messageApi.delete(id);
-    f.then(
-        (value) => _notifications.removeWhere((element) => element.id == id));
+    f
+        .then((value) =>
+            _notifications.removeWhere((element) => element.id == id))
+        .then((value) => notifyListeners());
     return f;
   }
 
@@ -100,7 +107,8 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse> _loginWith(OAuthCredential credential) async {
     try {
       await authenticationApi.loginWithFirebase(credential);
-    } catch (e) {
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -144,7 +152,8 @@ class AuthenticationProvider extends ChangeNotifier {
             error: 'Not authenticated');
       _relations = await authenticationApi.getRelations(u);
       return LangameResponse(LangameStatus.succeed);
-    } on LangameGetUserFriendsException catch (e) {
+    } on LangameGetUserFriendsException catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.cause);
     }
   }
@@ -158,7 +167,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   /// Create an authentication provider, and
-  AuthenticationProvider(FirebaseApi firebase, {bool fake = false}) {
+  AuthenticationProvider(this.firebase, {bool fake = false}) {
     // Emulator overcome fake api
     if (firebase.useEmulator) {
       print('Using emulator');
@@ -176,14 +185,18 @@ class AuthenticationProvider extends ChangeNotifier {
         if (_user == null) {
           _user = await authenticationApi.addLangameUser(data);
         }
-      } on LangameAddUserException catch (e) {
-        // Fail at addLangameUser
-        print(e.cause);
-      } on LangameAuthException catch (e) {
-        // Fail at generateTag
-        print(e.cause);
-      } catch (e) {
-        print(e.toString());
+        // } on LangameAddUserException catch (e) {
+        //   // Fail at addLangameUser
+        //   print(e.cause);
+        // } on LangameAuthException catch (e) {
+        //   // Fail at generateTag
+        //   print(e.cause);
+      } catch (e, s) {
+        firebase.crashlytics.recordError(e, s);
+        if (!kReleaseMode) {
+          debugPrint(e.toString());
+          debugPrint(s.toString());
+        }
       }
       notifyListeners();
     });
@@ -197,14 +210,18 @@ class AuthenticationProvider extends ChangeNotifier {
         if (langameUser == null) {
           langameUser = await authenticationApi.addLangameUser(data);
         }
-      } on LangameAddUserException catch (e) {
-        // Fail at addLangameUser
-        print(e.cause);
-      } on LangameAuthException catch (e) {
-        // Fail at generateTag
-        print(e.cause);
-      } catch (e) {
-        print(e.toString());
+        // } on LangameAddUserException catch (e) {
+        //   // Fail at addLangameUser
+        //   print(e.cause);
+        // } on LangameAuthException catch (e) {
+        //   // Fail at generateTag
+        //   print(e.cause);
+      } catch (e, s) {
+        firebase.crashlytics.recordError(e, s);
+        if (!kReleaseMode) {
+          debugPrint(e.toString());
+          debugPrint(s.toString());
+        }
       }
       sink.add(langameUser);
     });
@@ -227,7 +244,8 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       await messageApi.initializePermissions();
       await messageApi.listen(_onNotificationHandler);
-    } catch (e) {
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);

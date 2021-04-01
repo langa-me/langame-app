@@ -145,7 +145,10 @@ class ImplAuthenticationApi extends AuthenticationApi {
     if (!doc.exists) return null;
     var data = doc.data();
     if (data == null) return null;
-    return LangameUser.fromJson(data);
+    var u = LangameUser.fromJson(data);
+    firebase.crashlytics.setUserIdentifier(u.uid!);
+    firebase.analytics.setUserId(u.uid!);
+    return u;
   }
 
   Future<LangameUser> addLangameUser(User user) async {
@@ -159,7 +162,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
       langameUser.google = true;
     }
     langameUser.tag = t;
-    print('add $t');
+    if (!kReleaseMode) debugPrint('add $t');
     return users
         .doc(langameUser.uid)
         .set(langameUser.toJson())

@@ -17,12 +17,12 @@ class LangameView extends StatefulWidget {
   final String opponentUid;
   final String topic;
   final String question;
-  RtcEngine? _engine = null;
-  LangameView(this.opponentUid, this.topic, this.question);
+  final bool notifyOthers;
+  LangameView(this.opponentUid, this.topic, this.question, this.notifyOthers);
 
   @override
   _LangameViewState createState() =>
-      _LangameViewState(opponentUid, topic, question);
+      _LangameViewState(opponentUid, topic, question, notifyOthers);
 }
 
 class _LangameViewState extends State<LangameView> {
@@ -31,6 +31,8 @@ class _LangameViewState extends State<LangameView> {
   final String question;
   Duration _remaining = Duration(minutes: 15);
   late StreamSubscription<CountdownTimer> _sub;
+  RtcEngine? _engine;
+  final bool notifyOthers;
 
   String channelId = AppConst.agoraChannelId;
   bool isJoined = false,
@@ -39,12 +41,14 @@ class _LangameViewState extends State<LangameView> {
       playEffect = false,
       everyoneJoined = false;
 
-  _LangameViewState(this.opponentUid, this.topic, this.question) {
+  _LangameViewState(
+      this.opponentUid, this.topic, this.question, this.notifyOthers) {
     CountdownTimer countDownTimer = new CountdownTimer(
       Duration(minutes: 15),
       Duration(seconds: 1),
     );
 
+    // TODO: start when everyone is here
     _sub = countDownTimer.listen(null);
     _sub.onData((duration) {
       setState(() {
@@ -58,7 +62,9 @@ class _LangameViewState extends State<LangameView> {
   @override
   void initState() {
     super.initState();
-    // TODO: tell other "hey im waiting for you" thru firebase messaging
+    this._initEngine();
+
+    if (!notifyOthers) return;
     Provider.of<AuthenticationProvider>(context, listen: false)
         .sendReadyForLangame(opponentUid, topic, question)
         .then((res) {
@@ -71,8 +77,6 @@ class _LangameViewState extends State<LangameView> {
               ? 'failed to sendReadyForLangame ${res.error.toString()}'
               : Provider.of<FunnyProvider>(context).getFailingRandom());
     });
-
-    this._initEngine();
   }
 
   @override
@@ -143,21 +147,21 @@ class _LangameViewState extends State<LangameView> {
     super.dispose();
     _sub.cancel();
     _leaveChannel();
-    widget._engine?.destroy();
+    _engine?.destroy();
   }
 
   _initEngine() async {
-    widget._engine =
+    _engine =
         await RtcEngine.createWithConfig(RtcEngineConfig(AppConst.agoraAppID));
     this._addListeners();
 
-    await widget._engine!.enableAudio();
-    await widget._engine!.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    await widget._engine!.setClientRole(ClientRole.Broadcaster);
+    await _engine!.enableAudio();
+    await _engine!.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await _engine!.setClientRole(ClientRole.Broadcaster);
   }
 
   _addListeners() {
-    widget._engine?.setEventHandler(RtcEngineEventHandler(
+    _engine?.setEventHandler(RtcEngineEventHandler(
       userJoined: (a, b) {
         debugPrint('someone joined');
         debugPrint('$a | $b');
@@ -184,15 +188,15 @@ class _LangameViewState extends State<LangameView> {
     if (defaultTargetPlatform == TargetPlatform.android) {
       await Permission.microphone.request();
     }
-    await widget._engine?.joinChannel(AppConst.agoraToken, channelId, null, 0);
+    await _engine?.joinChannel(AppConst.agoraToken, channelId, null, 0);
   }
 
   _leaveChannel() async {
-    await widget._engine?.leaveChannel();
+    await _engine?.leaveChannel();
   }
 
   _switchMicrophone() {
-    widget._engine?.enableLocalAudio(!openMicrophone).then((value) {
+    _engine?.enableLocalAudio(!openMicrophone).then((value) {
       setState(() {
         openMicrophone = !openMicrophone;
       });
@@ -202,7 +206,7 @@ class _LangameViewState extends State<LangameView> {
   }
 
   _switchSpeakerphone() {
-    widget._engine?.setEnableSpeakerphone(!enableSpeakerphone).then((value) {
+    _engine?.setEnableSpeakerphone(!enableSpeakerphone).then((value) {
       setState(() {
         enableSpeakerphone = !enableSpeakerphone;
       });

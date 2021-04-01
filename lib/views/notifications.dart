@@ -4,6 +4,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'image.dart';
@@ -47,14 +48,16 @@ class _NotificationsViewState extends State<NotificationsView> {
         future: p.getLangameUser(p.notifications[i].senderUid),
         builder: (BuildContext context, AsyncSnapshot<LangameUser?> snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
-            var hasTopic = (p.notifications[i] is LangameNotificationPlay);
+            var n = p.notifications[i];
+            print(n.toJson());
+            print(n is LangameNotificationReadyToPlay);
             return Dismissible(
               // Show a red background as the item is swiped away.
               background: Container(color: Colors.red),
-              key: Key(p.notifications[i].id),
+              key: Key(n.id),
               onDismissed: (direction) {
                 if (i > p.notifications.length) return; // Already deleted?
-                p.deleteNotification(p.notifications[i].id).then((value) {
+                p.deleteNotification(n.id).then((value) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('successfully deleted')));
                 }).catchError((err) {
@@ -68,21 +71,33 @@ class _NotificationsViewState extends State<NotificationsView> {
                   leading:
                       buildCroppedRoundedNetworkImage(snapshot.data?.photoUrl),
                   title: Text(snapshot.data!.displayName!),
-                  subtitle: Text(hasTopic
-                      ? (p.notifications[i] as LangameNotificationPlay).topic
-                      : 'No topic?'),
+                  subtitle: Text(n is LangameNotificationReadyToPlay
+                      ? 'is ready to play ${n.topic}'
+                      : n is LangameNotificationPlay
+                          ? n.topic
+                          : Provider.of<FunnyProvider>(context)
+                              .getFailingRandom()),
                   // tileColor: Color.lerp(p.notifications[i].relation.level.toColor(),
                   //     theme.colorScheme.primary, 0.5), // TODO
                   onTap: () {
-                    if (hasTopic) {
+                    // TODO: delete notification
+                    p.deleteNotification(n.id);
+                    if (n is LangameNotificationPlay) {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => LangameView(
-                                p.notifications[i].senderUid,
-                                (p.notifications[i] as LangameNotificationPlay)
-                                    .topic,
-                                'Who?')),
+                          builder: (context) =>
+                              LangameView(n.senderUid, n.topic, 'Who?', true),
+                        ),
+                      );
+                    } else if (n is LangameNotificationReadyToPlay) {
+                      // Received a message "I am ready!"
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LangameView(
+                              n.senderUid, n.topic, n.question, false),
+                        ),
                       );
                     }
                   },
@@ -97,15 +112,22 @@ class _NotificationsViewState extends State<NotificationsView> {
   }
 }
 
-/// When opened a notification with app on the background, switch to
+/// When opened a notification with app on the background or foreground, switch to
 /// LangameView, TODO: add buttons on notification "accept" "decline"
 void onBackgroundOrForegroundOpened(LangameNotification n) {
   if (n is LangameNotificationPlay) {
     AppConst.navKey.currentState?.pushReplacement(
       MaterialPageRoute(
-          builder: (context) => LangameView(n.senderUid, n.topic, 'Who?')),
+        builder: (context) => LangameView(n.senderUid, n.topic, 'Who?', true),
+      ),
     );
-  } else {
-    throw UnimplementedError();
+  } else if (n is LangameNotificationReadyToPlay) {
+    // Received a message "I am ready!"
+    AppConst.navKey.currentState?.pushReplacement(
+      MaterialPageRoute(
+        builder: (context) =>
+            LangameView(n.senderUid, n.topic, n.question, false),
+      ),
+    );
   }
 }

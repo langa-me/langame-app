@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,6 +25,7 @@ import 'services/http/firebase.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  var analytics = FirebaseAnalytics();
   FirebaseApi firebase = FirebaseApi(
     FirebaseMessaging.instance,
     FirebaseFirestore.instance,
@@ -31,6 +35,8 @@ void main() async {
       'email',
       'https://www.googleapis.com/auth/contacts.readonly'
     ]),
+    FirebaseCrashlytics.instance,
+    analytics,
     useEmulator: false,
   );
   runApp(
@@ -46,18 +52,24 @@ void main() async {
             create: (context) => FirestoreProvider(firebase.firestore)),
         ChangeNotifierProvider(create: (_) => FunnyProvider()),
       ],
-      child: MyApp(),
+      child: MyApp(analytics),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  MyApp(this.analytics);
+
   @override
-  _MyAppState createState() => _MyAppState();
+  _MyAppState createState() => _MyAppState(this.analytics);
 }
 
 // TODO: https://github.com/rydmike/flex_color_scheme/blob/master/example/lib/example5/main.dart
 class _MyAppState extends State<MyApp> {
+  final FirebaseAnalytics analytics;
+  _MyAppState(this.analytics);
+
   @override
   Widget build(BuildContext context) {
     Provider.of<SettingProvider>(context, listen: false).load();
@@ -90,6 +102,9 @@ class _MyAppState extends State<MyApp> {
         // home: Scaffold(),
         home: Login(),
         navigatorKey: AppConst.navKey,
+        navigatorObservers: [
+          FirebaseAnalyticsObserver(analytics: analytics),
+        ],
       );
     });
   }

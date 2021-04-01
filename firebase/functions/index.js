@@ -12,6 +12,46 @@ const kUserDoesNotExist = (id) => `user ${id} does not exist`;
 const kInvalidRequest = "invalid request";
 const kUsersCollection = "users";
 const kNotificationsCollection = "notifications";
+//
+// class LangameUser {
+//   // / [uid] is set by Firebase authentication
+//   uid = "";
+//   email = "";
+//   displayName = "";
+//   // bool emailVerified = false;
+//   phoneNumber = "";
+//   photoUrl = "";
+//
+//   // / Is the user [online]?
+//   online = false;
+//
+//   // / Google account linked?
+//   google = false;
+//
+//   // / Facebook account linked?
+//   facebook = false;
+//
+//   // / Apple account linked?
+//   apple = false;
+//
+//   // / Favourite topics the user has picked, should impact recommendations
+//   favouriteTopics = [];
+//
+//   // / [isALangameUser] signifies whether this user is an imported contact
+//   // / or really someone who registered on Langame
+//   isALangameUser = false;
+//
+//   // / Twitter-like [tag] i.e. @steveTheApple
+//   tag = "";
+//
+//   // / Device [tokens] used for Cloud Messaging
+//   tokens = [];
+//   // constructor(height, width) {
+//   //   this.height = height;
+//   //   this.width = width;
+//   // }
+// }
+
 
 /**
  * Update user profile (Firebase Auth and Firestore LangameUser)

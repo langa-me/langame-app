@@ -29,6 +29,9 @@ class ImplMessageApi extends MessageApi {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  /// [localNotifications] stores the mapping Langame notification id -> local notification id
+  final Map<String, int> localNotifications = {};
+
   ImplMessageApi(FirebaseApi firebase,
       void Function(LangameNotification) onBackgroundOrForegroundOpened)
       : super(firebase, onBackgroundOrForegroundOpened);
@@ -47,12 +50,9 @@ class ImplMessageApi extends MessageApi {
             iOS: initializationSettingsIOS);
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (payload) async {
-      print('yaya');
-      print(payload);
       if (payload == null)
         throw LangameException('received null payload on notification tap');
       var pJson = jsonDecode(payload);
-      print(pJson);
       onBackgroundOrForegroundOpened(pJson['question'] != null
           ? LangameNotificationReadyToPlay.fromJson(pJson)
           : LangameNotificationPlay.fromJson(pJson));
@@ -164,12 +164,12 @@ class ImplMessageApi extends MessageApi {
         onBackgroundOrForegroundOpened(m.data['question'] == null
             ? LangameNotificationPlay.fromJson(m.data)
             : LangameNotificationReadyToPlay.fromJson(m.data)));
-    try {
+    runZonedGuarded(() {
       FirebaseMessaging.onBackgroundMessage(
           _firebaseMessagingBackgroundHandler);
-    } catch (e) {
-      print('ignoring usual FirebaseMessaging.onBackgroundMessage Null check');
-    }
+    },
+        (_, __) => print(
+            'ignoring usual FirebaseMessaging.onBackgroundMessage Null check'));
   }
 
   void _add(RemoteMessage m, {bool background = false}) {
@@ -178,28 +178,34 @@ class ImplMessageApi extends MessageApi {
     RemoteNotification? notification = m.notification;
     AndroidNotification? android = m.notification?.android;
     if (notification != null && android != null) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          iOS: IOSNotificationDetails(),
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channel.description,
-            // TODO add a proper drawable resource to android, for now using
-            //      one that already exists in example app.
-            icon: '@mipmap/ic_launcher',
-            importance: Importance.max,
-            priority: Priority.high,
-          ),
-        ),
-        payload: jsonEncode(m.data),
-      );
+      flutterLocalNotificationsPlugin
+          .show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              iOS: IOSNotificationDetails(),
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                // TODO add a proper drawable resource to android, for now using
+                //      one that already exists in example app.
+                icon: '@mipmap/ic_launcher',
+                importance: Importance.max,
+                priority: Priority.high,
+              ),
+            ),
+            payload: jsonEncode(m.data),
+            // Then add id to local notifications
+          )
+          .then((value) =>
+              localNotifications[m.data['id']] = notification.hashCode);
     }
     if (_addCallback != null) {
-      var n = LangameNotificationPlay.fromJson(m.data);
+      var n = m.data['question'] == null
+          ? LangameNotificationPlay.fromJson(m.data)
+          : LangameNotificationReadyToPlay.fromJson(m.data);
       n.background = background;
       _addCallback!(n);
     }
@@ -237,8 +243,9 @@ class ImplMessageApi extends MessageApi {
 
   @override
   Future<void> delete(String id) async {
-    throw UnimplementedError();
     // await flutterLocalNotificationsPlugin.cancel(id);
+
+    throw UnimplementedError();
     // TODO: delete in firestore
   }
 

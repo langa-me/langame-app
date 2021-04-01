@@ -70,13 +70,25 @@ class _LoginState extends State<Login> {
                     .pop();
                 successDialogFuture = null;
                 ap.messageApi.getInitialMessage().then((n) {
-                  if (n != null && n is LangameNotificationPlay) {
-                    Navigator.pushReplacement(
-                      context, // opened the terminated app from a notification
-                      MaterialPageRoute(
+                  if (n != null) {
+                    if (n is LangameNotificationPlay) {
+                      Navigator.pushReplacement(
+                        context, // opened the terminated app from a notification
+                        MaterialPageRoute(
                           builder: (context) =>
-                              LangameView(n.senderUid, n.topic, 'Who?')),
-                    );
+                              LangameView(n.senderUid, n.topic, 'Who?', true),
+                        ),
+                      );
+                    } else if (n is LangameNotificationReadyToPlay) {
+                      // Received a message "I am ready!"
+                      Navigator.pushReplacement(
+                        context, // opened the terminated app from a notification
+                        MaterialPageRoute(
+                          builder: (context) => LangameView(
+                              n.senderUid, n.topic, n.question, false),
+                        ),
+                      );
+                    }
                   } else {
                     // User is not opening the app from a notification
                     Navigator.pushReplacement(
