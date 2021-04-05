@@ -15,6 +15,7 @@ class FirebaseApi {
   final GoogleSignIn googleSignIn;
   final FirebaseCrashlytics crashlytics;
   final FirebaseAnalytics analytics;
+  // final FirebaseRemoteConfig remoteConfig;
   final bool useEmulator;
   FirebaseApi(this.messaging, this.firestore, this.auth, this.functions,
       this.googleSignIn, this.crashlytics, this.analytics,

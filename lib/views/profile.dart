@@ -8,19 +8,10 @@ import 'package:provider/provider.dart';
 
 import 'image.dart';
 
-class Profile extends StatefulWidget {
+class Profile extends StatelessWidget {
   final LangameUser _user;
   final bool isSelf;
   Profile(this._user, {this.isSelf = false});
-
-  @override
-  _ProfileState createState() => _ProfileState(_user, isSelf: this.isSelf);
-}
-
-class _ProfileState extends State<Profile> {
-  final LangameUser _user;
-  bool isSelf;
-  _ProfileState(this._user, {this.isSelf = false});
 
   @override
   Widget build(BuildContext context) {

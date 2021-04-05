@@ -81,7 +81,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                   //     theme.colorScheme.primary, 0.5), // TODO
                   onTap: () {
                     // TODO: delete notification
-                    p.deleteNotification(n.id);
+                    // p.deleteNotification(n.id);
                     if (n is LangameNotificationPlay) {
                       Navigator.pushReplacement(
                         context,

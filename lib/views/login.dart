@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/notification.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/providers/setting_provider.dart';
+import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/views/buttons/facebook.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/setup.dart';
@@ -52,7 +53,8 @@ class _LoginState extends State<Login> {
       if (user == null || successDialogFuture != null) return null;
 
       var hasDoneSetup =
-          Provider.of<SettingProvider>(context, listen: false).hasDoneSetup;
+          Provider.of<LocalStorageProvider>(context, listen: false)
+              .hasDoneSetup;
       // Once arriving on login page, if coming from a notification tap coming
       // from a terminated state (app closed, have notification in bar)
       // and the user is properly authenticated, will open directly langame view
@@ -62,7 +64,7 @@ class _LoginState extends State<Login> {
       if (hasDoneSetup) {
         var ap = Provider.of<AuthenticationProvider>(context, listen: false);
         ap.initializeMessageApi(onBackgroundOrForegroundOpened).then((res) {
-          res.handle(
+          res.thenShowSnackBar(
               context,
               () {
                 Navigator.of(_keySuccess.currentContext ?? context,
@@ -70,6 +72,9 @@ class _LoginState extends State<Login> {
                     .pop();
                 successDialogFuture = null;
                 ap.messageApi.getInitialMessage().then((n) {
+                  // TODO: doesn't work ? n = null
+                  Fluttertoast.showToast(
+                      msg: 'opening notification ${n?.toJson()}');
                   if (n != null) {
                     if (n is LangameNotificationPlay) {
                       Navigator.pushReplacement(
@@ -238,7 +243,7 @@ class _LoginState extends State<Login> {
     Dialogs.showLoadingDialog(context, _keyLoader);
     f.then((res) {
       Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
-      res.handle(
+      res.thenShowSnackBar(
         context,
         () => {},
         kReleaseMode

@@ -10,7 +10,7 @@ import 'package:langame/models/topic.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/providers/setting_provider.dart';
+import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/views/friends.dart';
 import 'package:provider/provider.dart';
@@ -79,9 +79,9 @@ class _SetupState extends State with AfterLayoutMixin {
             f.then((res) {
               Navigator.of(_keyLoader.currentContext!, rootNavigator: true)
                   .pop();
-              res.handle(context, () {
-                Provider.of<SettingProvider>(context, listen: false)
-                    .setHasDoneSetup(true);
+              res.thenShowSnackBar(context, () {
+                Provider.of<LocalStorageProvider>(context, listen: false)
+                    .saveHasDoneSetup(true);
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -105,15 +105,30 @@ class _SetupState extends State with AfterLayoutMixin {
             color: Theme.of(context).colorScheme.background,
             child: Center(
               child: !importRelations
-                  ? OutlinedButton.icon(
-                      style: Theme.of(context).elevatedButtonTheme.style,
-                      onPressed: () {
-                        setState(() {
-                          importRelations = true;
-                        });
-                      },
-                      icon: Icon(Icons.account_box_outlined),
-                      label: Text('Invite friends?'),
+                  ? Tooltip(
+                      message: 'Feature disabled for testing!',
+                      textStyle: Theme.of(context).textTheme.button,
+                      child: OutlinedButton.icon(
+                        style: Theme.of(context).elevatedButtonTheme.style,
+                        onPressed: () {
+                          // setState(() {
+                          //   // importRelations = true;
+                          // });
+                        },
+                        icon: Icon(Icons.account_box_outlined,
+                            color: Theme.of(context).colorScheme.secondary),
+                        label: Text('Invite friends?',
+                            style: Theme.of(context).textTheme.button),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      height: 50,
+                      padding: const EdgeInsets.all(24.0),
+                      preferBelow: false,
+                      showDuration: const Duration(seconds: 2),
+                      waitDuration: const Duration(milliseconds: 100),
                     )
                   : FutureBuilder<LangameResponse>(
                       future: Provider.of<AuthenticationProvider>(context,

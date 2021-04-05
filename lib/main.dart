@@ -9,13 +9,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/providers/profile_provider.dart';
-import 'package:langame/providers/setting_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/views/login.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,7 @@ import 'services/http/firebase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIOverlays([]);
   await Firebase.initializeApp();
   var analytics = FirebaseAnalytics();
   FirebaseApi firebase = FirebaseApi(
@@ -42,7 +44,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => SettingProvider()),
+        ChangeNotifierProvider(create: (_) => LocalStorageProvider(firebase)),
         ChangeNotifierProvider(create: (_) => TopicProvider()),
         ChangeNotifierProvider(
           create: (_) => AuthenticationProvider(firebase, fake: false),
@@ -72,8 +74,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<SettingProvider>(context, listen: false).load();
-    return Consumer<SettingProvider>(builder: (context, s, child) {
+    Provider.of<LocalStorageProvider>(context, listen: false).load();
+    return Consumer<LocalStorageProvider>(builder: (context, s, child) {
       return MaterialApp(
         title: 'Langame',
         themeMode: s.theme,

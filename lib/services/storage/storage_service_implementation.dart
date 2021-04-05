@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/models/errors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'storage_service.dart';
@@ -9,54 +9,50 @@ import 'storage_service.dart';
 class StorageServiceImpl implements StorageService {
   static const sharedPrefThemeKey = 'theme_key';
   static const sharedPrefSetupKey = 'setup_key';
+  static const sharedPrefSearchTagHistoryKey = 'search_tag_history_key';
   @override
   Future<ThemeMode?> getTheme() async {
-    String data = await _getStringFromPreferences(sharedPrefThemeKey);
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(sharedPrefThemeKey) ?? '';
     if (data == '') return null;
     Map<String, dynamic> decoded = jsonDecode(data);
-    if (!kReleaseMode) print('loaded preferences $decoded');
     return ThemeMode.values[decoded['themeMode']];
   }
 
   @override
   Future<void> saveTheme(ThemeMode data) async {
     String jsonString = jsonEncode({'themeMode': data.index});
-    _saveStringToPreferences(sharedPrefThemeKey, jsonString);
-    if (!kReleaseMode) print('saved preferences $jsonString');
-  }
-
-  Future<void> _saveStringToPreferences(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
-  }
-
-  Future<void> _saveBoolToPreferences(String key, bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(key, value);
-  }
-
-  Future<String> _getStringFromPreferences(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(key) ?? '';
-  }
-
-  Future<bool> _getBoolFromPreferences(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(key) ?? false;
+    final result = await prefs.setString(sharedPrefThemeKey, jsonString);
+    if (!result) throw LangameStorageException('failed to saveSetup');
   }
 
   @override
   Future<bool> getSetup() async {
-    bool hasUsedAlreadyDoneSetup =
-        await _getBoolFromPreferences(sharedPrefSetupKey);
-    if (!kReleaseMode)
-      print('preferences loaded, setup done? $hasUsedAlreadyDoneSetup');
-    return hasUsedAlreadyDoneSetup;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(sharedPrefSetupKey) ?? false;
   }
 
   @override
   Future<void> saveSetup(bool value) async {
-    _saveBoolToPreferences(sharedPrefSetupKey, value);
-    if (!kReleaseMode) print('setup done $value saved to preferences');
+    final prefs = await SharedPreferences.getInstance();
+    final result = await prefs.setBool(sharedPrefSetupKey, value);
+    if (!result) throw LangameStorageException('failed to saveSetup');
+  }
+
+  @override
+  Future<List<String>> getSearchTagsHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getStringList(sharedPrefSearchTagHistoryKey) ?? [];
+    return data;
+  }
+
+  @override
+  Future<void> saveSearchTagsHistory(List<String> searchTagsHistory) async {
+    final prefs = await SharedPreferences.getInstance();
+    final result = await prefs.setStringList(
+        sharedPrefSearchTagHistoryKey, searchTagsHistory);
+    if (!result)
+      throw LangameStorageException('failed to saveSearchTagsHistory');
   }
 }

@@ -17,4 +17,16 @@ class FakeStorageService implements StorageService {
 
   @override
   Future<void> saveSetup(bool value) async {}
+
+  @override
+  Future<List<String>> getSearchTagsHistory() {
+    // TODO: implement getSearchTagsHistory
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveSearchTagsHistory(List<String> searchTagsHistory) {
+    // TODO: implement saveSearchTagsHistory
+    throw UnimplementedError();
+  }
 }

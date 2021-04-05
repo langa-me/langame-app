@@ -24,6 +24,7 @@ dependencies:
   crypto: "^3.0.0"
   flutter_local_notifications: ^5.0.0
   firebase_crashlytics: "^1.0.0"
+  firebase_remote_config: "^0.9.0-dev.1"
 
   provider: "^5.0.0"
   http: "^0.13.0"
@@ -37,7 +38,6 @@ dependencies:
   shared_preferences: "^2.0.3"
   flutter_launcher_icons: "^0.9.0"
   async: "^2.4.0"
-  fluttertoast: "^7.1.6"
   agora_rtc_engine: "^4.0.0-rc.3"
 #  table_calendar: "3.0.0-nullsafety.1"
   badges: "2.0.0-nullsafety.1"
@@ -47,6 +47,8 @@ dependencies:
   json_annotation: ^4.0.1
   flutter_app_badger: ^1.2.0
   flutter_spinkit: "^5.0.0"
+  ordered_set: ^3.0.0
+  fluttertoast: ^8.0.3
 
   flutter:
     sdk: flutter

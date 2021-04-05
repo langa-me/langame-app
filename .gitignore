@@ -39,3 +39,11 @@ app.*.symbols
 
 # Obfuscation related
 app.*.map.json
+
+# Ignore keys
+*.keystore
+android/fastlane/key.properties
+android/fastlane/service_account_key.json
+google-services.json
+android_keys.zip
+# TODO: apple stuff

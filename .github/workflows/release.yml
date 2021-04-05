@@ -4,17 +4,63 @@ name: Flutter release CI
 on:
   push:
     branches:
-      - disabled
+      - main
+
 
 jobs:
-  build:
-    # This job will run on ubuntu virtual machine
+  # CI
+  build_android:
     runs-on: ubuntu-latest
     steps:
-
-      # Setup Java environment in order to build the Android app.
-      - uses: actions/checkout@v1
-
-# TODO
-# https://joshuamdeguzman.com/continuous-delivery-for-flutter-using-fastlane-and-github-actions-pt-2-android/
-# https://joshuamdeguzman.com/continuous-delivery-for-flutter-using-fastlane-and-github-actions-pt-3-ios/
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 12.x
+      - name: Decrypt Android keys
+        run: sh ./fastlane/decrypt.sh
+        env:
+          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: 1.17.5
+      - name: Install Flutter dependencies
+        run: flutter pub get
+        # Add build runner commands here if you have any
+      - name: Format files
+        run: flutter format --set-exit-if-changed .
+      - name: Analyze files
+        run: flutter analyze .
+      - name: Run the tests
+        run: flutter test
+  # CD
+  deploy_android:
+    runs-on: ubuntu-latest
+    needs: [build_android]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 12.x
+      - name: Decrypt Android keys
+        run: sh ./fastlane/decrypt.sh
+        env:
+          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: 1.17.5
+      - name: Install Flutter dependencies
+        run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.7.2'
+      - name: Run Fastlane
+        uses: maierj/fastlane-action@v2.0.1
+        with:
+          lane: closed_beta

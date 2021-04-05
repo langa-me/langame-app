@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
@@ -57,16 +58,8 @@ class ImplMessageApi extends MessageApi {
           ? LangameNotificationReadyToPlay.fromJson(pJson)
           : LangameNotificationPlay.fromJson(pJson));
     });
-    print((await flutterLocalNotificationsPlugin.pendingNotificationRequests())
-        .map((e) => e.title));
 
     if (Platform.isAndroid) {
-      List<ActiveNotification>? r = await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.getActiveNotifications();
-
-      r?.map((e) => print(e.body));
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
@@ -168,13 +161,11 @@ class ImplMessageApi extends MessageApi {
       FirebaseMessaging.onBackgroundMessage(
           _firebaseMessagingBackgroundHandler);
     },
-        (_, __) => print(
+        (_, __) => debugPrint(
             'ignoring usual FirebaseMessaging.onBackgroundMessage Null check'));
   }
 
   void _add(RemoteMessage m, {bool background = false}) {
-    print("received message ${m.data}");
-    print("${m.data}: ${m.sentTime.toString()}");
     RemoteNotification? notification = m.notification;
     AndroidNotification? android = m.notification?.android;
     if (notification != null && android != null) {

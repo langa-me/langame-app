@@ -1,6 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/providers/setting_provider.dart';
+import 'package:langame/providers/local_storage_provider.dart';
 import 'package:provider/provider.dart';
 
 class SettingsTwo extends StatefulWidget {
@@ -25,10 +25,11 @@ class _SettingsTwoState extends State<SettingsTwo> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Consumer<SettingProvider>(builder: (context, s, child) {
+              child:
+                  Consumer<LocalStorageProvider>(builder: (context, s, child) {
                 return FlexThemeModeSwitch(
                   themeMode: s.theme,
-                  onThemeModeChanged: s.setTheme,
+                  onThemeModeChanged: s.saveTheme,
                   flexSchemeData: flexSchemeData,
                 );
               }),

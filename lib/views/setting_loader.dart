@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/providers/setting_provider.dart';
+import 'package:langame/providers/local_storage_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'login.dart';
@@ -9,7 +9,7 @@ class SettingLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppSize(context);
-    final provider = Provider.of<SettingProvider>(context, listen: false);
+    final provider = Provider.of<LocalStorageProvider>(context, listen: false);
     provider.load().then((_) => Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Login()),

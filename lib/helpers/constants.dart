@@ -23,7 +23,7 @@ class AppConst {
   /// Define App ID and Token
   static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
   static const String agoraToken =
-      '00604dbfdb7d4a349bf9b02758aabd97c78IAAYWHigqe99f/tWT7Q92VvazyCCC+6JmtZevlf7ZI1bviFlc4wAAAAAEAAeXT+coRJmYAEAAQCgEmZg';
+      '00604dbfdb7d4a349bf9b02758aabd97c78IAAvmXNuSl7u/ZU8s51xZtf4yGrCtiY7jP5BR16lCo51AiFlc4wAAAAAEAAeXT+ciIJoYAEAAQCIgmhg';
 
   /// Your channel ID
   static const agoraChannelId = 'foo';

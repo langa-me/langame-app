@@ -5,4 +5,6 @@ abstract class StorageService {
   Future<ThemeMode?> getTheme();
   Future<void> saveSetup(bool value);
   Future<bool> getSetup();
+  Future<void> saveSearchTagsHistory(List<String> searchTagsHistory);
+  Future<List<String>> getSearchTagsHistory();
 }

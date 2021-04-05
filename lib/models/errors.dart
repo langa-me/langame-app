@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 /// API / service level errors
 class LangameException implements Exception {
@@ -71,6 +72,10 @@ class LangameMessagePermissionException extends LangameException {
   LangameMessagePermissionException(String cause) : super(cause);
 }
 
+class LangameStorageException extends LangameException {
+  LangameStorageException(String cause) : super(cause);
+}
+
 const String kUserDoesNotExists = 'user_does_not_exist';
 const String kNotAuthenticated = 'not_authenticated';
 const String kFailedToUpdateProfile = 'failed_to_update_profile';
@@ -82,7 +87,8 @@ class LangameResponse {
 
   LangameResponse(this.status, {this.error});
 
-  handle(BuildContext context, Function onSucceed, String failedMessage,
+  void thenShowSnackBar(
+      BuildContext context, Function onSucceed, String failedMessage,
       {Function? onFailure}) {
     switch (status) {
       case LangameStatus.cancelled:
@@ -103,6 +109,37 @@ class LangameResponse {
         break;
       case LangameStatus.succeed:
         onSucceed();
+        break;
+    }
+  }
+
+  void thenShowToast(String succeedMessage, String failedMessage,
+      {Function? onSucceed, Function? onFailure}) {
+    switch (status) {
+      case LangameStatus.cancelled:
+        break;
+      case LangameStatus.failed:
+        Fluttertoast.showToast(
+            msg: failedMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        if (onFailure != null) onFailure();
+        if (!kReleaseMode) throw LangameException(failedMessage);
+        break;
+      case LangameStatus.succeed:
+        Fluttertoast.showToast(
+            msg: succeedMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        if (onSucceed != null) onSucceed();
         break;
     }
   }

@@ -1,13 +1,14 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/functional.dart';
-import 'package:langame/models/errors.dart';
 import 'package:langame/models/topic.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
-import 'package:langame/views/friends.dart';
 import 'package:provider/provider.dart';
+
+import 'friends.dart';
 
 class SendLangameView extends StatefulWidget {
   final LangameUser _user;
@@ -100,27 +101,17 @@ class TopicGroupCard extends StatelessWidget {
           // piece of code that find appropriate question
           var provider =
               Provider.of<AuthenticationProvider>(context, listen: false);
-          provider.send(user, text).then((e) {
-            final snackBar =
-                SnackBar(content: Text('Sent $text to ${user.displayName}'));
-
-            // Find the ScaffoldMessenger in the widget tree
-            // and use it to show a SnackBar.
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            Navigator.pop(context);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => FriendsView()),
-            );
-          }).catchError((err) {
-            final snackBar = SnackBar(
-                content: Text(
-                    'Failed to send $text to ${user.displayName}, ${(err as LangameSendLangameException).cause}'));
-
-            // Find the ScaffoldMessenger in the widget tree
-            // and use it to show a SnackBar.
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }, test: (e) => e is LangameSendLangameException);
+          Navigator.pop(context);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => FriendsView()),
+          );
+          var failedMessage = Provider.of<FunnyProvider>(context, listen: false)
+              .getFailingRandom();
+          provider.send(user, text).then(
+                (e) => e.thenShowToast(
+                    'Sent $text to ${user.displayName}', failedMessage),
+              );
         },
         icon: Icon(Icons.autorenew_outlined),
         label: Text(text));
