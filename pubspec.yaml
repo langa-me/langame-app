@@ -1,6 +1,6 @@
 name: langame
-description: Langame, human conversations 2.0.
-version: 1.0.0
+description: AI Augmented human conversations
+version: 0.0.1+1
 authors:
   - Louis Beaumont <louis.beaumont@langa.me>
 

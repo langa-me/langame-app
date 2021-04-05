@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import {RtcRole, RtcTokenBuilder} from "agora-access-token";
 
 // Initialize admin firebase
 admin.initializeApp();
@@ -7,6 +8,16 @@ const kUserDoesNotExist = (id: string) => `user ${id} does not exist`;
 const kInvalidRequest: string = "invalid request";
 const kUsersCollection: string = "users";
 const kNotificationsCollection: string = "notifications";
+
+// Agora config
+// Fill the appID and appCertificate key given by Agora.io
+const appID = "<YOUR APP ID>";
+const appCertificate = "<YOUR APP CERTIFICATE>";
+
+// token expire time, hardcode to 3600 seconds = 1 hour
+const expirationTimeInSeconds = 3600;
+const role = RtcRole.PUBLISHER;
+
 
 /**
  * LangameUser represents a Langame user
@@ -96,6 +107,49 @@ function isLangameUser(obj: any): obj is LangameUser {
   // Checking typical LangameUser properties
   return typeof obj.uid === "string" && typeof obj.google === "boolean";
 }
+
+
+/**
+ *
+ * @type {HttpsFunction & Runnable<any>}
+ */
+exports.generateRtcToken = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    return {
+      statusCode: 401,
+      errorMessage: "not authenticated",
+    };
+  }
+  if (data === null) {
+    return {
+      statusCode: 400,
+      errorMessage: kInvalidRequest,
+    };
+  }
+
+  if (!data.channelName) {
+    return {
+      statusCode: 400,
+      errorMessage: "you must provide a channel name",
+    };
+  }
+
+  // const currentTimestamp = Math.floor(Date.now() / 1000)
+  // const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+  // const channelName = data.channelName;
+  // use 0 if uid is not specified
+  // const uid = req.query.uid || 0 // TODO:
+
+  // var key = RtcTokenBuilder.buildTokenWithUid(
+  // appID,
+  // appCertificate,
+  // channelName,
+  // uid,
+  // role,
+  // privilegeExpiredTs);
+
+  // return { 'key': key };
+});
 
 /**
  * Update user profile (Firebase Auth and Firestore LangameUser)

@@ -11,5 +11,5 @@ rm -rf release.zip service_account_key.json langame.keystore key.properties goog
 
 ```bash
 gpg --output release.zip --decrypt release.zip.gpg && jar xvf release.zip
-mv google-services.json ../android/app
+mv google-services.json app
 ```

@@ -15,6 +15,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/async.dart';
 
+// ignore: must_be_immutable
 class LangameView extends StatefulWidget {
   final String opponentUid;
   final String topic;

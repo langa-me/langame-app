@@ -1,11 +1,10 @@
 
-name: Flutter release CI
+name: Flutter release CI/CD
 
 on:
   push:
     branches:
       - main
-
 
 jobs:
   # CI
@@ -19,13 +18,13 @@ jobs:
         with:
           java-version: 12.x
       - name: Decrypt Android keys
-        run: sh ./fastlane/decrypt.sh
+        run: sh ./android/decrypt.sh
         env:
-          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 1.17.5
+          flutter-version: 2.0.3
       - name: Install Flutter dependencies
         run: flutter pub get
         # Add build runner commands here if you have any
@@ -47,13 +46,13 @@ jobs:
         with:
           java-version: 12.x
       - name: Decrypt Android keys
-        run: sh ./fastlane/decrypt.sh
+        run: sh ./android/decrypt.sh
         env:
-          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 1.17.5
+          flutter-version: 2.0.3
       - name: Install Flutter dependencies
         run: flutter pub get
       - run: flutter build apk --release
@@ -64,3 +63,4 @@ jobs:
         uses: maierj/fastlane-action@v2.0.1
         with:
           lane: closed_beta
+          subdirectory: android

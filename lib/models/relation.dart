@@ -1,10 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:langame/models/user.dart';
 
-part 'relation.g.dart';
-
 /// Evaluated relationship between users using AI + heuristics
-@JsonSerializable()
 class Relation {
   final LangameUser other;
   final RelationLevel level;
