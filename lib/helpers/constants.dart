@@ -2,6 +2,8 @@
 // to understand how to use the FlexColorScheme package demonstrated in
 // the examples.
 
+import 'package:flutter/material.dart';
+
 /// Layout constants and strings used in the example application
 class AppConst {
   // This class is not meant to be instantiated or extended; this constructor
@@ -14,28 +16,24 @@ class AppConst {
   static const String appName = 'Langame';
   static const String version = '0.0.1';
   static const String author = 'Louis Beaumont';
-  // static const String icon = 'assets/images/app_icon.png';
-
-  // The max dp width used for layout content on the screen in the available
-  // body area. Wider content gets growing side padding, kind of like on most
-  // web pages when they are used on super wide screen. Just a design used for
-  // this demo app, that works pretty well in this use case.
-  static const double maxBodyWidth = 1000;
-
-  // Edge padding for page content on the screen. A better looking result
-  // can be obtained if this increases in steps depending on canvas size.
-  // Keeping it fairly tight now, but not too small, it is a compromise for
-  // both phone and larger media.
-  static const double edgePadding = 12;
-
-  // The width of the side menu when expanded, only used by example 5.
-  static const double expandWidth = 225;
-
-  // The width of the side menu when rail sized, only used by example 5.
-  static const double shrinkWidth = 60;
 
   // Whether to log debug settings events
   static const bool debugSettings = false;
+
+  /// Define App ID and Token
+  static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
+  static const String agoraToken =
+      '00604dbfdb7d4a349bf9b02758aabd97c78IAAvmXNuSl7u/ZU8s51xZtf4yGrCtiY7jP5BR16lCo51AiFlc4wAAAAAEAAeXT+ciIJoYAEAAQCIgmhg';
+
+  /// Your channel ID
+  static const agoraChannelId = 'foo';
+
+  static const String saveTokenFunction = 'saveToken';
+  static const String sendLangameFunction = 'sendLangame';
+  static const String sendReadyForLangameFunction = 'sendReadyForLangame';
+  static const String updateProfileFunction = 'updateProfile';
+
+  static final navKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
 }
 
 /// Fonts assets used in this application,
@@ -63,4 +61,33 @@ class AppText {
   AppText._();
 
   // TODO https://flutter.dev/docs/development/accessibility-and-localization/internationalization#:~:text=platform%20might%20require.-,Setting%20up%20an%20internationalized%20app%3A%20the%20Flutter_localizations%20package,include%20a%20package%20called%20flutter_localizations%20.
+}
+
+// TODO: should be singleton probably
+class AppSize {
+  static late MediaQueryData _mediaQueryData;
+  static late double screenWidth;
+  static late double screenHeight;
+  static late double blockSizeHorizontal;
+  static late double blockSizeVertical;
+
+  static late double _safeAreaHorizontal;
+  static late double _safeAreaVertical;
+  static late double safeBlockHorizontal;
+  static late double safeBlockVertical;
+
+  AppSize(BuildContext context) {
+    _mediaQueryData = MediaQuery.of(context);
+    screenWidth = _mediaQueryData.size.width;
+    screenHeight = _mediaQueryData.size.height;
+    blockSizeHorizontal = screenWidth / 100;
+    blockSizeVertical = screenHeight / 100;
+
+    _safeAreaHorizontal =
+        _mediaQueryData.padding.left + _mediaQueryData.padding.right;
+    _safeAreaVertical =
+        _mediaQueryData.padding.top + _mediaQueryData.padding.bottom;
+    safeBlockHorizontal = (screenWidth - _safeAreaHorizontal) / 100;
+    safeBlockVertical = (screenHeight - _safeAreaVertical) / 100;
+  }
 }

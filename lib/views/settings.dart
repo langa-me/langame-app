@@ -1,7 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/helpers/constants.dart';
-import 'package:langame/providers/setting_provider.dart';
+import 'package:langame/providers/local_storage_provider.dart';
 import 'package:provider/provider.dart';
 
 class SettingsTwo extends StatefulWidget {
@@ -13,23 +12,24 @@ class SettingsTwo extends StatefulWidget {
 // theme definitions. The HomePage just contains UI to visually show what the
 // defined example looks like in an application and with commonly used Widgets.
 class _SettingsTwoState extends State<SettingsTwo> {
-  final FlexSchemeData flexSchemeData = FlexColor.schemes[FlexScheme.mandyRed];
+  final FlexSchemeData flexSchemeData = FlexColor.schemes[FlexScheme.mandyRed]!;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
       body: Container(
         child: ListView(
-          padding: const EdgeInsets.all(AppConst.edgePadding),
           children: <Widget>[
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: AppConst.edgePadding),
-              child: Consumer<SettingProvider>(builder: (context, s, child) {
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child:
+                  Consumer<LocalStorageProvider>(builder: (context, s, child) {
                 return FlexThemeModeSwitch(
                   themeMode: s.theme,
-                  onThemeModeChanged: s.setTheme,
+                  onThemeModeChanged: s.saveTheme,
                   flexSchemeData: flexSchemeData,
                 );
               }),

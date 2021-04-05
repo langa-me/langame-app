@@ -8,6 +8,13 @@ flutter pub get
 
 ## Usage
 
+### Json
+
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+flutter pub run build_runner watch --delete-conflicting-outputs
+```
+
 ### Emulator
 
 Get your local laptop IP for the client:
