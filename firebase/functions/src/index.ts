@@ -1,155 +1,18 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {RtcRole, RtcTokenBuilder} from "agora-access-token";
-
+import {FirebaseFunctionsResponse,
+  isFirebaseFunctionsResponse,
+  LangameUser} from "./models";
+import {
+  filterOutSendLangameCalls, generateAgoraRtcToken, getUserData,
+  handleSendToDevice, hashFnv32a,
+  kInvalidRequest,
+  kNotificationsCollection,
+  kUsersCollection,
+} from "./helpers";
 // Initialize admin firebase
 admin.initializeApp();
-const kUserDoesNotExist = (id: string) => `user ${id} does not exist`;
-const kInvalidRequest: string = "invalid request";
-const kUsersCollection: string = "users";
-const kNotificationsCollection: string = "notifications";
 
-// Agora config
-// Fill the appID and appCertificate key given by Agora.io
-const appID = "<YOUR APP ID>";
-const appCertificate = "<YOUR APP CERTIFICATE>";
-
-// token expire time, hardcode to 3600 seconds = 1 hour
-const expirationTimeInSeconds = 3600;
-const role = RtcRole.PUBLISHER;
-
-
-/**
- * LangameUser represents a Langame user
- */
-class LangameUser {
-    // / [uid] is set by Firebase authentication
-    uid?: string; // TODO: shouldn't be nullable
-    email?: string;
-    displayName?: string;
-    // bool emailVerified = false;
-    phoneNumber?: string;
-    photoUrl?: string;
-
-    // / Is the user [online]?
-    online: boolean = false;
-
-    // / Google account linked?
-    google: boolean = false;
-
-    // / Facebook account linked?
-    facebook: boolean = false;
-
-    // / Apple account linked?
-    apple: boolean = false;
-
-    // / Favourite topics the user has picked, should impact recommendations
-    favouriteTopics?: string[];
-
-    // / [isALangameUser] signifies whether this user is an imported contact
-    // / or really someone who registered on Langame
-    isALangameUser: boolean = false;
-
-    // / Twitter-like [tag] i.e. @steveTheApple
-    tag?: string;
-
-    // / Device [tokens] used for Cloud Messaging
-    tokens?: string[];
-
-    /**
-     *
-     * @param{string} uid
-     * @param{string} email
-     * @param{string} displayName
-     * @param{string} phoneNumber
-     * @param{string} photoUrl
-     * @param{boolean} online
-     * @param{boolean} google
-     * @param{boolean} facebook
-     * @param{boolean} apple
-     * @param{array} favouriteTopics
-     * @param{string} tag
-     * @param{array} tokens
-     */
-    constructor(uid: string,
-        email: string,
-        displayName: string,
-        phoneNumber: string,
-        photoUrl: string,
-        online: boolean = false,
-        google: boolean = false,
-        facebook: boolean = false,
-        apple: boolean = false,
-        favouriteTopics: string[],
-        tag: string,
-        tokens: string[]) {
-      this.uid = uid;
-      this.email = email;
-      this.displayName = displayName;
-      this.phoneNumber = phoneNumber;
-      this.photoUrl = photoUrl;
-      this.online = online;
-      this.google = google;
-      this.facebook = facebook;
-      this.apple = apple;
-      this.favouriteTopics = favouriteTopics;
-      this.tag = tag;
-      this.tokens = tokens;
-    }
-}
-
-/**
- * Check if object is a LangameUser
- * @param{any} obj
- * @return{boolean}
- */
-function isLangameUser(obj: any): obj is LangameUser {
-  // Checking typical LangameUser properties
-  return typeof obj.uid === "string" && typeof obj.google === "boolean";
-}
-
-
-/**
- *
- * @type {HttpsFunction & Runnable<any>}
- */
-exports.generateRtcToken = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    return {
-      statusCode: 401,
-      errorMessage: "not authenticated",
-    };
-  }
-  if (data === null) {
-    return {
-      statusCode: 400,
-      errorMessage: kInvalidRequest,
-    };
-  }
-
-  if (!data.channelName) {
-    return {
-      statusCode: 400,
-      errorMessage: "you must provide a channel name",
-    };
-  }
-
-  // const currentTimestamp = Math.floor(Date.now() / 1000)
-  // const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-  // const channelName = data.channelName;
-  // use 0 if uid is not specified
-  // const uid = req.query.uid || 0 // TODO:
-
-  // var key = RtcTokenBuilder.buildTokenWithUid(
-  // appID,
-  // appCertificate,
-  // channelName,
-  // uid,
-  // role,
-  // privilegeExpiredTs);
-
-  // return { 'key': key };
-});
 
 /**
  * Update user profile (Firebase Auth and Firestore LangameUser)
@@ -192,23 +55,26 @@ exports.updateProfile = functions.https.onCall(async (data, context) => {
  */
 exports.saveToken = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
-    return {
-      statusCode: 401,
-      errorMessage: "not authenticated",
-    };
+    return new FirebaseFunctionsResponse(
+        401,
+        undefined,
+        "not authenticated",
+    );
   }
   if (data === null) {
-    return {
-      statusCode: 400,
-      errorMessage: kInvalidRequest,
-    };
+    return new FirebaseFunctionsResponse(
+        400,
+        undefined,
+        kInvalidRequest,
+    );
   }
 
   if (!data.tokens) {
-    return {
-      statusCode: 400,
-      errorMessage: "you must provide token(s)",
-    };
+    return new FirebaseFunctionsResponse(
+        400,
+        undefined,
+        "you must provide token(s)",
+    );
   }
 
   // Save user device token(s) to Firestore, used to send notifications
@@ -231,193 +97,106 @@ exports.saveToken = functions.https.onCall(async (data, context) => {
       });
 });
 
-const filterOutSendLangameCalls =
-    (data: any, context: functions.https.CallableContext) => {
-      if (!context.auth) {
-        return {
-          result: null,
-          statusCode: 401,
-          errorMessage: "not authenticated",
-        };
-      }
-
-      if (!data) {
-        return {
-          statusCode: 400,
-          errorMessage: kInvalidRequest,
-        };
-      }
-
-      if (!data.recipient) {
-        return {
-          result: null,
-          statusCode: 400,
-          errorMessage: "invalid recipient",
-        };
-      }
-
-      if (!data.topic) {
-        return {
-          result: null,
-          statusCode: 400,
-          errorMessage: "invalid topic",
-        };
-      }
-      return 0;
-    };
-
-const getUserData = async (id: string) => {
-  const recipient = await admin
-      .firestore()
-      .collection(kUsersCollection)
-      .doc(id)
-      .get();
-  if (!recipient.exists) {
-    return {
-      result: null,
-      statusCode: 400,
-      errorMessage: kUserDoesNotExist(id),
-    };
-  }
-
-
-  const data = recipient.data();
-
-  if (!data) {
-    return {
-      result: null,
-      statusCode: 400,
-      errorMessage: kUserDoesNotExist(id),
-    };
-  }
-
-  if (!isLangameUser(data)) {
-    return {
-      result: null,
-      statusCode: 400,
-      errorMessage: kUserDoesNotExist(id),
-    };
-  }
-
-  const dataAsLangameUser = data as LangameUser;
-
-  if (!dataAsLangameUser.tokens) {
-    return {
-      result: null,
-      statusCode: 500,
-      errorMessage: `user ${id} has no devices (tokens)`,
-    };
-  }
-
-  if (!dataAsLangameUser.uid) {
-    return {
-      result: null,
-      statusCode: 500,
-      errorMessage: `user ${id} has no uid`,
-    };
-  }
-
-  if (!dataAsLangameUser.displayName) {
-    return {
-      result: null,
-      statusCode: 500,
-      errorMessage: `user ${id} has no displayName`,
-    };
-  }
-  return dataAsLangameUser;
-};
-
-const handleSendToDevice = (recipientData: LangameUser,
-    notificationPayload: any,
-    promise: Promise<admin.messaging.MessagingDevicesResponse>) => {
-  return promise.then((res) => {
-    res.results.forEach((r, i) => {
-      const t = recipientData.tokens![i];
-      functions.logger.warn("failed", t, r.error);
-      // Invalid token, remove it
-      if (r.error &&
-                r.error.code ===
-                "messaging/registration-token-not-registered" &&
-                t) {
-        admin
-            .firestore()
-            .collection(kUsersCollection)
-            .doc(recipientData.uid!)
-            .update({
-              tokens: admin.firestore.FieldValue
-                  .arrayRemove(t),
-            }).then(() => functions.logger.warn("removed invalid token", t))
-            .catch(() =>
-              functions.logger.error("failed to remove invalid token", t));
-      }
-    });
-    return {
-      result: notificationPayload.data.id,
-      statusCode: 200,
-      errorMessage: null,
-    };
-  }).catch((e) => {
-    functions.logger.error("sendLangame failed", e);
-    return {result: null, statusCode: 500, errorMessage: JSON.stringify(e)};
-  });
-};
 
 /**
  *
  * @type {HttpsFunction & Runnable<any>}
  */
 exports.sendLangame = functions.https.onCall(async (data, context) => {
+  // Check request body is ok
   const initialChecks = filterOutSendLangameCalls(data, context);
   if (initialChecks !== 0) return initialChecks;
-  const recipientData = await getUserData(data.recipient);
+  // Get recipients data from firestore
+  const recipientsData: Array<FirebaseFunctionsResponse | LangameUser> =
+      data.recipients.map(async (r: string) => await getUserData(r));
   // Failed ? Return error
-  if ("statusCode" in recipientData) return recipientData;
-  // @ts-ignore
-  const senderData = await getUserData(context.auth.uid);
+  if (recipientsData
+      .some((r: FirebaseFunctionsResponse | LangameUser) =>
+        isFirebaseFunctionsResponse(r))) {
+    return recipientsData.find((e: FirebaseFunctionsResponse | LangameUser) =>
+      isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
+  }
+  // Get sender data from firestore
+  const senderData: FirebaseFunctionsResponse | LangameUser =
+      await getUserData(context.auth!.uid);
   // Failed ? Return error
-  if ("statusCode" in senderData) return senderData;
+  if (isFirebaseFunctionsResponse(senderData)) return senderData;
 
-  const notificationPayload = {
-    data: {
-      id: "",
+  // TODO: is it really 100% atomic?
+  const channelName: string | number =
+      hashFnv32a(senderData.uid!, true, Date.now());
+  // Somehow, shouldn't happen
+  if (typeof channelName === "number") {
+    return new FirebaseFunctionsResponse(500,
+        undefined,
+        "failed to generate agora channel name");
+  }
+
+
+  const results = await recipientsData
       // @ts-ignore
-      senderUid: context.auth.uid,
-      recipientUid: recipientData.uid,
-      topic: data.topic,
-    },
-    notification: {
-      // Notification is tagged by sender uid
-      // If specified and a notification with the same tag is a
-      // already being shown, the new notification replaces
-      // the existing one in the notification drawer.
-      // Android only
+      .map(async (e: LangameUser, i: number) => {
+        // Generate the Agora token
+        const agoraRtcToken = generateAgoraRtcToken(channelName, i);
+        const notificationPayload = {
+          data: {
+            // Assigning notification id later
+            id: "",
+            senderUid: context.auth!.uid,
+            recipientUid: e.uid,
+            // Topic of the Langame
+            topic: data.topic,
+            // Channel user id number required for agora
+            agoraUid: i,
+            // A channel is created for this Langame
+            agoraChannelName: channelName,
+            // A token is generated for these users for this channel
+            agoraRtcToken: agoraRtcToken,
+          },
+          notification: {
+            // Notification is tagged by sender uid
+            // If specified and a notification with the same tag is a
+            // already being shown, the new notification replaces
+            // the existing one in the notification drawer.
+            // Android only
+            tag: context.auth!.uid,
+            body: `${senderData.displayName} invited you to play ${data.topic}`,
+            title: `Play ${data.topic} with ${senderData.displayName}?`,
+          },
+        };
+
+        const notification = await admin
+            .firestore()
+            .collection(kNotificationsCollection)
+            .add(notificationPayload);
+        notificationPayload.data.id = notification.id;
+
+        return await handleSendToDevice(e,
+            notificationPayload,
+            admin.messaging().sendToDevice(
+                e.tokens!,
+                // @ts-ignore
+                notificationPayload,
+                {
+                  // Required for background/quit data-only messages on iOS
+                  contentAvailable: true,
+                  // Required for background/quit data-only messages on Android
+                  priority: "high",
+                }
+            ),
+        );
+      });
+
+  // Failed ? Return error
+  if (results
       // @ts-ignore
-      tag: context.auth.uid,
-      body: `${senderData.displayName} invited you to play ${data.topic}`,
-      title: `Play ${data.topic} with ${senderData.displayName}?`,
-    },
-  };
-
-  const notification = await admin
-      .firestore()
-      .collection(kNotificationsCollection)
-      .add(notificationPayload);
-  notificationPayload.data.id = notification.id;
-
-  return handleSendToDevice(recipientData,
-      notificationPayload,
-      admin.messaging().sendToDevice(
-        recipientData.tokens!,
-        // @ts-ignore
-        notificationPayload,
-        {
-          // Required for background/quit data-only messages on iOS
-          contentAvailable: true,
-          // Required for background/quit data-only messages on Android
-          priority: "high",
-        }
-      ),
-  );
+      .some((r: FirebaseFunctionsResponse | LangameUser) =>
+        isFirebaseFunctionsResponse(r))) {
+    return recipientsData.find((e: FirebaseFunctionsResponse | LangameUser) =>
+      isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
+  }
+  // Succeed, results is string[]
+  return new FirebaseFunctionsResponse(200, results, undefined);
 });
 
 
@@ -428,62 +207,78 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
 exports.sendReadyForLangame = functions.https.onCall(async (data, context) => {
   const initialChecks = filterOutSendLangameCalls(data, context);
   if (initialChecks !== 0) return initialChecks;
-  const recipientData = await getUserData(data.recipient);
+  // Get recipients data from firestore
+  const recipientsData: Array<FirebaseFunctionsResponse | LangameUser> =
+      data.recipients.map(async (r: string) => await getUserData(r));
   // Failed ? Return error
-  if ("statusCode" in recipientData) return recipientData;
-  // @ts-ignore
-  const senderData = await getUserData(context.auth.uid);
+  if (recipientsData
+      .some((r: FirebaseFunctionsResponse | LangameUser) =>
+        isFirebaseFunctionsResponse(r))) {
+    return recipientsData.find((e: FirebaseFunctionsResponse | LangameUser) =>
+      isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
+  }
+  // Get sender data from firestore
+  const senderData: FirebaseFunctionsResponse | LangameUser =
+      await getUserData(context.auth!.uid);
   // Failed ? Return error
-  if ("statusCode" in senderData) return senderData;
+  if (isFirebaseFunctionsResponse(senderData)) return senderData;
 
   if (!data.question) {
-    return {
-      result: null,
-      statusCode: 400,
-      errorMessage: "invalid question",
-    };
+    return new FirebaseFunctionsResponse(
+        400,
+        undefined,
+        "invalid question",
+    );
   }
-
-  const notificationPayload = {
-    data: {
-      id: "",
+  const results = await recipientsData
       // @ts-ignore
-      senderUid: context.auth.uid,
-      recipientUid: recipientData.uid,
-      topic: data.topic,
-      question: data.question,
-    },
-    notification: {
-      // Notification is tagged by sender uid
-      // If specified and a notification with the same tag is a
-      // already being shown, the new notification replaces
-      // the existing one in the notification drawer.
-      // Android only
-      // @ts-ignore
-      tag: context.auth.uid,
-      body: `${senderData.displayName} is waiting you to play ${data.topic}`,
-      title: `Join ${senderData.displayName} to play ${data.topic} now?`,
-    },
-  };
-  const notification = await admin
-      .firestore()
-      .collection(kNotificationsCollection)
-      .add(notificationPayload);
-  notificationPayload.data.id = notification.id;
+      .map(async (e: LangameUser) => {
+        const notificationPayload = {
+          data: {
+            id: "",
+            senderUid: context.auth!.uid,
+            recipientUid: e.uid,
+            topic: data.topic,
+            question: data.question,
+          },
+          notification: {
+            tag: context.auth!.uid,
+            // eslint-disable-next-line max-len
+            body: `${senderData.displayName} is waiting you to play ${data.topic}`,
+            title: `Join ${senderData.displayName} to play ${data.topic} now?`,
+          },
+        };
+        const notification = await admin
+            .firestore()
+            .collection(kNotificationsCollection)
+            .add(notificationPayload);
+        notificationPayload.data.id = notification.id;
 
-  return handleSendToDevice(recipientData,
-      notificationPayload,
-      admin.messaging().sendToDevice(
-        recipientData.tokens!,
-        // @ts-ignore
-        notificationPayload,
-        {
-          // Required for background/quit data-only messages on iOS
-          contentAvailable: true,
-          // Required for background/quit data-only messages on Android
-          priority: "high",
-        }
-      ));
+        return handleSendToDevice(e,
+            notificationPayload,
+            admin.messaging().sendToDevice(
+            e.tokens!,
+            // @ts-ignore
+            notificationPayload,
+            {
+              // Required for background/quit data-only messages on iOS
+              contentAvailable: true,
+              // Required for background/quit data-only messages on Android
+              priority: "high",
+            }
+            ));
+      });
+
+  // Failed ? Return error
+  if (results
+      // @ts-ignore
+      .some((r: FirebaseFunctionsResponse | LangameUser) =>
+        isFirebaseFunctionsResponse(r))) {
+    return recipientsData.find((e: FirebaseFunctionsResponse | LangameUser) =>
+      isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
+  }
+  // Succeed, results is string[]
+  return new FirebaseFunctionsResponse(200, results, undefined);
 });
 
 // const fake = () => {

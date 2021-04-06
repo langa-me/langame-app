@@ -91,7 +91,7 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<String?> send(String recipient, String topic) async {
+  Future<List<String>?> send(List<String> recipients, String topic) async {
     // TODO: unfortunately Android only
     // firebaseMessaging.sendMessage()
 
@@ -102,7 +102,7 @@ class ImplMessageApi extends MessageApi {
     try {
       final HttpsCallableResult result = await callable.call(
         <String, dynamic>{
-          'recipient': recipient,
+          'recipients': recipients,
           'topic': topic,
         },
       );
@@ -122,7 +122,7 @@ class ImplMessageApi extends MessageApi {
           throw LangameSendLangameException(response.errorMessage ??
               FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
       }
-      return response.result;
+      return response.results;
     } catch (e) {
       throw LangameSendLangameException(e.toString());
     }
@@ -284,8 +284,8 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<String?> sendReadyForLangame(
-      String recipient, String topic, String question) async {
+  Future<List<String>?> sendReadyForLangame(
+      List<String> recipients, String topic, String question) async {
     HttpsCallable callable = firebase.functions.httpsCallable(
       AppConst.sendReadyForLangameFunction,
       options: HttpsCallableOptions(
@@ -296,7 +296,7 @@ class ImplMessageApi extends MessageApi {
     try {
       final HttpsCallableResult result = await callable.call(
         <String, dynamic>{
-          'recipient': recipient,
+          'recipients': recipients,
           'topic': topic,
           'question': question,
         },
@@ -318,7 +318,7 @@ class ImplMessageApi extends MessageApi {
           throw LangameSendReadyForLangameException(response.errorMessage ??
               FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
       }
-      return response.result;
+      return response.results;
     } catch (e) {
       throw LangameSendReadyForLangameException(e.toString());
     }

@@ -28,8 +28,8 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
         # Add build runner commands here if you have any
-      - name: Format files
-        run: flutter format --set-exit-if-changed .
+#      - name: Format files
+#        run: flutter format --set-exit-if-changed .
       - name: Analyze files
         run: flutter analyze .
       - name: Run the tests
@@ -56,11 +56,15 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
       - run: flutter build apk --release
-      - uses: actions/setup-ruby@v1
+      - uses: actions/upload-artifact@v2
         with:
-          ruby-version: '2.7.2'
-      - name: Run Fastlane
-        uses: maierj/fastlane-action@v2.0.1
-        with:
-          lane: closed_beta
-          subdirectory: android
+          name: release-apk
+          path: build/app/outputs/apk/release/app-release.apk
+#      - uses: actions/setup-ruby@v1
+#        with:
+#          ruby-version: '2.7.2'
+#      - name: Run Fastlane
+#        uses: maierj/fastlane-action@v2.0.1
+#        with:
+#          lane: closed_beta
+#          subdirectory: android

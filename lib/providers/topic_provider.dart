@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:core';
 
 import 'package:flutter/material.dart';
@@ -20,14 +19,13 @@ class TopicProvider extends ChangeNotifier {
   /// Defines whether it's fake API or real
   bool _fake = true;
   late TopicApi _api;
-  final List<TopicGroup> _topicGroups = [];
-  UnmodifiableListView<TopicGroup> get topicGroups =>
-      UnmodifiableListView(_topicGroups);
+  final List<Topic> _topics = [];
+  List<Topic> get topics => _topics;
 
   Future<void> getAllTopics() async {
-    _topicGroups.clear();
+    _topics.clear();
     (await _api.getTopics()).forEach((element) {
-      _topicGroups.add(element);
+      _topics.add(element);
       notifyListeners();
     });
   }

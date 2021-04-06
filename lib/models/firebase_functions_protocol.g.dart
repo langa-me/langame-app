@@ -62,7 +62,7 @@ FirebaseFunctionsResponseSendLangame
     _$enumDecode(
         _$FirebaseFunctionsResponseStatusCodeEnumMap, json['statusCode']),
     json['errorMessage'] as String?,
-    json['result'] as String?,
+    json['results'] as String?,
   );
 }
 
@@ -72,5 +72,5 @@ Map<String, dynamic> _$FirebaseFunctionsResponseSendLangameToJson(
       'statusCode':
           _$FirebaseFunctionsResponseStatusCodeEnumMap[instance.statusCode],
       'errorMessage': instance.errorMessage,
-      'result': instance.result,
+      'results': instance.results,
     };

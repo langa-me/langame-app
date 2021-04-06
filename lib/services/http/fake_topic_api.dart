@@ -4,23 +4,31 @@ import 'topic_api.dart';
 
 class FakeTopicApi implements TopicApi {
   @override
-  Future<List<TopicGroup>> getTopics() async {
+  Future<List<Topic>> getTopics() async {
     return [
-      TopicGroup("Recommendations", ["Nutrition", "Wisdom", "Career"]),
-      TopicGroup("Sciences",
-          ["Biology", "Physics", "Maths", "Artificial Intelligence"]),
-      TopicGroup("Philosophy", ["Purpose", "Love", "Friends"]),
-      TopicGroup("Spirituality", ["Religion", "Death", "Meditation"]),
-      TopicGroup("Health", ["Body", "Mind", "Fast"]),
-      TopicGroup("Wealth", [
-        "Stocks",
-        "Passive",
-        "Active",
-        "Bitcoin",
-        "Ethereum",
-        "VC",
-        "Angel Investing"
-      ])
+      Topic("Nutrition", ["Recommendations"]),
+      Topic("Wisdom", ["Recommendations"]),
+      Topic("Career", ["Recommendations"]),
+      Topic("Biology", ["Sciences"]),
+      Topic("Physics", ["Sciences"]),
+      Topic("Maths", ["Sciences"]),
+      Topic("Artificial Intelligence", ["Sciences"]),
+      Topic("Purpose", ["Philosophy"]),
+      Topic("Love", ["Philosophy"]),
+      Topic("Friends", ["Philosophy"]),
+      Topic("Religion", ["Spirituality"]),
+      Topic("Death", ["Spirituality"]),
+      Topic("Meditation", ["Spirituality"]),
+      Topic("Body", ["Health"]),
+      Topic("Mind", ["Health"]),
+      Topic("Fast", ["Health"]),
+      Topic("Stocks", ["Wealth"]),
+      Topic("Passive", ["Wealth"]),
+      Topic("Active", ["Wealth"]),
+      Topic("Bitcoin", ["Wealth"]),
+      Topic("Ethereum", ["Wealth"]),
+      Topic("Venture Capitalism", ["Wealth"]),
+      Topic("Angel Investing", ["Wealth"]),
     ];
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/topic.dart';
@@ -27,7 +28,7 @@ class Setup extends StatefulWidget {
 
 class _SetupState extends State with AfterLayoutMixin {
   List<Widget> topicGroups = [];
-  List<TopicGroup> favouriteTopics = [];
+  List<Topic> favouriteTopics = [];
   List<LangameUser> contactsToInvite = [];
   final controller = PageController(initialPage: 0, viewportFraction: 0.9);
   bool importRelations = false;
@@ -163,25 +164,36 @@ class _SetupState extends State with AfterLayoutMixin {
               padding: const EdgeInsets.only(top: 12.0),
               child: Consumer<TopicProvider>(
                 builder: (context, t, child) {
-                  return ListView.separated(
-                    separatorBuilder: (BuildContext context, int index) {
-                      return SizedBox(height: 4);
-                    },
-                    itemCount: t.topicGroups.length,
-                    padding: EdgeInsets.all(4.0),
-                    itemBuilder: (context, index) {
+                  return GroupedListView<Topic, String>(
+                    elements: t.topics,
+                    groupBy: (element) => element.groups.first,
+                    groupSeparatorBuilder: (String groupByValue) => Container(
+                      decoration: new BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondaryVariant,
+                          borderRadius: new BorderRadius.only(
+                            bottomLeft: const Radius.circular(40.0),
+                            topRight: const Radius.circular(40.0),
+                          )),
+                      padding: const EdgeInsets.all(5.0),
+                      child: Text(
+                        groupByValue,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    itemBuilder: (context, Topic t) {
                       return Center(
                         child: ToggleButton(
                             onChange: (bool selected) {
                               if (selected)
-                                favouriteTopics.add(t.topicGroups[index]);
+                                favouriteTopics.add(t);
                               else
-                                favouriteTopics.removeWhere(
-                                    (e) => e.name == t.topicGroups[index].name);
+                                favouriteTopics
+                                    .removeWhere((e) => e.name == t.name);
                             },
                             width: AppSize.blockSizeHorizontal * 70,
-                            textUnselected: t.topicGroups[index].name,
-                            textSelected: t.topicGroups[index].name),
+                            textUnselected: t.name,
+                            textSelected: t.name),
                       );
                     },
                   );

@@ -18,9 +18,22 @@ class LangameNotification {
 
 @JsonSerializable()
 class LangameNotificationPlay extends LangameNotification {
-  LangameNotificationPlay(id, senderUid, this.topic, {background = false})
+  LangameNotificationPlay(id, senderUid, this.topic, this.agoraUid,
+      this.agoraChannelName, this.agoraRtcToken,
+      {background = false})
       : super(id, senderUid, background: background);
+
+  /// Topic of the Langame
   String topic;
+
+  /// Self agora user id in the channel
+  int agoraUid;
+
+  /// Agora channel name
+  String agoraChannelName;
+
+  /// Agora RTC token for this channel and user
+  String agoraRtcToken;
 
   factory LangameNotificationPlay.fromJson(Map<String, dynamic> json) =>
       _$LangameNotificationPlayFromJson(json);

@@ -70,9 +70,10 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<LangameResponse> send(LangameUser recipient, String topic) async {
+  Future<LangameResponse> send(
+      List<LangameUser> recipients, String topic) async {
     try {
-      await messageApi.send(recipient.uid!, topic);
+      await messageApi.send(recipients.map((e) => e.uid!).toList(), topic);
     } catch (e, s) {
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
@@ -81,9 +82,9 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse> sendReadyForLangame(
-      String recipientUid, String topic, String question) async {
+      List<String> recipientsUid, String topic, String question) async {
     try {
-      await messageApi.sendReadyForLangame(recipientUid, topic, question);
+      await messageApi.sendReadyForLangame(recipientsUid, topic, question);
     } catch (e, s) {
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);

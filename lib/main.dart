@@ -15,6 +15,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
@@ -53,6 +54,7 @@ void main() async {
         ChangeNotifierProvider(
             create: (context) => FirestoreProvider(firebase.firestore)),
         ChangeNotifierProvider(create: (_) => FunnyProvider()),
+        ChangeNotifierProvider(create: (_) => LangameProvider()),
       ],
       child: MyApp(analytics),
     ),

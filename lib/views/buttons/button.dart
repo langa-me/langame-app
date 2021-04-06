@@ -100,12 +100,16 @@ class ToggleButton extends StatefulWidget {
   final String textUnselected;
   final double? width;
 
+  /// Whether to trigger the toggle on long press instead of simple tap
+  final bool onLongPress;
+
   ToggleButton(
       {this.textSelected = '',
       this.textUnselected = '',
       this.selected = false,
       this.onChange,
-      this.width = 150});
+      this.width = 150,
+      this.onLongPress = false});
 
   @override
   _ToggleButtonState createState() => _ToggleButtonState(
@@ -113,7 +117,8 @@ class ToggleButton extends StatefulWidget {
       onChange: onChange,
       textSelected: textSelected,
       textUnselected: textUnselected,
-      width: width);
+      width: width,
+      onLongPress: onLongPress);
 }
 
 class _ToggleButtonState extends State<ToggleButton> {
@@ -122,13 +127,15 @@ class _ToggleButtonState extends State<ToggleButton> {
   String textSelected;
   String textUnselected;
   final double? width;
+  final bool onLongPress;
 
   _ToggleButtonState(
       {this.textSelected = '',
       this.textUnselected = '',
       this.selected = false,
       this.onChange,
-      this.width = 150});
+      this.width = 150,
+      this.onLongPress = false});
 
   @override
   Widget build(BuildContext context) {
@@ -144,12 +151,8 @@ class _ToggleButtonState extends State<ToggleButton> {
                       Theme.of(context).colorScheme.secondary))
               .merge(Theme.of(context).elevatedButtonTheme.style),
           child: Text(textSelected),
-          onPressed: () {
-            setState(() {
-              selected = !selected;
-            });
-            if (onChange != null) onChange!(false);
-          },
+          onPressed: onLongPress ? null : _onFirstChildChange,
+          onLongPress: onLongPress ? _onFirstChildChange : null,
         ),
       ),
       secondChild: Container(
@@ -157,14 +160,24 @@ class _ToggleButtonState extends State<ToggleButton> {
         child: ElevatedButton(
           style: Theme.of(context).elevatedButtonTheme.style,
           child: Text(textUnselected),
-          onPressed: () {
-            setState(() {
-              selected = !selected;
-            });
-            if (onChange != null) onChange!(true);
-          },
+          onPressed: onLongPress ? null : _onSecondChildChange,
+          onLongPress: onLongPress ? _onSecondChildChange : null,
         ),
       ),
     );
+  }
+
+  _onFirstChildChange() {
+    setState(() {
+      selected = !selected;
+    });
+    if (onChange != null) onChange!(false);
+  }
+
+  _onSecondChildChange() {
+    setState(() {
+      selected = !selected;
+    });
+    if (onChange != null) onChange!(true);
   }
 }

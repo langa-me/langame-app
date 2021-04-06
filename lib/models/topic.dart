@@ -1,6 +1,8 @@
-class TopicGroup {
+class Topic {
   String name;
-  List<String> topics; // TODO: maybe enum ? but if collaborative mode?
 
-  TopicGroup(this.name, this.topics);
+  /// Classified as? i.e. topic "nutrition" is group "health,well being ..."
+  List<String> groups;
+
+  Topic(this.name, this.groups);
 }

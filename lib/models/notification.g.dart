@@ -28,6 +28,9 @@ LangameNotificationPlay _$LangameNotificationPlayFromJson(
     json['id'],
     json['senderUid'],
     json['topic'] as String,
+    json['agoraUid'] as int,
+    json['agoraChannelName'] as String,
+    json['agoraRtcToken'] as String,
     background: json['background'],
   );
 }
@@ -39,6 +42,9 @@ Map<String, dynamic> _$LangameNotificationPlayToJson(
       'senderUid': instance.senderUid,
       'background': instance.background,
       'topic': instance.topic,
+      'agoraUid': instance.agoraUid,
+      'agoraChannelName': instance.agoraChannelName,
+      'agoraRtcToken': instance.agoraRtcToken,
     };
 
 LangameNotificationReadyToPlay _$LangameNotificationReadyToPlayFromJson(

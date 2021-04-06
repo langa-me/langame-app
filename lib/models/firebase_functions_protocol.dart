@@ -31,11 +31,11 @@ class FirebaseFunctionsResponseSendLangame extends FirebaseFunctionsResponse {
   FirebaseFunctionsResponseSendLangame(
       FirebaseFunctionsResponseStatusCode statusCode,
       String? errorMessage,
-      String? result)
+      String? results)
       : super(statusCode, errorMessage);
 
-  /// The result should be either null (error) or the notification id  retrievable in Firestore
-  String? result;
+  /// The result should be either null (error) or the notifications id  retrievable in Firestore
+  List<String>? results;
 
   factory FirebaseFunctionsResponseSendLangame.fromJson(
           Map<String, dynamic> json) =>

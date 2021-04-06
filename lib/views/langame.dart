@@ -9,7 +9,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/views/image.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -72,20 +71,20 @@ class _LangameViewState extends State<LangameView> {
     super.initState();
     this._initEngine();
 
-    if (!widget.notifyOthers) return;
-    // TODO: generate and send some int id for channel
-    Provider.of<AuthenticationProvider>(context, listen: false)
-        .sendReadyForLangame(widget.opponentUid, widget.topic, question)
-        .then((res) {
-      res.thenShowSnackBar(context, () {
-        final snackBar = SnackBar(
-            content: Text('Your friend has been told of your presence!'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      },
-          !kReleaseMode
-              ? 'failed to sendReadyForLangame ${res.error.toString()}'
-              : Provider.of<FunnyProvider>(context).getFailingRandom());
-    });
+    // if (!widget.notifyOthers) return;
+    // // TODO: generate and send some int id for channel
+    // Provider.of<AuthenticationProvider>(context, listen: false)
+    //     .sendReadyForLangame(widget.opponentUid, widget.topic, question)
+    //     .then((res) {
+    //   res.thenShowSnackBar(context, () {
+    //     final snackBar = SnackBar(
+    //         content: Text('Your friend has been told of your presence!'));
+    //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    //   },
+    //       !kReleaseMode
+    //           ? 'failed to sendReadyForLangame ${res.error.toString()}'
+    //           : Provider.of<FunnyProvider>(context).getFailingRandom());
+    // });
   }
 
   @override

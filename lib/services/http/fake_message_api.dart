@@ -44,11 +44,6 @@ class FakeMessageApi extends MessageApi {
   }
 
   @override
-  Future<String?> send(String recipient, String topic) async {
-    return uuid.v4();
-  }
-
-  @override
   Future listen(void Function(LangameNotification p1) add) async {
     var r = Random();
     var delay = Duration(seconds: 5 + r.nextInt(10));
@@ -75,8 +70,13 @@ class FakeMessageApi extends MessageApi {
   }
 
   @override
-  Future<String?> sendReadyForLangame(
-      String recipient, String topic, String question) {
+  Future<List<String>?> send(List<String> recipients, String topic) async {
+    return List.generate(recipients.length, (_) => uuid.v4());
+  }
+
+  @override
+  Future<List<String>?> sendReadyForLangame(
+      List<String> recipients, String topic, String question) {
     // TODO: implement sendReadyForLangame
     throw UnimplementedError();
   }

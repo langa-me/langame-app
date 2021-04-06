@@ -17,12 +17,12 @@ abstract class MessageApi {
   Future<LangameResponse> initializePermissions();
 
   /// Send a Langame message and return the message id retrievable in Firestore
-  Future<String?> send(String recipient, String topic);
+  Future<List<String>?> send(List<String> recipients, String topic);
 
   /// Response to a Langame message to say "I am ready and waiting"
   /// Also send the Langame question along
-  Future<String?> sendReadyForLangame(
-      String recipient, String topic, String question);
+  Future<List<String>?> sendReadyForLangame(
+      List<String> recipients, String topic, String question);
 
   /// Start listening to messages
   Future<void> listen(void Function(LangameNotification) add);

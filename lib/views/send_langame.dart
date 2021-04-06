@@ -1,30 +1,28 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/helpers/functional.dart';
+import 'package:grouped_list/grouped_list.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/topic.dart';
 import 'package:langame/models/user.dart';
-import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
-import 'friends.dart';
+import 'buttons/button.dart';
 
 class SendLangameView extends StatefulWidget {
-  final LangameUser _user;
-  SendLangameView(this._user);
+  SendLangameView();
 
   @override
-  _SendLangameState createState() => _SendLangameState(_user);
+  _SendLangameState createState() => _SendLangameState();
 }
 
 class _SendLangameState extends State<SendLangameView>
     with AfterLayoutMixin<SendLangameView> {
-  List<Widget> topicGroups = [];
-  late TopicProvider provider;
-  LangameUser _user;
+  List<Topic> selectedTopics = [];
 
-  _SendLangameState(this._user);
+  _SendLangameState();
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -37,83 +35,112 @@ class _SendLangameState extends State<SendLangameView>
         appBar: AppBar(
           title: Text('Send Langame ...'),
         ),
-        body: Consumer<TopicProvider>(
-          builder: (context, t, child) {
-            return ListView(
-                children: t.topicGroups
-                    .map((e) => TopicGroupCard(e, _user))
-                    .toList());
+        body: Consumer<LangameProvider>(
+          builder: (context, l, child) {
+            return Column(children: [
+              Row(
+                  children: l.shoppingList
+                      .map((e) => _buildPlayerCard(e, l.remove))
+                      .toList()),
+              _buildSearchBar(),
+              Consumer<TopicProvider>(
+                builder: (context, t, child) {
+                  return GroupedListView<Topic, String>(
+                    elements: t.topics,
+                    groupBy: (element) => element.groups.first,
+                    groupSeparatorBuilder: (String groupByValue) =>
+                        Text(groupByValue),
+                    itemBuilder: (context, Topic t) {
+                      return Center(
+                        child: ToggleButton(
+                            onChange: (bool selected) {
+                              if (selected)
+                                selectedTopics.add(t);
+                              else
+                                selectedTopics
+                                    .removeWhere((e) => e.name == t.name);
+                            },
+                            width: AppSize.blockSizeHorizontal * 70,
+                            textUnselected: t.name,
+                            textSelected: t.name),
+                      );
+                    },
+                  );
+                },
+              ),
+            ]);
           },
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            // TODO: send langame
+          },
+          label: const Text('Send invitation'),
+          icon: const Icon(Icons.send_outlined),
+          backgroundColor: Theme.of(context).colorScheme.secondary,
         ));
-
-    // return Scaffold(appBar: AppBar(), body: ListView(children: topicGroups));
   }
-}
 
-class TopicGroupCard extends StatelessWidget {
-  const TopicGroupCard(this.topicGroup, this.user);
-  final TopicGroup topicGroup;
-  final LangameUser user;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
-    return new Card(
-      child: new Center(
-          child: new Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Container(
-                child: Column(children: [
-                  Text(this.topicGroup.name),
-                  Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: this
-                          .topicGroup
-                          .topics
-                          .asChunk(
-                              2) // TODO: too big topics may depasser screen
-                          .map((e) => Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: e
-                                    .map((e) =>
-                                        _buildButton(context, theme, e, user))
-                                    .intersperse(SizedBox(width: 5))
-                                    .toList(),
-                              ))
-                          .toList()),
-                ]),
-                decoration: BoxDecoration(
-                  borderRadius:
-                      new BorderRadius.all(const Radius.circular(10.0)),
-                ),
-              ))),
+  Widget _buildPlayerCard(
+      LangameUser player, void Function(LangameUser player) remove) {
+    return ListTile(
+      title: Text(player.displayName!),
+      trailing: IconButton(
+        icon: Icon(Icons.clear_outlined),
+        onPressed: () {
+          remove(player);
+        },
+      ),
     );
   }
 
-  Widget _buildButton(
-      BuildContext context, ThemeData theme, String text, LangameUser user) {
-    return OutlinedButton.icon(
-        style: theme.textButtonTheme.style,
-        onPressed: () {
-          // TODO: send message to X, I send you a Langame
-          // and also make an api call or message triggered
-          // piece of code that find appropriate question
-          var provider =
-              Provider.of<AuthenticationProvider>(context, listen: false);
-          Navigator.pop(context);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => FriendsView()),
-          );
-          var failedMessage = Provider.of<FunnyProvider>(context, listen: false)
-              .getFailingRandom();
-          provider.send(user, text).then(
-                (e) => e.thenShowToast(
-                    'Sent $text to ${user.displayName}', failedMessage),
-              );
-        },
-        icon: Icon(Icons.autorenew_outlined),
-        label: Text(text));
+  Widget _buildSearchBar() {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
+    return FloatingSearchBar(
+      hint: 'Search...',
+      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      transitionDuration: const Duration(milliseconds: 800),
+      transitionCurve: Curves.easeInOut,
+      physics: const BouncingScrollPhysics(),
+      axisAlignment: isPortrait ? 0.0 : -1.0,
+      openAxisAlignment: 0.0,
+      width: isPortrait ? 600 : 500,
+      debounceDelay: const Duration(milliseconds: 500),
+      onQueryChanged: (query) {
+        // Call your model, bloc, controller here.
+      },
+      // Specify a custom transition to be used for
+      // animating between opened and closed stated.
+      transition: CircularFloatingSearchBarTransition(),
+      actions: [
+        FloatingSearchBarAction(
+          showIfOpened: false,
+          child: CircularButton(
+            icon: const Icon(Icons.place),
+            onPressed: () {},
+          ),
+        ),
+        FloatingSearchBarAction.searchToClear(
+          showIfClosed: false,
+        ),
+      ],
+      builder: (context, transition) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Material(
+            color: Colors.white,
+            elevation: 4.0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: Colors.accents.map((color) {
+                return Container(height: 112, color: color);
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

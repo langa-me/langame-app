@@ -1,11 +1,12 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/views/profile.dart';
-import 'package:langame/views/send_langame.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -19,12 +20,18 @@ class FriendsView extends StatefulWidget {
 }
 
 /// Main page of Langame (temporary name...)
-class _FriendsViewState extends State<FriendsView> {
+class _FriendsViewState extends State<FriendsView>
+    with AfterLayoutMixin<FriendsView> {
   int _selectedIndex = 0;
   late FloatingSearchBarController _searchBarController;
   PageController _pageController = PageController(
     initialPage: 0,
   );
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    Provider.of<AuthenticationProvider>(context, listen: false).getRelations();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +79,12 @@ class _FriendsViewState extends State<FriendsView> {
               (context, authenticationProvider, profileProvider, child) {
             if (authenticationProvider.user != null) {
               return InkWell(
-                  onTap: () {
-                    profileProvider.profileShown =
-                        !profileProvider.profileShown;
-                  },
-                  child: buildCroppedRoundedNetworkImage(
-                      authenticationProvider.user!.photoUrl));
+                onTap: () {
+                  profileProvider.profileShown = !profileProvider.profileShown;
+                },
+                child: buildCroppedRoundedNetworkImage(
+                    authenticationProvider.user!.photoUrl),
+              );
             } else {
               return IconButton(
                   icon: Icon(Icons.account_circle), onPressed: () {});
@@ -93,9 +100,24 @@ class _FriendsViewState extends State<FriendsView> {
       }),
       controller: _pageController,
       children: [
-        Center(
-            child: Text('No friends? =>',
-                style: Theme.of(context).textTheme.headline3)),
+        Consumer<AuthenticationProvider>(
+          builder: (context, a, _) =>
+              a.relations == null || a.relations!.relations.length == 0
+                  ? Center(
+                      child: Text('No friends? =>',
+                          style: Theme.of(context).textTheme.headline3))
+                  : ListView.builder(
+                      itemCount: a.relations!.relations.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(
+                              '${a.relations!.relations[index].other.displayName}'),
+                          leading: buildCroppedRoundedNetworkImage(
+                              a.relations!.relations[index].other.photoUrl),
+                        );
+                      },
+                    ),
+        ),
         Consumer2<LocalStorageProvider, AuthenticationProvider>(
           builder: (context, lsp, ap, _) => FloatingSearchBar(
             queryStyle: Theme.of(context).textTheme.headline6,
@@ -287,6 +309,7 @@ class SearchResultsListView extends StatefulWidget {
 }
 
 class _SearchResultsListViewState extends State<SearchResultsListView> {
+  bool _hasBeenAddedToShoppingList = false;
   @override
   Widget build(BuildContext context) {
     return Consumer<LocalStorageProvider>(builder: (c, p, _) {
@@ -312,19 +335,18 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         Profile(p.selectedUser!),
         Spacer(),
         StretchableButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => SendLangameView(p.selectedUser!)),
-            );
-          },
+          // TODO: might use ToggleButton instead? (with icon)
+          onPressed: _hasBeenAddedToShoppingList
+              ? _onRemoveFromShoppingList(p)
+              : _onAddToShoppingList(p),
           borderRadius: 2,
           splashColor: Theme.of(context).colorScheme.secondaryVariant,
           buttonPadding: 4,
           buttonColor: Theme.of(context).colorScheme.secondary,
           children: [
-            Text('Send a Langame'),
+            Text(_hasBeenAddedToShoppingList
+                ? 'Remove from current Langame'
+                : 'Add to current Langame'),
             Container(
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -334,13 +356,43 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                   width: 2,
                 ),
               ),
-              child: Image.asset('images/logo.png',
-                  width: AppSize.blockSizeHorizontal * 12),
+              child: Icon(
+                  _hasBeenAddedToShoppingList
+                      ? Icons.remove_shopping_cart_outlined
+                      : Icons.add_shopping_cart_outlined,
+                  size: AppSize.blockSizeHorizontal * 5),
             ),
           ],
         ),
         SizedBox(height: AppSize.safeBlockVertical * 10)
       ]);
     });
+  }
+
+  void Function() _onAddToShoppingList(LocalStorageProvider p) {
+    return () {
+      Provider.of<LangameProvider>(context, listen: false).add(p.selectedUser!);
+      final snackBar = SnackBar(
+          content: Text(
+              '${p.selectedUser!.displayName} has been added to current Langame'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      setState(() {
+        _hasBeenAddedToShoppingList = true;
+      });
+    };
+  }
+
+  void Function() _onRemoveFromShoppingList(LocalStorageProvider p) {
+    return () {
+      Provider.of<LangameProvider>(context, listen: false)
+          .remove(p.selectedUser!);
+      final snackBar = SnackBar(
+          content: Text(
+              '${p.selectedUser!.displayName} has been removed from current Langame'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      setState(() {
+        _hasBeenAddedToShoppingList = false;
+      });
+    };
   }
 }
