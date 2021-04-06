@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -225,19 +226,53 @@ class ImplMessageApi extends MessageApi {
 
   @override
   Future<LangameNotification?> fetch(String id) async {
-    throw UnimplementedError();
+    CollectionReference notifications = firebase.firestore
+        .collection(AppConst.firestoreNotificationsCollection);
+
+    DocumentSnapshot doc = await notifications.doc(id).get();
+    if (!doc.exists) {
+      throw LangameMessageException('could not fetch notification $id');
+    }
+    var data = doc.data();
+    if (data == null || data['data'] == null) {
+      throw LangameMessageException('notification $id has no data');
+    }
+    // We store with format {data: ..., notification: ...}
+    // Here we only care about the data?
+    LangameNotification nResult = LangameNotification.fromJson(data['data']);
+    return nResult;
   }
 
+  // TODO: might do a 'fetch non-acknowledged notifications'
   Future<List<LangameNotification>?> fetchAll() async {
-    throw UnimplementedError();
+    CollectionReference notifications = firebase.firestore
+        .collection(AppConst.firestoreNotificationsCollection);
+    QuerySnapshot query = await notifications
+        .where('recipientUid', isEqualTo: firebase.auth.currentUser?.uid)
+        .get();
+    // If there is any non-null notifications, return all of them
+    if (query.docs.any(
+        (n) => n.exists && n.data() != null && n.data()!['data'] != null)) {
+      return query.docs
+          .where(
+              (n) => n.exists && n.data() != null && n.data()!['data'] != null)
+          .map((n) => LangameNotification.fromJson(n.data()!['data']))
+          .toList();
+    } else {
+      throw LangameMessageException(
+          'could not find any notifications for current user');
+    }
   }
 
   @override
   Future<void> delete(String id) async {
-    // await flutterLocalNotificationsPlugin.cancel(id);
-
-    throw UnimplementedError();
-    // TODO: delete in firestore
+    int? localNotification = localNotifications[id];
+    if (localNotification == null) {
+      throw LangameMessageException('unable to find local notification id');
+    }
+    Future f = flutterLocalNotificationsPlugin.cancel(localNotification);
+    f.then((_) => localNotifications.remove(id));
+    return f;
   }
 
   Future<void> _saveTokenToDatabase(String token) async {

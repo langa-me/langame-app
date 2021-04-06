@@ -42,8 +42,9 @@ app.*.map.json
 
 # Ignore keys
 *.keystore
-android/fastlane/key.properties
-android/fastlane/service_account_key.json
+*.jks
+key.properties
+service_account_key.json
 google-services.json
 release.zip
 # TODO: apple stuff

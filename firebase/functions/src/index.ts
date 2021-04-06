@@ -1,11 +1,17 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {FirebaseFunctionsResponse,
-  isFirebaseFunctionsResponse,
-  LangameUser} from "./models";
 import {
-  filterOutSendLangameCalls, generateAgoraRtcToken, getUserData,
-  handleSendToDevice, hashFnv32a,
+  FirebaseFunctionsResponse,
+  FirebaseFunctionsResponseStatusCode,
+  isFirebaseFunctionsResponse,
+  LangameUser,
+} from "./models";
+import {
+  filterOutSendLangameCalls,
+  generateAgoraRtcToken,
+  getUserData,
+  handleSendToDevice,
+  hashFnv32a,
   kInvalidRequest,
   kNotificationsCollection,
   kUsersCollection,
@@ -21,14 +27,14 @@ admin.initializeApp();
 exports.updateProfile = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     return {
-      statusCode: 401,
+      statusCode: FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
       errorMessage: "not authenticated",
     };
   }
   functions.logger.info(data);
   if (data === null) {
     return {
-      statusCode: 400,
+      statusCode: FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
       errorMessage: kInvalidRequest,
     };
   }
@@ -37,15 +43,17 @@ exports.updateProfile = functions.https.onCall(async (data, context) => {
       .collection(kUsersCollection)
       .doc(context.auth.uid)
       .update(data).then((_) => {
-        return {
-          statusCode: 200,
-          errorMessage: null,
-        };
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.OK,
+            undefined,
+            undefined,
+        );
       }).catch((e) => {
-        return {
-          statusCode: 500,
-          errorMessage: e,
-        };
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            undefined,
+            e,
+        );
       });
 });
 
@@ -56,14 +64,14 @@ exports.updateProfile = functions.https.onCall(async (data, context) => {
 exports.saveToken = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     return new FirebaseFunctionsResponse(
-        401,
+        FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
         undefined,
         "not authenticated",
     );
   }
   if (data === null) {
     return new FirebaseFunctionsResponse(
-        400,
+        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
         kInvalidRequest,
     );
@@ -71,7 +79,7 @@ exports.saveToken = functions.https.onCall(async (data, context) => {
 
   if (!data.tokens) {
     return new FirebaseFunctionsResponse(
-        400,
+        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
         "you must provide token(s)",
     );
@@ -85,15 +93,17 @@ exports.saveToken = functions.https.onCall(async (data, context) => {
       .update({
         "tokens": admin.firestore.FieldValue.arrayUnion(...data.tokens),
       }).then((_) => {
-        return {
-          statusCode: 200,
-          errorMessage: null,
-        };
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.OK,
+            undefined,
+            undefined,
+        );
       }).catch((e) => {
-        return {
-          statusCode: 500,
-          errorMessage: e,
-        };
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            undefined,
+            e,
+        );
       });
 });
 
@@ -127,7 +137,8 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
       hashFnv32a(senderData.uid!, true, Date.now());
   // Somehow, shouldn't happen
   if (typeof channelName === "number") {
-    return new FirebaseFunctionsResponse(500,
+    return new FirebaseFunctionsResponse(
+        FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,
         "failed to generate agora channel name");
   }
@@ -196,7 +207,10 @@ exports.sendLangame = functions.https.onCall(async (data, context) => {
       isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
   }
   // Succeed, results is string[]
-  return new FirebaseFunctionsResponse(200, results, undefined);
+  return new FirebaseFunctionsResponse(
+      FirebaseFunctionsResponseStatusCode.OK,
+      results,
+      undefined);
 });
 
 
@@ -225,7 +239,7 @@ exports.sendReadyForLangame = functions.https.onCall(async (data, context) => {
 
   if (!data.question) {
     return new FirebaseFunctionsResponse(
-        400,
+        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
         "invalid question",
     );
@@ -278,7 +292,10 @@ exports.sendReadyForLangame = functions.https.onCall(async (data, context) => {
       isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
   }
   // Succeed, results is string[]
-  return new FirebaseFunctionsResponse(200, results, undefined);
+  return new FirebaseFunctionsResponse(
+      FirebaseFunctionsResponseStatusCode.OK,
+      results,
+      undefined);
 });
 
 // const fake = () => {

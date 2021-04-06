@@ -34,6 +34,9 @@ class AppConst {
   static const String updateProfileFunction = 'updateProfile';
 
   static final navKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
+
+  static const String firestoreUsersCollection = 'users';
+  static const String firestoreNotificationsCollection = 'notifications';
 }
 
 /// Fonts assets used in this application,

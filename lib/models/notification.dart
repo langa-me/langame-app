@@ -6,9 +6,11 @@ part 'notification.g.dart';
 class LangameNotification {
   final String id;
   String senderUid;
+  String recipientUid;
   bool? background;
 
-  LangameNotification(this.id, this.senderUid, {this.background = false});
+  LangameNotification(this.id, this.senderUid, this.recipientUid,
+      {this.background = false});
 
   factory LangameNotification.fromJson(Map<String, dynamic> json) =>
       _$LangameNotificationFromJson(json);
@@ -18,10 +20,10 @@ class LangameNotification {
 
 @JsonSerializable()
 class LangameNotificationPlay extends LangameNotification {
-  LangameNotificationPlay(id, senderUid, this.topic, this.agoraUid,
-      this.agoraChannelName, this.agoraRtcToken,
+  LangameNotificationPlay(id, senderUid, recipientUid, this.topic,
+      this.agoraUid, this.agoraChannelName, this.agoraRtcToken,
       {background = false})
-      : super(id, senderUid, background: background);
+      : super(id, senderUid, recipientUid, background: background);
 
   /// Topic of the Langame
   String topic;
@@ -43,9 +45,10 @@ class LangameNotificationPlay extends LangameNotification {
 
 @JsonSerializable()
 class LangameNotificationReadyToPlay extends LangameNotification {
-  LangameNotificationReadyToPlay(id, senderUid, this.topic, this.question,
+  LangameNotificationReadyToPlay(
+      id, senderUid, recipientUid, this.topic, this.question,
       {background = false})
-      : super(id, senderUid, background: background);
+      : super(id, senderUid, recipientUid, background: background);
   String topic;
   String question;
 

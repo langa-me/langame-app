@@ -10,6 +10,7 @@ LangameNotification _$LangameNotificationFromJson(Map<String, dynamic> json) {
   return LangameNotification(
     json['id'] as String,
     json['senderUid'] as String,
+    json['recipientUid'] as String,
     background: json['background'] as bool?,
   );
 }
@@ -19,6 +20,7 @@ Map<String, dynamic> _$LangameNotificationToJson(
     <String, dynamic>{
       'id': instance.id,
       'senderUid': instance.senderUid,
+      'recipientUid': instance.recipientUid,
       'background': instance.background,
     };
 
@@ -27,6 +29,7 @@ LangameNotificationPlay _$LangameNotificationPlayFromJson(
   return LangameNotificationPlay(
     json['id'],
     json['senderUid'],
+    json['recipientUid'],
     json['topic'] as String,
     json['agoraUid'] as int,
     json['agoraChannelName'] as String,
@@ -40,6 +43,7 @@ Map<String, dynamic> _$LangameNotificationPlayToJson(
     <String, dynamic>{
       'id': instance.id,
       'senderUid': instance.senderUid,
+      'recipientUid': instance.recipientUid,
       'background': instance.background,
       'topic': instance.topic,
       'agoraUid': instance.agoraUid,
@@ -52,6 +56,7 @@ LangameNotificationReadyToPlay _$LangameNotificationReadyToPlayFromJson(
   return LangameNotificationReadyToPlay(
     json['id'],
     json['senderUid'],
+    json['recipientUid'],
     json['topic'] as String,
     json['question'] as String,
     background: json['background'],
@@ -63,6 +68,7 @@ Map<String, dynamic> _$LangameNotificationReadyToPlayToJson(
     <String, dynamic>{
       'id': instance.id,
       'senderUid': instance.senderUid,
+      'recipientUid': instance.recipientUid,
       'background': instance.background,
       'topic': instance.topic,
       'question': instance.question,

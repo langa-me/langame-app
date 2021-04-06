@@ -14,12 +14,14 @@ class FakeMessageApi extends MessageApi {
   FakeMessageApi(FirebaseApi firebase,
       void Function(LangameNotification) onBackgroundOrForegroundOpened)
       : super(firebase, onBackgroundOrForegroundOpened);
+
   @override
   Future<LangameResponse> initializePermissions() async {
     return LangameResponse(LangameStatus.succeed);
   }
 
   var uuid = Uuid();
+
   @override
   Future<LangameNotification?> fetch(String id) {
     // TODO: implement fetch
@@ -57,10 +59,7 @@ class FakeMessageApi extends MessageApi {
   LangameNotification _fakeNotification() {
     var sender = faang.pickAny();
 
-    return LangameNotification(
-      uuid.v4(),
-      sender!.uid!,
-    );
+    return LangameNotification(uuid.v4(), sender!.uid!, faang.pickAny()!.uid!);
   }
 
   @override

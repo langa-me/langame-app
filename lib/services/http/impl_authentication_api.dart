@@ -26,8 +26,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
   @override
   Stream<User?> get userChanges => _authStateChanges;
 
-  String kFirestoreUsersCollection = 'users';
-
   ImplAuthenticationApi(FirebaseApi firebase) : super(firebase) {
     _authStateChanges = firebase.auth.userChanges();
   }
@@ -140,7 +138,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   /// TODO: might use a transaction?
   Future<LangameUser?> getLangameUser(String uid) async {
     CollectionReference users =
-        firebase.firestore.collection(kFirestoreUsersCollection);
+        firebase.firestore.collection(AppConst.firestoreUsersCollection);
     DocumentSnapshot doc = await users.doc(uid).get();
     if (!doc.exists) return null;
     var data = doc.data();
@@ -153,7 +151,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   Future<LangameUser> addLangameUser(User user) async {
     CollectionReference users =
-        firebase.firestore.collection(kFirestoreUsersCollection);
+        firebase.firestore.collection(AppConst.firestoreUsersCollection);
     LangameUser langameUser = LangameUser.fromFirebaseUser(user);
     var t = await _generateTag(user);
     if (user.providerData.any((e) => e.providerId == 'google.com')) {
@@ -173,13 +171,13 @@ class ImplAuthenticationApi extends AuthenticationApi {
   @override
   Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
     CollectionReference users =
-        firebase.firestore.collection(kFirestoreUsersCollection);
+        firebase.firestore.collection(AppConst.firestoreUsersCollection);
 
     /// Query users with tag starting with [tag]
     QuerySnapshot doc = await users
         .where('tag', isGreaterThanOrEqualTo: tag)
         .where('tag', isLessThan: tag + 'z')
-        .get();
+        .get(); // TODO: ignore case
     return doc.docs
         .where((e) => e.data() != null)
         .map((e) => LangameUser.fromJson(e.data()!))

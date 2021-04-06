@@ -2,9 +2,13 @@
  * Enum representing status code
  */
 export enum FirebaseFunctionsResponseStatusCode {
+    // eslint-disable-next-line no-unused-vars
     OK = 200,
+    // eslint-disable-next-line no-unused-vars
     BAD_REQUEST = 400,
+    // eslint-disable-next-line no-unused-vars
     UNAUTHORIZED = 401,
+    // eslint-disable-next-line no-unused-vars
     INTERNAL = 500,
 }
 
