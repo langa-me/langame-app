@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:langame/models/channel.dart';
 import 'package:langame/models/user.dart';
 
 import 'firebase.dart';
@@ -47,4 +48,7 @@ abstract class AuthenticationApi {
       String? newEmail,
       String? tag,
       List<String>? topics});
+
+  Future<String> getChannelToken(String channelName);
+  Future<LangameChannel> getChannel(String channelName);
 }

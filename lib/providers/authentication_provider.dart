@@ -4,8 +4,10 @@ import 'dart:collection';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/notification.dart';
+import 'package:langame/models/topic.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/services/http/authentication_api.dart';
 import 'package:langame/services/http/fake_authentication_api.dart';
@@ -64,16 +66,19 @@ class AuthenticationProvider extends ChangeNotifier {
   //   return _notificationsStream.stream.asBroadcastStream();
   // }
 
-  void _onNotificationHandler(LangameNotification notification) {
-    _notifications.add(notification);
+  void _onNotificationHandler(LangameNotification? notification) {
+    if (notification != null) _notifications.add(notification);
     // _notificationsStream.add(notification);
     notifyListeners();
   }
 
   Future<LangameResponse> send(
-      List<LangameUser> recipients, String topic) async {
+      List<LangameUser> recipients, List<Topic> topics) async {
     try {
-      await messageApi.send(recipients.map((e) => e.uid!).toList(), topic);
+      debugPrint(recipients.map((e) => e.uid!).join(','));
+      // TODO: we'd likely send the whole  topic in the future (with classifications)
+      await messageApi.send(recipients.map((e) => e.uid!).toList(),
+          topics.map((e) => e.name).toList());
     } catch (e, s) {
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
@@ -81,10 +86,9 @@ class AuthenticationProvider extends ChangeNotifier {
     return LangameResponse(LangameStatus.succeed);
   }
 
-  Future<LangameResponse> sendReadyForLangame(
-      List<String> recipientsUid, String topic, String question) async {
+  Future<LangameResponse> sendReadyForLangame(String channelName) async {
     try {
-      await messageApi.sendReadyForLangame(recipientsUid, topic, question);
+      await messageApi.sendReadyForLangame(channelName);
     } catch (e, s) {
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
@@ -92,15 +96,54 @@ class AuthenticationProvider extends ChangeNotifier {
     return LangameResponse(LangameStatus.succeed);
   }
 
+  Future<LangameResponse<String>> getChannelToken(String channelName) async {
+    try {
+      var r = await authenticationApi.getChannelToken(channelName);
+      return LangameResponse<String>(LangameStatus.succeed, result: r);
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
+
+  Future<LangameResponse<LangameChannel>> getChannel(String channelName) async {
+    try {
+      var r = await authenticationApi.getChannel(channelName);
+      return LangameResponse<LangameChannel>(LangameStatus.succeed, result: r);
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
+
+  Future<LangameResponse<LangameNotification>> getNotification(
+      String id) async {
+    try {
+      var r = await messageApi.fetch(id);
+      return LangameResponse<LangameNotification>(LangameStatus.succeed,
+          result: r);
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
+
+  // TODO: use langame resp
   Future<void> getNotifications() async => await messageApi.fetchAll();
 
-  Future<void> deleteNotification(String id) {
-    var f = messageApi.delete(id);
-    f
-        .then((value) =>
-            _notifications.removeWhere((element) => element.id == id))
-        .then((value) => notifyListeners());
-    return f;
+  Future<LangameResponse<void>> deleteNotification(String id) async {
+    try {
+      var f = messageApi.delete(id);
+      f
+          .then((value) =>
+              _notifications.removeWhere((element) => element.id == id))
+          .then((value) => notifyListeners());
+      // return f;
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+    return LangameResponse(LangameStatus.succeed);
   }
 
   void stopNotifications() => messageApi.cancel();
@@ -163,8 +206,30 @@ class AuthenticationProvider extends ChangeNotifier {
     return await authenticationApi.getLangameUsersStartingWithTag(tag);
   }
 
-  Future<LangameUser?> getLangameUser(String uid) async {
-    return await authenticationApi.getLangameUser(uid);
+  Future<LangameResponse<LangameUser>> getLangameUser(String uid) async {
+    try {
+      var r = await authenticationApi.getLangameUser(uid);
+      return LangameResponse<LangameUser>(LangameStatus.succeed, result: r);
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
+
+  Future<LangameResponse<List<LangameUser>>> getLangameUsers(
+      List<String> userIds) async {
+    try {
+      List<LangameUser> r = [];
+      for (var i = 0; i < userIds.length; i++) {
+        var user = await authenticationApi.getLangameUser(userIds[i]);
+        if (user != null) r.add(user);
+      }
+      return LangameResponse<List<LangameUser>>(LangameStatus.succeed,
+          result: r);
+    } catch (e, s) {
+      firebase.crashlytics.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
   }
 
   /// Create an authentication provider, and
@@ -180,6 +245,7 @@ class AuthenticationProvider extends ChangeNotifier {
     }
     _firebaseUserStream = authenticationApi.userChanges;
     _firebaseUserStream.listen((data) async {
+      debugPrint(data.toString());
       if (data == null) return null;
       try {
         _user = await authenticationApi.getLangameUser(data.uid);
@@ -235,7 +301,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse> initializeMessageApi(
-      void Function(LangameNotification) onBackgroundOrForegroundOpened,
+      void Function(LangameNotification?) onBackgroundOrForegroundOpened,
       {bool fake = false}) async {
     messageApi = fake
         ? FakeMessageApi(

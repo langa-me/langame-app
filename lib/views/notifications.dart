@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/errors.dart';
 import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -44,62 +45,48 @@ class _NotificationsViewState extends State<NotificationsView> {
     //   return Scaffold();
     // }
 
-    return FutureBuilder<LangameUser?>(
+    return FutureBuilder<LangameResponse<LangameUser>>(
         future: p.getLangameUser(p.notifications[i].senderUid),
-        builder: (BuildContext context, AsyncSnapshot<LangameUser?> snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            var n = p.notifications[i];
-            print(n.toJson());
-            print(n is LangameNotificationReadyToPlay);
+        builder: (BuildContext context, snapshot) {
+          var n = p.notifications[i];
+          print(n.toJson());
+          if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.data!.result != null &&
+              n.topics != null) {
             return Dismissible(
               // Show a red background as the item is swiped away.
               background: Container(color: Colors.red),
-              key: Key(n.id),
-              onDismissed: (direction) {
+              key: Key(n.id!),
+              onDismissed: (direction) async {
                 if (i > p.notifications.length) return; // Already deleted?
-                p.deleteNotification(n.id).then((value) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('successfully deleted')));
-                }).catchError((err) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('failed to delete, $err')));
-                });
-                setState(() {});
+                var res = await p.deleteNotification(n.id!);
+                res.thenShowToast(
+                    'Notification deleted!',
+                    Provider.of<FunnyProvider>(context, listen: false)
+                        .getFailingRandom(),
+                    onSucceed: setState);
               },
               child: Card(
                 child: ListTile(
-                  leading:
-                      buildCroppedRoundedNetworkImage(snapshot.data?.photoUrl),
-                  title: Text(snapshot.data!.displayName!),
-                  subtitle: Text(n is LangameNotificationReadyToPlay
-                      ? 'is ready to play ${n.topic}'
-                      : n is LangameNotificationPlay
-                          ? n.topic
-                          : Provider.of<FunnyProvider>(context)
-                              .getFailingRandom()),
+                  leading: buildCroppedRoundedNetworkImage(
+                      snapshot.data!.result!.photoUrl),
+                  title: Text(snapshot.data!.result!.displayName!),
+                  subtitle: Text(n.ready == null || !n.ready!
+                      ? 'is ready to play ${n.topics}'
+                      : n.topics!.join(',')),
                   // tileColor: Color.lerp(p.notifications[i].relation.level.toColor(),
                   //     theme.colorScheme.primary, 0.5), // TODO
                   onTap: () {
                     // TODO: delete notification
-                    // p.deleteNotification(n.id);
-                    if (n is LangameNotificationPlay) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              LangameView(n.senderUid, n.topic, 'Who?', true),
-                        ),
-                      );
-                    } else if (n is LangameNotificationReadyToPlay) {
-                      // Received a message "I am ready!"
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LangameView(
-                              n.senderUid, n.topic, n.question, false),
-                        ),
-                      );
-                    }
+                    p.deleteNotification(n.id!);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            LangameView(n, n.ready == null || !n.ready!),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -114,20 +101,22 @@ class _NotificationsViewState extends State<NotificationsView> {
 
 /// When opened a notification with app on the background or foreground, switch to
 /// LangameView, TODO: add buttons on notification "accept" "decline"
-void onBackgroundOrForegroundOpened(LangameNotification n) {
-  if (n is LangameNotificationPlay) {
+void onBackgroundOrForegroundOpened(LangameNotification? n) {
+  // TODO: should delete notification then?
+  if (n?.channelName != null) {
     AppConst.navKey.currentState?.pushReplacement(
       MaterialPageRoute(
-        builder: (context) => LangameView(n.senderUid, n.topic, 'Who?', true),
+        builder: (context) => LangameView(n!, n.ready == null || !n.ready!),
       ),
     );
-  } else if (n is LangameNotificationReadyToPlay) {
-    // Received a message "I am ready!"
-    AppConst.navKey.currentState?.pushReplacement(
-      MaterialPageRoute(
-        builder: (context) =>
-            LangameView(n.senderUid, n.topic, n.question, false),
-      ),
-    );
+  } else {
+    // Fluttertoast.showToast(
+    //     msg: '',
+    //     toastLength: Toast.LENGTH_SHORT,
+    //     gravity: ToastGravity.BOTTOM,
+    //     timeInSecForIosWeb: 1,
+    //     backgroundColor: Colors.red,
+    //     textColor: Colors.white,
+    //     fontSize: 16.0);
   }
 }

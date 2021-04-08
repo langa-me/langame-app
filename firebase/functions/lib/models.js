@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isLangameUser = exports.LangameUser = exports.isFirebaseFunctionsResponse = exports.FirebaseFunctionsResponse = exports.FirebaseFunctionsResponseStatusCode = void 0;
+exports.isLangameNotification = exports.LangameNotification = exports.isLangameChannel = exports.LangameChannel = exports.ChannelUserLangameUser = exports.isLangameUser = exports.LangameUser = exports.isFirebaseFunctionsResponse = exports.FirebaseFunctionsResponse = exports.FirebaseFunctionsResponseStatusCode = void 0;
 /**
  * Enum representing status code
  */
@@ -15,6 +15,7 @@ var FirebaseFunctionsResponseStatusCode;
     // eslint-disable-next-line no-unused-vars
     FirebaseFunctionsResponseStatusCode[FirebaseFunctionsResponseStatusCode["INTERNAL"] = 500] = "INTERNAL";
 })(FirebaseFunctionsResponseStatusCode = exports.FirebaseFunctionsResponseStatusCode || (exports.FirebaseFunctionsResponseStatusCode = {}));
+// TODO: might extends (functions.https.) HttpsError
 /**
  * Response to all firebase functions
  */
@@ -100,4 +101,82 @@ function isLangameUser(obj) {
     return typeof obj.uid === "string" && typeof obj.google === "boolean";
 }
 exports.isLangameUser = isLangameUser;
+/**
+ * ChannelUserLangameUser is the mapping between channel uid (number)
+ * and langame uid (string)
+ */
+class ChannelUserLangameUser {
+    /**
+     * Constructor of ChannelUserLangameUser...
+     * @param{number} channelUid
+     * @param{string} langameUid
+     */
+    constructor({ channelUid, langameUid }) {
+        this.channelUid = channelUid;
+        this.langameUid = langameUid;
+    }
+}
+exports.ChannelUserLangameUser = ChannelUserLangameUser;
+/**
+ * Contains information about a Langame
+ */
+class LangameChannel {
+    /**
+     * Constructor of LangameChannel...
+     * @param{string} channelName
+     * @param{Array<ChannelUserLangameUser>} players
+     * @param{Array<string>} topics
+     * @param{Array<string>} questions
+     */
+    constructor({ channelName, players, topics, questions }) {
+        this.channelName = channelName;
+        this.players = players;
+        this.topics = topics;
+        this.questions = questions;
+    }
+}
+exports.LangameChannel = LangameChannel;
+/**
+ * Check if object is a LangameChannel
+ * @param{any} obj
+ * @return{boolean}
+ */
+function isLangameChannel(obj) {
+    // Checking typical LangameChannel properties
+    return typeof obj.channelName === "string";
+}
+exports.isLangameChannel = isLangameChannel;
+/**
+ * Contains information about a Langame notification
+ */
+class LangameNotification {
+    /**
+     * Constructor..
+     * @param{string} id
+     * @param{string} senderUid
+     * @param{string} recipientsUid
+     * @param{string} topics
+     * @param{string} channelName
+     * @param{string} ready
+     */
+    constructor({ id, senderUid, recipientsUid, topics, channelName, ready }) {
+        this.id = id;
+        this.senderUid = senderUid;
+        this.recipientsUid = recipientsUid;
+        this.topics = topics;
+        this.channelName = channelName;
+        this.ready = ready;
+    }
+}
+exports.LangameNotification = LangameNotification;
+/**
+ * Check if object is a LangameNotification
+ * @param{any} obj
+ * @return{boolean}
+ */
+function isLangameNotification(obj) {
+    // Checking typical LangameNotification properties
+    return typeof obj.senderUid === "string" && obj.id === "string";
+}
+exports.isLangameNotification = isLangameNotification;
 //# sourceMappingURL=models.js.map

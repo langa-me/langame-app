@@ -1,34 +1,36 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hashFnv32a = exports.generateAgoraRtcToken = exports.handleSendToDevice = exports.getUserData = exports.filterOutSendLangameCalls = exports.kNotificationsCollection = exports.kUsersCollection = exports.kInvalidRequest = exports.kUserDoesNotExist = exports.role = exports.expirationTimeInSeconds = exports.appCertificate = exports.appID = void 0;
+exports.getLangame = exports.hashFnv32a = exports.generateAgoraRtcToken = exports.handleSendToDevice = exports.getUserData = exports.filterOutSendLangameCalls = exports.kLangamesCollection = exports.kNotificationsCollection = exports.kUsersCollection = exports.kNotAuthenticated = exports.kInvalidRequest = exports.kUserDoesNotExist = exports.role = exports.expirationTimeInSeconds = exports.appCertificate = exports.appID = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const agora_access_token_1 = require("agora-access-token");
 const models_1 = require("./models");
 // Agora config
 // Fill the appID and appCertificate key given by Agora.io
-exports.appID = functions.config().agora.app.id;
-exports.appCertificate = functions.config().agora.app.certificate;
+exports.appID = functions.config().agora.id;
+exports.appCertificate = functions.config().agora.certificate;
 // token expire time, hardcode to 3600 seconds = 1 hour
 exports.expirationTimeInSeconds = 3600;
 exports.role = agora_access_token_1.RtcRole.PUBLISHER;
 const kUserDoesNotExist = (id) => `user ${id} does not exist`;
 exports.kUserDoesNotExist = kUserDoesNotExist;
 exports.kInvalidRequest = "invalid request";
+exports.kNotAuthenticated = "not authenticated";
 exports.kUsersCollection = "users";
 exports.kNotificationsCollection = "notifications";
+exports.kLangamesCollection = "langames";
 const filterOutSendLangameCalls = (data, context) => {
     if (!context.auth) {
-        return new models_1.FirebaseFunctionsResponse(401, undefined, "not authenticated");
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.UNAUTHORIZED, undefined, "not authenticated");
     }
     if (!data) {
-        return new models_1.FirebaseFunctionsResponse(400, undefined, exports.kInvalidRequest);
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.BAD_REQUEST, undefined, exports.kInvalidRequest);
     }
     if (!data.recipients) {
-        return new models_1.FirebaseFunctionsResponse(400, undefined, "invalid recipients");
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.BAD_REQUEST, undefined, "invalid recipients");
     }
-    if (!data.topic) {
-        return new models_1.FirebaseFunctionsResponse(400, undefined, "invalid topic");
+    if (!data.topics || data.topics.length === 0) {
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.BAD_REQUEST, undefined, "invalid topics");
     }
     return 0;
 };
@@ -40,29 +42,29 @@ const getUserData = async (id) => {
         .doc(id)
         .get();
     if (!recipient.exists) {
-        return new models_1.FirebaseFunctionsResponse(400, undefined, exports.kUserDoesNotExist(id));
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.BAD_REQUEST, undefined, exports.kUserDoesNotExist(id));
     }
     const data = recipient.data();
     if (!data) {
-        return new models_1.FirebaseFunctionsResponse(400, undefined, exports.kUserDoesNotExist(id));
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.BAD_REQUEST, undefined, exports.kUserDoesNotExist(id));
     }
     if (!models_1.isLangameUser(data)) {
-        return new models_1.FirebaseFunctionsResponse(400, undefined, exports.kUserDoesNotExist(id));
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.BAD_REQUEST, undefined, exports.kUserDoesNotExist(id));
     }
     const dataAsLangameUser = data;
     if (!dataAsLangameUser.tokens) {
-        return new models_1.FirebaseFunctionsResponse(500, undefined, `user ${id} has no devices (tokens)`);
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.INTERNAL, undefined, `user ${id} has no devices (tokens)`);
     }
     if (!dataAsLangameUser.uid) {
-        return new models_1.FirebaseFunctionsResponse(500, undefined, `user ${id} has no uid`);
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.INTERNAL, undefined, `user ${id} has no uid`);
     }
     if (!dataAsLangameUser.displayName) {
-        return new models_1.FirebaseFunctionsResponse(500, undefined, `user ${id} has no displayName`);
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.INTERNAL, undefined, `user ${id} has no displayName`);
     }
     return dataAsLangameUser;
 };
 exports.getUserData = getUserData;
-const handleSendToDevice = (recipientData, notificationPayload, promise) => {
+const handleSendToDevice = (recipientData, notificationId, promise) => {
     return promise.then((res) => {
         res.results.forEach((r, i) => {
             const t = recipientData.tokens[i];
@@ -83,10 +85,10 @@ const handleSendToDevice = (recipientData, notificationPayload, promise) => {
                     .catch(() => functions.logger.error("failed to remove invalid token", t));
             }
         });
-        return notificationPayload.data.id;
+        return notificationId;
     }).catch((e) => {
         functions.logger.error("sendLangame failed", e);
-        return new models_1.FirebaseFunctionsResponse(500, undefined, JSON.stringify(e));
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.INTERNAL, undefined, JSON.stringify(e));
     });
 };
 exports.handleSendToDevice = handleSendToDevice;
@@ -126,4 +128,27 @@ const hashFnv32a = (str, asString, seed) => {
     return hVal >>> 0;
 };
 exports.hashFnv32a = hashFnv32a;
+const getLangame = async (channelName) => {
+    const queryResult = await admin.firestore()
+        .collection(exports.kLangamesCollection)
+        .where("channelName", "==", channelName)
+        .get();
+    if (queryResult.docs.length === 0 ||
+        queryResult.docs.some((d) => !d.exists || !("players" in d.data()))) {
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.BAD_REQUEST, undefined, "could not find this channel");
+    }
+    try {
+        const data = queryResult.docs[0].data();
+        return new models_1.LangameChannel({
+            channelName: data.channelName,
+            players: data.players,
+            topics: data.topics,
+            questions: data.questions,
+        });
+    }
+    catch (e) {
+        return new models_1.FirebaseFunctionsResponse(models_1.FirebaseFunctionsResponseStatusCode.INTERNAL, undefined, "failed to build langame object");
+    }
+};
+exports.getLangame = getLangame;
 //# sourceMappingURL=helpers.js.map

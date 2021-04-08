@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/firebase_functions_protocol.dart';
 import 'package:langame/models/relation.dart';
@@ -178,10 +179,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
         .where('tag', isGreaterThanOrEqualTo: tag)
         .where('tag', isLessThan: tag + 'z')
         .get(); // TODO: ignore case
-    return doc.docs
-        .where((e) => e.data() != null)
-        .map((e) => LangameUser.fromJson(e.data()!))
-        .toList();
+    return doc.docs.map((e) => LangameUser.fromJson(e.data())).toList();
   }
 
   @override
@@ -279,5 +277,51 @@ class ImplAuthenticationApi extends AuthenticationApi {
             'Could not generate a tag for ${user.displayName}');
     }
     return tag;
+  }
+
+  @override
+  Future<String> getChannelToken(String channelName) async {
+    HttpsCallable callable = firebase.functions.httpsCallable(
+        AppConst.getChannelTokenFunction,
+        options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
+
+    try {
+      final HttpsCallableResult result = await callable.call(
+        <String, dynamic>{
+          'channelName': channelName,
+        },
+      );
+      print(result.data);
+      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
+        Map<String, dynamic>.from(result.data),
+      );
+      switch (response.statusCode) {
+        case FirebaseFunctionsResponseStatusCode.OK:
+          break;
+        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
+          throw LangameGetAudioTokenException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
+        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
+          throw LangameGetAudioTokenException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
+        case FirebaseFunctionsResponseStatusCode.INTERNAL:
+          throw LangameGetAudioTokenException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
+      }
+      return response.results![0];
+    } catch (e) {
+      throw LangameGetAudioTokenException(e.toString());
+    }
+  }
+
+  @override
+  Future<LangameChannel> getChannel(String channelName) async {
+    var r = await firebase.firestore
+        .collection(AppConst.firestoreLangamesCollection)
+        .where('channelName', isEqualTo: channelName)
+        .get();
+
+    Map<String, dynamic> first = r.docs.first.data();
+    return LangameChannel.fromJson(first);
   }
 }

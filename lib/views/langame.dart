@@ -1,282 +1,504 @@
-import 'dart:async';
 import 'dart:collection';
-import 'dart:math';
+import 'dart:ui';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/channel.dart';
+import 'package:langame/models/errors.dart';
+import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
+import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/views/image.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:quiver/async.dart';
 
-// ignore: must_be_immutable
+import 'friends.dart';
+import 'image.dart';
+
 class LangameView extends StatefulWidget {
-  final String opponentUid;
-  final String topic;
-  final String question;
+  final LangameNotification notification;
   final bool notifyOthers;
-  RtcEngine? _engine;
 
-  LangameView(this.opponentUid, this.topic, this.question, this.notifyOthers);
+  LangameView(this.notification, this.notifyOthers);
 
   @override
-  _LangameViewState createState() => _LangameViewState(question);
+  _LangameViewState createState() => _LangameViewState();
 }
 
 class Player {
-  int agoraUid;
-  int langameUid;
+  LangameUser langameUser;
   bool isSpeaking;
 
-  Player(this.agoraUid, this.langameUid, this.isSpeaking);
+  Player(this.langameUser, this.isSpeaking);
 }
 
 class _LangameViewState extends State<LangameView> {
-  final String question;
-  Duration _remaining = Duration(minutes: 15);
-  late StreamSubscription<CountdownTimer> _sub;
-  // agoraUid -> Player
-  HashMap _players = HashMap<int, Player>();
-  String channelId = AppConst.agoraChannelId;
-  bool isJoined = false,
-      openMicrophone = false,
-      enableSpeakerphone = false,
-      playEffect = false,
-      everyoneJoined = false;
-
-  _LangameViewState(this.question) {
-    CountdownTimer countDownTimer = new CountdownTimer(
-      Duration(minutes: 15),
-      Duration(seconds: 1),
-    );
-
-    // TODO: start when everyone is here
-    _sub = countDownTimer.listen(null);
-    _sub.onData((duration) {
-      setState(() {
-        _remaining = duration.remaining;
-      });
-    });
-
-    _sub.onDone(_sub.cancel);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    this._initEngine();
-
-    // if (!widget.notifyOthers) return;
-    // // TODO: generate and send some int id for channel
-    // Provider.of<AuthenticationProvider>(context, listen: false)
-    //     .sendReadyForLangame(widget.opponentUid, widget.topic, question)
-    //     .then((res) {
-    //   res.thenShowSnackBar(context, () {
-    //     final snackBar = SnackBar(
-    //         content: Text('Your friend has been told of your presence!'));
-    //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    //   },
-    //       !kReleaseMode
-    //           ? 'failed to sendReadyForLangame ${res.error.toString()}'
-    //           : Provider.of<FunnyProvider>(context).getFailingRandom());
-    // });
-  }
+  bool permissionRequested = false;
+  bool notified = false;
+  String? channelToken;
+  LangameChannel? channel;
+  List<LangameUser> channelLangameUsers = [];
+  bool engineInitialized = false;
+  bool channelJoined = false;
+  HashMap<int, Player> joinedPlayers = HashMap();
+  String? question; // TODO!!!!!!!!!!!!!!!
+  int errors = 0;
+  static const int maxErrors = 3;
 
   @override
   Widget build(BuildContext context) {
-    this._joinChannel();
-    return !everyoneJoined
-        ? Scaffold(
-            body: FutureBuilder<LangameUser?>(
-                future: Provider.of<AuthenticationProvider>(context)
-                    .getLangameUser(widget.opponentUid),
-                builder: (c, snapshot) {
-                  if (snapshot.hasError) {
-                  } else if (snapshot.hasData && snapshot.data != null) {
-                    return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // SpinKitWave(
-                                  //   color:
-                                  //       Theme.of(context).colorScheme.primary,
-                                  //   size: AppSize.blockSizeHorizontal * 3,
-                                  // ),
-                                  SizedBox(
-                                      width: AppSize.blockSizeHorizontal * 5),
-                                  Text(
-                                    'Waiting for ${snapshot.data!.displayName}...',
-                                    style:
-                                        Theme.of(context).textTheme.headline6,
-                                  )
-                                ]),
+    // TODO: might do that on other pages too
+    var network = Provider.of<ConnectivityResult>(context);
+    if (network != ConnectivityResult.wifi &&
+        network != ConnectivityResult.mobile) {
+      return _buildLoading(text: 'You are offline!');
+    }
+
+    if (!permissionRequested) {
+      var p = Provider.of<AudioProvider>(context);
+      return FutureBuilder<LangameResponse<bool>>(
+        future: p.checkPermission(),
+        builder: (c, s) {
+          if (s.hasError) _handleError();
+          if (s.hasData && s.data != null && s.data!.result != null) {
+            // Already permission granted
+            if (s.data!.result!) {
+              _postFrameCallback(
+                  (_) => setState(() => permissionRequested = true));
+            } else {
+              // Not requested / denied in the past
+              return AlertDialog(
+                title: Text('We need your permission to use your microphone.'),
+                actions: [
+                  OutlinedButton.icon(
+                    onPressed: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => FriendsView()),
+                    ),
+                    icon: Icon(Icons.cancel_outlined),
+                    label: Text('CANCEL'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      var p =
+                          Provider.of<AudioProvider>(context, listen: false);
+                      var res = await p.requestPermission();
+                      res.thenShowToast(
+                        'Understood!',
+                        Provider.of<FunnyProvider>(context, listen: false)
+                            .getFailingRandom(),
+                        onSucceed: () {
+                          // Permission granted!
+                          if (res.result != null && res.result!) {
+                            _postFrameCallback((duration) =>
+                                setState(() => permissionRequested = true));
+                            return;
+                          }
+                          Fluttertoast.showToast(
+                                  msg:
+                                      'You can\'t play Langame without microphone :(, you can still enable it in your settings later.')
+                              .then(
+                            (_) => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FriendsView(),
+                              ),
+                            ),
+                          );
+                        },
+                        onFailure: () => Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FriendsView(),
                           ),
-                          SizedBox(height: AppSize.blockSizeVertical * 5),
-                          Container(
-                            width: AppSize.blockSizeHorizontal * 80,
-                            height: AppSize.blockSizeVertical * 60,
-                            color: Colors.white,
-                          )
-                        ]);
-                  }
-                  return SizedBox.shrink();
-                  // return SpinKitRotatingCircle(
-                  //   color: Theme.of(context).colorScheme.primary,
-                  //   size: 50.0,
-                  // );
-                }),
-          )
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.check_circle_outline),
+                    label: Text('UNDERSTOOD'),
+                  ),
+                ],
+              );
+            }
+          }
+          return _buildLoading();
+        },
+      );
+    }
+    // Second-step, ask for a token generation
+    if (channelToken == null) {
+      var p = Provider.of<AuthenticationProvider>(context, listen: false);
+      return FutureBuilder<LangameResponse<String>>(
+          future: p.getChannelToken(widget.notification.channelName!),
+          builder: (c, s) {
+            if (s.hasError) _handleError();
+            if (s.hasData && s.data != null) {
+              s.data!.thenShowToast(
+                Provider.of<FunnyProvider>(context, listen: false)
+                    .getLoadingRandom(),
+                Provider.of<FunnyProvider>(context, listen: false)
+                    .getFailingRandom(),
+                onSucceed: () {
+                  // https://stackoverflow.com/questions/47592301/setstate-or-markneedsbuild-called-during-build
+                  _postFrameCallback(
+                      (_) => setState(() => channelToken = s.data!.result));
+                },
+                onFailure: () {
+                  _postFrameCallback(
+                      (_) => setState(() => channelToken = null));
+                },
+              );
+            }
+            return _buildLoading();
+          });
+    }
+    debugPrint('channelToken $channelToken');
+    // Third-step, retrieve channel data
+    if (channel == null) {
+      var p = Provider.of<AuthenticationProvider>(context, listen: false);
+      return FutureBuilder<LangameResponse<LangameChannel>>(
+        future: p.getChannel(widget.notification.channelName!),
+        builder: (c, s) {
+          if (s.hasError) _handleError();
+          if (s.hasData && s.data != null) {
+            s.data!.thenShowToast(
+              Provider.of<FunnyProvider>(context, listen: false)
+                  .getLoadingRandom(),
+              Provider.of<FunnyProvider>(context, listen: false)
+                  .getFailingRandom(),
+              onSucceed: () {
+                _postFrameCallback((_) {
+                  setState(() => channel = s.data!.result);
+                  p.getLangameUsers(s.data!.result!.players
+                      .map((e) => e.langameUid)
+                      .toList());
+                });
+              },
+              onFailure: () {
+                _postFrameCallback((_) => setState(() => channel = null));
+              },
+            );
+          }
+          return _buildLoading();
+        },
+      );
+    }
+    debugPrint(
+        'channel ${channel?.channelName} ${channel?.players.map((p) => p.toJson()).join(',')}');
+
+    // Fourth-step, retrieve langame users data
+    if (channelLangameUsers.isEmpty) {
+      var p = Provider.of<AuthenticationProvider>(context, listen: false);
+      return FutureBuilder<LangameResponse<List<LangameUser>>>(
+        future: p.getLangameUsers(
+            channel!.players.map((e) => e.langameUid).toList()),
+        builder: (c, s) {
+          if (s.hasError) _handleError();
+          if (s.hasData && s.data != null) {
+            s.data!.thenShowToast(
+              Provider.of<FunnyProvider>(context, listen: false)
+                  .getLoadingRandom(),
+              Provider.of<FunnyProvider>(context, listen: false)
+                  .getFailingRandom(),
+              onSucceed: () => _postFrameCallback(
+                  (_) => setState(() => channelLangameUsers = s.data!.result!)),
+              onFailure: () => _postFrameCallback(
+                  (_) => setState(() => channelLangameUsers = [])),
+            );
+          }
+          return _buildLoading();
+        },
+      );
+    }
+    debugPrint(
+        'channelLangameUsers ${channelLangameUsers.map((e) => e.displayName).join(',')}');
+
+    // Fifth-step, initialize audio engine
+    if (!engineInitialized) {
+      var p = Provider.of<AudioProvider>(context, listen: false);
+      return FutureBuilder<LangameResponse<void>>(
+        future: p.initEngine(_buildEventHandler()),
+        builder: (c, s) {
+          if (s.hasError) _handleError();
+          if (s.hasData && s.data != null) {
+            s.data!.thenShowToast(
+              Provider.of<FunnyProvider>(context, listen: false)
+                  .getLoadingRandom(),
+              Provider.of<FunnyProvider>(context, listen: false)
+                  .getFailingRandom(),
+              onSucceed: () => _postFrameCallback(
+                  (_) => setState(() => engineInitialized = true)),
+              onFailure: () => _postFrameCallback(
+                  (_) => setState(() => engineInitialized = false)),
+            );
+          }
+          return _buildLoading();
+        },
+      );
+    }
+    debugPrint('engineInitialized $engineInitialized');
+
+    // Sixth-step, join audio channel
+    if (!channelJoined) {
+      var p = Provider.of<AudioProvider>(context, listen: false);
+      var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+      ChannelUserLangameUser player =
+          channel!.players.firstWhere((p) => p.langameUid == ap.user?.uid);
+      return FutureBuilder<LangameResponse<void>>(
+          future: p.joinChannel(channelToken!, widget.notification.channelName!,
+              player.channelUid),
+          builder: (c, s) {
+            if (s.hasError) _handleError();
+            if (s.hasData && s.data != null) {
+              s.data!.thenShowToast(
+                Provider.of<FunnyProvider>(context, listen: false)
+                    .getLoadingRandom(),
+                Provider.of<FunnyProvider>(context, listen: false)
+                    .getFailingRandom(),
+                onSucceed: () => _postFrameCallback(
+                    (_) => setState(() => channelJoined = true)),
+                onFailure: () => _postFrameCallback(
+                    (_) => setState(() => channelJoined = false)),
+              );
+            }
+            return _buildLoading();
+          });
+    }
+    debugPrint('channelJoined $channelJoined');
+
+    if (channelToken == null ||
+        channel == null ||
+        channelLangameUsers.isEmpty ||
+        !engineInitialized ||
+        !channelJoined) {
+      // TODO: turn mic off
+      _buildLoading();
+    } else if (widget.notifyOthers && !notified) {
+      // TODO: generate and send some int id for channel
+      Provider.of<AuthenticationProvider>(context, listen: false)
+          .sendReadyForLangame(widget.notification.channelName!)
+          .then((res) {
+        res.thenShowToast(
+          'Your friends have been told of your presence!',
+          !kReleaseMode
+              ? 'failed to sendReadyForLangame ${res.error.toString()}'
+              : Provider.of<FunnyProvider>(context, listen: false)
+                  .getFailingRandom(),
+          onSucceed: () =>
+              _postFrameCallback((_) => setState(() => notified = true)),
+          onFailure: () =>
+              _postFrameCallback((_) => setState(() => notified = false)),
+        );
+      });
+    }
+    debugPrint('notified $notified');
+    debugPrint(
+        'joinedPlayers ${joinedPlayers.values.map((e) => e.langameUser.displayName).join(',')}');
+
+    return joinedPlayers.length != channel?.players.length
+        ? _buildWaitingScreen()
         : Scaffold(
-            // appBar: AppBar(automaticallyImplyLeading: false),
-            body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-              _buildTimerText(),
-              _buildQuestion(),
-              _buildBottomHalf(),
-            ]),
+            appBar: AppBar(automaticallyImplyLeading: false),
+            body: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _buildTimerText(),
+                _buildQuestion(), // TODO!!!!!!!!!!!
+                _buildBottomHalf(),
+              ],
+            ),
           );
   }
 
   @override
   void dispose() {
     super.dispose();
-    Future.value([_sub.cancel(), _leaveChannel()])
-        .whenComplete(() => widget._engine?.destroy());
+    Provider.of<AudioProvider>(context, listen: false)
+        .leaveChannel(); // TODO: might fail? osef?
   }
 
-  _initEngine() async {
-    widget._engine =
-        await RtcEngine.createWithConfig(RtcEngineConfig(AppConst.agoraAppID));
-    this._addListeners();
-    await widget._engine!.enableAudio();
-    await widget._engine!.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    await widget._engine!.setClientRole(ClientRole.Broadcaster);
-  }
-
-  _addListeners() {
-    widget._engine?.setEventHandler(RtcEngineEventHandler(
-      activeSpeaker: (int uid) {
-        setState(() {
-          _players[uid].isSpeaking = true;
-        });
-      },
-      microphoneEnabled: (bool a) {
-        debugPrint('microphoneEnabled $a');
-      },
-      streamMessage: (int a, int b, String c) {
-        debugPrint('streamMessage a $a b $b c $c');
-      },
-      localUserRegistered: (int a, String b) {
-        debugPrint('localUserRegistered a $a b$b');
-      },
-      userOffline: (int uid, UserOfflineReason reason) {
-        debugPrint('someone left $uid $reason');
-        if (reason == UserOfflineReason.Quit)
-          Fluttertoast.showToast(msg: '... left');
-        setState(() {
-          _players.remove(uid);
-        });
-      },
-      userJoined: (int uid, int b) {
-        debugPrint('someone joined');
-        debugPrint('$uid | $b');
-        widget._engine
-            ?.getUserInfoByUid(uid)
-            .then((v) => debugPrint('getUserInfoByUid ${v.toJson()}'));
-
-        setState(() {
-          everyoneJoined = true;
-          _players[uid] = Player(uid, -1, false); // TODO -1 get mapping
-        });
-      },
-      joinChannelSuccess: (channel, uid, elapsed) {
-        debugPrint('joinChannelSuccess $channel $uid $elapsed');
-        setState(() {
-          isJoined = true;
-          _players[uid] = Player(uid, -1, false); // TODO: get self id?
-        });
-      },
-      leaveChannel: (stats) {
-        debugPrint('leaveChannel ${stats.toJson()}');
-        setState(() {
-          isJoined = false;
-        });
-      },
-    ));
-  }
-
-  _joinChannel() async {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      await Permission.microphone.request();
+  void _handleError() {
+    if (errors > maxErrors) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => FriendsView()),
+      );
+      Fluttertoast.showToast(
+        msg: Provider.of<FunnyProvider>(context, listen: false)
+            .getFailingRandom(),
+        backgroundColor: Colors.red,
+      );
+      return;
     }
-    await widget._engine?.joinChannel(
-        AppConst.agoraToken, channelId, 'foobar', Random().nextInt(10));
+    setState(() => errors++);
   }
 
-  _leaveChannel() async {
-    await widget._engine?.leaveChannel();
+  void _postFrameCallback(FrameCallback callback) {
+    WidgetsBinding.instance!.addPostFrameCallback(callback);
   }
 
-  _switchMicrophone() {
-    widget._engine?.sendStreamMessage(0, 'yo bro');
-    widget._engine?.enableLocalAudio(!openMicrophone).then((value) {
-      setState(() {
-        openMicrophone = !openMicrophone;
-      });
-    }).catchError((err) {
-      debugPrint('enableLocalAudio $err');
-    });
+  Widget _buildLoading({String? text}) {
+    return Center(
+      child: SpinKitHourGlass(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.black,
+      ),
+      // child: SpinKitPumpingHeart(
+      //   itemBuilder: (BuildContext context, int index) {
+      //     return DecoratedBox(
+      //       decoration: BoxDecoration(
+      //         color: Theme.of(context).brightness == Brightness.dark
+      //             ? Colors.white
+      //             : Colors.black,
+      //       ),
+      //       child: Text(text != null
+      //           ? text
+      //           : Provider.of<FunnyProvider>(context, listen: false)
+      //               .getLoadingRandom()),
+      //     );
+      //   },
+      // ),
+    );
   }
 
-  _switchSpeakerphone() {
-    widget._engine?.setEnableSpeakerphone(!enableSpeakerphone).then((value) {
-      setState(() {
-        enableSpeakerphone = !enableSpeakerphone;
-      });
-    }).catchError((err) {
-      debugPrint('setEnableSpeakerphone $err');
-    });
+  RtcEngineEventHandler _buildEventHandler() => RtcEngineEventHandler(
+        activeSpeaker: (int uid) {
+          setState(() {
+            joinedPlayers[uid]?.isSpeaking = true;
+          });
+        },
+        microphoneEnabled: (bool a) {
+          debugPrint('microphoneEnabled $a');
+        },
+        streamMessage: (int a, int b, String c) {
+          debugPrint('streamMessage a $a b $b c $c');
+        },
+        localUserRegistered: (int a, String b) {
+          debugPrint('localUserRegistered a $a b$b');
+        },
+        userOffline: (int uid, UserOfflineReason reason) {
+          debugPrint('someone left $uid $reason');
+          if (reason == UserOfflineReason.Quit) {
+            Fluttertoast.showToast(
+                msg: '${joinedPlayers[uid]?.langameUser.displayName} left');
+          }
+          setState(() {
+            joinedPlayers.remove(uid);
+          });
+        },
+        userJoined: (int uid, int b) {
+          debugPrint('someone joined');
+          debugPrint('$uid | $b');
+          Fluttertoast.showToast(
+              msg: '${joinedPlayers[uid]?.langameUser.displayName} joined');
+
+          var joinerIds =
+              channel?.players.firstWhere((p) => p.channelUid == uid);
+          var joinerAsLangameUser = channelLangameUsers
+              .firstWhere((p) => p.uid == joinerIds?.langameUid);
+          // TODO: might fail to retrieve this user?
+          setState(() {
+            joinedPlayers[uid] = Player(joinerAsLangameUser, false);
+          });
+        },
+        joinChannelSuccess: (channelName, uid, elapsed) {
+          debugPrint('joinChannelSuccess $channelName $uid $elapsed');
+
+          var joinerIds =
+              channel?.players.firstWhere((p) => p.channelUid == uid);
+          var joinerAsLangameUser = channelLangameUsers
+              .firstWhere((p) => p.uid == joinerIds?.langameUid);
+          // TODO: might fail to retrieve this user?
+          setState(() {
+            joinedPlayers[uid] = Player(joinerAsLangameUser, false);
+          });
+        },
+        leaveChannel: (stats) {
+          debugPrint('leaveChannel ${stats.toJson()}');
+        },
+      );
+
+  Widget _buildWaitingScreen() {
+    return Scaffold(
+      body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20))),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            SpinKitWave(
+              color: Theme.of(context).colorScheme.primary,
+              size: AppSize.blockSizeHorizontal * 3,
+            ),
+            SizedBox(width: AppSize.blockSizeVertical * 5),
+            Expanded(
+              child: Text(
+                /// Exclusion between 'supposed to join' and 'joined ones' joined by ','
+                'Waiting for ${channelLangameUsers.where((e) => !joinedPlayers.values.map((e) => e.langameUser.uid).contains(e)).map((e) => e.displayName).join(',')}...',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            ),
+          ]),
+        ),
+        SizedBox(height: AppSize.blockSizeVertical * 5),
+        Container(
+            width: AppSize.blockSizeHorizontal * 80,
+            height: AppSize.blockSizeVertical * 60,
+            color: Colors.white,
+            child: Text(
+                'In the future there will be a wikipedia page about the topic(s) here'))
+      ]),
+    );
   }
 
   Widget _buildTimerText() {
     var theme = Theme.of(context);
-    return Center(
-      child: Container(
-        margin: EdgeInsets.only(
-            top: AppSize.safeBlockVertical * 5,
-            bottom: AppSize.blockSizeVertical * 5),
-        height: AppSize.blockSizeVertical * 8,
-        width: AppSize.blockSizeHorizontal * 30,
-        color: Colors.transparent,
-        child: Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-              color: theme.buttonTheme.colorScheme!.primary,
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          child: new Center(
-            child: new Text(
-              '${_remaining.inMinutes}:${_remaining.inSeconds.remainder(60).toString().length == 2 ? '' : '0'}${_remaining.inSeconds.remainder(60)}',
-              textAlign: TextAlign.center,
-              style: theme.primaryTextTheme.button,
+
+    Widget _loadIfNotStarted(AudioProvider p) {
+      p.startTimer(); // TODO: no error handling ^^
+      return _buildLoading();
+    }
+
+    return Consumer<AudioProvider>(
+      builder: (context, p, child) => !p.timerStarted
+          ? _loadIfNotStarted(p)
+          : StreamBuilder<Duration>(
+              stream: p.remaining,
+              builder: (c, s) => Center(
+                child: Container(
+                  margin: EdgeInsets.only(
+                      top: AppSize.safeBlockVertical * 5,
+                      bottom: AppSize.blockSizeVertical * 5),
+                  height: AppSize.blockSizeVertical * 8,
+                  width: AppSize.blockSizeHorizontal * 30,
+                  color: Colors.transparent,
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        color: theme.buttonTheme.colorScheme!.primary,
+                        borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                    child: new Center(
+                      child: new Text(
+                        !s.hasData
+                            ? '15:00'
+                            : '${s.data!.inMinutes}:${s.data!.inSeconds.remainder(60).toString().length == 2 ? '' : '0'}${s.data!.inSeconds.remainder(60)}',
+                        textAlign: TextAlign.center,
+                        style: theme.primaryTextTheme.button,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -294,7 +516,7 @@ class _LangameViewState extends State<LangameView> {
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
           child: Center(
             child: Text(
-              question,
+              'foobar', //question, // TODO!!!!!!!!!!!!!!!!!!
               textAlign: TextAlign.center,
               style: theme.primaryTextTheme.button,
             ),
@@ -323,7 +545,7 @@ class _LangameViewState extends State<LangameView> {
           width: AppSize.blockSizeHorizontal * 80,
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: _players.values
+              children: joinedPlayers.values
                   .map((p) => Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(
@@ -338,25 +560,30 @@ class _LangameViewState extends State<LangameView> {
                           ),
                         ),
                         child: Center(
-                          child: buildCroppedRoundedNetworkImage(null),
+                          child: buildCroppedRoundedNetworkImage(
+                              p.langameUser.photoUrl),
                         ),
                       ))
                   .toList()),
         ),
         SizedBox(height: AppSize.safeBlockVertical * 5),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          IconButton(
-            icon: Icon(
-                openMicrophone ? Icons.mic_rounded : Icons.mic_off_rounded),
-            onPressed: () => _switchMicrophone(),
-          ),
-          IconButton(
-            icon: Icon(enableSpeakerphone
-                ? Icons.speaker_notes_off_outlined
-                : Icons.speaker_notes_outlined),
-            onPressed: () => _switchSpeakerphone(),
-          )
-        ]),
+        Consumer<AudioProvider>(
+            builder: (context, p, child) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: Icon(p.isMicrophoneEnabled
+                            ? Icons.mic_rounded
+                            : Icons.mic_off_rounded),
+                        onPressed: () => p.switchMicrophone(),
+                      ),
+                      IconButton(
+                        icon: Icon(p.isSpeakerphoneEnabled
+                            ? Icons.speaker_notes_off_outlined
+                            : Icons.speaker_notes_outlined),
+                        onPressed: () => p.switchSpeakerphone(),
+                      )
+                    ])),
       ],
     );
   }

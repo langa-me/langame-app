@@ -1,13 +1,19 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {RtcRole, RtcTokenBuilder} from "agora-access-token";
-import {FirebaseFunctionsResponse, isLangameUser, LangameUser} from "./models";
+import {
+  FirebaseFunctionsResponse,
+  FirebaseFunctionsResponseStatusCode,
+  isLangameUser,
+  LangameChannel,
+  LangameUser,
+} from "./models";
 
 
 // Agora config
 // Fill the appID and appCertificate key given by Agora.io
-export const appID = functions.config().agora.app.id;
-export const appCertificate = functions.config().agora.app.certificate;
+export const appID = functions.config().agora.id;
+export const appCertificate = functions.config().agora.certificate;
 
 // token expire time, hardcode to 3600 seconds = 1 hour
 export const expirationTimeInSeconds = 3600;
@@ -16,14 +22,16 @@ export const role = RtcRole.PUBLISHER;
 
 export const kUserDoesNotExist = (id: string) => `user ${id} does not exist`;
 export const kInvalidRequest: string = "invalid request";
+export const kNotAuthenticated: string = "not authenticated";
 export const kUsersCollection: string = "users";
 export const kNotificationsCollection: string = "notifications";
+export const kLangamesCollection: string = "langames";
 
 export const filterOutSendLangameCalls =
     (data: any, context: functions.https.CallableContext) => {
       if (!context.auth) {
         return new FirebaseFunctionsResponse(
-            401,
+            FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
             undefined,
             "not authenticated",
         );
@@ -31,7 +39,7 @@ export const filterOutSendLangameCalls =
 
       if (!data) {
         return new FirebaseFunctionsResponse(
-            400,
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
             undefined,
             kInvalidRequest,
         );
@@ -39,17 +47,17 @@ export const filterOutSendLangameCalls =
 
       if (!data.recipients) {
         return new FirebaseFunctionsResponse(
-            400,
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
             undefined,
             "invalid recipients",
         );
       }
 
-      if (!data.topic) {
+      if (!data.topics || data.topics.length === 0) {
         return new FirebaseFunctionsResponse(
-            400,
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
             undefined,
-            "invalid topic",
+            "invalid topics",
         );
       }
       return 0;
@@ -63,7 +71,7 @@ export const getUserData = async (id: string) => {
       .get();
   if (!recipient.exists) {
     return new FirebaseFunctionsResponse(
-        400,
+        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
         kUserDoesNotExist(id),
     );
@@ -74,7 +82,7 @@ export const getUserData = async (id: string) => {
 
   if (!data) {
     return new FirebaseFunctionsResponse(
-        400,
+        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
         kUserDoesNotExist(id),
     );
@@ -82,7 +90,7 @@ export const getUserData = async (id: string) => {
 
   if (!isLangameUser(data)) {
     return new FirebaseFunctionsResponse(
-        400,
+        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
         kUserDoesNotExist(id),
     );
@@ -92,7 +100,7 @@ export const getUserData = async (id: string) => {
 
   if (!dataAsLangameUser.tokens) {
     return new FirebaseFunctionsResponse(
-        500,
+        FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,
         `user ${id} has no devices (tokens)`,
     );
@@ -100,7 +108,7 @@ export const getUserData = async (id: string) => {
 
   if (!dataAsLangameUser.uid) {
     return new FirebaseFunctionsResponse(
-        500,
+        FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,
         `user ${id} has no uid`,
     );
@@ -108,7 +116,7 @@ export const getUserData = async (id: string) => {
 
   if (!dataAsLangameUser.displayName) {
     return new FirebaseFunctionsResponse(
-        500,
+        FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,
         `user ${id} has no displayName`,
     );
@@ -117,7 +125,7 @@ export const getUserData = async (id: string) => {
 };
 
 export const handleSendToDevice = (recipientData: LangameUser,
-    notificationPayload: any,
+    notificationId: string,
     promise: Promise<admin.messaging.MessagingDevicesResponse>)
     : Promise<string | FirebaseFunctionsResponse> => {
   return promise.then((res) => {
@@ -141,10 +149,13 @@ export const handleSendToDevice = (recipientData: LangameUser,
               functions.logger.error("failed to remove invalid token", t));
       }
     });
-    return notificationPayload.data.id;
+    return notificationId;
   }).catch((e) => {
     functions.logger.error("sendLangame failed", e);
-    return new FirebaseFunctionsResponse(500, undefined, JSON.stringify(e));
+    return new FirebaseFunctionsResponse(
+        FirebaseFunctionsResponseStatusCode.INTERNAL,
+        undefined,
+        JSON.stringify(e));
   });
 };
 
@@ -191,4 +202,36 @@ export const hashFnv32a = (str: string, asString: boolean, seed: number):
     return ("0000000" + (hVal >>> 0).toString(16)).substr(-8);
   }
   return hVal >>> 0;
+};
+
+export const getLangame = async (channelName: string):
+    Promise<FirebaseFunctionsResponse | LangameChannel> => {
+  const queryResult = await admin.firestore()
+      .collection(kLangamesCollection)
+      .where("channelName", "==", channelName)
+      .get();
+  if (queryResult.docs.length === 0 ||
+      queryResult.docs.some((d) =>
+        !d.exists || !("players" in d.data()))) {
+    return new FirebaseFunctionsResponse(
+        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+        undefined,
+        "could not find this channel",
+    );
+  }
+  try {
+    const data = queryResult.docs[0].data();
+    return new LangameChannel({
+      channelName: data.channelName,
+      players: data.players,
+      topics: data.topics,
+      questions: data.questions,
+    });
+  } catch (e) {
+    return new FirebaseFunctionsResponse(
+        FirebaseFunctionsResponseStatusCode.INTERNAL,
+        undefined,
+        "failed to build langame object",
+    );
+  }
 };

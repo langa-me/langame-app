@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -55,6 +57,10 @@ void main() async {
             create: (context) => FirestoreProvider(firebase.firestore)),
         ChangeNotifierProvider(create: (_) => FunnyProvider()),
         ChangeNotifierProvider(create: (_) => LangameProvider()),
+        ChangeNotifierProvider(create: (_) => AudioProvider(firebase)),
+        StreamProvider<ConnectivityResult>.value(
+            value: Connectivity().onConnectivityChanged,
+            initialData: ConnectivityResult.none)
       ],
       child: MyApp(analytics),
     ),
@@ -88,9 +94,12 @@ class _MyAppState extends State<MyApp> {
           background: Colors.transparent,
         ).toTheme.copyWith(
             // elevatedButtonTheme: ElevatedButtonThemeData(
-            //     // style: ButtonStyle(
-            //     //     backgroundColor: MaterialStateProperty.all(Colors.red)),
-            //     ),
+            //   style: ButtonStyle(
+            //       backgroundColor: MaterialStateProperty.all(
+            //           ThemeData.),
+            //       textStyle: MaterialStateProperty.all(
+            //           Theme.of(context).textTheme.headline6)),
+            // ),
             ),
         darkTheme: FlexColorScheme.dark(
           scheme: FlexScheme.ebonyClay,
@@ -99,9 +108,12 @@ class _MyAppState extends State<MyApp> {
           background: Colors.transparent,
         ).toTheme.copyWith(
             // elevatedButtonTheme: ElevatedButtonThemeData(
-            //     // style: ButtonStyle(
-            //     //     backgroundColor: MaterialStateProperty.all(Colors.red)),
-            //     ),
+            //   style: ButtonStyle(
+            //       backgroundColor: MaterialStateProperty.all(
+            //           Theme.of(context).colorScheme.primary),
+            //       textStyle: MaterialStateProperty.all(
+            //           Theme.of(context).textTheme.headline6)),
+            // ),
             ),
         // home: Scaffold(),
         home: Login(),

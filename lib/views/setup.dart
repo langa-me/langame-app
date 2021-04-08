@@ -75,7 +75,7 @@ class _SetupState extends State with AfterLayoutMixin {
             Future<LangameResponse> f =
                 Provider.of<AuthenticationProvider>(context, listen: false)
                     .initializeMessageApi(onBackgroundOrForegroundOpened);
-            Dialogs.showLoadingDialog(context, _keyLoader);
+            Dialogs.showLoadingDialog(context, _keyLoader, Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
 
             f.then((res) {
               Navigator.of(_keyLoader.currentContext!, rootNavigator: true)

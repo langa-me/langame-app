@@ -1,302 +1,415 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {
+  ChannelUserLangameUser,
   FirebaseFunctionsResponse,
   FirebaseFunctionsResponseStatusCode,
-  isFirebaseFunctionsResponse,
+  isFirebaseFunctionsResponse, LangameChannel, LangameNotification,
   LangameUser,
 } from "./models";
 import {
   filterOutSendLangameCalls,
-  generateAgoraRtcToken,
+  generateAgoraRtcToken, getLangame,
   getUserData,
   handleSendToDevice,
   hashFnv32a,
   kInvalidRequest,
+  kLangamesCollection,
+  kNotAuthenticated,
   kNotificationsCollection,
   kUsersCollection,
 } from "./helpers";
 // Initialize admin firebase
 admin.initializeApp();
+admin.firestore().settings({ignoreUndefinedProperties: true});
+console.log("refresh");
+/*
+ admin.auth() // TODO: should kick everyone
+     .listUsers()
+     .then((r) => r.users.forEach((u) =>
+     functions.logger.info(u.displayName)
+     /* admin.auth().revokeRefreshTokens(u.uid)* /));
+*/
 
+// see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
+const runtimeOpts = {
+  maxInstances: 10,
+};
+// TODO: spawn function in EU!!
+
+/**
+ * Generate an audio channel token for the user
+ * @type {HttpsFunction & Runnable<any>}
+ */
+exports.getChannelToken = functions
+    .runWith(runtimeOpts)
+    .https
+    .onCall(async (data, context) => {
+      if (!context.auth) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
+            undefined,
+            kNotAuthenticated,
+        );
+      }
+      if (!data) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            kInvalidRequest,
+        );
+      }
+      if (!data.channelName) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            "you must provide a valid channel name",
+        );
+      }
+
+      const langame = await getLangame(data.channelName);
+      if ("statusCode" in langame) return langame;
+      const player = langame.players
+          .find((p: any) => p.langameUid === context.auth!.uid);
+
+      if (!player) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            "could not find user in this channel",
+        );
+      }
+      const agoraRtcToken =
+      generateAgoraRtcToken(data.channelName, player.channelUid);
+      return new FirebaseFunctionsResponse(
+          FirebaseFunctionsResponseStatusCode.OK,
+          [agoraRtcToken],
+          undefined,
+      );
+    });
 
 /**
  * Update user profile (Firebase Auth and Firestore LangameUser)
  * @type {HttpsFunction & Runnable<any>}
  */
-exports.updateProfile = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    return {
-      statusCode: FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
-      errorMessage: "not authenticated",
-    };
-  }
-  functions.logger.info(data);
-  if (data === null) {
-    return {
-      statusCode: FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-      errorMessage: kInvalidRequest,
-    };
-  }
-  return await admin
-      .firestore()
-      .collection(kUsersCollection)
-      .doc(context.auth.uid)
-      .update(data).then((_) => {
+exports.updateProfile = functions
+    .runWith(runtimeOpts)
+    .https
+    .onCall(async (data, context) => {
+      if (!context.auth) {
         return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.OK,
+            FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
             undefined,
-            undefined,
+            kNotAuthenticated,
         );
-      }).catch((e) => {
+      }
+      if (!data) {
         return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
             undefined,
-            e,
+            kInvalidRequest,
         );
-      });
-});
+      }
+      return await admin
+          .firestore()
+          .collection(kUsersCollection)
+          .doc(context.auth.uid)
+          .update(data).then((_) => {
+            return new FirebaseFunctionsResponse(
+                FirebaseFunctionsResponseStatusCode.OK,
+                undefined,
+                undefined,
+            );
+          }).catch((e) => {
+            return new FirebaseFunctionsResponse(
+                FirebaseFunctionsResponseStatusCode.INTERNAL,
+                undefined,
+                e,
+            );
+          });
+    });
+
+/**
+ *
+ * @type {HttpsFunction & Runnable<any>}
+ */ // TODO: rename
+exports.saveToken = functions
+    .runWith(runtimeOpts)
+    .https
+    .onCall(async (data, context) => {
+      if (!context.auth) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
+            undefined,
+            kNotAuthenticated,
+        );
+      }
+      if (data === null) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            kInvalidRequest,
+        );
+      }
+
+      if (!data.tokens) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            "you must provide token(s)",
+        );
+      }
+
+      // Save user device token(s) to Firestore, used to send notifications
+      return await admin
+          .firestore()
+          .collection(kUsersCollection)
+          .doc(context.auth.uid)
+          .update({
+            "tokens": admin.firestore.FieldValue.arrayUnion(...data.tokens),
+          }).then((_) => {
+            return new FirebaseFunctionsResponse(
+                FirebaseFunctionsResponseStatusCode.OK,
+                undefined,
+                undefined,
+            );
+          }).catch((e) => {
+            return new FirebaseFunctionsResponse(
+                FirebaseFunctionsResponseStatusCode.INTERNAL,
+                undefined,
+                e,
+            );
+          });
+    });
+
 
 /**
  *
  * @type {HttpsFunction & Runnable<any>}
  */
-exports.saveToken = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
-        undefined,
-        "not authenticated",
-    );
-  }
-  if (data === null) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        kInvalidRequest,
-    );
-  }
+exports.sendLangame = functions
+    .runWith(runtimeOpts)
+    .https
+    .onCall(async (data, context) => {
+      // Check request body is ok
+      const initialChecks = filterOutSendLangameCalls(data, context);
+      if (initialChecks !== 0) return initialChecks;
+      // Get recipients data from firestore
+      const recipientsData: Array<FirebaseFunctionsResponse | LangameUser> = [];
+      for (const r of data.recipients) {
+        const user = await getUserData(r);
+        if ("statusCode" in user) return user;
+        recipientsData.push(user);
+      }
 
-  if (!data.tokens) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        "you must provide token(s)",
-    );
-  }
-
-  // Save user device token(s) to Firestore, used to send notifications
-  return await admin
-      .firestore()
-      .collection(kUsersCollection)
-      .doc(context.auth.uid)
-      .update({
-        "tokens": admin.firestore.FieldValue.arrayUnion(...data.tokens),
-      }).then((_) => {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.OK,
-            undefined,
-            undefined,
-        );
-      }).catch((e) => {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.INTERNAL,
-            undefined,
-            e,
-        );
-      });
-});
-
-
-/**
- *
- * @type {HttpsFunction & Runnable<any>}
- */
-exports.sendLangame = functions.https.onCall(async (data, context) => {
-  // Check request body is ok
-  const initialChecks = filterOutSendLangameCalls(data, context);
-  if (initialChecks !== 0) return initialChecks;
-  // Get recipients data from firestore
-  const recipientsData: Array<FirebaseFunctionsResponse | LangameUser> =
-      data.recipients.map(async (r: string) => await getUserData(r));
-  // Failed ? Return error
-  if (recipientsData
-      .some((r: FirebaseFunctionsResponse | LangameUser) =>
-        isFirebaseFunctionsResponse(r))) {
-    return recipientsData.find((e: FirebaseFunctionsResponse | LangameUser) =>
-      isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
-  }
-  // Get sender data from firestore
-  const senderData: FirebaseFunctionsResponse | LangameUser =
+      // Get sender data from firestore
+      const senderData: FirebaseFunctionsResponse | LangameUser =
       await getUserData(context.auth!.uid);
-  // Failed ? Return error
-  if (isFirebaseFunctionsResponse(senderData)) return senderData;
+      // Failed ? Return error
+      if (isFirebaseFunctionsResponse(senderData)) return senderData;
 
-  // TODO: is it really 100% atomic?
-  const channelName: string | number =
+      // TODO: is it really 100% atomic?
+      const channelName: string | number =
       hashFnv32a(senderData.uid!, true, Date.now());
-  // Somehow, shouldn't happen
-  if (typeof channelName === "number") {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        "failed to generate agora channel name");
-  }
+      // Somehow, shouldn't happen
+      if (typeof channelName === "number") {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            undefined,
+            "failed to generate channel name");
+      }
 
+      const recipientsUid = recipientsData.map((r) => (r as LangameUser).uid);
+      const playersLangameUid = recipientsUid.concat([senderData.uid!]);
+      await admin
+          .firestore()
+          .collection(kLangamesCollection)
+          .add(JSON.parse(JSON.stringify(new LangameChannel({
+            channelName: channelName,
+            players: playersLangameUid.map((e, i) => {
+              // i.e. mapping channel user id -> Langame user id
+              return new ChannelUserLangameUser({
+                channelUid: i+1, // Agora need not start 0
+                langameUid: e!,
+              });
+            }),
+            topics: data.topics,
+            questions: [],
+          })))); // TODO: might check error?
 
-  const results = await recipientsData
+      const results = await recipientsData
       // @ts-ignore
-      .map(async (e: LangameUser, i: number) => {
-        // Generate the Agora token
-        const agoraRtcToken = generateAgoraRtcToken(channelName, i);
-        const notificationPayload = {
-          data: {
-            // Assigning notification id later
-            id: "",
-            senderUid: context.auth!.uid,
-            recipientUid: e.uid,
-            // Topic of the Langame
-            topic: data.topic,
-            // Channel user id number required for agora
-            agoraUid: i,
-            // A channel is created for this Langame
-            agoraChannelName: channelName,
-            // A token is generated for these users for this channel
-            agoraRtcToken: agoraRtcToken,
-          },
-          notification: {
-            // Notification is tagged by sender uid
-            // If specified and a notification with the same tag is a
-            // already being shown, the new notification replaces
-            // the existing one in the notification drawer.
-            // Android only
-            tag: context.auth!.uid,
-            body: `${senderData.displayName} invited you to play ${data.topic}`,
-            title: `Play ${data.topic} with ${senderData.displayName}?`,
-          },
-        };
+          .map(async (e: LangameUser) => {
+            const notificationPayload = new LangameNotification({
+              senderUid: context.auth!.uid,
+              // @ts-ignore
+              recipientsUid: recipientsUid,
+              // Topics of the Langame
+              topics: data.topics,
+              channelName: channelName,
+            });
 
-        const notification = await admin
-            .firestore()
-            .collection(kNotificationsCollection)
-            .add(notificationPayload);
-        notificationPayload.data.id = notification.id;
+            const notification = await admin
+                .firestore()
+                .collection(kNotificationsCollection)
+                .add(JSON.parse(JSON.stringify(notificationPayload)));
 
-        return await handleSendToDevice(e,
-            notificationPayload,
-            admin.messaging().sendToDevice(
+            return await handleSendToDevice(e,
+                notification.id,
+                admin.messaging().sendToDevice(
                 e.tokens!,
-                // @ts-ignore
-                notificationPayload,
+                {
+                  data: {id: notification.id},
+                  notification: {
+                    tag: context.auth!.uid,
+                    // eslint-disable-next-line max-len
+                    body: `${senderData.displayName} invited you to play ${data.topics.join(",")}`,
+                    // eslint-disable-next-line max-len
+                    title: `Play ${data.topics.join(",")} with ${senderData.displayName}?`,
+                  },
+                },
                 {
                   // Required for background/quit data-only messages on iOS
                   contentAvailable: true,
                   // Required for background/quit data-only messages on Android
                   priority: "high",
                 }
-            ),
-        );
-      });
-
-  // Failed ? Return error
-  if (results
-      // @ts-ignore
-      .some((r: FirebaseFunctionsResponse | LangameUser) =>
-        isFirebaseFunctionsResponse(r))) {
-    return recipientsData.find((e: FirebaseFunctionsResponse | LangameUser) =>
-      isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
-  }
-  // Succeed, results is string[]
-  return new FirebaseFunctionsResponse(
-      FirebaseFunctionsResponseStatusCode.OK,
-      results,
-      undefined);
-});
+                ),
+            );
+          });
+      const successfulResults = results.filter((r) =>
+        !isFirebaseFunctionsResponse(r));
+      // If all failed
+      if (successfulResults.length === 0) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            undefined,
+            "could not send Langame");
+      }
+      // TODO: might send a notification to the sender to offer joining now?
+      // Succeed
+      return new FirebaseFunctionsResponse(
+          FirebaseFunctionsResponseStatusCode.OK,
+          undefined,
+          undefined);
+    });
 
 
 /**
  *
  * @type {HttpsFunction & Runnable<any>}
  */
-exports.sendReadyForLangame = functions.https.onCall(async (data, context) => {
-  const initialChecks = filterOutSendLangameCalls(data, context);
-  if (initialChecks !== 0) return initialChecks;
-  // Get recipients data from firestore
-  const recipientsData: Array<FirebaseFunctionsResponse | LangameUser> =
-      data.recipients.map(async (r: string) => await getUserData(r));
-  // Failed ? Return error
-  if (recipientsData
-      .some((r: FirebaseFunctionsResponse | LangameUser) =>
-        isFirebaseFunctionsResponse(r))) {
-    return recipientsData.find((e: FirebaseFunctionsResponse | LangameUser) =>
-      isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
-  }
-  // Get sender data from firestore
-  const senderData: FirebaseFunctionsResponse | LangameUser =
+exports.sendReadyForLangame = functions
+    .runWith(runtimeOpts)
+    .https
+    .onCall(async (data, context) => {
+      if (!context.auth) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
+            undefined,
+            "not authenticated",
+        );
+      }
+
+      if (!data) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            kInvalidRequest,
+        );
+      }
+
+      if (!data.channelName) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            "you must provide a channel name",
+        );
+      }
+
+      const langame = await getLangame(data.channelName);
+      if ("statusCode" in langame) return langame;
+      // We need to filter players with self,
+      // do not want to send self notification
+      const playersExceptSelf = langame.players.filter((p) =>
+        p.langameUid != context.auth!.uid);
+      if (playersExceptSelf.length === 0) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            undefined,
+            "could not find any players in this Langame",
+        );
+      }
+      // Get players data from firestore (need their messaging tokens)
+      const recipientsData: Array<FirebaseFunctionsResponse | LangameUser> = [];
+      for (const r of playersExceptSelf) {
+        const user = await getUserData(r.langameUid);
+        if ("statusCode" in user) return user;
+        recipientsData.push(user);
+      }
+      // Get sender data from firestore
+      const senderData: FirebaseFunctionsResponse | LangameUser =
       await getUserData(context.auth!.uid);
-  // Failed ? Return error
-  if (isFirebaseFunctionsResponse(senderData)) return senderData;
+      // Failed ? Return error
+      if ("statusCode" in senderData) return senderData;
 
-  if (!data.question) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        "invalid question",
-    );
-  }
-  const results = await recipientsData
+      const recipientsUid = recipientsData.map((r) => (r as LangameUser).uid);
+
+      const results = await recipientsData
       // @ts-ignore
-      .map(async (e: LangameUser) => {
-        const notificationPayload = {
-          data: {
-            id: "",
-            senderUid: context.auth!.uid,
-            recipientUid: e.uid,
-            topic: data.topic,
-            question: data.question,
-          },
-          notification: {
-            tag: context.auth!.uid,
-            // eslint-disable-next-line max-len
-            body: `${senderData.displayName} is waiting you to play ${data.topic}`,
-            title: `Join ${senderData.displayName} to play ${data.topic} now?`,
-          },
-        };
-        const notification = await admin
-            .firestore()
-            .collection(kNotificationsCollection)
-            .add(notificationPayload);
-        notificationPayload.data.id = notification.id;
+          .map(async (e: LangameUser) => {
+            const notificationPayload = new LangameNotification(
+                {
+                  senderUid: context.auth!.uid,
+                  // @ts-ignore
+                  recipientsUid: recipientsUid,
+                  topics: langame.topics,
+                  channelName: langame.channelName,
+                  ready: true,
+                });
+            const notification = await admin
+                .firestore()
+                .collection(kNotificationsCollection)
+                .add(JSON.parse(JSON.stringify(notificationPayload)));
 
-        return handleSendToDevice(e,
-            notificationPayload,
-            admin.messaging().sendToDevice(
+            return handleSendToDevice(e,
+                notification.id,
+                admin.messaging().sendToDevice(
             e.tokens!,
-            // @ts-ignore
-            notificationPayload,
+            {
+              data: {id: notification.id},
+              notification: {
+                tag: context.auth!.uid,
+                // eslint-disable-next-line max-len
+                body: `${senderData.displayName} is waiting you to play ${langame.topics.join(",")}`,
+                // eslint-disable-next-line max-len
+                title: `Join ${senderData.displayName} to play ${langame.topics.join(",")} now?`,
+              },
+            },
             {
               // Required for background/quit data-only messages on iOS
               contentAvailable: true,
               // Required for background/quit data-only messages on Android
               priority: "high",
             }
-            ));
-      });
+                ));
+          });
 
-  // Failed ? Return error
-  if (results
-      // @ts-ignore
-      .some((r: FirebaseFunctionsResponse | LangameUser) =>
-        isFirebaseFunctionsResponse(r))) {
-    return recipientsData.find((e: FirebaseFunctionsResponse | LangameUser) =>
-      isFirebaseFunctionsResponse(e)); // TODO: how to aggregate errors?
-  }
-  // Succeed, results is string[]
-  return new FirebaseFunctionsResponse(
-      FirebaseFunctionsResponseStatusCode.OK,
-      results,
-      undefined);
-});
+      const successfulResults = results.filter((r) =>
+        !isFirebaseFunctionsResponse(r));
+        // If all failed
+      if (successfulResults.length === 0) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            undefined,
+            "could not send ready for Langame");
+      }
+      // Succeed
+      return new FirebaseFunctionsResponse(
+          FirebaseFunctionsResponseStatusCode.OK,
+          undefined,
+          undefined);
+    });
 
 // const fake = () => {
 //   const nbUsers = 12;

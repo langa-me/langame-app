@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:langame/helpers/fake.dart';
 import 'package:langame/helpers/random.dart';
+import 'package:langame/models/channel.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/services/http/authentication_api.dart';
 
@@ -78,5 +79,17 @@ class FakeAuthenticationApi extends AuthenticationApi {
       List<String>? topics}) async {
     _user =
         MockUser(displayName: displayName, photoURL: photoURL, email: newEmail);
+  }
+
+  @override
+  Future<LangameChannel> getChannel(String channelName) {
+    // TODO: implement getChannel
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getChannelToken(String channelName) {
+    // TODO: implement getChannelToken
+    throw UnimplementedError();
   }
 }

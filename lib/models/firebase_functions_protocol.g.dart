@@ -12,7 +12,8 @@ FirebaseFunctionsResponse _$FirebaseFunctionsResponseFromJson(
     _$enumDecode(
         _$FirebaseFunctionsResponseStatusCodeEnumMap, json['statusCode']),
     json['errorMessage'] as String?,
-  );
+  )..results =
+      (json['results'] as List<dynamic>?)?.map((e) => e as String).toList();
 }
 
 Map<String, dynamic> _$FirebaseFunctionsResponseToJson(
@@ -21,6 +22,7 @@ Map<String, dynamic> _$FirebaseFunctionsResponseToJson(
       'statusCode':
           _$FirebaseFunctionsResponseStatusCodeEnumMap[instance.statusCode],
       'errorMessage': instance.errorMessage,
+      'results': instance.results,
     };
 
 K _$enumDecode<K, V>(
@@ -55,22 +57,3 @@ const _$FirebaseFunctionsResponseStatusCodeEnumMap = {
   FirebaseFunctionsResponseStatusCode.UNAUTHORIZED: 401,
   FirebaseFunctionsResponseStatusCode.INTERNAL: 500,
 };
-
-FirebaseFunctionsResponseSendLangame
-    _$FirebaseFunctionsResponseSendLangameFromJson(Map<String, dynamic> json) {
-  return FirebaseFunctionsResponseSendLangame(
-    _$enumDecode(
-        _$FirebaseFunctionsResponseStatusCodeEnumMap, json['statusCode']),
-    json['errorMessage'] as String?,
-    json['results'] as String?,
-  );
-}
-
-Map<String, dynamic> _$FirebaseFunctionsResponseSendLangameToJson(
-        FirebaseFunctionsResponseSendLangame instance) =>
-    <String, dynamic>{
-      'statusCode':
-          _$FirebaseFunctionsResponseStatusCodeEnumMap[instance.statusCode],
-      'errorMessage': instance.errorMessage,
-      'results': instance.results,
-    };

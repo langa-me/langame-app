@@ -14,7 +14,6 @@ class AppConst {
   // When I build a new public version I just make sure to update this info
   // before building them.
   static const String appName = 'Langame';
-  static const String version = '0.0.1';
   static const String author = 'Louis Beaumont';
 
   // Whether to log debug settings events
@@ -22,21 +21,18 @@ class AppConst {
 
   /// Define App ID and Token
   static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
-  static const String agoraToken =
-      '00604dbfdb7d4a349bf9b02758aabd97c78IAAvmXNuSl7u/ZU8s51xZtf4yGrCtiY7jP5BR16lCo51AiFlc4wAAAAAEAAeXT+ciIJoYAEAAQCIgmhg';
-
-  /// Your channel ID
-  static const agoraChannelId = 'foo';
 
   static const String saveTokenFunction = 'saveToken';
   static const String sendLangameFunction = 'sendLangame';
   static const String sendReadyForLangameFunction = 'sendReadyForLangame';
   static const String updateProfileFunction = 'updateProfile';
+  static const String getChannelTokenFunction = 'getChannelToken';
 
   static final navKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
 
   static const String firestoreUsersCollection = 'users';
   static const String firestoreNotificationsCollection = 'notifications';
+  static const String firestoreLangamesCollection = 'langames';
 }
 
 /// Fonts assets used in this application,

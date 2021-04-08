@@ -12,6 +12,7 @@ export enum FirebaseFunctionsResponseStatusCode {
     INTERNAL = 500,
 }
 
+// TODO: might extends (functions.https.) HttpsError
 /**
  * Response to all firebase functions
  */
@@ -137,4 +138,110 @@ export class LangameUser {
 export function isLangameUser(obj: any): obj is LangameUser {
   // Checking typical LangameUser properties
   return typeof obj.uid === "string" && typeof obj.google === "boolean";
+}
+
+/**
+ * ChannelUserLangameUser is the mapping between channel uid (number)
+ * and langame uid (string)
+ */
+export class ChannelUserLangameUser {
+    channelUid: number;
+    langameUid: string;
+
+    /**
+     * Constructor of ChannelUserLangameUser...
+     * @param{number} channelUid
+     * @param{string} langameUid
+     */
+    constructor({channelUid, langameUid}:{
+        channelUid: number,
+        langameUid: string
+    }) {
+      this.channelUid = channelUid;
+      this.langameUid = langameUid;
+    }
+}
+
+/**
+ * Contains information about a Langame
+ */
+export class LangameChannel {
+    channelName: string;
+    players: Array<ChannelUserLangameUser>;
+    topics: Array<string>;
+    questions: Array<string>;
+
+    /**
+     * Constructor of LangameChannel...
+     * @param{string} channelName
+     * @param{Array<ChannelUserLangameUser>} players
+     * @param{Array<string>} topics
+     * @param{Array<string>} questions
+     */
+    constructor({channelName, players, topics, questions}:{channelName: string,
+        players: Array<ChannelUserLangameUser>,
+        topics: Array<string>,
+        questions: Array<string>}) {
+      this.channelName = channelName;
+      this.players = players;
+      this.topics = topics;
+      this.questions = questions;
+    }
+}
+
+/**
+ * Check if object is a LangameChannel
+ * @param{any} obj
+ * @return{boolean}
+ */
+export function isLangameChannel(obj: any): obj is LangameChannel {
+  // Checking typical LangameChannel properties
+  return typeof obj.channelName === "string";
+}
+
+
+/**
+ * Contains information about a Langame notification
+ */
+export class LangameNotification {
+    id?: string;
+    senderUid: string;
+    recipientsUid: Array<string>;
+    topics?: Array<string>;
+    channelName?: string;
+    ready?: boolean;
+
+    /**
+     * Constructor..
+     * @param{string} id
+     * @param{string} senderUid
+     * @param{string} recipientsUid
+     * @param{string} topics
+     * @param{string} channelName
+     * @param{string} ready
+     */
+    constructor({id, senderUid, recipientsUid, topics, channelName, ready}:
+                    {id: string,
+        senderUid: string,
+        recipientsUid: Array<string>,
+        topics: Array<string>,
+        channelName: string,
+        ready: boolean}) {
+      this.id = id;
+      this.senderUid = senderUid;
+      this.recipientsUid = recipientsUid;
+      this.topics = topics;
+      this.channelName = channelName;
+      this.ready = ready;
+    }
+}
+
+/**
+ * Check if object is a LangameNotification
+ * @param{any} obj
+ * @return{boolean}
+ */
+export function isLangameNotification(obj: any): obj is LangameNotification {
+  // Checking typical LangameNotification properties
+  return typeof obj.senderUid === "string" && obj.id === "string";
 }

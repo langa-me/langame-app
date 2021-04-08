@@ -41,7 +41,7 @@ class Dialogs {
   }
 
   static Future<void> showLoadingDialog(
-      BuildContext context, GlobalKey key) async {
+      BuildContext context, GlobalKey key, String text) async {
     return showDialog<void>(
         context: context,
         barrierDismissible: false,
@@ -64,7 +64,7 @@ class Dialogs {
                           height: 10,
                         ),
                         Text(
-                          'Please Wait....',
+                          text,
                           style: Theme.of(context).textTheme.headline6!.merge(
                               TextStyle(
                                   color: Theme.of(context).brightness ==

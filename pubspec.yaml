@@ -1,8 +1,8 @@
 name: langame
 description: AI Augmented human conversations
-version: 1.0.0+1
+version: 1.0.1+2
 authors:
-  - Louis Beaumont <louis.beaumont@langa.me>
+  - Langame <mail@langa.me>
 
 homepage: https://github.com/louis030195/langame-app
 
@@ -12,18 +12,18 @@ environment:
 dependencies:
 
   # Firebase
-  firebase_core: "^1.0.2"
-  firebase_auth: "^1.0.1"
-  cloud_firestore: "^1.0.3"
-  cloud_functions: "^1.0.2"
+  firebase_core: "^1.0.3"
+  firebase_auth: "^1.0.2"
+  cloud_firestore: "^1.0.4"
+  cloud_functions: "^1.0.3"
   firebase_analytics: 8.0.0-dev.0
-  firebase_messaging: "^9.1.0"
+  firebase_messaging: "^9.1.1"
   google_sign_in: "^5.0.0"
   flutter_facebook_auth: "^3.0.0-nullsafety.1"
   sign_in_with_apple: "^3.0.0"
   crypto: "^3.0.0"
   flutter_local_notifications: ^5.0.0
-  firebase_crashlytics: "^1.0.0"
+  firebase_crashlytics: "^2.0.0"
   firebase_remote_config: "^0.9.0-dev.1"
 
   provider: "^5.0.0"
@@ -50,7 +50,7 @@ dependencies:
   ordered_set: ^3.0.0
   fluttertoast: ^8.0.3
   grouped_list: ^4.0.0
-
+  connectivity: ^3.0.3
   flutter:
     sdk: flutter
 

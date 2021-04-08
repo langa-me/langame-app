@@ -50,6 +50,14 @@ class LangameSendLangameException extends LangameException {
   LangameSendLangameException(String cause) : super(cause);
 }
 
+class LangameGetAudioTokenException extends LangameException {
+  LangameGetAudioTokenException(String cause) : super(cause);
+}
+
+class LangameGetChannelException extends LangameException {
+  LangameGetChannelException(String cause) : super(cause);
+}
+
 class LangameSendReadyForLangameException extends LangameException {
   LangameSendReadyForLangameException(String cause) : super(cause);
 }
@@ -81,11 +89,12 @@ const String kNotAuthenticated = 'not_authenticated';
 const String kFailedToUpdateProfile = 'failed_to_update_profile';
 
 /// Front-end level responses
-class LangameResponse {
+class LangameResponse<T> {
   final LangameStatus status;
+  final T? result;
   final Object? error;
 
-  LangameResponse(this.status, {this.error});
+  LangameResponse(this.status, {this.result, this.error});
 
   void thenShowSnackBar(
       BuildContext context, Function onSucceed, String failedMessage,

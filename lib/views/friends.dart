@@ -7,6 +7,7 @@ import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/views/profile.dart';
+import 'package:langame/views/send_langame.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -58,23 +59,52 @@ class _FriendsViewState extends State<FriendsView>
   }
 
   PreferredSizeWidget? _buildAppBar() {
+    Widget notifications = InkWell(
+        child: Consumer<AuthenticationProvider>(builder: (context, p, c) {
+      return Badge(
+        badgeContent: Text('${p.notifications.length}'),
+        child: Icon(Icons.notifications),
+        padding: const EdgeInsets.all(3.0),
+        position: BadgePosition.topStart(top: 7, start: 10),
+      );
+    }), onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => NotificationsView()),
+      );
+    });
     return AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        leading: InkWell(
-            child: Consumer<AuthenticationProvider>(builder: (context, p, c) {
-          return Badge(
-            badgeContent: Text('${p.notifications.length}'),
-            child: Icon(Icons.notifications),
-            padding: const EdgeInsets.all(3.0),
-            position: BadgePosition.topStart(top: 7, start: 10),
-          );
-        }), onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => NotificationsView()),
-          );
-        }),
+        leading: notifications,
         actions: <Widget>[
+          SizedBox(width: AppSize.blockSizeHorizontal * 25),
+          Consumer<LangameProvider>(
+            builder: (context, l, child) => l.shoppingList.length == 0
+                ? SizedBox.shrink()
+                : ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).colorScheme.secondary),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SendLangameView()),
+                      );
+                    },
+                    child: Row(children: [
+                      Text('Current Langame'),
+                      Badge(
+                        badgeContent: Text('${l.shoppingList.length}'),
+                        child: Icon(Icons.shopping_cart_outlined),
+                        padding: const EdgeInsets.all(3.0),
+                        position: BadgePosition.topStart(top: 7, start: 10),
+                      )
+                    ]),
+                  ),
+          ),
+          Spacer(),
           Consumer2<AuthenticationProvider, ProfileProvider>(builder:
               (context, authenticationProvider, profileProvider, child) {
             if (authenticationProvider.user != null) {
@@ -309,10 +339,10 @@ class SearchResultsListView extends StatefulWidget {
 }
 
 class _SearchResultsListViewState extends State<SearchResultsListView> {
-  bool _hasBeenAddedToShoppingList = false;
   @override
   Widget build(BuildContext context) {
-    return Consumer<LocalStorageProvider>(builder: (c, p, _) {
+    return Consumer2<LocalStorageProvider, LangameProvider>(
+        builder: (c, p, lp, _) {
       if (p.selectedUser == null) {
         return Center(
           child: Column(
@@ -336,15 +366,15 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         Spacer(),
         StretchableButton(
           // TODO: might use ToggleButton instead? (with icon)
-          onPressed: _hasBeenAddedToShoppingList
-              ? _onRemoveFromShoppingList(p)
-              : _onAddToShoppingList(p),
+          onPressed: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
+              ? _onRemoveFromShoppingList(p, lp)
+              : _onAddToShoppingList(p, lp),
           borderRadius: 2,
           splashColor: Theme.of(context).colorScheme.secondaryVariant,
           buttonPadding: 4,
           buttonColor: Theme.of(context).colorScheme.secondary,
           children: [
-            Text(_hasBeenAddedToShoppingList
+            Text(lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
                 ? 'Remove from current Langame'
                 : 'Add to current Langame'),
             Container(
@@ -357,7 +387,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                 ),
               ),
               child: Icon(
-                  _hasBeenAddedToShoppingList
+                  lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
                       ? Icons.remove_shopping_cart_outlined
                       : Icons.add_shopping_cart_outlined,
                   size: AppSize.blockSizeHorizontal * 5),
@@ -369,30 +399,25 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     });
   }
 
-  void Function() _onAddToShoppingList(LocalStorageProvider p) {
+  void Function() _onAddToShoppingList(
+      LocalStorageProvider p, LangameProvider lp) {
     return () {
-      Provider.of<LangameProvider>(context, listen: false).add(p.selectedUser!);
+      lp.add(p.selectedUser!);
       final snackBar = SnackBar(
           content: Text(
               '${p.selectedUser!.displayName} has been added to current Langame'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      setState(() {
-        _hasBeenAddedToShoppingList = true;
-      });
     };
   }
 
-  void Function() _onRemoveFromShoppingList(LocalStorageProvider p) {
+  void Function() _onRemoveFromShoppingList(
+      LocalStorageProvider p, LangameProvider lp) {
     return () {
-      Provider.of<LangameProvider>(context, listen: false)
-          .remove(p.selectedUser!);
+      lp.remove(p.selectedUser!);
       final snackBar = SnackBar(
           content: Text(
               '${p.selectedUser!.displayName} has been removed from current Langame'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      setState(() {
-        _hasBeenAddedToShoppingList = false;
-      });
     };
   }
 }

@@ -12,7 +12,8 @@ firebase login
 ### Secrets
 
 ```bash
-firebase functions:config:set agora.app.id="THE AGORA APP ID" agora.app.certificate="THE AGORA CERTIFICATE"
+firebase functions:config:set agora.id="THE AGORA APP ID" agora.certificate="THE AGORA CERTIFICATE"
+firebase functions:config:get > .runtimeconfig.json
 ```
 
 Then you need to re-deploy your functions

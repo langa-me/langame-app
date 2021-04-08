@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/notification.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -74,26 +73,15 @@ class _LoginState extends State<Login> {
                 ap.messageApi.getInitialMessage().then((n) {
                   // TODO: doesn't work ? n = null
                   Fluttertoast.showToast(
-                      msg: 'opening notification ${n?.toJson()}');
-                  if (n != null) {
-                    if (n is LangameNotificationPlay) {
-                      Navigator.pushReplacement(
-                        context, // opened the terminated app from a notification
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              LangameView(n.senderUid, n.topic, 'Who?', true),
-                        ),
-                      );
-                    } else if (n is LangameNotificationReadyToPlay) {
-                      // Received a message "I am ready!"
-                      Navigator.pushReplacement(
-                        context, // opened the terminated app from a notification
-                        MaterialPageRoute(
-                          builder: (context) => LangameView(
-                              n.senderUid, n.topic, n.question, false),
-                        ),
-                      );
-                    }
+                      msg: 'opening notification senderUid ${n?.senderUid}');
+                  if (n != null && n.channelName != null) {
+                    Navigator.pushReplacement(
+                      context, // opened the terminated app from a notification
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            LangameView(n, n.ready == null || !n.ready!),
+                      ),
+                    );
                   } else {
                     // User is not opening the app from a notification
                     Navigator.pushReplacement(
@@ -103,10 +91,12 @@ class _LoginState extends State<Login> {
                   }
                 });
               },
-              !kReleaseMode
-                  ? 'failed to initializeMessageApi ${res.error.toString()}'
-                  : Provider.of<FunnyProvider>(context, listen: false)
-                      .getFailingRandom(),
+              res.error.toString().contains('firebase_functions/unavailable')
+                  ? 'Could not authenticate, please check your internet connection'
+                  : !kReleaseMode
+                      ? 'failed to initializeMessageApi ${res.error.toString()}'
+                      : Provider.of<FunnyProvider>(context, listen: false)
+                          .getFailingRandom(),
               onFailure: () {
                 Navigator.of(_keySuccess.currentContext ?? context,
                         rootNavigator: true)
@@ -154,9 +144,13 @@ class _LoginState extends State<Login> {
             padding: const EdgeInsets.only(top: 60.0),
             child: Center(
               child: Container(
-                  width: 200,
-                  height: 150,
-                  child: Image.asset('images/logo.png')),
+                width: 200,
+                height: 150,
+                child: Image.asset('images/logo-colourless.png',
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Colors.black
+                        : Colors.white),
+              ),
             ),
           ),
           SizedBox(height: 100),
@@ -240,16 +234,19 @@ class _LoginState extends State<Login> {
   Future _handleOnPressedLogin(
       Future<LangameResponse> Function() fn, String entity) async {
     var f = fn().timeout(const Duration(seconds: 5));
-    Dialogs.showLoadingDialog(context, _keyLoader);
+    Dialogs.showLoadingDialog(context, _keyLoader,
+        Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
     f.then((res) {
       Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
       res.thenShowSnackBar(
         context,
         () => {},
-        kReleaseMode
-            ? 'failed to login to $entity, ${res.error.toString()}'
-            : Provider.of<FunnyProvider>(context, listen: false)
-                .getFailingRandom(),
+        res.error.toString().contains('network_error') // TODO: hack
+            ? 'Could not authenticate, please check your internet connection'
+            : !kReleaseMode
+                ? 'failed to login to $entity, ${res.error.toString()}'
+                : Provider.of<FunnyProvider>(context, listen: false)
+                    .getFailingRandom(),
       );
     });
   }

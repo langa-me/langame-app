@@ -8,11 +8,14 @@ part of 'notification.dart';
 
 LangameNotification _$LangameNotificationFromJson(Map<String, dynamic> json) {
   return LangameNotification(
-    json['id'] as String,
     json['senderUid'] as String,
-    json['recipientUid'] as String,
-    background: json['background'] as bool?,
-  );
+    (json['recipientsUid'] as List<dynamic>).map((e) => e as String).toList(),
+  )
+    ..id = json['id'] as String?
+    ..topics =
+        (json['topics'] as List<dynamic>?)?.map((e) => e as String).toList()
+    ..channelName = json['channelName'] as String?
+    ..ready = json['ready'] as bool?;
 }
 
 Map<String, dynamic> _$LangameNotificationToJson(
@@ -20,56 +23,8 @@ Map<String, dynamic> _$LangameNotificationToJson(
     <String, dynamic>{
       'id': instance.id,
       'senderUid': instance.senderUid,
-      'recipientUid': instance.recipientUid,
-      'background': instance.background,
-    };
-
-LangameNotificationPlay _$LangameNotificationPlayFromJson(
-    Map<String, dynamic> json) {
-  return LangameNotificationPlay(
-    json['id'],
-    json['senderUid'],
-    json['recipientUid'],
-    json['topic'] as String,
-    json['agoraUid'] as int,
-    json['agoraChannelName'] as String,
-    json['agoraRtcToken'] as String,
-    background: json['background'],
-  );
-}
-
-Map<String, dynamic> _$LangameNotificationPlayToJson(
-        LangameNotificationPlay instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'senderUid': instance.senderUid,
-      'recipientUid': instance.recipientUid,
-      'background': instance.background,
-      'topic': instance.topic,
-      'agoraUid': instance.agoraUid,
-      'agoraChannelName': instance.agoraChannelName,
-      'agoraRtcToken': instance.agoraRtcToken,
-    };
-
-LangameNotificationReadyToPlay _$LangameNotificationReadyToPlayFromJson(
-    Map<String, dynamic> json) {
-  return LangameNotificationReadyToPlay(
-    json['id'],
-    json['senderUid'],
-    json['recipientUid'],
-    json['topic'] as String,
-    json['question'] as String,
-    background: json['background'],
-  );
-}
-
-Map<String, dynamic> _$LangameNotificationReadyToPlayToJson(
-        LangameNotificationReadyToPlay instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'senderUid': instance.senderUid,
-      'recipientUid': instance.recipientUid,
-      'background': instance.background,
-      'topic': instance.topic,
-      'question': instance.question,
+      'recipientsUid': instance.recipientsUid,
+      'topics': instance.topics,
+      'channelName': instance.channelName,
+      'ready': instance.ready,
     };

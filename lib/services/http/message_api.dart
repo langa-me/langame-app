@@ -8,7 +8,7 @@ import 'package:langame/services/http/firebase.dart';
 /// fetching from firestore, deleting from firestore
 abstract class MessageApi {
   final FirebaseApi firebase;
-  final void Function(LangameNotification) onBackgroundOrForegroundOpened;
+  final void Function(LangameNotification?) onBackgroundOrForegroundOpened;
 
   MessageApi(this.firebase, this.onBackgroundOrForegroundOpened);
 
@@ -17,15 +17,13 @@ abstract class MessageApi {
   Future<LangameResponse> initializePermissions();
 
   /// Send a Langame message and return the message id retrievable in Firestore
-  Future<List<String>?> send(List<String> recipients, String topic);
+  Future<void> send(List<String> recipients, List<String> topics);
 
   /// Response to a Langame message to say "I am ready and waiting"
-  /// Also send the Langame question along
-  Future<List<String>?> sendReadyForLangame(
-      List<String> recipients, String topic, String question);
+  Future<void> sendReadyForLangame(String channelName);
 
   /// Start listening to messages
-  Future<void> listen(void Function(LangameNotification) add);
+  Future<void> listen(void Function(LangameNotification?) add);
 
   /// Overlay on top of FirebaseMessaging.cgetInitialMessage that transform
   /// into a LangameNotification

@@ -31,13 +31,16 @@ class FirebaseApi {
 
     if (!useEmulator) return;
 
+    // Need to clear local cache otherwise would use non-emulator data
+    // firestore.clearPersistence();
+
     /// https://firebase.google.com/docs/emulator-suite
     /// Warning: change local IP accordingly i.e. `ip a`
     /// then from mobile `telnet IP PORT`
-    auth.useEmulator('http://192.168.1.102:9099');
-    functions.useFunctionsEmulator(origin: 'http://192.168.1.102:5001');
+    auth.useEmulator('http://192.168.1.19:9099');
+    functions.useFunctionsEmulator(origin: 'http://192.168.1.19:5001');
     firestore.settings = Settings(
-      host: '192.168.1.102:8080',
+      host: '192.168.1.19:8080',
       sslEnabled: false,
     );
   }
