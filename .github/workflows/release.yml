@@ -55,7 +55,7 @@ jobs:
           flutter-version: 2.0.4
       - name: Install Flutter dependencies
         run: flutter pub get
-      - run: flutter build apk --release
+      - run: flutter build apk --release --flavor prod
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: '2.7.2'

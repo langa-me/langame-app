@@ -7,14 +7,15 @@ platform :android do
       gradle(task: 'clean')
       gradle(
         task: 'bundle',
+        flavor: 'prod',
         build_type: 'Release'
       )
       upload_to_play_store(
         track: 'internal',
-        aab: '../build/app/outputs/bundle/release/app-release.aab',
-        skip_upload_metadata: true,
-        skip_upload_images: true,
-        skip_upload_screenshots: true,
+        aab: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
+        skip_upload_metadata: false,
+        skip_upload_images: false,
+        skip_upload_screenshots: false,
         release_status: 'draft',
         version_code: flutter_version(
           pubspec_location: '../pubspec.yaml'
