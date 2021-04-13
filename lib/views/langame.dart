@@ -6,8 +6,8 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/notification.dart';
@@ -39,7 +39,6 @@ class Player {
 
 class _LangameViewState extends State<LangameView> {
   bool permissionRequested = false;
-  bool notified = false;
   String? channelToken;
   LangameChannel? channel;
   List<LangameUser> channelLangameUsers = [];
@@ -49,6 +48,22 @@ class _LangameViewState extends State<LangameView> {
   String? question; // TODO!!!!!!!!!!!!!!!
   int errors = 0;
   static const int maxErrors = 3;
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<AuthenticationProvider>(context, listen: false)
+        .sendReadyForLangame(widget.notification.channelName!)
+        .then((res) {
+      res.thenShowToast(
+        'Your friends have been told of your presence!',
+        !kReleaseMode
+            ? 'failed to sendReadyForLangame ${res.error.toString()}'
+            : Provider.of<FunnyProvider>(context, listen: false)
+                .getFailingRandom(),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,15 +114,12 @@ class _LangameViewState extends State<LangameView> {
                                 setState(() => permissionRequested = true));
                             return;
                           }
-                          Fluttertoast.showToast(
-                                  msg:
-                                      'You can\'t play Langame without microphone :(, you can still enable it in your settings later.')
-                              .then(
-                            (_) => Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FriendsView(),
-                              ),
+                          showToast(
+                              'You can\'t play Langame without microphone :(, you can still enable it in your settings later.');
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FriendsView(),
                             ),
                           );
                         },
@@ -173,7 +185,13 @@ class _LangameViewState extends State<LangameView> {
                   .getFailingRandom(),
               onSucceed: () {
                 _postFrameCallback((_) {
-                  setState(() => channel = s.data!.result);
+                  setState(() {
+                    channel = s.data!.result;
+                    question = s.data!.result!.questions.isEmpty
+                        ? Provider.of<FunnyProvider>(context, listen: false)
+                            .getFailingRandom()
+                        : channel!.questions.first;
+                  });
                   p.getLangameUsers(s.data!.result!.players
                       .map((e) => e.langameUid)
                       .toList());
@@ -278,25 +296,7 @@ class _LangameViewState extends State<LangameView> {
         !channelJoined) {
       // TODO: turn mic off
       _buildLoading();
-    } else if (widget.notifyOthers && !notified) {
-      // TODO: generate and send some int id for channel
-      Provider.of<AuthenticationProvider>(context, listen: false)
-          .sendReadyForLangame(widget.notification.channelName!)
-          .then((res) {
-        res.thenShowToast(
-          'Your friends have been told of your presence!',
-          !kReleaseMode
-              ? 'failed to sendReadyForLangame ${res.error.toString()}'
-              : Provider.of<FunnyProvider>(context, listen: false)
-                  .getFailingRandom(),
-          onSucceed: () =>
-              _postFrameCallback((_) => setState(() => notified = true)),
-          onFailure: () =>
-              _postFrameCallback((_) => setState(() => notified = false)),
-        );
-      });
     }
-    debugPrint('notified $notified');
     debugPrint(
         'joinedPlayers ${joinedPlayers.values.map((e) => e.langameUser.displayName).join(',')}');
 
@@ -318,8 +318,8 @@ class _LangameViewState extends State<LangameView> {
   @override
   void dispose() {
     super.dispose();
-    Provider.of<AudioProvider>(context, listen: false)
-        .leaveChannel(); // TODO: might fail? osef?
+    Provider.of<AudioProvider>(AppConst.navKey.currentContext!, listen: false)
+        .leaveChannel(); // TODO: might fail?
   }
 
   void _handleError() {
@@ -328,10 +328,9 @@ class _LangameViewState extends State<LangameView> {
         context,
         MaterialPageRoute(builder: (context) => FriendsView()),
       );
-      Fluttertoast.showToast(
-        msg: Provider.of<FunnyProvider>(context, listen: false)
-            .getFailingRandom(),
-        backgroundColor: Colors.red,
+      showToast(
+        Provider.of<FunnyProvider>(context, listen: false).getFailingRandom(),
+        color: Colors.red,
       );
       return;
     }
@@ -344,7 +343,7 @@ class _LangameViewState extends State<LangameView> {
 
   Widget _buildLoading({String? text}) {
     return Center(
-      child: SpinKitHourGlass(
+      child: SpinKitPumpingHeart(
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.white
             : Colors.black,
@@ -372,6 +371,8 @@ class _LangameViewState extends State<LangameView> {
           setState(() {
             joinedPlayers[uid]?.isSpeaking = true;
           });
+          debugPrint(
+              '${joinedPlayers[uid]?.langameUser.displayName} speaking: ${joinedPlayers[uid]?.isSpeaking}');
         },
         microphoneEnabled: (bool a) {
           debugPrint('microphoneEnabled $a');
@@ -383,21 +384,22 @@ class _LangameViewState extends State<LangameView> {
           debugPrint('localUserRegistered a $a b$b');
         },
         userOffline: (int uid, UserOfflineReason reason) {
-          debugPrint('someone left $uid $reason');
           if (reason == UserOfflineReason.Quit) {
-            Fluttertoast.showToast(
-                msg: '${joinedPlayers[uid]?.langameUser.displayName} left');
+            showToast(
+                '${joinedPlayers[uid]?.langameUser.displayName} left, Langame is fulfilled!',
+                color: Colors.green);
           }
           setState(() {
             joinedPlayers.remove(uid);
           });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FriendsView(),
+            ),
+          );
         },
         userJoined: (int uid, int b) {
-          debugPrint('someone joined');
-          debugPrint('$uid | $b');
-          Fluttertoast.showToast(
-              msg: '${joinedPlayers[uid]?.langameUser.displayName} joined');
-
           var joinerIds =
               channel?.players.firstWhere((p) => p.channelUid == uid);
           var joinerAsLangameUser = channelLangameUsers
@@ -406,6 +408,8 @@ class _LangameViewState extends State<LangameView> {
           setState(() {
             joinedPlayers[uid] = Player(joinerAsLangameUser, false);
           });
+
+          showToast('${joinerAsLangameUser.displayName} joined!');
         },
         joinChannelSuccess: (channelName, uid, elapsed) {
           debugPrint('joinChannelSuccess $channelName $uid $elapsed');
@@ -465,6 +469,9 @@ class _LangameViewState extends State<LangameView> {
 
     Widget _loadIfNotStarted(AudioProvider p) {
       p.startTimer(); // TODO: no error handling ^^
+      // hack to force rebuild (notifyListeners() in provider cause
+      // setState() or markNeedsBuild() called during build)
+      _postFrameCallback((_) => setState(() {}));
       return _buildLoading();
     }
 
@@ -516,7 +523,7 @@ class _LangameViewState extends State<LangameView> {
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
           child: Center(
             child: Text(
-              'foobar', //question, // TODO!!!!!!!!!!!!!!!!!!
+              question!,
               textAlign: TextAlign.center,
               style: theme.primaryTextTheme.button,
             ),
@@ -546,24 +553,32 @@ class _LangameViewState extends State<LangameView> {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: joinedPlayers.values
-                  .map((p) => Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(40),
+                  .map(
+                    (p) => Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(40),
+                            ),
+                            border: Border.all(
+                              width: 10,
+                              color: p.isSpeaking
+                                  ? Colors.red
+                                  : Theme.of(context).colorScheme.primary,
+                              style: BorderStyle.solid,
+                            ),
                           ),
-                          border: Border.all(
-                            width: 3,
-                            color: p.isSpeaking
-                                ? Colors.red
-                                : Theme.of(context).colorScheme.primary,
-                            style: BorderStyle.solid,
+                          child: Center(
+                            child: buildCroppedRoundedNetworkImage(
+                                p.langameUser.photoUrl),
                           ),
                         ),
-                        child: Center(
-                          child: buildCroppedRoundedNetworkImage(
-                              p.langameUser.photoUrl),
-                        ),
-                      ))
+                        // Icon(Icons
+                        //     .mic_rounded), // TODO: use show if other has mic on or not
+                      ],
+                    ),
+                  )
                   .toList()),
         ),
         SizedBox(height: AppSize.safeBlockVertical * 5),
@@ -577,12 +592,13 @@ class _LangameViewState extends State<LangameView> {
                             : Icons.mic_off_rounded),
                         onPressed: () => p.switchMicrophone(),
                       ),
-                      IconButton(
-                        icon: Icon(p.isSpeakerphoneEnabled
-                            ? Icons.speaker_notes_off_outlined
-                            : Icons.speaker_notes_outlined),
-                        onPressed: () => p.switchSpeakerphone(),
-                      )
+                      // TODO: does not work somehow, not rly mandatory
+                      // IconButton(
+                      //   icon: Icon(p.isSpeakerphoneEnabled
+                      //       ? Icons.speaker_notes_outlined
+                      //       : Icons.speaker_notes_off_outlined),
+                      //   onPressed: () => p.switchSpeakerphone(),
+                      // )
                     ])),
       ],
     );

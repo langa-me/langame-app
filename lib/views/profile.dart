@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/profile_provider.dart';
-import 'package:langame/views/settings.dart';
 import 'package:provider/provider.dart';
 
 import 'image.dart';
@@ -47,10 +46,10 @@ class Profile extends StatelessWidget {
               onPressed: () {
                 Provider.of<ProfileProvider>(context, listen: false)
                     .profileShown = false;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsTwo()),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => SettingsTwo()),
+                // );
               },
             ),
           ),

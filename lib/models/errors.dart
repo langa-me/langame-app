@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:langame/helpers/toast.dart';
 
 /// API / service level errors
 class LangameException implements Exception {
@@ -128,26 +128,30 @@ class LangameResponse<T> {
       case LangameStatus.cancelled:
         break;
       case LangameStatus.failed:
-        Fluttertoast.showToast(
-            msg: failedMessage,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        showToast(failedMessage, color: Colors.red);
         if (onFailure != null) onFailure();
         if (!kReleaseMode) throw LangameException(failedMessage);
         break;
       case LangameStatus.succeed:
-        Fluttertoast.showToast(
-            msg: succeedMessage,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        showToast(succeedMessage, color: Colors.green);
+        if (onSucceed != null) onSucceed();
+        break;
+    }
+  }
+
+  void thenShowToastWithContext(
+      BuildContext context, String succeedMessage, String failedMessage,
+      {Function? onSucceed, Function? onFailure}) {
+    switch (status) {
+      case LangameStatus.cancelled:
+        break;
+      case LangameStatus.failed:
+        showToastWithContext(context, failedMessage, color: Colors.red);
+        if (onFailure != null) onFailure();
+        if (!kReleaseMode) throw LangameException(failedMessage);
+        break;
+      case LangameStatus.succeed:
+        showToastWithContext(context, succeedMessage);
         if (onSucceed != null) onSucceed();
         break;
     }

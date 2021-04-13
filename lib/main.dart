@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:feedback/feedback.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
@@ -42,27 +45,37 @@ void main() async {
     ]),
     FirebaseCrashlytics.instance,
     analytics,
+    FirebaseStorage.instance,
     useEmulator: false,
   );
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => LocalStorageProvider(firebase)),
-        ChangeNotifierProvider(create: (_) => TopicProvider()),
-        ChangeNotifierProvider(
-          create: (_) => AuthenticationProvider(firebase, fake: false),
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then(
+    (_) => runApp(
+      BetterFeedback(
+        child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+                create: (_) => LocalStorageProvider(firebase)),
+            ChangeNotifierProvider(create: (_) => TopicProvider()),
+            ChangeNotifierProvider(
+              create: (_) => AuthenticationProvider(firebase, fake: false),
+            ),
+            ChangeNotifierProvider(create: (_) => ProfileProvider()),
+            ChangeNotifierProvider(
+                create: (context) => FirestoreProvider(firebase.firestore)),
+            ChangeNotifierProvider(create: (_) => FunnyProvider()),
+            ChangeNotifierProvider(create: (_) => LangameProvider()),
+            ChangeNotifierProvider(create: (_) => AudioProvider(firebase)),
+            StreamProvider<ConnectivityResult>.value(
+                value: Connectivity().onConnectivityChanged,
+                initialData: ConnectivityResult.none),
+            ChangeNotifierProvider(
+              create: (_) => FeedbackProvider(firebase),
+            ),
+          ],
+          child: MyApp(analytics),
         ),
-        ChangeNotifierProvider(create: (_) => ProfileProvider()),
-        ChangeNotifierProvider(
-            create: (context) => FirestoreProvider(firebase.firestore)),
-        ChangeNotifierProvider(create: (_) => FunnyProvider()),
-        ChangeNotifierProvider(create: (_) => LangameProvider()),
-        ChangeNotifierProvider(create: (_) => AudioProvider(firebase)),
-        StreamProvider<ConnectivityResult>.value(
-            value: Connectivity().onConnectivityChanged,
-            initialData: ConnectivityResult.none)
-      ],
-      child: MyApp(analytics),
+      ),
     ),
   );
 }
@@ -81,14 +94,21 @@ class _MyAppState extends State<MyApp> {
   _MyAppState(this.analytics);
 
   @override
+  initState() {
+    super.initState();
+    analytics.logAppOpen();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Provider.of<LocalStorageProvider>(context, listen: false).load();
+    FlexScheme scheme = FlexScheme.bigStone;
     return Consumer<LocalStorageProvider>(builder: (context, s, child) {
       return MaterialApp(
         title: 'Langame',
         themeMode: s.theme,
         theme: FlexColorScheme.light(
-          scheme: FlexScheme.ebonyClay,
+          scheme: scheme,
           fontFamily: AppFont.mainFont,
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
           background: Colors.transparent,
@@ -102,7 +122,7 @@ class _MyAppState extends State<MyApp> {
             // ),
             ),
         darkTheme: FlexColorScheme.dark(
-          scheme: FlexScheme.ebonyClay,
+          scheme: scheme,
           fontFamily: AppFont.mainFont,
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
           background: Colors.transparent,
@@ -121,6 +141,7 @@ class _MyAppState extends State<MyApp> {
         navigatorObservers: [
           FirebaseAnalyticsObserver(analytics: analytics),
         ],
+        debugShowCheckedModeBanner: false,
       );
     });
   }

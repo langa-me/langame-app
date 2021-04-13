@@ -5,9 +5,9 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
-import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/views/profile.dart';
 import 'package:langame/views/send_langame.dart';
+import 'package:langame/views/settings.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +31,7 @@ class _FriendsViewState extends State<FriendsView>
 
   @override
   void afterFirstLayout(BuildContext context) {
-    Provider.of<AuthenticationProvider>(context, listen: false).getRelations();
+    // Provider.of<AuthenticationProvider>(context, listen: false).getRelations();
   }
 
   @override
@@ -62,8 +62,14 @@ class _FriendsViewState extends State<FriendsView>
     Widget notifications = InkWell(
         child: Consumer<AuthenticationProvider>(builder: (context, p, c) {
       return Badge(
-        badgeContent: Text('${p.notifications.length}'),
-        child: Icon(Icons.notifications),
+        badgeContent: Text(
+          '${p.notifications.length}',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        child: Icon(
+          Icons.notifications_outlined,
+          color: Colors.white,
+        ),
         padding: const EdgeInsets.all(3.0),
         position: BadgePosition.topStart(top: 7, start: 10),
       );
@@ -84,19 +90,27 @@ class _FriendsViewState extends State<FriendsView>
                 : ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.secondary),
+                        Theme.of(context).colorScheme.primaryVariant,
+                      ),
                     ),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => SendLangameView()),
+                          builder: (context) => SendLangameView(),
+                        ),
                       );
                     },
                     child: Row(children: [
                       Text('Current Langame'),
                       Badge(
-                        badgeContent: Text('${l.shoppingList.length}'),
+                        badgeContent: Text(
+                          '${l.shoppingList.length}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         child: Icon(Icons.shopping_cart_outlined),
                         padding: const EdgeInsets.all(3.0),
                         position: BadgePosition.topStart(top: 7, start: 10),
@@ -105,21 +119,16 @@ class _FriendsViewState extends State<FriendsView>
                   ),
           ),
           Spacer(),
-          Consumer2<AuthenticationProvider, ProfileProvider>(builder:
-              (context, authenticationProvider, profileProvider, child) {
-            if (authenticationProvider.user != null) {
-              return InkWell(
-                onTap: () {
-                  profileProvider.profileShown = !profileProvider.profileShown;
-                },
-                child: buildCroppedRoundedNetworkImage(
-                    authenticationProvider.user!.photoUrl),
-              );
-            } else {
-              return IconButton(
-                  icon: Icon(Icons.account_circle), onPressed: () {});
-            }
-          })
+          IconButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsView()),
+            ),
+            icon: Icon(
+              Icons.settings_outlined,
+              color: Colors.white,
+            ),
+          ),
         ]);
   }
 
@@ -134,8 +143,12 @@ class _FriendsViewState extends State<FriendsView>
           builder: (context, a, _) =>
               a.relations == null || a.relations!.relations.length == 0
                   ? Center(
-                      child: Text('No friends? =>',
-                          style: Theme.of(context).textTheme.headline3))
+                      child: Text(
+                        'In the future, you will see your friends, or people with whom you interacted with here',
+                        style: Theme.of(context).textTheme.headline6,
+                        textAlign: TextAlign.center,
+                      ),
+                    )
                   : ListView.builder(
                       itemCount: a.relations!.relations.length,
                       itemBuilder: (context, index) {
@@ -318,12 +331,18 @@ class _FriendsViewState extends State<FriendsView>
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           backgroundColor: theme.colorScheme.primary,
-          icon: Icon(Icons.home_outlined, color: theme.colorScheme.secondary),
+          icon: Icon(Icons.home_outlined,
+              color: _selectedIndex == 0
+                  ? Theme.of(context).colorScheme.secondary
+                  : Colors.white),
           label: 'Home',
         ),
         BottomNavigationBarItem(
           backgroundColor: theme.colorScheme.primary,
-          icon: Icon(Icons.search_outlined, color: theme.colorScheme.secondary),
+          icon: Icon(Icons.search_outlined,
+              color: _selectedIndex == 1
+                  ? Theme.of(context).colorScheme.secondary
+                  : Colors.white),
           label: 'Search',
         ),
       ],
@@ -369,23 +388,23 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           onPressed: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
               ? _onRemoveFromShoppingList(p, lp)
               : _onAddToShoppingList(p, lp),
-          borderRadius: 2,
-          splashColor: Theme.of(context).colorScheme.secondaryVariant,
+          borderRadius: 1,
+          splashColor: Theme.of(context).colorScheme.primaryVariant,
           buttonPadding: 4,
-          buttonColor: Theme.of(context).colorScheme.secondary,
+          buttonColor: Theme.of(context).colorScheme.primary,
           children: [
             Text(lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
                 ? 'Remove from current Langame'
                 : 'Add to current Langame'),
             Container(
               margin: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 2,
-                ),
-              ),
+              // decoration: BoxDecoration(
+              //   borderRadius: BorderRadius.circular(3),
+              //   border: Border.all(
+              //     color: Theme.of(context).colorScheme.primary,
+              //     width: 2,
+              //   ),
+              // ),
               child: Icon(
                   lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
                       ? Icons.remove_shopping_cart_outlined

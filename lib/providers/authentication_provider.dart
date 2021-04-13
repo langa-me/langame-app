@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/notification.dart';
-import 'package:langame/models/topic.dart';
+import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/services/http/authentication_api.dart';
 import 'package:langame/services/http/fake_authentication_api.dart';
@@ -73,12 +73,12 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse> send(
-      List<LangameUser> recipients, List<Topic> topics) async {
+      List<LangameUser> recipients, List<Question> topics) async {
     try {
       debugPrint(recipients.map((e) => e.uid!).join(','));
       // TODO: we'd likely send the whole  topic in the future (with classifications)
       await messageApi.send(recipients.map((e) => e.uid!).toList(),
-          topics.map((e) => e.name).toList());
+          topics.map((e) => e.question).toList());
     } catch (e, s) {
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
@@ -189,17 +189,18 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse> getRelations() async {
-    try {
-      var u = await userStream.first;
-      if (u == null)
-        return LangameResponse(LangameStatus.failed,
-            error: 'Not authenticated');
-      _relations = await authenticationApi.getRelations(u);
-      return LangameResponse(LangameStatus.succeed);
-    } on LangameGetUserFriendsException catch (e, s) {
-      firebase.crashlytics.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e.cause);
-    }
+    throw UnimplementedError();
+    // try {
+    //   var u = await userStream.first;
+    //   if (u == null)
+    //     return LangameResponse(LangameStatus.failed,
+    //         error: 'Not authenticated');
+    //   _relations = await authenticationApi.getRelations(u);
+    //   return LangameResponse(LangameStatus.succeed);
+    // } on LangameGetUserFriendsException catch (e, s) {
+    //   firebase.crashlytics.recordError(e, s);
+    //   return LangameResponse(LangameStatus.failed, error: e.cause);
+    // }
   }
 
   Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
@@ -244,6 +245,7 @@ class AuthenticationProvider extends ChangeNotifier {
           : ImplAuthenticationApi(firebase);
     }
     _firebaseUserStream = authenticationApi.userChanges;
+    _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
       debugPrint(data.toString());
       if (data == null) return null;
@@ -265,39 +267,40 @@ class AuthenticationProvider extends ChangeNotifier {
           debugPrint(s.toString());
         }
       }
+      _userStream.add(_user);
       notifyListeners();
     });
-    final firebaseUserToLangameUser =
-        StreamTransformer<User?, LangameUser?>.fromHandlers(
-            handleData: (data, sink) async {
-      if (data == null) return null;
-      LangameUser? langameUser =
-          await authenticationApi.getLangameUser(data.uid);
-      try {
-        if (langameUser == null) {
-          langameUser = await authenticationApi.addLangameUser(data);
-        }
-        // } on LangameAddUserException catch (e) {
-        //   // Fail at addLangameUser
-        //   print(e.cause);
-        // } on LangameAuthException catch (e) {
-        //   // Fail at generateTag
-        //   print(e.cause);
-      } catch (e, s) {
-        firebase.crashlytics.recordError(e, s);
-        if (!kReleaseMode) {
-          debugPrint(e.toString());
-          debugPrint(s.toString());
-        }
-      }
-      sink.add(langameUser);
-    });
-    _userStream = StreamController.broadcast();
-    _userStream.addStream(Stream.empty()).then((_) {
-      _firebaseUserStream
-          .transform(firebaseUserToLangameUser)
-          .pipe(_userStream);
-    });
+    // final firebaseUserToLangameUser =
+    //     StreamTransformer<User?, LangameUser?>.fromHandlers(
+    //         handleData: (data, sink) async {
+    //   if (data == null) return null;
+    //   LangameUser? langameUser =
+    //       await authenticationApi.getLangameUser(data.uid);
+    //   try {
+    //     if (langameUser == null) {
+    //       langameUser = await authenticationApi.addLangameUser(data);
+    //     }
+    //     // } on LangameAddUserException catch (e) {
+    //     //   // Fail at addLangameUser
+    //     //   print(e.cause);
+    //     // } on LangameAuthException catch (e) {
+    //     //   // Fail at generateTag
+    //     //   print(e.cause);
+    //   } catch (e, s) {
+    //     firebase.crashlytics.recordError(e, s);
+    //     if (!kReleaseMode) {
+    //       debugPrint(e.toString());
+    //       debugPrint(s.toString());
+    //     }
+    //   }
+    //   sink.add(langameUser);
+    // });
+    // _userStream = StreamController.broadcast();
+    // _userStream.addStream(Stream.empty()).then((_) {
+    //   _firebaseUserStream
+    //       .transform(firebaseUserToLangameUser)
+    //       .pipe(_userStream);
+    // });
   }
 
   Future<LangameResponse> initializeMessageApi(
@@ -311,6 +314,8 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       await messageApi.initializePermissions();
       await messageApi.listen(_onNotificationHandler);
+      // i.e. no internet
+      // TODO  Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
     } catch (e, s) {
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);

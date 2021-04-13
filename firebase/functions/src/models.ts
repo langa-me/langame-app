@@ -245,3 +245,40 @@ export function isLangameNotification(obj: any): obj is LangameNotification {
   // Checking typical LangameNotification properties
   return typeof obj.senderUid === "string" && obj.id === "string";
 }
+
+/**
+ * Tag is something you put on a question: is it philosophy, biology
+ * physics, politics, travel...?
+ */
+export class Tag {
+    question: string;
+    content: string;
+    score: number;
+
+    /**
+     * constructor...
+     * @param{string} question
+     * @param{string} content
+     * @param{number} score
+     */
+    constructor(question: string, content: string, score: number) {
+      this.question = question;
+      this.content = content;
+      this.score = score;
+    }
+}
+
+/**
+ * Question...
+ */
+export class Question {
+    content: string;
+
+    /**
+     * constructor...
+     * @param{string} content
+     */
+    constructor(content: string) {
+      this.content = content;
+    }
+}

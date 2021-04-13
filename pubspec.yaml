@@ -1,6 +1,6 @@
 name: langame
 description: AI Augmented human conversations
-version: 1.0.1+2
+version: 1.0.2+3
 authors:
   - Langame <mail@langa.me>
 
@@ -13,6 +13,7 @@ dependencies:
 
   # Firebase
   firebase_core: "^1.0.3"
+  firebase_storage: "^8.0.3"
   firebase_auth: "^1.0.2"
   cloud_firestore: "^1.0.4"
   cloud_functions: "^1.0.3"
@@ -33,7 +34,7 @@ dependencies:
 #  flutter_sound: "^8.0.0+2"
   permission_handler: "^6.0.1"
 #  speech_to_text: "^4.0.0"
-#  protobuf: "^2.0.0"
+  protobuf: "^2.0.0"
   flex_color_scheme: "^2.0.0-nullsafety.1"
   shared_preferences: "^2.0.3"
   flutter_launcher_icons: "^0.9.0"
@@ -51,6 +52,11 @@ dependencies:
   fluttertoast: ^8.0.3
   grouped_list: ^4.0.0
   connectivity: ^3.0.3
+  package_info: ^2.0.0
+  device_info: ^2.0.0
+  url_launcher: ^6.0.3
+  feedback: ^1.2.1
+  shake: ^1.0.0
   flutter:
     sdk: flutter
 

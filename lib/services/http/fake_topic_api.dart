@@ -1,34 +1,34 @@
-import 'package:langame/models/topic.dart';
+import 'package:langame/models/question.dart';
 
 import 'topic_api.dart';
 
 class FakeTopicApi implements TopicApi {
   @override
-  Future<List<Topic>> getTopics() async {
+  Future<List<Question>> getTopics() async {
     return [
-      Topic("Nutrition", ["Recommendations"]),
-      Topic("Wisdom", ["Recommendations"]),
-      Topic("Career", ["Recommendations"]),
-      Topic("Biology", ["Sciences"]),
-      Topic("Physics", ["Sciences"]),
-      Topic("Maths", ["Sciences"]),
-      Topic("Artificial Intelligence", ["Sciences"]),
-      Topic("Purpose", ["Philosophy"]),
-      Topic("Love", ["Philosophy"]),
-      Topic("Friends", ["Philosophy"]),
-      Topic("Religion", ["Spirituality"]),
-      Topic("Death", ["Spirituality"]),
-      Topic("Meditation", ["Spirituality"]),
-      Topic("Body", ["Health"]),
-      Topic("Mind", ["Health"]),
-      Topic("Fast", ["Health"]),
-      Topic("Stocks", ["Wealth"]),
-      Topic("Passive", ["Wealth"]),
-      Topic("Active", ["Wealth"]),
-      Topic("Bitcoin", ["Wealth"]),
-      Topic("Ethereum", ["Wealth"]),
-      Topic("Venture Capitalism", ["Wealth"]),
-      Topic("Angel Investing", ["Wealth"]),
+      Question("Nutrition", ["Recommendations"]),
+      Question("Wisdom", ["Recommendations"]),
+      Question("Career", ["Recommendations"]),
+      Question("Biology", ["Sciences"]),
+      Question("Physics", ["Sciences"]),
+      Question("Maths", ["Sciences"]),
+      Question("Artificial Intelligence", ["Sciences"]),
+      Question("Purpose", ["Philosophy"]),
+      Question("Love", ["Philosophy"]),
+      Question("Friends", ["Philosophy"]),
+      Question("Religion", ["Spirituality"]),
+      Question("Death", ["Spirituality"]),
+      Question("Meditation", ["Spirituality"]),
+      Question("Body", ["Health"]),
+      Question("Mind", ["Health"]),
+      Question("Fast", ["Health"]),
+      Question("Stocks", ["Wealth"]),
+      Question("Passive", ["Wealth"]),
+      Question("Active", ["Wealth"]),
+      Question("Bitcoin", ["Wealth"]),
+      Question("Ethereum", ["Wealth"]),
+      Question("Venture Capitalism", ["Wealth"]),
+      Question("Angel Investing", ["Wealth"]),
     ];
   }
 }

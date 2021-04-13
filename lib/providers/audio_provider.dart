@@ -10,6 +10,9 @@ import 'package:langame/services/http/firebase.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quiver/async.dart';
 
+/// [AudioProvider] handles logic for audio communication
+/// currently only supporting Agora
+/// see doc https://docs.agora.io/en/Voice/API%20Reference/flutter/index.html
 class AudioProvider extends ChangeNotifier {
   RtcEngine? _engine;
   FirebaseApi firebase;
@@ -18,7 +21,7 @@ class AudioProvider extends ChangeNotifier {
 
   bool _isMicrophoneEnabled = false;
   bool get isMicrophoneEnabled => _isMicrophoneEnabled;
-  bool _isSpeakerphoneEnabled = false;
+  bool _isSpeakerphoneEnabled = true;
   bool get isSpeakerphoneEnabled => _isSpeakerphoneEnabled;
 
   // ignore: close_sinks
@@ -89,9 +92,9 @@ class AudioProvider extends ChangeNotifier {
       await _engine!.enableAudio();
       await _engine!.setChannelProfile(ChannelProfile.LiveBroadcasting);
       await _engine!.setClientRole(ClientRole.Broadcaster);
-      // Disable by default
-      if (_isMicrophoneEnabled) await switchMicrophone();
-      if (_isSpeakerphoneEnabled) await switchSpeakerphone();
+      // Usually disabling microphone by default
+      await _engine!.enableLocalAudio(_isMicrophoneEnabled);
+      await _engine!.setEnableSpeakerphone(_isSpeakerphoneEnabled);
     } catch (e, s) {
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);

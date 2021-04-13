@@ -3,6 +3,10 @@ service cloud.firestore {
     match /databases/{database}/documents {
         match /users/{userId} {
             allow read: if request.auth != null;
+            // For the first time someone sign-in, he will be allowed to create an user
+            // if the user has the same auth uid, here we use "request.resource" instead
+            // of "resource" because the collection might not exist.
+            allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
         }
         match /notifications/{notificationId} {
             // Only allow self notification access

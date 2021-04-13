@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/models/topic.dart';
+import 'package:langame/helpers/toast.dart';
+import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -23,7 +24,7 @@ class SendLangameView extends StatefulWidget {
 
 class _SendLangameState extends State<SendLangameView>
     with AfterLayoutMixin<SendLangameView> {
-  List<Topic> selectedTopics = [];
+  List<Question> selectedTopics = [];
   String filter = '';
   _SendLangameState();
 
@@ -36,10 +37,11 @@ class _SendLangameState extends State<SendLangameView>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          actions: [
-            _buildSearchBar(),
-          ]),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        actions: [
+          _buildSearchBar(),
+        ],
+      ),
       body: Consumer<LangameProvider>(
         builder: (context, l, child) {
           return Column(children: [
@@ -49,14 +51,15 @@ class _SendLangameState extends State<SendLangameView>
                     .toList()),
             Consumer<TopicProvider>(
               builder: (context, t, child) {
-                List<Topic> filteredTopics = t.topics
-                    .where((e) =>
-                        e.name.toLowerCase().startsWith(filter.toLowerCase()))
+                List<Question> filteredTopics = t.topics
+                    .where((e) => e.question
+                        .toLowerCase()
+                        .startsWith(filter.toLowerCase()))
                     .toList();
                 return Expanded(
-                  child: GroupedListView<Topic, String>(
+                  child: GroupedListView<Question, String>(
                     elements: filteredTopics,
-                    groupBy: (element) => element.groups.first,
+                    groupBy: (element) => element.tags.first,
                     groupSeparatorBuilder: (String groupByValue) => Container(
                       decoration: new BoxDecoration(
                           color: Theme.of(context).colorScheme.secondaryVariant,
@@ -71,19 +74,19 @@ class _SendLangameState extends State<SendLangameView>
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
-                    itemBuilder: (context, Topic t) {
+                    itemBuilder: (context, Question t) {
                       return Center(
                         child: ToggleButton(
                             onChange: (bool selected) {
                               if (selected)
                                 selectedTopics.add(t);
                               else
-                                selectedTopics
-                                    .removeWhere((e) => e.name == t.name);
+                                selectedTopics.removeWhere(
+                                    (e) => e.question == t.question);
                             },
                             width: AppSize.blockSizeHorizontal * 70,
-                            textUnselected: t.name,
-                            textSelected: t.name),
+                            textUnselected: t.question,
+                            textSelected: t.question),
                       );
                     },
                   ),
@@ -96,6 +99,16 @@ class _SendLangameState extends State<SendLangameView>
       floatingActionButton: Consumer<LangameProvider>(
         builder: (context, l, child) => FloatingActionButton.extended(
           onPressed: () async {
+            if (selectedTopics.isEmpty) {
+              showBasicSnackBar(context, 'You must select at least one topics');
+              return;
+            }
+            if (selectedTopics.length > 3) {
+              // TODO: better UX
+              showBasicSnackBar(
+                  context, 'You must select a maximum of 3 topics');
+              return;
+            }
             var res = await Provider.of<AuthenticationProvider>(context,
                     listen: false)
                 .send(l.shoppingList, selectedTopics);
@@ -140,6 +153,12 @@ class _SendLangameState extends State<SendLangameView>
         backgroundColor: Theme.of(context).colorScheme.primary,
         backdropColor: Theme.of(context).colorScheme.primary,
         hint: 'Search topics...',
+        leadingActions: [
+          BackButton(color: Colors.white),
+        ],
+        automaticallyImplyBackButton: false,
+        hintStyle: TextStyle(color: Colors.white),
+        queryStyle: TextStyle(color: Colors.white),
         scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
         transitionDuration: const Duration(milliseconds: 800),
         transitionCurve: Curves.easeInOut,
@@ -159,6 +178,7 @@ class _SendLangameState extends State<SendLangameView>
         transition: CircularFloatingSearchBarTransition(),
         actions: [
           FloatingSearchBarAction.searchToClear(
+            color: Colors.white,
             showIfClosed: true,
           ),
         ],

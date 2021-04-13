@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/providers/firestore_provider.dart';
+import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/views/buttons/facebook.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/setup.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/apple.dart';
@@ -24,8 +24,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final _feedbackFormKey = GlobalKey<FormState>(debugLabel: '_feedbackFormKey');
-  final _feedbackController = TextEditingController();
   final GlobalKey<State> _keyLoader =
       GlobalKey<State>(debugLabel: '_keyLoader');
   final GlobalKey<State> _keySuccess =
@@ -33,10 +31,8 @@ class _LoginState extends State<Login> {
   Future<void>? successDialogFuture;
 
   @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    _feedbackController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -46,7 +42,7 @@ class _LoginState extends State<Login> {
 
     final provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-
+    Provider.of<FeedbackProvider>(context, listen: false).initShake();
     // Bunch of spaghetti code to check if it is a new user or already authenticated
     provider.userStream.first.then((user) {
       if (user == null || successDialogFuture != null) return null;
@@ -72,8 +68,8 @@ class _LoginState extends State<Login> {
                 successDialogFuture = null;
                 ap.messageApi.getInitialMessage().then((n) {
                   // TODO: doesn't work ? n = null
-                  Fluttertoast.showToast(
-                      msg: 'opening notification senderUid ${n?.senderUid}');
+                  // Fluttertoast.showToast(
+                  //     msg: 'opening notification senderUid ${n?.senderUid}');
                   if (n != null && n.channelName != null) {
                     Navigator.pushReplacement(
                       context, // opened the terminated app from a notification
@@ -118,8 +114,6 @@ class _LoginState extends State<Login> {
         });
       }
     });
-    // print(provider.user);
-    // print(FirebaseAuth.instance.currentUser?.displayName);
     var logins = <Widget>[
       FacebookSignInButton(
           onPressed: () async {
@@ -153,80 +147,32 @@ class _LoginState extends State<Login> {
               ),
             ),
           ),
-          SizedBox(height: 100),
+          SizedBox(height: AppSize.safeBlockVertical * 10),
           Column(children: logins, mainAxisAlignment: MainAxisAlignment.center),
           Spacer(),
-          Expanded(
-            flex: 1,
-            child: OutlinedButton.icon(
-              style: theme.textButtonTheme.style,
-              onPressed: () {
-                _feedbackDialog(context, theme);
-              },
-              icon: Icon(Icons.favorite_border_outlined,
-                  size: 24, color: theme.colorScheme.secondary),
-              label: Text('Help us, send a feedback',
+          Container(
+            height: AppSize.safeBlockVertical * 5,
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(
+                Icons.favorite_border_outlined,
+                size: 24,
+                color: theme.colorScheme.secondary,
+              ),
+              Text('Try to firmly shake your phone',
                   style: theme.textTheme.button),
-            ),
+            ]),
+          ),
+          Spacer(),
+          FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (c, s) => Text(
+                s.hasData && s.data != null
+                    ? '${s.data!.appName}-${s.data!.version}'
+                    : '',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.caption),
           ),
         ],
-      ),
-    );
-  }
-
-  void _feedbackDialog(BuildContext context, ThemeData theme) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Row(children: <Widget>[
-          Text('Thank you a lot!', style: theme.primaryTextTheme.headline6),
-          Spacer(),
-          Icon(Icons.favorite_border_outlined),
-        ]),
-        content: Form(
-          key: _feedbackFormKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextFormField(
-                controller: _feedbackController,
-                validator: (value) {
-                  if (value != null && value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              OutlinedButton.icon(
-                style: theme.textButtonTheme.style,
-                onPressed: () {
-                  // Validate returns true if the form is valid, or false
-                  // otherwise.
-                  if (_feedbackFormKey.currentState != null &&
-                      _feedbackFormKey.currentState!.validate()) {
-                    final p =
-                        Provider.of<FirestoreProvider>(context, listen: false);
-                    var f = p.sendFeedback(_feedbackController.text);
-                    // Quit the window without waiting for api, don't block user...
-                    Navigator.of(context).pop();
-
-                    f.then((value) {
-                      // If the form is valid, display a Snackbar.
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text('Thank you!')));
-                    }).catchError((err) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Failed to send feedback, $err')));
-                    });
-                  }
-                },
-                icon: Icon(Icons.send_outlined,
-                    size: 18, color: theme.colorScheme.secondary),
-                label: Text('Send', style: theme.textTheme.button),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

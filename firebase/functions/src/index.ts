@@ -4,11 +4,13 @@ import {
   ChannelUserLangameUser,
   FirebaseFunctionsResponse,
   FirebaseFunctionsResponseStatusCode,
-  isFirebaseFunctionsResponse, LangameChannel, LangameNotification,
+  isFirebaseFunctionsResponse,
+  LangameChannel,
+  LangameNotification,
   LangameUser,
 } from "./models";
 import {
-  filterOutSendLangameCalls,
+  filterOutSendLangameCalls, findQuestionsInTopics,
   generateAgoraRtcToken, getLangame,
   getUserData,
   handleSendToDevice,
@@ -19,6 +21,7 @@ import {
   kNotificationsCollection,
   kUsersCollection,
 } from "./helpers";
+import {newFeedback} from "./feedback";
 // Initialize admin firebase
 admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
@@ -219,6 +222,10 @@ exports.sendLangame = functions
             "failed to generate channel name");
       }
 
+      const questions = await findQuestionsInTopics(data.topics, 1, 0.1);
+      functions
+          .logger
+          .info("found questions for topics", data.topics, questions);
       const recipientsUid = recipientsData.map((r) => (r as LangameUser).uid);
       const playersLangameUid = recipientsUid.concat([senderData.uid!]);
       await admin
@@ -234,7 +241,7 @@ exports.sendLangame = functions
               });
             }),
             topics: data.topics,
-            questions: [],
+            questions: questions.map((q) => q.content),
           })))); // TODO: might check error?
 
       const results = await recipientsData
@@ -411,103 +418,15 @@ exports.sendReadyForLangame = functions
           undefined);
     });
 
-// const fake = () => {
-//   const nbUsers = 12;
-//   deleteAllPepes(
-//       admin.firestore(),
-//       10_000,
-//   ).then(() => {
-//     console.log("Cleared data");
-//     for (let i = 0; i < nbUsers; i++) {
-//       const uid = uuidv4();
-//       const userDoc = new LangameUser(
-//           uid,
-//           `pepe${uid}@gmail.com`,
-//           "pepe" + uid,
-//           "",
-//           "https://c.files.bbci.co.uk/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg",
-//           false,
-//           false,
-//           false,
-//           false,
-//           [],
-//           "pepe" + uid,
-//           []
-//       );
-//       admin.firestore()
-//           .collection(kUsersCollection)
-//           .doc(userDoc.uid!).set(JSON.parse(JSON.stringify(userDoc)));
-//     }
-//     console.log("Generated", nbUsers, "users");
-//   });
-// };
-// fake();
-
-
-/**
- *
- * @return {string}
- */
-// function uuidv4() {
-//   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-//   .replace(/[xy]/g, function(c) {
-//     const r = Math.random() * 16 | 0;
-//     const v = c == "x" ? r : (r & 0x3 | 0x8);
-//     return v.toString(16);
-//   });
-// }
-
-/**
- *
- * @param{FirebaseFirestore.Firestore} db
- * @param{number} batchSize
- * @return {Promise<void>}
- */
-// async function deleteAllPepes(db: firestore.Firestore,
-//     batchSize: number) {
-//   const collectionRef = db.collection(kUsersCollection);
-//   const query = collectionRef
-//       .where("photoUrl", "==", "https://c.files.bbci.co.uk/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg")
-//       .orderBy("__name__")
-//       .limit(batchSize);
-//
-//   return new Promise((resolve, reject) => {
-//     deleteQueryBatch(db, query, resolve).catch(reject);
-//   });
-// }
-
-/**
- *
- * @param{Firestore} db
- * @param{DocumentData} query
- * @param{number} resolve
- * @return {Promise<void>}
- */
-// async function deleteQueryBatch(db: firestore.Firestore,
-//     query: firestore.Query<firestore.DocumentData>,
-//     // eslint-disable-next-line no-undef
-//     resolve: any) {
-//   const snapshot = await query.get();
-//
-//   const batchSize = snapshot.size;
-//   if (batchSize === 0) {
-//     // When there are no documents left, we are done
-//     // @ts-ignore
-//     resolve();
-//     return;
-//   }
-//
-//   // Delete documents in a batch
-//   const batch = db.batch();
-//   snapshot.docs
-//   .forEach((doc: { ref: firestore.DocumentReference<any>; }) => {
-//     batch.delete(doc.ref);
-//   });
-//   await batch.commit();
-//
-//   // Recurse on the next process tick, to avoid
-//   // exploding the stack.
-//   process.nextTick(() => {
-//     deleteQueryBatch(db, query, resolve);
-//   });
-// }
+// https://firebase.google.com/docs/functions/gcp-storage-events
+exports.onFeedback = functions
+    .storage.object().onFinalize(async (object) => {
+      if (!object.name?.startsWith("feedbacks") ||
+          !object.mediaLink ||
+            !object.metadata) {
+        return;
+      }
+      functions.logger.info("new feedback", JSON.stringify(object));
+      await newFeedback(object.mediaLink, object.metadata);
+    }
+    );

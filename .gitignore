@@ -48,3 +48,6 @@ service_account_key.json
 google-services.json
 release.zip
 # TODO: apple stuff
+
+# Doc generated
+doc

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:langame/helpers/constants.dart';
 
 class Dialogs {
@@ -27,12 +28,10 @@ class Dialogs {
                         Text(
                           text,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline6!.merge(
-                              TextStyle(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.black
-                                      : Colors.white)),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline6!
+                              .merge(TextStyle(color: Colors.white)),
                         )
                       ]),
                     )
@@ -47,34 +46,34 @@ class Dialogs {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return WillPopScope(
-              onWillPop: () async => false,
-              child: SimpleDialog(
-                  key: key,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  children: <Widget>[
-                    Center(
-                      child: Column(children: [
-                        CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.black
-                                  : Colors.white),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          text,
-                          style: Theme.of(context).textTheme.headline6!.merge(
-                              TextStyle(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.black
-                                      : Colors.white)),
-                        )
-                      ]),
+            onWillPop: () async => false,
+            child: SimpleDialog(
+              key: key,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              children: <Widget>[
+                Center(
+                  child: Column(children: [
+                    // TODO: random SpinKit :)
+                    SpinKitChasingDots(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headline6!.merge(
+                            TextStyle(color: Colors.white),
+                          ),
                     )
-                  ]));
+                  ]),
+                )
+              ],
+            ),
+          );
         });
   }
 }

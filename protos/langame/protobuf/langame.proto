@@ -1,0 +1,17 @@
+syntax = "proto3";
+package langame.protobuf;
+
+message Question {
+  string id = 1;
+  string content = 2;
+}
+
+message Tag {
+  string id = 1;
+  string content = 2;
+  double score = 3;
+  // Whether tagged by a human (i.e. ignore then score?)
+  bool human = 4;
+  string question = 5;
+  // TODO: metadata about model used, version etc.
+}

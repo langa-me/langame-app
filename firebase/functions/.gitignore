@@ -3,3 +3,6 @@ node_modules/
 
 # Builds
 lib
+
+# Service account
+langame-dev-8ac76897c7bc.json

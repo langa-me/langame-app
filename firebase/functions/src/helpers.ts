@@ -6,7 +6,7 @@ import {
   FirebaseFunctionsResponseStatusCode,
   isLangameUser,
   LangameChannel,
-  LangameUser,
+  LangameUser, Question,
 } from "./models";
 
 
@@ -26,6 +26,8 @@ export const kNotAuthenticated: string = "not authenticated";
 export const kUsersCollection: string = "users";
 export const kNotificationsCollection: string = "notifications";
 export const kLangamesCollection: string = "langames";
+export const kTagsCollection: string = "tags";
+export const kQuestionsCollection: string = "questions";
 
 export const filterOutSendLangameCalls =
     (data: any, context: functions.https.CallableContext) => {
@@ -235,3 +237,37 @@ export const getLangame = async (channelName: string):
     );
   }
 };
+
+/**
+ * findQuestionsInTopics Find questions in topic ordered by score, filtering
+ * low scores
+ * @param{Array<string>} tags
+ * @param{number} limit
+ * @param{number} minimumThreshold
+ */
+export const findQuestionsInTopics =
+    async (tags: Array<string>, limit: number, minimumThreshold: number):
+        Promise<Question[]> => {
+      tags = tags.map((t) => t.toLowerCase());
+      // TODO should aggregate/whatever u call it score in topic
+      // Filter questions with highest scores for these tags
+      const documents = await admin
+          .firestore()
+          .collection(kTagsCollection)
+          .orderBy("score", "desc")
+          .where("score", ">", minimumThreshold)
+          .where("content", "in", tags)
+          .limit(limit)
+          .get();
+
+      const questions = [];
+      for (const d of documents.docs) {
+        const q = await admin
+            .firestore()
+            .collection(kQuestionsCollection)
+            .doc(d.data().question)
+            .get();
+        questions.push(q.data() as Question);
+      }
+      return questions;
+    };

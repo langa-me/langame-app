@@ -1,12 +1,10 @@
-# Langame Flutter
+# Langame
 
-## Installation
+## Development
 
 ```bash
-flutter pub get
+npm install -g protoc-gen-ts
 ```
-
-## Usage
 
 ### Json
 

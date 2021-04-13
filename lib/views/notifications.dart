@@ -6,6 +6,7 @@ import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/views/popup_menu.dart';
 import 'package:provider/provider.dart';
 
 import 'image.dart';
@@ -23,8 +24,12 @@ class _NotificationsViewState extends State<NotificationsView> {
 
     return Scaffold(
       appBar: AppBar(
-          title: Text('Notifications'),
-          backgroundColor: theme.colorScheme.primary),
+        title: Text('Notifications'),
+        backgroundColor: theme.colorScheme.primary,
+        actions: [
+          buildPopupMenuWithHelpAndFeedback(),
+        ],
+      ),
       body: Consumer<AuthenticationProvider>(
         builder: (BuildContext context, p, c) {
           return ListView.builder(

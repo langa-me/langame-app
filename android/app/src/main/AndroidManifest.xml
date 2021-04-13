@@ -15,7 +15,6 @@
         </intent>
     </queries>
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:label="Langame"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">

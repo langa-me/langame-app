@@ -33,6 +33,8 @@ class AppConst {
   static const String firestoreUsersCollection = 'users';
   static const String firestoreNotificationsCollection = 'notifications';
   static const String firestoreLangamesCollection = 'langames';
+
+  static const String helpUrl = 'https://help.langa.me';
 }
 
 /// Fonts assets used in this application,

@@ -3,6 +3,7 @@ module.exports = {
   env: {
     es6: true,
     node: true,
+    jest: true,
   },
   extends: [
     "eslint:recommended",
@@ -17,7 +18,9 @@ module.exports = {
     sourceType: "module",
   },
   ignorePatterns: [
+    "test/*",
     "/lib/**/*", // Ignore built files.
+    "jest.config.js",
   ],
   plugins: [
     "@typescript-eslint",

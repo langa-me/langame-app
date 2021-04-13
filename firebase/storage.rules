@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /feedbacks/{image} {
+      // TODO: rate limit
+      allow create: if request.auth != null;
+    }
+  }
+}

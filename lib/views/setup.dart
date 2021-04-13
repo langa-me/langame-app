@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/topic.dart';
+import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -28,7 +28,7 @@ class Setup extends StatefulWidget {
 
 class _SetupState extends State with AfterLayoutMixin {
   List<Widget> topicGroups = [];
-  List<Topic> favouriteTopics = [];
+  List<Question> favouriteTopics = [];
   List<LangameUser> contactsToInvite = [];
   final controller = PageController(initialPage: 0, viewportFraction: 0.9);
   bool importRelations = false;
@@ -65,7 +65,8 @@ class _SetupState extends State with AfterLayoutMixin {
             // Register that this user has already done the setup
             // SharedPreferences prefs = await SharedPreferences.getInstance();
             // prefs.setBool('setup', true);
-            print('fav topics ${favouriteTopics.map((e) => e.name).toList()}');
+            print(
+                'fav topics ${favouriteTopics.map((e) => e.question).toList()}');
             print('contactsToInvite ${contactsToInvite.map((e) => [
                   e.displayName,
                   e.email
@@ -75,7 +76,11 @@ class _SetupState extends State with AfterLayoutMixin {
             Future<LangameResponse> f =
                 Provider.of<AuthenticationProvider>(context, listen: false)
                     .initializeMessageApi(onBackgroundOrForegroundOpened);
-            Dialogs.showLoadingDialog(context, _keyLoader, Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
+            Dialogs.showLoadingDialog(
+                context,
+                _keyLoader,
+                Provider.of<FunnyProvider>(context, listen: false)
+                    .getLoadingRandom());
 
             f.then((res) {
               Navigator.of(_keyLoader.currentContext!, rootNavigator: true)
@@ -164,9 +169,9 @@ class _SetupState extends State with AfterLayoutMixin {
               padding: const EdgeInsets.only(top: 12.0),
               child: Consumer<TopicProvider>(
                 builder: (context, t, child) {
-                  return GroupedListView<Topic, String>(
+                  return GroupedListView<Question, String>(
                     elements: t.topics,
-                    groupBy: (element) => element.groups.first,
+                    groupBy: (element) => element.tags.first,
                     groupSeparatorBuilder: (String groupByValue) => Container(
                       decoration: new BoxDecoration(
                           color: Theme.of(context).colorScheme.secondaryVariant,
@@ -181,19 +186,19 @@ class _SetupState extends State with AfterLayoutMixin {
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
-                    itemBuilder: (context, Topic t) {
+                    itemBuilder: (context, Question t) {
                       return Center(
                         child: ToggleButton(
                             onChange: (bool selected) {
                               if (selected)
                                 favouriteTopics.add(t);
                               else
-                                favouriteTopics
-                                    .removeWhere((e) => e.name == t.name);
+                                favouriteTopics.removeWhere(
+                                    (e) => e.question == t.question);
                             },
                             width: AppSize.blockSizeHorizontal * 70,
-                            textUnselected: t.name,
-                            textSelected: t.name),
+                            textUnselected: t.question,
+                            textSelected: t.question),
                       );
                     },
                   );

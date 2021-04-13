@@ -29,5 +29,8 @@
       "host": "0.0.0.0",
       "port": 9099
     }
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

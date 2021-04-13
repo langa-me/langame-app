@@ -1,5 +1,5 @@
-import 'package:langame/models/topic.dart';
+import 'package:langame/models/question.dart';
 
 abstract class TopicApi {
-  Future<List<Topic>> getTopics();
+  Future<List<Question>> getTopics();
 }

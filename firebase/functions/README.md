@@ -12,7 +12,7 @@ firebase login
 ### Secrets
 
 ```bash
-firebase functions:config:set agora.id="THE AGORA APP ID" agora.certificate="THE AGORA CERTIFICATE"
+firebase functions:config:set agora.id="THE AGORA APP ID" agora.certificate="THE AGORA CERTIFICATE" github.token="THE GITHUB TOKEN"
 firebase functions:config:get > .runtimeconfig.json
 ```
 
@@ -30,4 +30,10 @@ npm run serve
 
 ```bash
 npm run deploy
+```
+
+## Test
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="path/to/key.json"
 ```
