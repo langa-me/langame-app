@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:connectivity/connectivity.dart';
@@ -17,12 +19,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
-import 'package:langame/providers/firestore_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
-import 'package:langame/providers/profile_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/views/login.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +34,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIOverlays([]);
   await Firebase.initializeApp();
+  var crashlytics = FirebaseCrashlytics.instance;
   var analytics = FirebaseAnalytics();
   FirebaseApi firebase = FirebaseApi(
     FirebaseMessaging.instance,
@@ -43,11 +45,20 @@ void main() async {
       'email',
       'https://www.googleapis.com/auth/contacts.readonly'
     ]),
-    FirebaseCrashlytics.instance,
+    crashlytics,
     analytics,
     FirebaseStorage.instance,
     useEmulator: false,
   );
+  // Pass all uncaught errors from the framework to Crashlytics.
+  FlutterError.onError = crashlytics.recordFlutterError;
+  Isolate.current.addErrorListener(RawReceivePort((pair) async {
+    final List<dynamic> errorAndStacktrace = pair;
+    await crashlytics.recordError(
+      errorAndStacktrace.first,
+      errorAndStacktrace.last,
+    );
+  }).sendPort);
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then(
     (_) => runApp(
@@ -60,11 +71,11 @@ void main() async {
             ChangeNotifierProvider(
               create: (_) => AuthenticationProvider(firebase, fake: false),
             ),
-            ChangeNotifierProvider(create: (_) => ProfileProvider()),
-            ChangeNotifierProvider(
-                create: (context) => FirestoreProvider(firebase.firestore)),
             ChangeNotifierProvider(create: (_) => FunnyProvider()),
             ChangeNotifierProvider(create: (_) => LangameProvider()),
+            ChangeNotifierProvider(
+                create: (_) => CrashAnalyticsProvider(
+                    firebase.crashlytics, firebase.analytics)),
             ChangeNotifierProvider(create: (_) => AudioProvider(firebase)),
             StreamProvider<ConnectivityResult>.value(
                 value: Connectivity().onConnectivityChanged,

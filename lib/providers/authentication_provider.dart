@@ -57,18 +57,8 @@ class AuthenticationProvider extends ChangeNotifier {
   UnmodifiableListView<LangameNotification> get notifications =>
       UnmodifiableListView(_notifications);
 
-  // /// Stream of messages
-  // // ignore: close_sinks
-  // final _notificationsStream =
-  //     StreamController<LangameNotification>.broadcast();
-  //
-  // Stream<LangameNotification> get notificationsStream {
-  //   return _notificationsStream.stream.asBroadcastStream();
-  // }
-
   void _onNotificationHandler(LangameNotification? notification) {
     if (notification != null) _notifications.add(notification);
-    // _notificationsStream.add(notification);
     notifyListeners();
   }
 
@@ -80,6 +70,7 @@ class AuthenticationProvider extends ChangeNotifier {
       await messageApi.send(recipients.map((e) => e.uid!).toList(),
           topics.map((e) => e.question).toList());
     } catch (e, s) {
+      firebase.crashlytics.log('failed to send langame');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -90,6 +81,7 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       await messageApi.sendReadyForLangame(channelName);
     } catch (e, s) {
+      firebase.crashlytics.log('failed to sendReadyForLangame');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -101,6 +93,7 @@ class AuthenticationProvider extends ChangeNotifier {
       var r = await authenticationApi.getChannelToken(channelName);
       return LangameResponse<String>(LangameStatus.succeed, result: r);
     } catch (e, s) {
+      firebase.crashlytics.log('failed to get channel $channelName token');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -111,6 +104,7 @@ class AuthenticationProvider extends ChangeNotifier {
       var r = await authenticationApi.getChannel(channelName);
       return LangameResponse<LangameChannel>(LangameStatus.succeed, result: r);
     } catch (e, s) {
+      firebase.crashlytics.log('failed to get channel $channelName');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -123,6 +117,7 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse<LangameNotification>(LangameStatus.succeed,
           result: r);
     } catch (e, s) {
+      firebase.crashlytics.log('failed to getNotification');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -140,6 +135,7 @@ class AuthenticationProvider extends ChangeNotifier {
           .then((value) => notifyListeners());
       // return f;
     } catch (e, s) {
+      firebase.crashlytics.log('failed to deleteNotification');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -152,6 +148,7 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       await authenticationApi.loginWithFirebase(credential);
     } catch (e, s) {
+      firebase.crashlytics.log('failed to _loginWith');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -164,8 +161,11 @@ class AuthenticationProvider extends ChangeNotifier {
         .then(_loginWith)
         .catchError(() => LangameResponse(LangameStatus.cancelled),
             test: (e) => e is LangameAppleSignInException)
-        .catchError((err) =>
-            LangameResponse(LangameStatus.failed, error: err.toString()));
+        .catchError((e, s) {
+      firebase.crashlytics.log('failed to loginWithApple');
+      firebase.crashlytics.recordError(e, s);
+      LangameResponse(LangameStatus.failed, error: e.toString());
+    });
   }
 
   Future<LangameResponse> loginWithFacebook() async {
@@ -174,8 +174,11 @@ class AuthenticationProvider extends ChangeNotifier {
         .then(_loginWith)
         .catchError(() => LangameResponse(LangameStatus.cancelled),
             test: (e) => e is LangameFacebookSignInException)
-        .catchError((err) =>
-            LangameResponse(LangameStatus.failed, error: err.toString()));
+        .catchError((e, s) {
+      firebase.crashlytics.log('failed to loginWithFacebook');
+      firebase.crashlytics.recordError(e, s);
+      LangameResponse(LangameStatus.failed, error: e.toString());
+    });
   }
 
   Future<LangameResponse> loginWithGoogle() async {
@@ -184,25 +187,18 @@ class AuthenticationProvider extends ChangeNotifier {
         .then(_loginWith)
         .catchError((err) => LangameResponse(LangameStatus.cancelled),
             test: (e) => e is LangameGoogleSignInException)
-        .catchError((err) =>
-            LangameResponse(LangameStatus.failed, error: err.toString()));
+        .catchError((e, s) {
+      firebase.crashlytics.log('failed to loginWithGoogle');
+      firebase.crashlytics.recordError(e, s);
+      LangameResponse(LangameStatus.failed, error: e.toString());
+    });
   }
 
   Future<LangameResponse> getRelations() async {
     throw UnimplementedError();
-    // try {
-    //   var u = await userStream.first;
-    //   if (u == null)
-    //     return LangameResponse(LangameStatus.failed,
-    //         error: 'Not authenticated');
-    //   _relations = await authenticationApi.getRelations(u);
-    //   return LangameResponse(LangameStatus.succeed);
-    // } on LangameGetUserFriendsException catch (e, s) {
-    //   firebase.crashlytics.recordError(e, s);
-    //   return LangameResponse(LangameStatus.failed, error: e.cause);
-    // }
   }
 
+  // TODO langame response
   Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
     return await authenticationApi.getLangameUsersStartingWithTag(tag);
   }
@@ -212,6 +208,7 @@ class AuthenticationProvider extends ChangeNotifier {
       var r = await authenticationApi.getLangameUser(uid);
       return LangameResponse<LangameUser>(LangameStatus.succeed, result: r);
     } catch (e, s) {
+      firebase.crashlytics.log('failed to getLangameUser $uid');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -228,6 +225,7 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse<List<LangameUser>>(LangameStatus.succeed,
           result: r);
     } catch (e, s) {
+      firebase.crashlytics.log('failed to get users ${userIds.join(",")}');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -250,57 +248,19 @@ class AuthenticationProvider extends ChangeNotifier {
       debugPrint(data.toString());
       if (data == null) return null;
       try {
+        await firebase.crashlytics.setUserIdentifier(data.uid);
         _user = await authenticationApi.getLangameUser(data.uid);
         if (_user == null) {
           _user = await authenticationApi.addLangameUser(data);
         }
-        // } on LangameAddUserException catch (e) {
-        //   // Fail at addLangameUser
-        //   print(e.cause);
-        // } on LangameAuthException catch (e) {
-        //   // Fail at generateTag
-        //   print(e.cause);
       } catch (e, s) {
+        firebase.crashlytics.log(
+            'failed to setup user on firebase stream change uid: ${data.uid}');
         firebase.crashlytics.recordError(e, s);
-        if (!kReleaseMode) {
-          debugPrint(e.toString());
-          debugPrint(s.toString());
-        }
       }
       _userStream.add(_user);
       notifyListeners();
     });
-    // final firebaseUserToLangameUser =
-    //     StreamTransformer<User?, LangameUser?>.fromHandlers(
-    //         handleData: (data, sink) async {
-    //   if (data == null) return null;
-    //   LangameUser? langameUser =
-    //       await authenticationApi.getLangameUser(data.uid);
-    //   try {
-    //     if (langameUser == null) {
-    //       langameUser = await authenticationApi.addLangameUser(data);
-    //     }
-    //     // } on LangameAddUserException catch (e) {
-    //     //   // Fail at addLangameUser
-    //     //   print(e.cause);
-    //     // } on LangameAuthException catch (e) {
-    //     //   // Fail at generateTag
-    //     //   print(e.cause);
-    //   } catch (e, s) {
-    //     firebase.crashlytics.recordError(e, s);
-    //     if (!kReleaseMode) {
-    //       debugPrint(e.toString());
-    //       debugPrint(s.toString());
-    //     }
-    //   }
-    //   sink.add(langameUser);
-    // });
-    // _userStream = StreamController.broadcast();
-    // _userStream.addStream(Stream.empty()).then((_) {
-    //   _firebaseUserStream
-    //       .transform(firebaseUserToLangameUser)
-    //       .pipe(_userStream);
-    // });
   }
 
   Future<LangameResponse> initializeMessageApi(
@@ -317,6 +277,7 @@ class AuthenticationProvider extends ChangeNotifier {
       // i.e. no internet
       // TODO  Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
     } catch (e, s) {
+      firebase.crashlytics.log('failed to initializeMessageApi');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

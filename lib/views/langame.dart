@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:langame/helpers/constants.dart';
@@ -14,6 +13,7 @@ import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -53,24 +53,22 @@ class _LangameViewState extends State<LangameView> {
   void initState() {
     super.initState();
     Provider.of<AuthenticationProvider>(context, listen: false)
-        .sendReadyForLangame(widget.notification.channelName!)
-        .then((res) {
-      res.thenShowToast(
-        'Your friends have been told of your presence!',
-        !kReleaseMode
-            ? 'failed to sendReadyForLangame ${res.error.toString()}'
-            : Provider.of<FunnyProvider>(context, listen: false)
-                .getFailingRandom(),
-      );
-    });
+        .sendReadyForLangame(widget.notification.channelName!);
+    showToast('Your friends have been told of your presence!');
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: might do that on other pages too
-    var network = Provider.of<ConnectivityResult>(context);
+    var network = Provider.of<ConnectivityResult>(context, listen: false);
     if (network != ConnectivityResult.wifi &&
         network != ConnectivityResult.mobile) {
+      Provider.of<CrashAnalyticsProvider>(context, listen: false)
+          .analytics
+          .logEvent(name: 'offline', parameters: {
+        'view': 'langame_view',
+        'initialized': joinedPlayers.length != channel?.players.length,
+      });
       return _buildLoading(text: 'You are offline!');
     }
 
@@ -169,7 +167,9 @@ class _LangameViewState extends State<LangameView> {
             return _buildLoading();
           });
     }
-    debugPrint('channelToken $channelToken');
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .crashlytics
+        .log('channelToken $channelToken');
     // Third-step, retrieve channel data
     if (channel == null) {
       var p = Provider.of<AuthenticationProvider>(context, listen: false);
@@ -192,9 +192,6 @@ class _LangameViewState extends State<LangameView> {
                             .getFailingRandom()
                         : channel!.questions.first;
                   });
-                  p.getLangameUsers(s.data!.result!.players
-                      .map((e) => e.langameUid)
-                      .toList());
                 });
               },
               onFailure: () {
@@ -206,7 +203,7 @@ class _LangameViewState extends State<LangameView> {
         },
       );
     }
-    debugPrint(
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).crashlytics.log(
         'channel ${channel?.channelName} ${channel?.players.map((p) => p.toJson()).join(',')}');
 
     // Fourth-step, retrieve langame users data
@@ -233,7 +230,7 @@ class _LangameViewState extends State<LangameView> {
         },
       );
     }
-    debugPrint(
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).crashlytics.log(
         'channelLangameUsers ${channelLangameUsers.map((e) => e.displayName).join(',')}');
 
     // Fifth-step, initialize audio engine
@@ -259,7 +256,9 @@ class _LangameViewState extends State<LangameView> {
         },
       );
     }
-    debugPrint('engineInitialized $engineInitialized');
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .crashlytics
+        .log('engineInitialized $engineInitialized');
 
     // Sixth-step, join audio channel
     if (!channelJoined) {
@@ -287,7 +286,9 @@ class _LangameViewState extends State<LangameView> {
             return _buildLoading();
           });
     }
-    debugPrint('channelJoined $channelJoined');
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .crashlytics
+        .log('channelJoined $channelJoined');
 
     if (channelToken == null ||
         channel == null ||
@@ -297,7 +298,7 @@ class _LangameViewState extends State<LangameView> {
       // TODO: turn mic off
       _buildLoading();
     }
-    debugPrint(
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).crashlytics.log(
         'joinedPlayers ${joinedPlayers.values.map((e) => e.langameUser.displayName).join(',')}');
 
     return joinedPlayers.length != channel?.players.length
@@ -332,6 +333,10 @@ class _LangameViewState extends State<LangameView> {
         Provider.of<FunnyProvider>(context, listen: false).getFailingRandom(),
         color: Colors.red,
       );
+      Provider.of<CrashAnalyticsProvider>(context, listen: false)
+          .crashlytics
+          .recordError(LangameException('failed to start langame'), null,
+              reason: 'failed to start langame', fatal: true);
       return;
     }
     setState(() => errors++);
@@ -348,21 +353,6 @@ class _LangameViewState extends State<LangameView> {
             ? Colors.white
             : Colors.black,
       ),
-      // child: SpinKitPumpingHeart(
-      //   itemBuilder: (BuildContext context, int index) {
-      //     return DecoratedBox(
-      //       decoration: BoxDecoration(
-      //         color: Theme.of(context).brightness == Brightness.dark
-      //             ? Colors.white
-      //             : Colors.black,
-      //       ),
-      //       child: Text(text != null
-      //           ? text
-      //           : Provider.of<FunnyProvider>(context, listen: false)
-      //               .getLoadingRandom()),
-      //     );
-      //   },
-      // ),
     );
   }
 
@@ -371,17 +361,25 @@ class _LangameViewState extends State<LangameView> {
           setState(() {
             joinedPlayers[uid]?.isSpeaking = true;
           });
-          debugPrint(
-              '${joinedPlayers[uid]?.langameUser.displayName} speaking: ${joinedPlayers[uid]?.isSpeaking}');
+          Provider.of<CrashAnalyticsProvider>(context, listen: false)
+              .crashlytics
+              .log(
+                  '${joinedPlayers[uid]?.langameUser.displayName} speaking: ${joinedPlayers[uid]?.isSpeaking}');
         },
         microphoneEnabled: (bool a) {
-          debugPrint('microphoneEnabled $a');
+          Provider.of<CrashAnalyticsProvider>(context, listen: false)
+              .crashlytics
+              .log('microphoneEnabled $a');
         },
         streamMessage: (int a, int b, String c) {
-          debugPrint('streamMessage a $a b $b c $c');
+          Provider.of<CrashAnalyticsProvider>(context, listen: false)
+              .crashlytics
+              .log('streamMessage a $a b $b c $c');
         },
         localUserRegistered: (int a, String b) {
-          debugPrint('localUserRegistered a $a b$b');
+          Provider.of<CrashAnalyticsProvider>(context, listen: false)
+              .crashlytics
+              .log('localUserRegistered a $a b$b');
         },
         userOffline: (int uid, UserOfflineReason reason) {
           if (reason == UserOfflineReason.Quit) {
@@ -412,7 +410,9 @@ class _LangameViewState extends State<LangameView> {
           showToast('${joinerAsLangameUser.displayName} joined!');
         },
         joinChannelSuccess: (channelName, uid, elapsed) {
-          debugPrint('joinChannelSuccess $channelName $uid $elapsed');
+          Provider.of<CrashAnalyticsProvider>(context, listen: false)
+              .crashlytics
+              .log('joinChannelSuccess $channelName $uid $elapsed');
 
           var joinerIds =
               channel?.players.firstWhere((p) => p.channelUid == uid);
@@ -424,7 +424,9 @@ class _LangameViewState extends State<LangameView> {
           });
         },
         leaveChannel: (stats) {
-          debugPrint('leaveChannel ${stats.toJson()}');
+          Provider.of<CrashAnalyticsProvider>(context, listen: false)
+              .crashlytics
+              .log('leaveChannel ${stats.toJson()}');
         },
       );
 

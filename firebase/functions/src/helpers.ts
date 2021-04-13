@@ -133,7 +133,13 @@ export const handleSendToDevice = (recipientData: LangameUser,
   return promise.then((res) => {
     res.results.forEach((r, i) => {
       const t = recipientData.tokens![i];
-      functions.logger.warn("failed", t, r.error);
+      functions.logger.warn("failed to send notification",
+          "failureCount",
+          res.failureCount,
+          "token",
+          t,
+          "error:",
+          JSON.stringify(r.error));
       // Invalid token, remove it
       if (r.error &&
                 r.error.code ===
@@ -153,7 +159,7 @@ export const handleSendToDevice = (recipientData: LangameUser,
     });
     return notificationId;
   }).catch((e) => {
-    functions.logger.error("sendLangame failed", e);
+    functions.logger.error("sendLangame failed", JSON.stringify(e));
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,

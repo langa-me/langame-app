@@ -96,11 +96,11 @@ class LangameResponse<T> {
 
   LangameResponse(this.status, {this.result, this.error});
 
-  void thenShowSnackBar(
-      BuildContext context, Function onSucceed, String failedMessage,
-      {Function? onFailure}) {
+  void thenShowSnackBar(BuildContext context, String failedMessage,
+      {Function? onSucceed, Function? onCancelled, Function? onFailure}) {
     switch (status) {
       case LangameStatus.cancelled:
+        if (onCancelled != null) onCancelled();
         break;
       case LangameStatus.failed:
         final snackBar = SnackBar(
@@ -117,7 +117,7 @@ class LangameResponse<T> {
         if (!kReleaseMode) throw LangameException(failedMessage);
         break;
       case LangameStatus.succeed:
-        onSucceed();
+        if (onSucceed != null) onSucceed();
         break;
     }
   }

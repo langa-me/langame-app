@@ -1,5 +1,4 @@
 import 'package:after_layout/after_layout.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
@@ -7,7 +6,6 @@ import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -98,7 +96,7 @@ class _SendLangameState extends State<SendLangameView>
       ),
       floatingActionButton: Consumer<LangameProvider>(
         builder: (context, l, child) => FloatingActionButton.extended(
-          onPressed: () async {
+          onPressed: () {
             if (selectedTopics.isEmpty) {
               showBasicSnackBar(context, 'You must select at least one topics');
               return;
@@ -109,17 +107,12 @@ class _SendLangameState extends State<SendLangameView>
                   context, 'You must select a maximum of 3 topics');
               return;
             }
-            var res = await Provider.of<AuthenticationProvider>(context,
-                    listen: false)
+            Provider.of<AuthenticationProvider>(context, listen: false)
                 .send(l.shoppingList, selectedTopics);
-            res.thenShowToast(
-                'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}',
-                kReleaseMode
-                    ? Provider.of<FunnyProvider>(context, listen: false)
-                        .getFailingRandom()
-                    : res.error.toString(),
-                onSucceed: () => Navigator.pop(
-                    context)); // TODO: offer to join the langame now
+            showToast(
+                'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
+            Navigator.pop(context);
+            // TODO: offer to join the langame now
           },
           label: const Text('Send invitation'),
           icon: const Icon(Icons.send_outlined),

@@ -26,11 +26,8 @@ class FirebaseApi {
       // Force disable Crashlytics collection while doing every day development.
       // Temporarily toggle this to true if you want to test crash reporting in your app.
       // FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    } else {
-      // Pass all uncaught errors from the framework to Crashlytics.
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
     }
-
+    crashlytics.setCrashlyticsCollectionEnabled(true);
     if (!useEmulator) return;
 
     // Need to clear local cache otherwise would use non-emulator data

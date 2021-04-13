@@ -85,20 +85,22 @@ class _SetupState extends State with AfterLayoutMixin {
             f.then((res) {
               Navigator.of(_keyLoader.currentContext!, rootNavigator: true)
                   .pop();
-              res.thenShowSnackBar(context, () {
-                Provider.of<LocalStorageProvider>(context, listen: false)
-                    .saveHasDoneSetup(true);
-                Navigator.pushReplacement(
+              res.thenShowSnackBar(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => FriendsView(),
-                  ),
-                );
-              },
                   !kReleaseMode
                       ? 'failed to initialize the application, ${res.error.toString()}'
                       : Provider.of<FunnyProvider>(context, listen: false)
                           .getFailingRandom(),
+                  onSucceed: () {
+                    Provider.of<LocalStorageProvider>(context, listen: false)
+                        .saveHasDoneSetup(true);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FriendsView(),
+                      ),
+                    );
+                  },
                   onFailure: () => controller.previousPage(
                       duration: new Duration(seconds: 1),
                       curve: Curves.bounceIn));

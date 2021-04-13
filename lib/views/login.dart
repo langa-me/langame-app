@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
@@ -61,43 +62,41 @@ class _LoginState extends State<Login> {
         ap.initializeMessageApi(onBackgroundOrForegroundOpened).then((res) {
           res.thenShowSnackBar(
               context,
-              () {
-                Navigator.of(_keySuccess.currentContext ?? context,
-                        rootNavigator: true)
-                    .pop();
-                successDialogFuture = null;
-                ap.messageApi.getInitialMessage().then((n) {
-                  // TODO: doesn't work ? n = null
-                  // Fluttertoast.showToast(
-                  //     msg: 'opening notification senderUid ${n?.senderUid}');
-                  if (n != null && n.channelName != null) {
-                    Navigator.pushReplacement(
-                      context, // opened the terminated app from a notification
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            LangameView(n, n.ready == null || !n.ready!),
-                      ),
-                    );
-                  } else {
-                    // User is not opening the app from a notification
-                    Navigator.pushReplacement(
-                      context, // If the already logged has already done the setup
-                      MaterialPageRoute(builder: (context) => FriendsView()),
-                    );
-                  }
-                });
-              },
               res.error.toString().contains('firebase_functions/unavailable')
                   ? 'Could not authenticate, please check your internet connection'
                   : !kReleaseMode
                       ? 'failed to initializeMessageApi ${res.error.toString()}'
                       : Provider.of<FunnyProvider>(context, listen: false)
-                          .getFailingRandom(),
-              onFailure: () {
-                Navigator.of(_keySuccess.currentContext ?? context,
-                        rootNavigator: true)
-                    .pop();
-              });
+                          .getFailingRandom(), onSucceed: () {
+            Navigator.of(_keySuccess.currentContext ?? context,
+                    rootNavigator: true)
+                .pop();
+            successDialogFuture = null;
+            ap.messageApi.getInitialMessage().then((n) {
+              // TODO: doesn't work ? n = null
+              // Fluttertoast.showToast(
+              //     msg: 'opening notification senderUid ${n?.senderUid}');
+              if (n != null && n.channelName != null) {
+                Navigator.pushReplacement(
+                  context, // opened the terminated app from a notification
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        LangameView(n, n.ready == null || !n.ready!),
+                  ),
+                );
+              } else {
+                // User is not opening the app from a notification
+                Navigator.pushReplacement(
+                  context, // If the already logged has already done the setup
+                  MaterialPageRoute(builder: (context) => FriendsView()),
+                );
+              }
+            });
+          }, onFailure: () {
+            Navigator.of(_keySuccess.currentContext ?? context,
+                    rootNavigator: true)
+                .pop();
+          });
         });
       } else {
         // User previously authenticated but didn't do setup
@@ -116,20 +115,23 @@ class _LoginState extends State<Login> {
     });
     var logins = <Widget>[
       FacebookSignInButton(
-          onPressed: () async {
-            await _handleOnPressedLogin(provider.loginWithFacebook, 'Facebook');
+          onPressed: () {
+            showBasicSnackBar(
+                context, 'Facebook authentication is coming soon!');
+            // await _handleOnPressedLogin(provider.loginWithFacebook, 'Facebook');
           },
-          splashColor: Colors.green),
+          splashColor: Theme.of(context).colorScheme.primary),
       GoogleSignInButton(
           onPressed: () async {
             await _handleOnPressedLogin(provider.loginWithGoogle, 'Google');
           },
-          splashColor: Colors.green),
+          splashColor: Theme.of(context).colorScheme.primary),
       AppleSignInButton(
-          onPressed: () async {
-            await _handleOnPressedLogin(provider.loginWithApple, 'Apple');
+          onPressed: () {
+            showBasicSnackBar(context, 'Apple authentication is coming soon!');
+            // await _handleOnPressedLogin(provider.loginWithApple, 'Apple');
           },
-          splashColor: Colors.green)
+          splashColor: Theme.of(context).colorScheme.primary)
     ];
     return Scaffold(
       body: Column(
@@ -186,7 +188,6 @@ class _LoginState extends State<Login> {
       Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
       res.thenShowSnackBar(
         context,
-        () => {},
         res.error.toString().contains('network_error') // TODO: hack
             ? 'Could not authenticate, please check your internet connection'
             : !kReleaseMode
