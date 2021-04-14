@@ -61,7 +61,7 @@ class _SetupState extends State with AfterLayoutMixin {
       ]),
       body: PageView(
         onPageChanged: (int? i) async {
-          if (i != null && i > 2.0) {
+          if (i != null && i > 3.0) {
             // Register that this user has already done the setup
             // SharedPreferences prefs = await SharedPreferences.getInstance();
             // prefs.setBool('setup', true);
@@ -109,6 +109,26 @@ class _SetupState extends State with AfterLayoutMixin {
         },
         controller: controller,
         children: <Widget>[
+          Center(
+            child: Container(
+              height: AppSize.safeBlockVertical * 5,
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(
+                  Icons.favorite_border_outlined,
+                  size: 24,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                Text('Try to firmly shake your phone',
+                    style: Theme.of(context).textTheme.button),
+                Icon(
+                  Icons.favorite_border_outlined,
+                  size: 24,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ]),
+            ),
+          ),
           Container(
             color: Theme.of(context).colorScheme.background,
             child: Center(

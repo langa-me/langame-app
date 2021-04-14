@@ -152,6 +152,7 @@ class AuthenticationProvider extends ChangeNotifier {
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
+    firebase.analytics.logLogin();
     return LangameResponse(LangameStatus.succeed);
   }
 
@@ -245,10 +246,10 @@ class AuthenticationProvider extends ChangeNotifier {
     _firebaseUserStream = authenticationApi.userChanges;
     _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
-      debugPrint(data.toString());
       if (data == null) return null;
       try {
         await firebase.crashlytics.setUserIdentifier(data.uid);
+        await firebase.analytics.setUserId(data.uid);
         _user = await authenticationApi.getLangameUser(data.uid);
         if (_user == null) {
           _user = await authenticationApi.addLangameUser(data);

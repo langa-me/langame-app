@@ -1,0 +1,4 @@
+- Shake to feedback
+- Topic oriented conversations
+- Google authentication
+- Light / dark mode

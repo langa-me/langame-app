@@ -335,6 +335,7 @@ class ImplMessageApi extends MessageApi {
           Map<String, dynamic>.from(result.data));
       switch (response.statusCode) {
         case FirebaseFunctionsResponseStatusCode.OK:
+          firebase.crashlytics.log('new FCM token');
           break;
         case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
           throw LangameMessageException(response.errorMessage ??

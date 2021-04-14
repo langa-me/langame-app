@@ -4,6 +4,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
@@ -38,7 +39,6 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     AppSize(context);
 
     final provider =
@@ -152,19 +152,6 @@ class _LoginState extends State<Login> {
           SizedBox(height: AppSize.safeBlockVertical * 10),
           Column(children: logins, mainAxisAlignment: MainAxisAlignment.center),
           Spacer(),
-          Container(
-            height: AppSize.safeBlockVertical * 5,
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(
-                Icons.favorite_border_outlined,
-                size: 24,
-                color: theme.colorScheme.secondary,
-              ),
-              Text('Try to firmly shake your phone',
-                  style: theme.textTheme.button),
-            ]),
-          ),
-          Spacer(),
           FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
             builder: (c, s) => Text(
@@ -181,11 +168,17 @@ class _LoginState extends State<Login> {
 
   Future _handleOnPressedLogin(
       Future<LangameResponse> Function() fn, String entity) async {
+    // TODO: clean this mess
     var f = fn().timeout(const Duration(seconds: 5));
     Dialogs.showLoadingDialog(context, _keyLoader,
         Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
     f.then((res) {
       Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
+      if (res.status == LangameStatus.succeed) {
+        Provider.of<CrashAnalyticsProvider>(context, listen: false)
+            .analytics
+            .logSignUp(signUpMethod: entity);
+      }
       res.thenShowSnackBar(
         context,
         res.error.toString().contains('network_error') // TODO: hack

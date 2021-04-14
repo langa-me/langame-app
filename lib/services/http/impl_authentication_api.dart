@@ -160,7 +160,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
         debugPrint('${user.displayName} is authenticated with google.com');
       langameUser.google = true;
     }
-    langameUser.tag = t;
+    langameUser.tag = t.toLowerCase();
     if (!kReleaseMode) debugPrint('add $t');
     return users
         .doc(langameUser.uid)
@@ -173,6 +173,8 @@ class ImplAuthenticationApi extends AuthenticationApi {
   Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
     CollectionReference users =
         firebase.firestore.collection(AppConst.firestoreUsersCollection);
+
+    tag = tag.toLowerCase();
 
     /// Query users with tag starting with [tag]
     QuerySnapshot doc = await users

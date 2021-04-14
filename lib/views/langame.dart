@@ -52,6 +52,7 @@ class _LangameViewState extends State<LangameView> {
   @override
   void initState() {
     super.initState();
+    if (!widget.notifyOthers) return;
     Provider.of<AuthenticationProvider>(context, listen: false)
         .sendReadyForLangame(widget.notification.channelName!);
     showToast('Your friends have been told of your presence!');
@@ -73,7 +74,7 @@ class _LangameViewState extends State<LangameView> {
     }
 
     if (!permissionRequested) {
-      var p = Provider.of<AudioProvider>(context);
+      var p = Provider.of<AudioProvider>(context, listen: false);
       return FutureBuilder<LangameResponse<bool>>(
         future: p.checkPermission(),
         builder: (c, s) {
@@ -140,6 +141,8 @@ class _LangameViewState extends State<LangameView> {
         },
       );
     }
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .log('permissionRequested $permissionRequested');
     // Second-step, ask for a token generation
     if (channelToken == null) {
       var p = Provider.of<AuthenticationProvider>(context, listen: false);
@@ -168,7 +171,6 @@ class _LangameViewState extends State<LangameView> {
           });
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .crashlytics
         .log('channelToken $channelToken');
     // Third-step, retrieve channel data
     if (channel == null) {
@@ -203,7 +205,7 @@ class _LangameViewState extends State<LangameView> {
         },
       );
     }
-    Provider.of<CrashAnalyticsProvider>(context, listen: false).crashlytics.log(
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
         'channel ${channel?.channelName} ${channel?.players.map((p) => p.toJson()).join(',')}');
 
     // Fourth-step, retrieve langame users data
@@ -230,7 +232,7 @@ class _LangameViewState extends State<LangameView> {
         },
       );
     }
-    Provider.of<CrashAnalyticsProvider>(context, listen: false).crashlytics.log(
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
         'channelLangameUsers ${channelLangameUsers.map((e) => e.displayName).join(',')}');
 
     // Fifth-step, initialize audio engine
@@ -257,7 +259,6 @@ class _LangameViewState extends State<LangameView> {
       );
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .crashlytics
         .log('engineInitialized $engineInitialized');
 
     // Sixth-step, join audio channel
@@ -287,7 +288,6 @@ class _LangameViewState extends State<LangameView> {
           });
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .crashlytics
         .log('channelJoined $channelJoined');
 
     if (channelToken == null ||
@@ -298,7 +298,7 @@ class _LangameViewState extends State<LangameView> {
       // TODO: turn mic off
       _buildLoading();
     }
-    Provider.of<CrashAnalyticsProvider>(context, listen: false).crashlytics.log(
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
         'joinedPlayers ${joinedPlayers.values.map((e) => e.langameUser.displayName).join(',')}');
 
     return joinedPlayers.length != channel?.players.length
@@ -309,7 +309,7 @@ class _LangameViewState extends State<LangameView> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 _buildTimerText(),
-                _buildQuestion(), // TODO!!!!!!!!!!!
+                _buildQuestion(),
                 _buildBottomHalf(),
               ],
             ),
@@ -361,24 +361,19 @@ class _LangameViewState extends State<LangameView> {
           setState(() {
             joinedPlayers[uid]?.isSpeaking = true;
           });
-          Provider.of<CrashAnalyticsProvider>(context, listen: false)
-              .crashlytics
-              .log(
-                  '${joinedPlayers[uid]?.langameUser.displayName} speaking: ${joinedPlayers[uid]?.isSpeaking}');
+          Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
+              '${joinedPlayers[uid]?.langameUser.displayName} speaking: ${joinedPlayers[uid]?.isSpeaking}');
         },
         microphoneEnabled: (bool a) {
           Provider.of<CrashAnalyticsProvider>(context, listen: false)
-              .crashlytics
               .log('microphoneEnabled $a');
         },
         streamMessage: (int a, int b, String c) {
           Provider.of<CrashAnalyticsProvider>(context, listen: false)
-              .crashlytics
               .log('streamMessage a $a b $b c $c');
         },
         localUserRegistered: (int a, String b) {
           Provider.of<CrashAnalyticsProvider>(context, listen: false)
-              .crashlytics
               .log('localUserRegistered a $a b$b');
         },
         userOffline: (int uid, UserOfflineReason reason) {
@@ -390,12 +385,7 @@ class _LangameViewState extends State<LangameView> {
           setState(() {
             joinedPlayers.remove(uid);
           });
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FriendsView(),
-            ),
-          );
+          _onEnd();
         },
         userJoined: (int uid, int b) {
           var joinerIds =
@@ -411,7 +401,6 @@ class _LangameViewState extends State<LangameView> {
         },
         joinChannelSuccess: (channelName, uid, elapsed) {
           Provider.of<CrashAnalyticsProvider>(context, listen: false)
-              .crashlytics
               .log('joinChannelSuccess $channelName $uid $elapsed');
 
           var joinerIds =
@@ -425,10 +414,19 @@ class _LangameViewState extends State<LangameView> {
         },
         leaveChannel: (stats) {
           Provider.of<CrashAnalyticsProvider>(context, listen: false)
-              .crashlytics
               .log('leaveChannel ${stats.toJson()}');
         },
       );
+
+  void _onEnd() {
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).log('langame end', analyticsMessage: 'langame_end');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FriendsView(),
+      ),
+    );
+  }
 
   Widget _buildWaitingScreen() {
     return Scaffold(
@@ -482,31 +480,43 @@ class _LangameViewState extends State<LangameView> {
           ? _loadIfNotStarted(p)
           : StreamBuilder<Duration>(
               stream: p.remaining,
-              builder: (c, s) => Center(
-                child: Container(
-                  margin: EdgeInsets.only(
-                      top: AppSize.safeBlockVertical * 5,
-                      bottom: AppSize.blockSizeVertical * 5),
-                  height: AppSize.blockSizeVertical * 8,
-                  width: AppSize.blockSizeHorizontal * 30,
-                  color: Colors.transparent,
+              builder: (c, s) {
+                if (s.hasData && s.data != null && s.data!.inSeconds == 0) {
+                  _onEnd();
+                }
+                return Center(
                   child: Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                        color: theme.buttonTheme.colorScheme!.primary,
-                        borderRadius: BorderRadius.all(Radius.circular(10.0))),
-                    child: new Center(
-                      child: new Text(
-                        !s.hasData
-                            ? '15:00'
-                            : '${s.data!.inMinutes}:${s.data!.inSeconds.remainder(60).toString().length == 2 ? '' : '0'}${s.data!.inSeconds.remainder(60)}',
-                        textAlign: TextAlign.center,
-                        style: theme.primaryTextTheme.button,
+                    margin: EdgeInsets.only(
+                        top: AppSize.safeBlockVertical * 5,
+                        bottom: AppSize.blockSizeVertical * 5),
+                    height: AppSize.blockSizeVertical * 8,
+                    width: AppSize.blockSizeHorizontal * 30,
+                    color: Colors.transparent,
+                    child: Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                          color: theme.buttonTheme.colorScheme!.primary,
+                          borderRadius: const BorderRadius.all(
+                              const Radius.circular(10.0))),
+                      child: new Center(
+                        child: new Text(
+                          !s.hasData
+                              ? '15:00'
+                              : '${s.data!.inMinutes}:${s.data!
+                              .inSeconds
+                              .remainder(60)
+                              .toString()
+                              .length == 2 ? '' : '0'}${s.data!.inSeconds
+                              .remainder(60)}',
+                          textAlign: TextAlign.center,
+                          style: theme.primaryTextTheme.button,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
+                );
+
+              }
             ),
     );
   }

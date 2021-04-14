@@ -79,7 +79,7 @@ void main() async {
             ChangeNotifierProvider(create: (_) => AudioProvider(firebase)),
             StreamProvider<ConnectivityResult>.value(
                 value: Connectivity().onConnectivityChanged,
-                initialData: ConnectivityResult.none),
+                initialData: ConnectivityResult.wifi),
             ChangeNotifierProvider(
               create: (_) => FeedbackProvider(firebase),
             ),
