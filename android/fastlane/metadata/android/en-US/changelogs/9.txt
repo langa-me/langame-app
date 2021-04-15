@@ -1,0 +1,2 @@
+- Join now features
+- Removed permission for Google contacts

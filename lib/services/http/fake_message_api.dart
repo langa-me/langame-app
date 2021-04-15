@@ -49,7 +49,7 @@ class FakeMessageApi extends MessageApi {
   }
 
   @override
-  Future<void> send(List<String> recipients, List<String> topics) async {
+  Future<String> send(List<String> recipients, List<String> topics) async {
     throw UnimplementedError();
   }
 

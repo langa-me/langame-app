@@ -17,7 +17,7 @@ abstract class MessageApi {
   Future<LangameResponse> initializePermissions();
 
   /// Send a Langame message and return the message id retrievable in Firestore
-  Future<void> send(List<String> recipients, List<String> topics);
+  Future<String> send(List<String> recipients, List<String> topics);
 
   /// Response to a Langame message to say "I am ready and waiting"
   Future<void> sendReadyForLangame(String channelName);

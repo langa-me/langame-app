@@ -81,7 +81,7 @@ class _LoginState extends State<Login> {
                   context, // opened the terminated app from a notification
                   MaterialPageRoute(
                     builder: (context) =>
-                        LangameView(n, n.ready == null || !n.ready!),
+                        LangameView(n.channelName!, n.ready == null || !n.ready!),
                   ),
                 );
               } else {

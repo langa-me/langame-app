@@ -10,13 +10,11 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/firebase_functions_protocol.dart';
-import 'package:langame/models/relation.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/services/http/firebase.dart';
 
 import 'authentication_api.dart';
 
-// TODO: ABSOLUTELY TEST
 class ImplAuthenticationApi extends AuthenticationApi {
   GoogleSignInAccount? _google;
 
@@ -79,59 +77,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
       throw LangameFirebaseSignInException(
           cause: 'failed to signInWithCredential ${e.toString()}');
     }
-  }
-
-  @override
-  Future<LangameUserRelations> getRelations(LangameUser user) async {
-    // TODO: for now it get EXTERNAL relations, need to merge with langame relations? (i.e. firestore)
-    // var appleRelations =
-    //     _apple != null ? await _getAppleRelations(_apple!) : <Relation>[];
-    // var facebookRelations = _facebook != null
-    //     ? await _getFacebookRelations(_facebook!)
-    //     : <Relation>[];
-    // TODO: merge somehow the three
-    var googleRelations =
-        _google != null ? await _getGoogleRelations(_google!) : <Relation>[];
-    return LangameUserRelations(user, googleRelations);
-  }
-
-  // /// Retrieve EXTERNAL contacts from Apple API
-  // Future<List<Relation>> _getAppleRelations(AppleUser user) async {
-  //   throw UnimplementedError();
-  // }
-  // /// Retrieve EXTERNAL contacts from Facebook API
-  // Future<List<Relation>> _getFacebookRelations(FacebookUser user) async {
-  //   throw UnimplementedError();
-  // }
-
-  /// Retrieve EXTERNAL contacts from Google People API
-  Future<List<Relation>> _getGoogleRelations(GoogleSignInAccount user) async {
-    var result = <Relation>[];
-    Response response;
-    response = await get(
-      Uri.parse('https://people.googleapis.com/v1/people/me/connections'
-          '?requestMask.includeField=person.names,person.emailAddresses'),
-      headers: await user.authHeaders,
-    );
-    if (response.statusCode != 200) {
-      print('People API ${response.statusCode} response: ${response.body}');
-      return result;
-    }
-    final Map<String, dynamic> data = json.decode(response.body);
-    final List<dynamic>? connections = data['connections'];
-    if (connections == null) return result;
-    var contacts = connections.where((c) => c['names'] != null);
-    // TODO: check if contact already has an account on the app (firestore) somehow
-    // https://developers.google.com/people/api/rest/v1/people/listDirectoryPeople
-    result.addAll(contacts
-        .map((c) => [
-              c['names'][0]['displayName'],
-              c['emailAddresses'] != null
-                  ? c['emailAddresses'][0]['value']
-                  : null
-            ])
-        .map((c) => Relation(LangameUser(displayName: c[0], email: c[1]))));
-    return result;
   }
 
   /// Query Firestore with [uid] looking for a LangameUser
@@ -299,7 +244,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
       );
       switch (response.statusCode) {
         case FirebaseFunctionsResponseStatusCode.OK:
-          break;
+          return response.result!['channelToken'];
         case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
           throw LangameGetAudioTokenException(response.errorMessage ??
               FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
@@ -310,7 +255,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
           throw LangameGetAudioTokenException(response.errorMessage ??
               FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
       }
-      return response.results![0];
     } catch (e) {
       throw LangameGetAudioTokenException(e.toString());
     }

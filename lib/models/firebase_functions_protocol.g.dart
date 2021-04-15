@@ -12,8 +12,7 @@ FirebaseFunctionsResponse _$FirebaseFunctionsResponseFromJson(
     _$enumDecode(
         _$FirebaseFunctionsResponseStatusCodeEnumMap, json['statusCode']),
     json['errorMessage'] as String?,
-  )..results =
-      (json['results'] as List<dynamic>?)?.map((e) => e as String).toList();
+  )..result = json['result'];
 }
 
 Map<String, dynamic> _$FirebaseFunctionsResponseToJson(
@@ -22,7 +21,7 @@ Map<String, dynamic> _$FirebaseFunctionsResponseToJson(
       'statusCode':
           _$FirebaseFunctionsResponseStatusCodeEnumMap[instance.statusCode],
       'errorMessage': instance.errorMessage,
-      'results': instance.results,
+      'result': instance.result,
     };
 
 K _$enumDecode<K, V>(

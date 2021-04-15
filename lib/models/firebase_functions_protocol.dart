@@ -7,7 +7,7 @@ class FirebaseFunctionsResponse {
   FirebaseFunctionsResponseStatusCode statusCode =
       FirebaseFunctionsResponseStatusCode.INTERNAL;
   String? errorMessage;
-  List<String>? results;
+  dynamic? result;
   FirebaseFunctionsResponse(this.statusCode, this.errorMessage);
 
   factory FirebaseFunctionsResponse.fromJson(Map<String, dynamic> json) =>

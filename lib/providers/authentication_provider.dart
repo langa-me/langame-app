@@ -62,19 +62,24 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<LangameResponse> send(
+  Future<LangameResponse<String>> send(
       List<LangameUser> recipients, List<Question> topics) async {
     try {
-      debugPrint(recipients.map((e) => e.uid!).join(','));
+      final String msg =
+          'send langame to ${recipients.map((e) => e.uid!).join(',')}';
+      debugPrint(msg);
+      firebase.crashlytics.log(msg);
+
       // TODO: we'd likely send the whole  topic in the future (with classifications)
-      await messageApi.send(recipients.map((e) => e.uid!).toList(),
+      var channelName = await messageApi.send(
+          recipients.map((e) => e.uid!).toList(),
           topics.map((e) => e.question).toList());
+      return LangameResponse(LangameStatus.succeed, result: channelName);
     } catch (e, s) {
       firebase.crashlytics.log('failed to send langame');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
-    return LangameResponse(LangameStatus.succeed);
   }
 
   Future<LangameResponse> sendReadyForLangame(String channelName) async {
@@ -91,6 +96,7 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse<String>> getChannelToken(String channelName) async {
     try {
       var r = await authenticationApi.getChannelToken(channelName);
+      debugPrint('channeltoken $r');
       return LangameResponse<String>(LangameStatus.succeed, result: r);
     } catch (e, s) {
       firebase.crashlytics.log('failed to get channel $channelName token');

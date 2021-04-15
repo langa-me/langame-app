@@ -86,7 +86,7 @@ exports.getChannelToken = functions
       generateAgoraRtcToken(data.channelName, player.channelUid);
       return new FirebaseFunctionsResponse(
           FirebaseFunctionsResponseStatusCode.OK,
-          [agoraRtcToken],
+          {channelToken: agoraRtcToken},
           undefined,
       );
     });
@@ -242,7 +242,10 @@ exports.sendLangame = functions
             }),
             topics: data.topics,
             questions: questions.map((q) => q.content),
-          })))); // TODO: might check error?
+          }),
+          ),
+          ),
+          ); // TODO: might check error?
 
       const results = await recipientsData
       // @ts-ignore
@@ -297,7 +300,7 @@ exports.sendLangame = functions
       // Succeed
       return new FirebaseFunctionsResponse(
           FirebaseFunctionsResponseStatusCode.OK,
-          undefined,
+          {channelName: channelName},
           undefined);
     });
 

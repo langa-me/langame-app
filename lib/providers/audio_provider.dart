@@ -27,8 +27,8 @@ class AudioProvider extends ChangeNotifier {
   bool get isSpeakerphoneEnabled => _isSpeakerphoneEnabled;
 
   // ignore: close_sinks
-  StreamController<Duration> _remaining = StreamController();
-  Stream<Duration> get remaining => _remaining.stream;
+  StreamController<Duration> _remaining = StreamController.broadcast();
+  Stream<Duration> get remaining => _remaining.stream.asBroadcastStream();
   StreamSubscription<CountdownTimer>? _sub;
 
   bool get timerStarted => _sub != null;
@@ -50,6 +50,18 @@ class AudioProvider extends ChangeNotifier {
       _sub?.onDone(_sub?.cancel);
     } catch (e, s) {
       firebase.crashlytics.log('failed to start timer');
+      firebase.crashlytics.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+    return LangameResponse(LangameStatus.succeed);
+  }
+
+  LangameResponse stopTimer() {
+    try {
+      _sub?.cancel();
+      _sub = null;
+    } catch (e, s) {
+      firebase.crashlytics.log('failed to stop timer');
       firebase.crashlytics.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -116,7 +128,7 @@ class AudioProvider extends ChangeNotifier {
       debugPrint(msg);
       firebase.crashlytics.log(msg);
 
-      final r = RetryOptions(maxAttempts: 3);
+      final r = RetryOptions(maxAttempts: 8);
       await r.retry(
         () => _engine
             ?.joinChannel(token, channel, null, agoraUid)

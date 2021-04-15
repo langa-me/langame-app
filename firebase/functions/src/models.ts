@@ -17,21 +17,21 @@ export enum FirebaseFunctionsResponseStatusCode {
  * Response to all firebase functions
  */
 export class FirebaseFunctionsResponse {
-    results?: any[];
+    result?: any[];
     statusCode: FirebaseFunctionsResponseStatusCode;
     errorMessage?: string;
 
     /**
      * Constructor ...
      * @param{FirebaseFunctionsResponseStatusCode} statusCode
-     * @param{any[]} results
+     * @param{any} result
      * @param{string} errorMessage
      */
     constructor(
         statusCode: FirebaseFunctionsResponseStatusCode,
-        results?: any[],
+        result?: any,
         errorMessage?: string) {
-      this.results = results;
+      this.result = result;
       this.statusCode = statusCode;
       this.errorMessage = errorMessage;
     }

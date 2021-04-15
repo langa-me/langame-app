@@ -9,7 +9,6 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -21,10 +20,10 @@ import 'friends.dart';
 import 'image.dart';
 
 class LangameView extends StatefulWidget {
-  final LangameNotification notification;
+  final String channelName;
   final bool notifyOthers;
 
-  LangameView(this.notification, this.notifyOthers);
+  LangameView(this.channelName, this.notifyOthers);
 
   @override
   _LangameViewState createState() => _LangameViewState();
@@ -57,7 +56,7 @@ class _LangameViewState extends State<LangameView> {
     super.initState();
     if (!widget.notifyOthers) return;
     Provider.of<AuthenticationProvider>(context, listen: false)
-        .sendReadyForLangame(widget.notification.channelName!);
+        .sendReadyForLangame(widget.channelName);
     // showToast(
     //   'Your friends have been told of your presence!',
     //   color: Theme.of(context).colorScheme.primary,
@@ -92,7 +91,7 @@ class _LangameViewState extends State<LangameView> {
     if (channelToken == null) {
       var p = Provider.of<AuthenticationProvider>(context, listen: false);
       return FutureBuilder<LangameResponse<String>>(
-          future: p.getChannelToken(widget.notification.channelName!),
+          future: p.getChannelToken(widget.channelName),
           builder: (c, s) {
             if (s.hasError) _handleError();
             if (s.hasData &&
@@ -115,7 +114,7 @@ class _LangameViewState extends State<LangameView> {
     if (channel == null) {
       var p = Provider.of<AuthenticationProvider>(context, listen: false);
       return FutureBuilder<LangameResponse<LangameChannel>>(
-        future: p.getChannel(widget.notification.channelName!),
+        future: p.getChannel(widget.channelName),
         builder: (c, s) {
           if (s.hasError) _handleError();
           if (s.hasData &&
@@ -201,8 +200,8 @@ class _LangameViewState extends State<LangameView> {
       ChannelUserLangameUser player =
           channel!.players.firstWhere((p) => p.langameUid == ap.user?.uid);
       return FutureBuilder<LangameResponse<void>>(
-          future: p.joinChannel(channelToken!, widget.notification.channelName!,
-              player.channelUid),
+          future: p.joinChannel(
+              channelToken!, widget.channelName, player.channelUid),
           builder: (c, s) {
             if (s.hasError) _handleError();
             if (s.hasData &&
@@ -249,9 +248,7 @@ class _LangameViewState extends State<LangameView> {
               children: [
                 _buildTimerText(),
                 _buildQuestion(),
-                Spacer(),
                 _buildBottomHalf(),
-                SizedBox(height: AppSize.safeBlockVertical * 5),
               ],
             ),
           );
@@ -260,6 +257,8 @@ class _LangameViewState extends State<LangameView> {
   @override
   void dispose() {
     super.dispose();
+    Provider.of<AudioProvider>(AppConst.navKey.currentContext!, listen: false)
+        .stopTimer();
     Provider.of<AudioProvider>(AppConst.navKey.currentContext!, listen: false)
         .leaveChannel(); // TODO: might fail?
   }
@@ -341,7 +340,7 @@ class _LangameViewState extends State<LangameView> {
               reason: 'failed to start langame', fatal: true);
       return;
     }
-    setState(() => errors++);
+    _postFrameCallback((_) => setState(() => errors++));
   }
 
   void _postFrameCallback(FrameCallback callback) {
@@ -350,8 +349,8 @@ class _LangameViewState extends State<LangameView> {
 
   Widget _buildLoading({String? text}) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Spacer(),
         Text(
           text ?? '',
           style: Theme.of(context).textTheme.headline6,
@@ -361,7 +360,6 @@ class _LangameViewState extends State<LangameView> {
               ? Colors.white
               : Colors.black,
         ),
-        Spacer(),
       ],
     );
   }
@@ -393,10 +391,12 @@ class _LangameViewState extends State<LangameView> {
               analyticsParameters: {
                 'uid': joinedPlayers[uid]?.langameUser.uid
               });
+          final String? displayName =
+              joinedPlayers[uid]?.langameUser.displayName;
           setState(() {
             joinedPlayers.remove(uid);
           });
-          _onEnd(left: joinedPlayers[uid]?.langameUser.displayName);
+          _onEnd(left: displayName);
         },
         userJoined: (int uid, int _) {
           var joinerIds =
@@ -552,8 +552,8 @@ class _LangameViewState extends State<LangameView> {
     var theme = Theme.of(context);
     return Center(
       child: Container(
-        height: AppSize.blockSizeVertical * 20,
-        width: AppSize.blockSizeHorizontal * 70,
+        height: AppSize.blockSizeVertical * 30,
+        width: AppSize.blockSizeHorizontal * 85,
         color: Colors.transparent,
         child: Container(
           padding: EdgeInsets.all(12),
@@ -573,71 +573,73 @@ class _LangameViewState extends State<LangameView> {
   }
 
   Widget _buildBottomHalf() {
-    return Column(
-      children: [
-        Divider(),
-        Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(40.0)),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.primaryVariant,
-              width: 5,
+    return Expanded(
+      child: Column(
+        children: [
+          Divider(),
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(40.0)),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primaryVariant,
+                width: 5,
+              ),
+              color: Theme.of(context).colorScheme.primary,
             ),
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          width: AppSize.blockSizeHorizontal * 80,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: joinedPlayers.values
-                  .map(
-                    (p) => Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(40),
+            width: AppSize.blockSizeHorizontal * 80,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: joinedPlayers.values
+                    .map(
+                      (p) => Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(40),
+                              ),
+                              border: Border.all(
+                                width: 10,
+                                color: p.isSpeaking
+                                    ? Colors.red
+                                    : Theme.of(context).colorScheme.primary,
+                                style: BorderStyle.solid,
+                              ),
                             ),
-                            border: Border.all(
-                              width: 10,
-                              color: p.isSpeaking
-                                  ? Colors.red
-                                  : Theme.of(context).colorScheme.primary,
-                              style: BorderStyle.solid,
+                            child: Center(
+                              child: buildCroppedRoundedNetworkImage(
+                                  p.langameUser.photoUrl),
                             ),
                           ),
-                          child: Center(
-                            child: buildCroppedRoundedNetworkImage(
-                                p.langameUser.photoUrl),
-                          ),
-                        ),
-                        // Icon(Icons
-                        //     .mic_rounded), // TODO: use show if other has mic on or not
-                      ],
-                    ),
-                  )
-                  .toList()),
-        ),
-        SizedBox(height: AppSize.safeBlockVertical * 5),
-        Consumer<AudioProvider>(
-            builder: (context, p, child) => Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(
-                        icon: Icon(p.isMicrophoneEnabled
-                            ? Icons.mic_rounded
-                            : Icons.mic_off_rounded),
-                        onPressed: () => p.switchMicrophone(),
+                          // Icon(Icons
+                          //     .mic_rounded), // TODO: use show if other has mic on or not
+                        ],
                       ),
-                      // TODO: does not work somehow, not rly mandatory
-                      // IconButton(
-                      //   icon: Icon(p.isSpeakerphoneEnabled
-                      //       ? Icons.speaker_notes_outlined
-                      //       : Icons.speaker_notes_off_outlined),
-                      //   onPressed: () => p.switchSpeakerphone(),
-                      // )
-                    ])),
-      ],
+                    )
+                    .toList()),
+          ),
+          SizedBox(height: AppSize.safeBlockVertical * 5),
+          Consumer<AudioProvider>(
+              builder: (context, p, child) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IconButton(
+                          icon: Icon(p.isMicrophoneEnabled
+                              ? Icons.mic_rounded
+                              : Icons.mic_off_rounded),
+                          onPressed: () => p.switchMicrophone(),
+                        ),
+                        // TODO: does not work somehow, not rly mandatory
+                        // IconButton(
+                        //   icon: Icon(p.isSpeakerphoneEnabled
+                        //       ? Icons.speaker_notes_outlined
+                        //       : Icons.speaker_notes_off_outlined),
+                        //   onPressed: () => p.switchSpeakerphone(),
+                        // )
+                      ])),
+        ],
+      ),
     );
   }
 

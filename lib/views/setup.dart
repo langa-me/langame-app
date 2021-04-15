@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
@@ -14,6 +15,7 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/views/friends.dart';
+import 'package:langame/views/icons/icons.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
@@ -52,7 +54,7 @@ class _SetupState extends State with AfterLayoutMixin {
     return Scaffold(
       appBar: AppBar(actions: [
         IconButton(
-            icon: Icon(Icons.skip_next_outlined),
+            icon: MovingIcon(Icons.skip_next_outlined, -25, 0),
             tooltip: 'Skip',
             onPressed: () async {
               controller.nextPage(
@@ -132,59 +134,16 @@ class _SetupState extends State with AfterLayoutMixin {
           Container(
             color: Theme.of(context).colorScheme.background,
             child: Center(
-              child: !importRelations
-                  ? Tooltip(
-                      message: 'Feature disabled for testing!',
-                      textStyle: Theme.of(context).textTheme.button,
-                      child: OutlinedButton.icon(
-                        style: Theme.of(context).elevatedButtonTheme.style,
-                        onPressed: () {
-                          // setState(() {
-                          //   // importRelations = true;
-                          // });
-                        },
-                        icon: Icon(Icons.account_box_outlined,
-                            color: Theme.of(context).colorScheme.secondary),
-                        label: Text('Invite friends?',
-                            style: Theme.of(context).textTheme.button),
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondary,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      height: 50,
-                      padding: const EdgeInsets.all(24.0),
-                      preferBelow: false,
-                      showDuration: const Duration(seconds: 2),
-                      waitDuration: const Duration(milliseconds: 100),
-                    )
-                  : FutureBuilder<LangameResponse>(
-                      future: Provider.of<AuthenticationProvider>(context,
-                              listen: false)
-                          .getRelations(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          final snackBar = SnackBar(
-                            content: Text(!kReleaseMode
-                                ? 'Could not import relations! ${snapshot.error.toString()}'
-                                : Provider.of<FunnyProvider>(context,
-                                        listen: false)
-                                    .getFailingRandom()),
-                          );
-
-                          // Find the ScaffoldMessenger in the widget tree
-                          // and use it to show a SnackBar.
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          // Reset to initial state
-                          setState(() {
-                            importRelations = false;
-                          });
-                        } else if (snapshot.hasData &&
-                            snapshot.data!.status == LangameStatus.succeed) {
-                          return _buildContactList();
-                        }
-                        return Center(child: CircularProgressIndicator());
-                      }),
+              child: OutlinedButton.icon(
+                style: Theme.of(context).elevatedButtonTheme.style,
+                onPressed: () {
+                  showBasicSnackBar(context, 'feature not implemented yet!');
+                },
+                icon: Icon(Icons.account_box_outlined,
+                    color: Theme.of(context).colorScheme.secondary),
+                label: Text('Invite friends?',
+                    style: Theme.of(context).textTheme.button),
+              ),
             ),
           ),
           Padding(
@@ -212,6 +171,8 @@ class _SetupState extends State with AfterLayoutMixin {
                       return Center(
                         child: ToggleButton(
                             onChange: (bool selected) {
+                              showBasicSnackBar(
+                                  context, 'this feature has no impact yet');
                               if (selected)
                                 favouriteTopics.add(t);
                               else
@@ -261,7 +222,7 @@ class _SetupState extends State with AfterLayoutMixin {
             maxLength: 8,
             // The validator receives the text that the user has entered.
             validator: (value) {
-              // TODO: instead if not picking a custom tag, find one according to user data
+              showBasicSnackBar(context, 'this is not implemented yet!');
               // TODO: validation should at least check availability of tag
               // TODO: and maybe check profanity (funniest part)
               if (value == null || value.isEmpty) {
@@ -278,8 +239,8 @@ class _SetupState extends State with AfterLayoutMixin {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('Processing Data')));
+                  // ScaffoldMessenger.of(context)
+                  //     .showSnackBar(SnackBar(content: Text('Processing Data')));
                 }
               },
               child: Text('Submit'),
@@ -288,41 +249,5 @@ class _SetupState extends State with AfterLayoutMixin {
         ],
       ),
     );
-  }
-
-  Widget _buildContactList() {
-    return Consumer<AuthenticationProvider>(builder: (context, p, child) {
-      var noContacts = Center(child: Text('You have no contacts to import'));
-      if (p.relations == null) {
-        return noContacts;
-      }
-      var externalContacts =
-          p.relations!.relations.where((e) => !e.other.isALangameUser).toList();
-      // Has no external contacts that did not join Langame
-      if (externalContacts.length == 0) {
-        return noContacts;
-      }
-      return ListView.separated(
-        itemBuilder: (BuildContext context, int index) {
-          return Center(
-            child: ToggleButton(
-                onChange: (bool selected) {
-                  if (selected)
-                    contactsToInvite.add(externalContacts[index].other);
-                  else
-                    contactsToInvite.removeWhere(
-                        (e) => e.email == externalContacts[index].other.email);
-                },
-                width: AppSize.blockSizeHorizontal * 70,
-                textUnselected: externalContacts[index].other.displayName!,
-                textSelected: externalContacts[index].other.displayName!),
-          );
-        },
-        itemCount: externalContacts.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return SizedBox(height: 4);
-        },
-      );
-    });
   }
 }

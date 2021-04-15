@@ -38,12 +38,6 @@ class FakeAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<LangameUserRelations> getRelations(LangameUser user) {
-    // TODO: implement getRelations
-    throw UnimplementedError();
-  }
-
-  @override
   Future<OAuthCredential> loginWithApple() {
     // TODO: implement loginWithApple
     throw UnimplementedError();

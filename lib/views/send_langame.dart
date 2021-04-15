@@ -6,12 +6,14 @@ import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
+import 'langame.dart';
 
 class SendLangameView extends StatefulWidget {
   SendLangameView();
@@ -94,32 +96,66 @@ class _SendLangameState extends State<SendLangameView>
           ]);
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Consumer<LangameProvider>(
-        builder: (context, l, child) => FloatingActionButton.extended(
-          onPressed: () {
-            if (selectedTopics.isEmpty) {
-              showBasicSnackBar(context, 'You must select at least one topics');
-              return;
-            }
-            if (selectedTopics.length > 3) {
-              // TODO: better UX
-              showBasicSnackBar(
-                  context, 'You must select a maximum of 3 topics');
-              return;
-            }
-            Provider.of<AuthenticationProvider>(context, listen: false)
-                .send(l.shoppingList, selectedTopics);
-            showToast(
-                'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
-            Navigator.pop(context);
-            // TODO: offer to join the langame now
-          },
-          label: const Text('Send invitation'),
-          icon: const Icon(Icons.send_outlined),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
+        builder: (context, l, child) => Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FloatingActionButton.extended(
+              heroTag: 'join_now',
+              onPressed: () async {
+                var channelName = await _handleFloatingPressed(l);
+                if (channelName == null) {
+                  showToast(
+                      Provider.of<FunnyProvider>(context, listen: false)
+                          .getFailingRandom(),
+                      color: Colors.red);
+                  return;
+                }
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LangameView(channelName, false)),
+                );
+              },
+              label: const Text('Join now'),
+              icon: const Icon(Icons.phone_in_talk_outlined),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+            ),
+            FloatingActionButton.extended(
+              heroTag: 'join_later',
+              onPressed: () {
+                _handleFloatingPressed(l);
+                Navigator.pop(context);
+              },
+              label: const Text('Join later'),
+              icon: const Icon(Icons.send_outlined),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Future<String?> _handleFloatingPressed(LangameProvider l) async {
+    if (selectedTopics.isEmpty) {
+      showBasicSnackBar(context, 'You must select at least one topics');
+      return null;
+    }
+    if (selectedTopics.length > 3) {
+      // TODO: better UX
+      showBasicSnackBar(context, 'You must select a maximum of 3 topics');
+      return null;
+    }
+
+    showToast(
+        'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
+    var res = await Provider.of<AuthenticationProvider>(context, listen: false)
+        .send(l.shoppingList, selectedTopics);
+    setState(selectedTopics.clear);
+
+    return res.result;
   }
 
   Widget _buildPlayerCard(

@@ -88,8 +88,8 @@ class _NotificationsViewState extends State<NotificationsView> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            LangameView(n, n.ready == null || !n.ready!),
+                        builder: (context) => LangameView(
+                            n.channelName!, n.ready == null || !n.ready!),
                       ),
                     );
                   },
@@ -111,7 +111,8 @@ void onBackgroundOrForegroundOpened(LangameNotification? n) {
   if (n?.channelName != null) {
     AppConst.navKey.currentState?.pushReplacement(
       MaterialPageRoute(
-        builder: (context) => LangameView(n!, n.ready == null || !n.ready!),
+        builder: (context) =>
+            LangameView(n!.channelName!, n.ready == null || !n.ready!),
       ),
     );
   } else {

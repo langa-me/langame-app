@@ -145,7 +145,7 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<void> send(List<String> recipients, List<String> topics) async {
+  Future<String> send(List<String> recipients, List<String> topics) async {
     HttpsCallable callable = firebase.functions.httpsCallable(
         AppConst.sendLangameFunction,
         options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
@@ -157,12 +157,14 @@ class ImplMessageApi extends MessageApi {
           'topics': topics,
         },
       );
-      print(result.data);
+      debugPrint('send!');
+      debugPrint(result.data.toString());
       FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
           Map<String, dynamic>.from(result.data));
+      debugPrint(response.toJson().toString());
       switch (response.statusCode) {
         case FirebaseFunctionsResponseStatusCode.OK:
-          break;
+          return response.result!['channelName'];
         case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
           throw LangameSendLangameException(response.errorMessage ??
               FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
