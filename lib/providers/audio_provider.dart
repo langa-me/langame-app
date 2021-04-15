@@ -4,11 +4,13 @@ import 'dart:core';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quiver/async.dart';
+import 'package:retry/retry.dart';
 
 /// [AudioProvider] handles logic for audio communication
 /// currently only supporting Agora
@@ -36,7 +38,7 @@ class AudioProvider extends ChangeNotifier {
       // Ignore
       if (_sub != null) return LangameResponse(LangameStatus.succeed);
       CountdownTimer countDownTimer = CountdownTimer(
-        Duration(minutes: 15),
+        Duration(minutes: 1),
         Duration(seconds: 1),
       );
 
@@ -109,9 +111,18 @@ class AudioProvider extends ChangeNotifier {
   Future<LangameResponse<void>> joinChannel(
       String token, String channel, int agoraUid) async {
     try {
-      debugPrint(
-          'trying to join channel $channel with token $token with uid $agoraUid');
-      await _engine?.joinChannel(token, channel, null, agoraUid);
+      final msg =
+          'trying to join channel $channel with token $token with uid $agoraUid';
+      debugPrint(msg);
+      firebase.crashlytics.log(msg);
+
+      final r = RetryOptions(maxAttempts: 3);
+      await r.retry(
+        () => _engine
+            ?.joinChannel(token, channel, null, agoraUid)
+            .timeout(Duration(seconds: 5)),
+        retryIf: (e) => e is PlatformException || e is TimeoutException,
+      );
     } catch (e, s) {
       firebase.crashlytics.log('failed to join channel $channel');
       firebase.crashlytics.recordError(e, s);

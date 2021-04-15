@@ -15,9 +15,9 @@ import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/apple.dart';
+import 'dialogs/dialogs.dart';
 import 'friends.dart';
 import 'langame.dart';
-import 'loaders/dialogs.dart';
 import 'notifications.dart';
 
 class Login extends StatefulWidget {

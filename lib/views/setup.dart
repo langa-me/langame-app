@@ -17,7 +17,7 @@ import 'package:langame/views/friends.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
-import 'loaders/dialogs.dart';
+import 'dialogs/dialogs.dart';
 import 'notifications.dart';
 
 /// Setup the app for the user (topics, friends...)

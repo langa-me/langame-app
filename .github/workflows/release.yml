@@ -56,7 +56,7 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
       - run: flutter build apk --release --flavor prod
-      - uses: actions/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7.2'
       - name: Run Fastlane

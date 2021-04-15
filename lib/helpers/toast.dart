@@ -12,7 +12,9 @@ void showBasicSnackBar(BuildContext context, String message) {
 }
 
 void showToast(String message,
-    {Color color = Colors.green, double fontSize = 16.0}) {
+    {Color color = Colors.green,
+    Color textColor = Colors.white,
+    double fontSize = 16.0}) {
   if (!kReleaseMode) debugPrint(message);
   Fluttertoast.showToast(
     msg: message,
@@ -20,7 +22,7 @@ void showToast(String message,
     gravity: ToastGravity.BOTTOM,
     timeInSecForIosWeb: 1,
     backgroundColor: color,
-    textColor: Colors.white,
+    textColor: textColor,
     fontSize: fontSize,
   );
 }
