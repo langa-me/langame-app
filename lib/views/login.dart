@@ -48,6 +48,7 @@ class _LoginState extends State<Login> {
     final provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
     Provider.of<FeedbackProvider>(context, listen: false).initShake();
+
     // Bunch of spaghetti code to check if it is a new user or already authenticated
     provider.userStream.first.then((user) {
       if (user == null || successDialogFuture != null) return null;
@@ -116,10 +117,9 @@ class _LoginState extends State<Login> {
           );
         });
       }
-      setState(() {
-        buttonsDisabled = false;
-      });
     });
+    if (provider.user == null) setState(() => buttonsDisabled = false);
+
     var logins = <Widget>[
       FacebookSignInButton(
           onPressed: () {

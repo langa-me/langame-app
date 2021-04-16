@@ -1,0 +1,2 @@
+- Improved send Langame page
+- Much better notification management, deletion, background open etc.
