@@ -34,6 +34,6 @@ abstract class MessageApi {
 
   /// Fetch a message
   Future<LangameNotification?> fetch(String id);
-  Future<List<LangameNotification>?> fetchAll();
+  Future<List<LangameNotification>> fetchAll();
   Future<void> delete(String id);
 }

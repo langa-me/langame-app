@@ -1,8 +1,9 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
-import 'package:langame/views/popup_menu.dart';
+import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
 
 class SettingsView extends StatefulWidget {
@@ -15,6 +16,14 @@ class SettingsView extends StatefulWidget {
 // defined example looks like in an application and with commonly used Widgets.
 class _SettingsState extends State<SettingsView> {
   final FlexSchemeData flexSchemeData = FlexColor.schemes[FlexScheme.mandyRed]!;
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .analytics
+        .setCurrentScreen(screenName: 'settings');
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -31,10 +31,14 @@ class _LoginState extends State<Login> {
   final GlobalKey<State> _keySuccess =
       GlobalKey<State>(debugLabel: '_keySuccess');
   Future<void>? successDialogFuture;
+  bool buttonsDisabled = true;
 
   @override
   void initState() {
     super.initState();
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .analytics
+        .setCurrentScreen(screenName: 'login');
   }
 
   @override
@@ -61,42 +65,42 @@ class _LoginState extends State<Login> {
         var ap = Provider.of<AuthenticationProvider>(context, listen: false);
         ap.initializeMessageApi(onBackgroundOrForegroundOpened).then((res) {
           res.thenShowSnackBar(
-              context,
-              res.error.toString().contains('firebase_functions/unavailable')
+              context: context,
+              failedMessage: res.error
+                      .toString()
+                      .contains('firebase_functions/unavailable')
                   ? 'Could not authenticate, please check your internet connection'
                   : !kReleaseMode
                       ? 'failed to initializeMessageApi ${res.error.toString()}'
                       : Provider.of<FunnyProvider>(context, listen: false)
-                          .getFailingRandom(), onSucceed: () {
-            Navigator.of(_keySuccess.currentContext ?? context,
-                    rootNavigator: true)
-                .pop();
-            successDialogFuture = null;
-            ap.messageApi.getInitialMessage().then((n) {
-              // TODO: doesn't work ? n = null
-              // Fluttertoast.showToast(
-              //     msg: 'opening notification senderUid ${n?.senderUid}');
-              if (n != null && n.channelName != null) {
-                Navigator.pushReplacement(
-                  context, // opened the terminated app from a notification
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        LangameView(n.channelName!, n.ready == null || !n.ready!),
-                  ),
-                );
-              } else {
-                // User is not opening the app from a notification
-                Navigator.pushReplacement(
-                  context, // If the already logged has already done the setup
-                  MaterialPageRoute(builder: (context) => FriendsView()),
-                );
-              }
-            });
-          }, onFailure: () {
-            Navigator.of(_keySuccess.currentContext ?? context,
-                    rootNavigator: true)
-                .pop();
-          });
+                          .getFailingRandom(),
+              onSucceed: () {
+                Navigator.of(_keySuccess.currentContext ?? context,
+                        rootNavigator: true)
+                    .pop();
+                successDialogFuture = null;
+                ap.messageApi.getInitialMessage().then((n) {
+                  if (n != null && n.channelName != null) {
+                    Navigator.pushReplacement(
+                      context, // opened the terminated app from a notification
+                      MaterialPageRoute(
+                        builder: (context) => LangameView(
+                            n.channelName!, n.ready == null || !n.ready!),
+                      ),
+                    );
+                  } else {
+                    // User is not opening the app from a notification
+                    Navigator.pushReplacement(
+                      context, // If the already logged has already done the setup
+                      MaterialPageRoute(builder: (context) => FriendsView()),
+                    );
+                  }
+                });
+              },
+              onFailure: () => Navigator.of(
+                      _keySuccess.currentContext ?? context,
+                      rootNavigator: true)
+                  .pop());
         });
       } else {
         // User previously authenticated but didn't do setup
@@ -112,10 +116,14 @@ class _LoginState extends State<Login> {
           );
         });
       }
+      setState(() {
+        buttonsDisabled = false;
+      });
     });
     var logins = <Widget>[
       FacebookSignInButton(
           onPressed: () {
+            if (buttonsDisabled) return;
             showBasicSnackBar(
                 context, 'Facebook authentication is coming soon!');
             // await _handleOnPressedLogin(provider.loginWithFacebook, 'Facebook');
@@ -123,11 +131,13 @@ class _LoginState extends State<Login> {
           splashColor: Theme.of(context).colorScheme.primary),
       GoogleSignInButton(
           onPressed: () async {
+            if (buttonsDisabled) return;
             await _handleOnPressedLogin(provider.loginWithGoogle, 'Google');
           },
           splashColor: Theme.of(context).colorScheme.primary),
       AppleSignInButton(
           onPressed: () {
+            if (buttonsDisabled) return;
             showBasicSnackBar(context, 'Apple authentication is coming soon!');
             // await _handleOnPressedLogin(provider.loginWithApple, 'Apple');
           },
@@ -180,8 +190,10 @@ class _LoginState extends State<Login> {
             .logSignUp(signUpMethod: entity);
       }
       res.thenShowSnackBar(
-        context,
-        res.error.toString().contains('network_error') // TODO: hack
+        context: context,
+        failedMessage: res.error
+                .toString()
+                .contains('network_error') // TODO: hack
             ? 'Could not authenticate, please check your internet connection'
             : !kReleaseMode
                 ? 'failed to login to $entity, ${res.error.toString()}'

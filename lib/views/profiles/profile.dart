@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/user.dart';
 
-import 'image.dart';
+import '../images/image.dart';
 
 class Profile extends StatelessWidget {
   final LangameUser _user;

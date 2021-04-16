@@ -146,7 +146,7 @@ class AudioProvider extends ChangeNotifier {
   Future<LangameResponse<void>> leaveChannel() async {
     try {
       await _engine?.leaveChannel();
-      _engine?.destroy();
+      await _engine?.destroy();
       _engine = null;
     } catch (e, s) {
       firebase.crashlytics.log('failed to leaveChannel');

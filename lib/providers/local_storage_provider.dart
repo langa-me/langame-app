@@ -89,7 +89,6 @@ class LocalStorageProvider extends ChangeNotifier {
   void placeFirstSearchHistory(String tag) {
     _searchTagHistory.removeWhere((e) => e == tag);
     _searchTagHistory.add(tag);
-    debugPrint('${_searchTagHistory.toList()}'); // TODO: set = unordered
   }
 
   void deleteSearchHistory(String tag) {

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:langame/helpers/constants.dart';
@@ -101,12 +100,9 @@ class ImplAuthenticationApi extends AuthenticationApi {
     LangameUser langameUser = LangameUser.fromFirebaseUser(user);
     var t = await _generateTag(user);
     if (user.providerData.any((e) => e.providerId == 'google.com')) {
-      if (!kReleaseMode)
-        debugPrint('${user.displayName} is authenticated with google.com');
       langameUser.google = true;
     }
     langameUser.tag = t.toLowerCase();
-    if (!kReleaseMode) debugPrint('add $t');
     return users
         .doc(langameUser.uid)
         .set(langameUser.toJson())

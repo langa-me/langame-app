@@ -5,11 +5,12 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/notification.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/views/popup_menu.dart';
+import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
 
-import 'image.dart';
+import 'images/image.dart';
 import 'langame.dart';
 
 class NotificationsView extends StatefulWidget {
@@ -18,6 +19,14 @@ class NotificationsView extends StatefulWidget {
 }
 
 class _NotificationsViewState extends State<NotificationsView> {
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .analytics
+        .setCurrentScreen(screenName: 'notifications');
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -61,16 +70,20 @@ class _NotificationsViewState extends State<NotificationsView> {
               n.topics != null) {
             return Dismissible(
               // Show a red background as the item is swiped away.
-              background: Container(color: Colors.red),
+              background:
+                  Container(color: Theme.of(context).colorScheme.secondary),
               key: Key(n.id!),
               onDismissed: (direction) async {
                 if (i > p.notifications.length) return; // Already deleted?
                 var res = await p.deleteNotification(n.id!);
-                res.thenShowToast(
-                    'Notification deleted!',
-                    Provider.of<FunnyProvider>(context, listen: false)
-                        .getFailingRandom(),
-                    onSucceed: setState);
+                res.thenShowSnackBar(
+                  context: context,
+                  succeedMessage: 'Notification deleted!',
+                  failedMessage:
+                      Provider.of<FunnyProvider>(context, listen: false)
+                          .getFailingRandom(),
+                  // onSucceed: () => setState(() {}),
+                );
               },
               child: Card(
                 child: ListTile(

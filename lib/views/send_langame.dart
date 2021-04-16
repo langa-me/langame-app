@@ -6,7 +6,7 @@ import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -30,6 +30,9 @@ class _SendLangameState extends State<SendLangameView>
 
   @override
   void afterFirstLayout(BuildContext context) {
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .analytics
+        .setCurrentScreen(screenName: 'send_langame');
     Provider.of<TopicProvider>(context, listen: false).getAllTopics();
   }
 
@@ -106,10 +109,6 @@ class _SendLangameState extends State<SendLangameView>
               onPressed: () async {
                 var channelName = await _handleFloatingPressed(l);
                 if (channelName == null) {
-                  showToast(
-                      Provider.of<FunnyProvider>(context, listen: false)
-                          .getFailingRandom(),
-                      color: Colors.red);
                   return;
                 }
                 Navigator.pushReplacement(
@@ -124,8 +123,9 @@ class _SendLangameState extends State<SendLangameView>
             ),
             FloatingActionButton.extended(
               heroTag: 'join_later',
-              onPressed: () {
-                _handleFloatingPressed(l);
+              onPressed: () async {
+                var channelName = await _handleFloatingPressed(l);
+                if (channelName == null) return;
                 Navigator.pop(context);
               },
               label: const Text('Join later'),
@@ -149,7 +149,7 @@ class _SendLangameState extends State<SendLangameView>
       return null;
     }
 
-    showToast(
+    showBasicSnackBar(context,
         'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
     var res = await Provider.of<AuthenticationProvider>(context, listen: false)
         .send(l.shoppingList, selectedTopics);

@@ -14,12 +14,11 @@ import {
   generateAgoraRtcToken, getLangame,
   getUserData,
   handleSendToDevice,
-  hashFnv32a,
+  hashFnv32a, kBetasCollection,
   kInvalidRequest,
   kLangamesCollection,
   kNotAuthenticated,
-  kNotificationsCollection,
-  kUsersCollection,
+  kNotificationsCollection, kUsersCollection,
 } from "./helpers";
 import {newFeedback} from "./feedback";
 // Initialize admin firebase
@@ -39,6 +38,90 @@ const runtimeOpts = {
   maxInstances: 10,
 };
 // TODO: spawn function in EU!!
+
+const callers = new Map();
+const maxCalls = 10;
+// Every 10 seconds, reduce the rate limit of every caller by one
+setInterval(() => {
+  callers.forEach(function(part, index, callers) {
+    if (part === 0) return;
+    callers.set(index, part-1);
+  });
+}, 10_00);
+
+/**
+ *
+ * @type {HttpsFunction & Runnable<any>}
+ */
+exports.subscribe = functions
+    .runWith(runtimeOpts)
+    .https
+    .onCall(async (data, context) => {
+      const caller = callers.get(context.rawRequest.headers.origin);
+      if (caller > maxCalls) {
+        return new FirebaseFunctionsResponse(
+            429,
+            undefined,
+            "too many requests",
+        );
+      }
+      callers.set(context.rawRequest.headers.origin, caller ? caller+1 : 1);
+
+      if (!data) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            kInvalidRequest,
+        );
+      }
+      if (!data.email) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            "you must provide a valid email",
+        );
+      }
+
+      functions.logger.info("trying to register new beta user", data.email);
+
+      const existing = await admin
+          .firestore()
+          .collection(kBetasCollection)
+          .where("email", "==", data.email)
+          .get();
+
+      if (existing.docs.some((d) => d.exists)) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            "already subscribed",
+        );
+      }
+
+
+      return admin
+          .firestore()
+          .collection(kBetasCollection)
+          .add({email: data.email, date: Date.now()})
+          .then((_) => {
+            functions.logger.info("new beta user", data.email);
+            return new FirebaseFunctionsResponse(
+                FirebaseFunctionsResponseStatusCode.OK,
+                undefined,
+                undefined,
+            );
+          }).catch((e) => {
+            functions.
+                logger.
+                error("failed to add new beta user", data.email, e);
+
+            return new FirebaseFunctionsResponse(
+                FirebaseFunctionsResponseStatusCode.INTERNAL,
+                undefined,
+                "failed to add beta email",
+            );
+          });
+    });
 
 /**
  * Generate an audio channel token for the user

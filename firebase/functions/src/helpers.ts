@@ -28,6 +28,7 @@ export const kNotificationsCollection: string = "notifications";
 export const kLangamesCollection: string = "langames";
 export const kTagsCollection: string = "tags";
 export const kQuestionsCollection: string = "questions";
+export const kBetasCollection: string = "betas";
 
 export const filterOutSendLangameCalls =
     (data: any, context: functions.https.CallableContext) => {

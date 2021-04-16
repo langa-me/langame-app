@@ -15,3 +15,50 @@ message Tag {
   string question = 5;
   // TODO: metadata about model used, version etc.
 }
+
+message User {
+    /// [uid] is set by Firebase authentication
+    string uid = 1;
+    string email = 2;
+    string display_name = 3;
+    // bool emailVerified = false;
+    string phone_number = 4;
+    string photo_url = 5;
+
+    /// Is the user [online]?
+    bool online = 6;
+
+    /// Google account linked?
+    bool google = 7;
+
+    /// Facebook account linked?
+    bool facebook = 8;
+
+    /// Apple account linked?
+    bool apple = 9;
+
+    /// Favourite topics the user has picked, should impact recommendations
+    repeated string favourite_topics = 10;
+
+    /// Twitter-like [tag] i.e. @steveTheApple
+    string tag = 11;
+
+    /// Device [tokens] used for Cloud Messaging
+    repeated string tokens = 12;
+}
+
+/// Evaluated relationship between users using AI + heuristics
+message Relation {
+    User other = 1;
+    RelationLevel level = 2;
+
+    // Langame played together
+    //  int64 interactions = 1;
+
+    enum RelationLevel {
+        BAD = 0;
+        AVERAGE = 1;
+        GREAT = 2;
+    }
+}
+

@@ -11,6 +11,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
@@ -46,6 +47,9 @@ class _SetupState extends State with AfterLayoutMixin {
 
   @override
   void afterFirstLayout(BuildContext context) {
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .analytics
+        .setCurrentScreen(screenName: 'setup');
     Provider.of<TopicProvider>(context, listen: false).getAllTopics();
   }
 
@@ -88,8 +92,8 @@ class _SetupState extends State with AfterLayoutMixin {
               Navigator.of(_keyLoader.currentContext!, rootNavigator: true)
                   .pop();
               res.thenShowSnackBar(
-                  context,
-                  !kReleaseMode
+                  context: context,
+                  failedMessage: !kReleaseMode
                       ? 'failed to initialize the application, ${res.error.toString()}'
                       : Provider.of<FunnyProvider>(context, listen: false)
                           .getFailingRandom(),

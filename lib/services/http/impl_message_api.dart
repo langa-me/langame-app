@@ -41,8 +41,6 @@ class ImplMessageApi extends MessageApi {
   void _add(RemoteMessage m) async {
     RemoteNotification? notification = m.notification;
     AndroidNotification? android = m.notification?.android;
-    debugPrint(
-        'message: ${jsonEncode(m.data)} - ${m.notification?.android?.tag}');
     if (notification != null && android != null) {
       flutterLocalNotificationsPlugin
           .show(
@@ -109,7 +107,6 @@ class ImplMessageApi extends MessageApi {
       var n = await fetch(pJson['id']);
       if (n == null) onBackgroundOrForegroundOpened(null);
       n!.id = pJson['id'];
-      debugPrint('click ${n.toJson()}');
       onBackgroundOrForegroundOpened(n);
     });
 
@@ -157,11 +154,8 @@ class ImplMessageApi extends MessageApi {
           'topics': topics,
         },
       );
-      debugPrint('send!');
-      debugPrint(result.data.toString());
       FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
           Map<String, dynamic>.from(result.data));
-      debugPrint(response.toJson().toString());
       switch (response.statusCode) {
         case FirebaseFunctionsResponseStatusCode.OK:
           return response.result!['channelName'];
@@ -244,7 +238,6 @@ class ImplMessageApi extends MessageApi {
     _onNonTerminatedOpened = FirebaseMessaging.onMessageOpenedApp
         .listen((m) => fetch(m.data['id']).then((n) {
               n?.id = m.data['id'];
-              debugPrint('opened ${n?.toJson()}');
               onBackgroundOrForegroundOpened(n);
             }));
     runZonedGuarded(() {
@@ -286,31 +279,29 @@ class ImplMessageApi extends MessageApi {
   }
 
   // TODO: might do a 'fetch non-acknowledged notifications'
-  Future<List<LangameNotification>?> fetchAll() async {
+  Future<List<LangameNotification>> fetchAll() async {
     CollectionReference notifications = firebase.firestore
         .collection(AppConst.firestoreNotificationsCollection);
     QuerySnapshot query = await notifications
         .where('recipientsUid', arrayContains: firebase.auth.currentUser?.uid)
         .get();
     // If there is any non-null notifications, return all of them
-    if (query.docs.any((n) => n.exists)) {
-      return query.docs.where((n) => n.exists).map((n) {
-        var ln = LangameNotification.fromJson(n.data());
-        ln.id = n.data()['id'];
-        return ln;
-      }).toList();
-    } else {
-      throw LangameMessageException(
-          'could not find any notifications for current user');
-    }
+    return query.docs.where((n) => n.exists).map((n) {
+      var ln = LangameNotification.fromJson(n.data());
+      ln.id = n.id;
+      return ln;
+    }).toList();
   }
 
   @override
   Future<void> delete(String id) async {
+    firebase.firestore
+        .collection(AppConst.firestoreNotificationsCollection)
+        .doc(id)
+        .delete();
+    // TODO: not sure it every worked? (trying to delete notifications in status bar)
     int? localNotification = localNotifications[id];
-    if (localNotification == null) {
-      throw LangameMessageException('unable to find local notification id');
-    }
+    if (localNotification == null) return;
     Future f = flutterLocalNotificationsPlugin.cancel(localNotification);
     f.then((_) => localNotifications.remove(id));
     return f;
@@ -356,10 +347,12 @@ class ImplMessageApi extends MessageApi {
 
   @override
   Future<LangameNotification?> getInitialMessage() async {
-    var m = await firebase.messaging.getInitialMessage();
-    if (m == null) return null;
-    var n = LangameNotification.fromJson(m.data);
-    n.id = m.data['id'];
-    return n;
+    var rawNotification =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    if (rawNotification == null || rawNotification.payload == null) return null;
+    var json = jsonDecode(rawNotification.payload!);
+    if (json['id'] == null) return null;
+    var notification = await fetch(json['id']);
+    return notification;
   }
 }

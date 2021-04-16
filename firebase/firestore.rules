@@ -11,6 +11,7 @@ service cloud.firestore {
         match /notifications/{notificationId} {
             // Only allow self notification access
             allow read: if request.auth != null && request.auth.uid in resource.data.recipientsUid;
+            allow delete: if request.auth != null && request.auth.uid in resource.data.recipientsUid;
         }
         match /langames/{langameId} {
             // Only allow access to invited Langames

@@ -1,18 +1,18 @@
-import 'package:after_layout/after_layout.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
-import 'package:langame/views/profile.dart';
+import 'package:langame/views/profiles/profile.dart';
 import 'package:langame/views/send_langame.dart';
 import 'package:langame/views/settings.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
-import 'image.dart';
+import 'images/image.dart';
 import 'notifications.dart';
 
 class FriendsView extends StatefulWidget {
@@ -21,23 +21,20 @@ class FriendsView extends StatefulWidget {
 }
 
 /// Main page of Langame (temporary name...)
-class _FriendsViewState extends State<FriendsView>
-    with AfterLayoutMixin<FriendsView> {
+class _FriendsViewState extends State<FriendsView> {
   int _selectedIndex = 0;
   late FloatingSearchBarController _searchBarController;
   PageController _pageController = PageController(
     initialPage: 0,
   );
 
-  @override
-  void afterFirstLayout(BuildContext context) {
-    // Provider.of<AuthenticationProvider>(context, listen: false).getRelations();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
+      floatingActionButton: _buildFloatingButtons(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: _buildPageView(),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -46,6 +43,9 @@ class _FriendsViewState extends State<FriendsView>
   @override
   void initState() {
     super.initState();
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).analytics.setCurrentScreen(screenName: 'friends');
+    Provider.of<AuthenticationProvider>(context, listen: false)
+        .fetchNotifications();
     _searchBarController = FloatingSearchBarController();
   }
 
@@ -80,57 +80,52 @@ class _FriendsViewState extends State<FriendsView>
       );
     });
     return AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        leading: notifications,
-        actions: <Widget>[
-          SizedBox(width: AppSize.blockSizeHorizontal * 25),
-          Consumer<LangameProvider>(
-            builder: (context, l, child) => l.shoppingList.length == 0
-                ? SizedBox.shrink()
-                : ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        Theme.of(context).colorScheme.primaryVariant,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SendLangameView(),
-                        ),
-                      );
-                    },
-                    child: Row(children: [
-                      Text('Current Langame'),
-                      Badge(
-                        badgeContent: Text(
-                          '${l.shoppingList.length}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        child: Icon(Icons.shopping_cart_outlined),
-                        padding: const EdgeInsets.all(3.0),
-                        position: BadgePosition.topStart(top: 7, start: 10),
-                      )
-                    ]),
-                  ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      leading: notifications,
+      actions: [
+        IconButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingsView()),
           ),
-          Spacer(),
-          IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SettingsView()),
-            ),
-            icon: Icon(
-              Icons.settings_outlined,
-              color: Colors.white,
-            ),
+          icon: Icon(
+            Icons.settings_outlined,
+            color: Colors.white,
           ),
-        ]);
+        ),
+      ],
+    );
   }
+
+  Widget _buildFloatingButtons() => Consumer<LangameProvider>(
+        builder: (context, l, child) => l.shoppingList.length == 0
+            ? SizedBox.shrink()
+            : FloatingActionButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(15.0),
+                  ),
+                ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SendLangameView(),
+                  ),
+                ),
+                child: Badge(
+                  badgeContent: Text(
+                    '${l.shoppingList.length}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  child: Icon(Icons.shopping_cart_outlined),
+                  padding: const EdgeInsets.all(3.0),
+                  position: BadgePosition.topStart(top: 7, start: 10),
+                ),
+              ),
+      );
 
   Widget _buildPageView() {
     return PageView(
@@ -165,6 +160,7 @@ class _FriendsViewState extends State<FriendsView>
           builder: (context, lsp, ap, _) => FloatingSearchBar(
             queryStyle: Theme.of(context).textTheme.headline6,
             controller: _searchBarController,
+            automaticallyImplyBackButton: false,
             body: FloatingSearchBarScrollNotifier(
               child: Container(
                 // Padding top of default FloatingSearchBar height (48) + app size * 5
@@ -389,31 +385,28 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               ? _onRemoveFromShoppingList(p, lp)
               : _onAddToShoppingList(p, lp),
           borderRadius: 1,
-          splashColor: Theme.of(context).colorScheme.primaryVariant,
+          splashColor: Theme.of(context).colorScheme.secondaryVariant,
           buttonPadding: 4,
-          buttonColor: Theme.of(context).colorScheme.primary,
+          buttonColor: Theme.of(context).colorScheme.secondary,
           children: [
-            Text(lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-                ? 'Remove from current Langame'
-                : 'Add to current Langame'),
+            Text(
+                lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
+                    ? 'Remove'
+                    : 'Add',
+                style: TextStyle(color: Colors.black)),
             Container(
               margin: EdgeInsets.all(10),
-              // decoration: BoxDecoration(
-              //   borderRadius: BorderRadius.circular(3),
-              //   border: Border.all(
-              //     color: Theme.of(context).colorScheme.primary,
-              //     width: 2,
-              //   ),
-              // ),
               child: Icon(
-                  lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-                      ? Icons.remove_shopping_cart_outlined
-                      : Icons.add_shopping_cart_outlined,
-                  size: AppSize.blockSizeHorizontal * 5),
+                lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
+                    ? Icons.remove_shopping_cart_outlined
+                    : Icons.add_shopping_cart_outlined,
+                size: AppSize.blockSizeHorizontal * 5,
+                color: Colors.black,
+              ),
             ),
           ],
         ),
-        SizedBox(height: AppSize.safeBlockVertical * 10)
+        Spacer(),
       ]);
     });
   }

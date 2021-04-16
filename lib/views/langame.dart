@@ -17,7 +17,7 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'friends.dart';
-import 'image.dart';
+import 'images/image.dart';
 
 class LangameView extends StatefulWidget {
   final String channelName;
@@ -54,19 +54,15 @@ class _LangameViewState extends State<LangameView> {
   @override
   void initState() {
     super.initState();
-    if (!widget.notifyOthers) return;
-    Provider.of<AuthenticationProvider>(context, listen: false)
-        .sendReadyForLangame(widget.channelName);
-    // showToast(
-    //   'Your friends have been told of your presence!',
-    //   color: Theme.of(context).colorScheme.primary,
-    //   textColor: Theme.of(context).brightness == Brightness.dark
-    //       ? Colors.white
-    //       : Colors.black,
-    // );
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .analytics
+        .setCurrentScreen(screenName: 'langame');
     var fp = Provider.of<FunnyProvider>(context, listen: false);
     _loadingMessage = fp.getLoadingRandom();
     _failingMessage = fp.getFailingRandom();
+    if (!widget.notifyOthers) return;
+    Provider.of<AuthenticationProvider>(context, listen: false)
+        .sendReadyForLangame(widget.channelName);
   }
 
   @override

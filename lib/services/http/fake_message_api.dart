@@ -26,7 +26,7 @@ class FakeMessageApi extends MessageApi {
   }
 
   @override
-  Future<List<LangameNotification>?> fetchAll() {
+  Future<List<LangameNotification>> fetchAll() {
     // TODO: implement fetchAll
     throw UnimplementedError();
   }
