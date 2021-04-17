@@ -49,8 +49,8 @@ class AudioProvider extends ChangeNotifier {
 
       _sub?.onDone(_sub?.cancel);
     } catch (e, s) {
-      firebase.crashlytics.log('failed to start timer');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to start timer');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -61,8 +61,8 @@ class AudioProvider extends ChangeNotifier {
       _sub?.cancel();
       _sub = null;
     } catch (e, s) {
-      firebase.crashlytics.log('failed to stop timer');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to stop timer');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -78,8 +78,8 @@ class AudioProvider extends ChangeNotifier {
         return LangameResponse(LangameStatus.succeed, result: true);
       }
     } catch (e, s) {
-      firebase.crashlytics.log('failed to check permission');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to check permission');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -94,8 +94,8 @@ class AudioProvider extends ChangeNotifier {
         return LangameResponse(LangameStatus.succeed, result: true);
       }
     } catch (e, s) {
-      firebase.crashlytics.log('failed to requestPermission');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to requestPermission');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -113,8 +113,8 @@ class AudioProvider extends ChangeNotifier {
       await _engine!.enableLocalAudio(_isMicrophoneEnabled);
       await _engine!.setEnableSpeakerphone(_isSpeakerphoneEnabled);
     } catch (e, s) {
-      firebase.crashlytics.log('failed to init audio engine');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to init audio engine');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -126,7 +126,7 @@ class AudioProvider extends ChangeNotifier {
       final msg =
           'trying to join channel $channel with token $token with uid $agoraUid';
       debugPrint(msg);
-      firebase.crashlytics.log(msg);
+      firebase.crashlytics?.log(msg);
 
       final r = RetryOptions(maxAttempts: 8);
       await r.retry(
@@ -136,8 +136,8 @@ class AudioProvider extends ChangeNotifier {
         retryIf: (e) => e is PlatformException || e is TimeoutException,
       );
     } catch (e, s) {
-      firebase.crashlytics.log('failed to join channel $channel');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to join channel $channel');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -149,8 +149,8 @@ class AudioProvider extends ChangeNotifier {
       await _engine?.destroy();
       _engine = null;
     } catch (e, s) {
-      firebase.crashlytics.log('failed to leaveChannel');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to leaveChannel');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -162,8 +162,8 @@ class AudioProvider extends ChangeNotifier {
       _isMicrophoneEnabled = !_isMicrophoneEnabled;
       notifyListeners();
     } catch (e, s) {
-      firebase.crashlytics.log('failed to switchMicrophone');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to switchMicrophone');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -175,8 +175,8 @@ class AudioProvider extends ChangeNotifier {
       _isSpeakerphoneEnabled = !_isSpeakerphoneEnabled;
       notifyListeners();
     } catch (e, s) {
-      firebase.crashlytics.log('failed to switchSpeakerphone');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.log('failed to switchSpeakerphone');
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);

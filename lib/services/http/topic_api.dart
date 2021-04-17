@@ -1,5 +1,11 @@
-import 'package:langame/models/question.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart';
+
+import 'firebase.dart';
 
 abstract class TopicApi {
-  Future<List<Question>> getTopics();
+  final FirebaseApi firebase;
+
+  TopicApi(this.firebase);
+
+  Future<List<Topic>> getTopics();
 }

@@ -12,7 +12,7 @@ firebase login
 ### Secrets
 
 ```bash
-firebase functions:config:set agora.id="THE AGORA APP ID" agora.certificate="THE AGORA CERTIFICATE" github.token="THE GITHUB TOKEN"
+firebase functions:config:set agora.id="THE AGORA APP ID" agora.certificate="THE AGORA CERTIFICATE" github.token="THE GITHUB TOKEN" openai.key="OPENAI KEY"
 firebase functions:config:get > .runtimeconfig.json
 ```
 

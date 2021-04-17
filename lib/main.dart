@@ -37,17 +37,16 @@ void main() async {
   var crashlytics = FirebaseCrashlytics.instance;
   var analytics = FirebaseAnalytics();
   FirebaseApi firebase = FirebaseApi(
-    FirebaseMessaging.instance,
-    FirebaseFirestore.instance,
-    FirebaseAuth.instance,
-    FirebaseFunctions.instance,
-    GoogleSignIn(scopes: <String>[
+    messaging: FirebaseMessaging.instance,
+    firestore: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
+    functions: FirebaseFunctions.instance,
+    googleSignIn: GoogleSignIn(scopes: <String>[
       'email',
-      'https://www.googleapis.com/auth/contacts.readonly'
     ]),
-    crashlytics,
-    analytics,
-    FirebaseStorage.instance,
+    crashlytics: crashlytics,
+    analytics: analytics,
+    storage: FirebaseStorage.instance,
     useEmulator: false,
   );
   // Pass all uncaught errors from the framework to Crashlytics.
@@ -67,7 +66,7 @@ void main() async {
           providers: [
             ChangeNotifierProvider(
                 create: (_) => LocalStorageProvider(firebase)),
-            ChangeNotifierProvider(create: (_) => TopicProvider()),
+            ChangeNotifierProvider(create: (_) => TopicProvider(firebase)),
             ChangeNotifierProvider(
               create: (_) => AuthenticationProvider(firebase, fake: false),
             ),
@@ -75,7 +74,7 @@ void main() async {
             ChangeNotifierProvider(create: (_) => LangameProvider()),
             ChangeNotifierProvider(
                 create: (_) => CrashAnalyticsProvider(
-                    firebase.crashlytics, firebase.analytics)),
+                    firebase.crashlytics!, firebase.analytics!)),
             ChangeNotifierProvider(create: (_) => AudioProvider(firebase)),
             StreamProvider<ConnectivityResult>.value(
                 value: Connectivity().onConnectivityChanged,

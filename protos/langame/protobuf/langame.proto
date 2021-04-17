@@ -1,6 +1,14 @@
 syntax = "proto3";
 package langame.protobuf;
 
+// Note: models ids are usually not stored in Firestore since it already use id to index them
+// it is mostly used within the logic of the front-end / services
+
+message Topic {
+  string id = 1;
+  string content = 2;
+}
+
 message Question {
   string id = 1;
   string content = 2;
@@ -13,6 +21,7 @@ message Tag {
   // Whether tagged by a human (i.e. ignore then score?)
   bool human = 4;
   string question = 5;
+  bool generated = 6;
   // TODO: metadata about model used, version etc.
 }
 

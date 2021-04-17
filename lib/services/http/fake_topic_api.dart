@@ -1,34 +1,15 @@
-import 'package:langame/models/question.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart';
+import 'package:langame/services/http/firebase.dart';
 
 import 'topic_api.dart';
 
-class FakeTopicApi implements TopicApi {
+class FakeTopicApi extends TopicApi {
+  FakeTopicApi(FirebaseApi firebase) : super(firebase);
+
   @override
-  Future<List<Question>> getTopics() async {
+  Future<List<Topic>> getTopics() async {
     return [
-      Question("Nutrition", ["Recommendations"]),
-      Question("Wisdom", ["Recommendations"]),
-      Question("Career", ["Recommendations"]),
-      Question("Biology", ["Sciences"]),
-      Question("Physics", ["Sciences"]),
-      Question("Maths", ["Sciences"]),
-      Question("Artificial Intelligence", ["Sciences"]),
-      Question("Purpose", ["Philosophy"]),
-      Question("Love", ["Philosophy"]),
-      Question("Friends", ["Philosophy"]),
-      Question("Religion", ["Spirituality"]),
-      Question("Death", ["Spirituality"]),
-      Question("Meditation", ["Spirituality"]),
-      Question("Body", ["Health"]),
-      Question("Mind", ["Health"]),
-      Question("Fast", ["Health"]),
-      Question("Stocks", ["Wealth"]),
-      Question("Passive", ["Wealth"]),
-      Question("Active", ["Wealth"]),
-      Question("Bitcoin", ["Wealth"]),
-      Question("Ethereum", ["Wealth"]),
-      Question("Venture Capitalism", ["Wealth"]),
-      Question("Angel Investing", ["Wealth"]),
+      Topic(content: "Nutrition"),
     ];
   }
 }

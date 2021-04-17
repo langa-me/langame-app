@@ -6,8 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/models/notification.dart';
-import 'package:langame/models/question.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/services/http/authentication_api.dart';
 import 'package:langame/services/http/fake_authentication_api.dart';
@@ -58,7 +58,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   void _log(String msg) {
     if (kDebugMode) debugPrint(msg);
-    firebase.crashlytics.log(msg);
+    firebase.crashlytics?.log(msg);
   }
 
   void _onNotificationHandler(LangameNotification? notification) {
@@ -68,7 +68,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse<String>> send(
-      List<LangameUser> recipients, List<Question> topics) async {
+      List<LangameUser> recipients, List<lg.Topic> topics) async {
     try {
       final String msg =
           'send langame to ${recipients.map((e) => e.uid!).join(',')}';
@@ -77,11 +77,11 @@ class AuthenticationProvider extends ChangeNotifier {
       // TODO: we'd likely send the whole  topic in the future (with classifications)
       var channelName = await messageApi.send(
           recipients.map((e) => e.uid!).toList(),
-          topics.map((e) => e.question).toList());
+          topics.map((e) => e.content).toList());
       return LangameResponse(LangameStatus.succeed, result: channelName);
     } catch (e, s) {
       _log('failed to send langame');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -92,7 +92,7 @@ class AuthenticationProvider extends ChangeNotifier {
       _log('sendReadyForLangame');
     } catch (e, s) {
       _log('failed to sendReadyForLangame');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -105,7 +105,7 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse<String>(LangameStatus.succeed, result: r);
     } catch (e, s) {
       _log('failed to get channel $channelName token');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -117,7 +117,7 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse<LangameChannel>(LangameStatus.succeed, result: r);
     } catch (e, s) {
       _log('failed to get channel $channelName');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -132,7 +132,7 @@ class AuthenticationProvider extends ChangeNotifier {
           result: r);
     } catch (e, s) {
       _log('failed to getNotification');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -149,7 +149,7 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse<LangameNotification>(LangameStatus.succeed);
     } catch (e, s) {
       _log('failed to fetchNotifications');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -165,7 +165,7 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
       _log('failed to deleteNotification');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -178,10 +178,10 @@ class AuthenticationProvider extends ChangeNotifier {
       _log('_loginWith');
     } catch (e, s) {
       _log('failed to _loginWith');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
-    firebase.analytics.logLogin();
+    firebase.analytics?.logLogin();
     return LangameResponse(LangameStatus.succeed);
   }
 
@@ -193,7 +193,7 @@ class AuthenticationProvider extends ChangeNotifier {
             test: (e) => e is LangameAppleSignInException)
         .catchError((e, s) {
       _log('failed to loginWithApple');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       LangameResponse(LangameStatus.failed, error: e.toString());
     });
   }
@@ -206,7 +206,7 @@ class AuthenticationProvider extends ChangeNotifier {
             test: (e) => e is LangameFacebookSignInException)
         .catchError((e, s) {
       _log('failed to loginWithFacebook');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       LangameResponse(LangameStatus.failed, error: e.toString());
     });
   }
@@ -219,7 +219,7 @@ class AuthenticationProvider extends ChangeNotifier {
             test: (e) => e is LangameGoogleSignInException)
         .catchError((e, s) {
       _log('failed to loginWithGoogle');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       LangameResponse(LangameStatus.failed, error: e.toString());
     });
   }
@@ -241,7 +241,7 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse<LangameUser>(LangameStatus.succeed, result: r);
     } catch (e, s) {
       _log('failed to getLangameUser $uid');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -259,7 +259,7 @@ class AuthenticationProvider extends ChangeNotifier {
           result: r);
     } catch (e, s) {
       _log('failed to get users ${userIds.join(",")}');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -280,15 +280,15 @@ class AuthenticationProvider extends ChangeNotifier {
     _firebaseUserStream.listen((data) async {
       if (data == null) return null;
       try {
-        await firebase.crashlytics.setUserIdentifier(data.uid);
-        await firebase.analytics.setUserId(data.uid);
+        await firebase.crashlytics?.setUserIdentifier(data.uid);
+        await firebase.analytics?.setUserId(data.uid);
         _user = await authenticationApi.getLangameUser(data.uid);
         if (_user == null) {
           _user = await authenticationApi.addLangameUser(data);
         }
       } catch (e, s) {
         _log('failed to setup user on firebase stream change uid: ${data.uid}');
-        firebase.crashlytics.recordError(e, s);
+        firebase.crashlytics?.recordError(e, s);
       }
       _log('_firebaseUserStream.listen ${_user?.uid}');
       _userStream.add(_user);
@@ -311,7 +311,7 @@ class AuthenticationProvider extends ChangeNotifier {
       // TODO  Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
     } catch (e, s) {
       _log('failed to initializeMessageApi');
-      firebase.crashlytics.recordError(e, s);
+      firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);

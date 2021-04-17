@@ -35,8 +35,8 @@ class FeedbackProvider extends ChangeNotifier {
     _detector = ShakeDetector.autoStart(
       shakeThresholdGravity: 2,
       onPhoneShake: () {
-        firebase.analytics.logEvent(name: 'shake', parameters: {
-          'user': firebase.auth.currentUser!.displayName,
+        firebase.analytics?.logEvent(name: 'shake', parameters: {
+          'user': firebase.auth?.currentUser!.displayName,
         });
         show();
       },
@@ -58,7 +58,7 @@ class FeedbackProvider extends ChangeNotifier {
       };
       final upload = (String deviceInfo) {
         final Reference storageReference =
-            firebase.storage.ref('/feedbacks').child('$uid.png');
+            firebase.storage!.ref('/feedbacks').child('$uid.png');
 
         final UploadTask uploadTask = storageReference.putData(
           feedbackScreenshot!,
@@ -67,12 +67,13 @@ class FeedbackProvider extends ChangeNotifier {
             customMetadata: {
               'feedback': feedback,
               'uid': uid,
-              'user': firebase.auth.currentUser!.displayName!,
+              'user': firebase.auth!.currentUser!.displayName!,
               'deviceInfo': deviceInfo,
             },
           ),
         );
-        uploadTask.catchError((e, s) => firebase.crashlytics.recordError(e, s));
+        uploadTask
+            .catchError((e, s) => firebase.crashlytics?.recordError(e, s));
       };
       if (Platform.isAndroid) {
         // TODO: maybe wrap this device info stuff into helper

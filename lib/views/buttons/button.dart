@@ -139,6 +139,12 @@ class _ToggleButtonState extends State<ToggleButton> {
 
   @override
   Widget build(BuildContext context) {
+    var s = ElevatedButton.styleFrom(
+      primary: Theme.of(context).colorScheme.primary,
+      side: BorderSide(width: 2, color: Colors.grey),
+      elevation: 5,
+      padding: EdgeInsets.all(5),
+    );
     return AnimatedCrossFade(
       duration: Duration(milliseconds: 200),
       crossFadeState:
@@ -146,20 +152,24 @@ class _ToggleButtonState extends State<ToggleButton> {
       firstChild: Container(
         width: width,
         child: ElevatedButton(
-          style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      Theme.of(context).colorScheme.secondary))
-              .merge(Theme.of(context).elevatedButtonTheme.style),
-          child: Text(textSelected),
+          style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).colorScheme.secondary)
+              .merge(s),
+          child: Text(textSelected,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, color: Colors.white)),
           onPressed: onLongPress ? null : _onFirstChildChange,
           onLongPress: onLongPress ? _onFirstChildChange : null,
         ),
       ),
       secondChild: Container(
         width: width,
+        padding: EdgeInsets.all(2),
         child: ElevatedButton(
-          style: Theme.of(context).elevatedButtonTheme.style,
-          child: Text(textUnselected),
+          style: s,
+          child: Text(textUnselected,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, color: Colors.white)),
           onPressed: onLongPress ? null : _onSecondChildChange,
           onLongPress: onLongPress ? _onSecondChildChange : null,
         ),

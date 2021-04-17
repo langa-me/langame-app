@@ -4,12 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/question.dart';
-import 'package:langame/models/user.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -30,11 +28,8 @@ class Setup extends StatefulWidget {
 }
 
 class _SetupState extends State with AfterLayoutMixin {
-  List<Widget> topicGroups = [];
-  List<Question> favouriteTopics = [];
-  List<LangameUser> contactsToInvite = [];
+  List<Topic> favouriteTopics = [];
   final controller = PageController(initialPage: 0, viewportFraction: 0.9);
-  bool importRelations = false;
 
   // Create a global key that uniquely identifies the Form widget
   // and allows validation of the form.
@@ -69,14 +64,13 @@ class _SetupState extends State with AfterLayoutMixin {
         onPageChanged: (int? i) async {
           if (i != null && i > 3.0) {
             // Register that this user has already done the setup
-            // SharedPreferences prefs = await SharedPreferences.getInstance();
-            // prefs.setBool('setup', true);
-            print(
-                'fav topics ${favouriteTopics.map((e) => e.question).toList()}');
-            print('contactsToInvite ${contactsToInvite.map((e) => [
-                  e.displayName,
-                  e.email
-                ]).toList()}');
+
+            Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
+              'favourite topics ${favouriteTopics.map((e) => e.content).join(",")}',
+              analyticsMessage: 'favourite_topics',
+              analyticsParameters: {'topics': favouriteTopics},
+            );
+
             // TODO: send mail to everyone "join langame bro"
 
             Future<LangameResponse> f =
@@ -92,24 +86,24 @@ class _SetupState extends State with AfterLayoutMixin {
               Navigator.of(_keyLoader.currentContext!, rootNavigator: true)
                   .pop();
               res.thenShowSnackBar(
-                  context: context,
-                  failedMessage: !kReleaseMode
-                      ? 'failed to initialize the application, ${res.error.toString()}'
-                      : Provider.of<FunnyProvider>(context, listen: false)
-                          .getFailingRandom(),
-                  onSucceed: () {
-                    Provider.of<LocalStorageProvider>(context, listen: false)
-                        .saveHasDoneSetup(true);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FriendsView(),
-                      ),
-                    );
-                  },
-                  onFailure: () => controller.previousPage(
-                      duration: new Duration(seconds: 1),
-                      curve: Curves.bounceIn));
+                context: context,
+                failedMessage: !kReleaseMode
+                    ? 'failed to initialize the application, ${res.error.toString()}'
+                    : Provider.of<FunnyProvider>(context, listen: false)
+                        .getFailingRandom(),
+                onSucceed: () {
+                  Provider.of<LocalStorageProvider>(context, listen: false)
+                      .saveHasDoneSetup(true);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FriendsView(),
+                    ),
+                  );
+                },
+                onFailure: () => controller.previousPage(
+                    duration: new Duration(seconds: 1), curve: Curves.bounceIn),
+              );
             });
           }
         },
@@ -150,47 +144,51 @@ class _SetupState extends State with AfterLayoutMixin {
               ),
             ),
           ),
-          Padding(
-              padding: const EdgeInsets.only(top: 12.0),
-              child: Consumer<TopicProvider>(
-                builder: (context, t, child) {
-                  return GroupedListView<Question, String>(
-                    elements: t.topics,
-                    groupBy: (element) => element.tags.first,
-                    groupSeparatorBuilder: (String groupByValue) => Container(
-                      decoration: new BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondaryVariant,
-                          borderRadius: new BorderRadius.only(
-                            bottomLeft: const Radius.circular(40.0),
-                            topRight: const Radius.circular(40.0),
-                          )),
-                      padding: const EdgeInsets.all(5.0),
-                      child: Text(
-                        groupByValue,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6,
+          Column(children: [
+            Text(
+              'What are your interests?',
+              style: Theme.of(context).textTheme.headline6,
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'It will influence your recommendations',
+              style: Theme.of(context).textTheme.caption,
+              textAlign: TextAlign.center,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Consumer<TopicProvider>(
+                  builder: (context, t, child) {
+                    return ListView.separated(
+                      itemCount: t.topics.length,
+                      separatorBuilder: (BuildContext context, int index) =>
+                          Divider(
+                        color: Theme.of(context).colorScheme.secondaryVariant,
                       ),
-                    ),
-                    itemBuilder: (context, Question t) {
-                      return Center(
-                        child: ToggleButton(
-                            onChange: (bool selected) {
-                              showBasicSnackBar(
-                                  context, 'this feature has no impact yet');
-                              if (selected)
-                                favouriteTopics.add(t);
-                              else
-                                favouriteTopics.removeWhere(
-                                    (e) => e.question == t.question);
-                            },
-                            width: AppSize.blockSizeHorizontal * 70,
-                            textUnselected: t.question,
-                            textSelected: t.question),
-                      );
-                    },
-                  );
-                },
-              )),
+                      itemBuilder: (context, int i) {
+                        return Center(
+                          child: ToggleButton(
+                              onChange: (bool selected) {
+                                showBasicSnackBar(
+                                    context, 'this feature has no impact yet');
+                                if (selected)
+                                  favouriteTopics.add(t.topics[i]);
+                                else
+                                  favouriteTopics.removeWhere(
+                                      (e) => e.content == t.topics[i].content);
+                              },
+                              width: AppSize.blockSizeHorizontal * 70,
+                              textUnselected: t.topics[i].content,
+                              textSelected: t.topics[i].content),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ]),
           Container(
             color: Theme.of(context).colorScheme.background,
             child: Center(

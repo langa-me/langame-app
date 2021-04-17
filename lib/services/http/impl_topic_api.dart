@@ -1,34 +1,20 @@
-import 'package:langame/models/question.dart';
+import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart';
+import 'package:langame/services/http/firebase.dart';
 
 import 'topic_api.dart';
 
-class ImplTopicApi implements TopicApi {
+class ImplTopicApi extends TopicApi {
+  ImplTopicApi(FirebaseApi firebase) : super(firebase);
+
   @override
-  Future<List<Question>> getTopics() async {
-    return [
-      // Question("Nutrition", ["Recommendations"]),
-      // Question("Wisdom", ["Recommendations"]),
-      // Question("Career", ["Recommendations"]),
-      Question("Biology", ["Sciences"]),
-      Question("Physics", ["Sciences"]),
-      // Question("Maths", ["Sciences"]),
-      Question("Artificial Intelligence", ["Sciences"]),
-      Question("Purpose", ["Philosophy"]),
-      Question("Love", ["Philosophy"]),
-      Question("Friends", ["Philosophy"]),
-      // Question("Religion", ["Spirituality"]),
-      // Question("Death", ["Spirituality"]),
-      // Question("Meditation", ["Spirituality"]),
-      Question("Nutrition", ["Health"]),
-      Question("Mind", ["Health"]),
-      // Question("Fast", ["Health"]),
-      // Question("Stocks", ["Wealth"]),
-      // Question("Passive", ["Wealth"]),
-      // Question("Active", ["Wealth"]),
-      // Question("Bitcoin", ["Wealth"]),
-      // Question("Ethereum", ["Wealth"]),
-      // Question("Venture Capitalism", ["Wealth"]),
-      // Question("Angel Investing", ["Wealth"]),
-    ];
+  Future<List<Topic>> getTopics() async {
+    var query = await firebase.firestore!
+        .collection(AppConst.firestoreTopicsCollection)
+        .get();
+    return query.docs
+        .where((e) => e.exists == true && e.data()['content'] != null)
+        .map((e) => Topic(id: e.id, content: e.data()['content']))
+        .toList();
   }
 }

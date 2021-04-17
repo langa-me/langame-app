@@ -1,9 +1,8 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
-import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
-import 'package:langame/models/question.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -24,7 +23,7 @@ class SendLangameView extends StatefulWidget {
 
 class _SendLangameState extends State<SendLangameView>
     with AfterLayoutMixin<SendLangameView> {
-  List<Question> selectedTopics = [];
+  List<Topic> selectedTopics = [];
   String filter = '';
   _SendLangameState();
 
@@ -54,44 +53,31 @@ class _SendLangameState extends State<SendLangameView>
                     .toList()),
             Consumer<TopicProvider>(
               builder: (context, t, child) {
-                List<Question> filteredTopics = t.topics
-                    .where((e) => e.question
+                List<Topic> filteredTopics = t.topics
+                    .where((e) => e.content
                         .toLowerCase()
                         .startsWith(filter.toLowerCase()))
                     .toList();
                 return Expanded(
-                  child: GroupedListView<Question, String>(
-                    elements: filteredTopics,
-                    groupBy: (element) => element.tags.first,
-                    groupSeparatorBuilder: (String groupByValue) => Container(
-                      decoration: new BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondaryVariant,
-                          borderRadius: new BorderRadius.only(
-                            bottomLeft: const Radius.circular(40.0),
-                            topRight: const Radius.circular(40.0),
-                          )),
-                      padding: const EdgeInsets.all(5.0),
-                      child: Text(
-                        groupByValue,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
+                  child: GridView.builder(
+                    itemCount: filteredTopics.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 3,
+                      crossAxisSpacing: 20,
+                      mainAxisSpacing: 0,
                     ),
-                    itemBuilder: (context, Question t) {
-                      return Center(
-                        child: ToggleButton(
-                            onChange: (bool selected) {
-                              if (selected)
-                                selectedTopics.add(t);
-                              else
-                                selectedTopics.removeWhere(
-                                    (e) => e.question == t.question);
-                            },
-                            width: AppSize.blockSizeHorizontal * 70,
-                            textUnselected: t.question,
-                            textSelected: t.question),
-                      );
-                    },
+                    itemBuilder: (context, int i) => ToggleButton(
+                        onChange: (bool selected) {
+                          if (selected)
+                            selectedTopics.add(filteredTopics[i]);
+                          else
+                            selectedTopics.removeWhere(
+                                (e) => e.content == filteredTopics[i].content);
+                        },
+                        width: AppSize.blockSizeHorizontal * 70,
+                        textUnselected: filteredTopics[i].content,
+                        textSelected: filteredTopics[i].content),
                   ),
                 );
               },

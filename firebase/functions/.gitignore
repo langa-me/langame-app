@@ -5,4 +5,4 @@ node_modules/
 lib
 
 # Service account
-langame-dev-8ac76897c7bc.json
+langame*.json

@@ -7,10 +7,10 @@ import {
   isFirebaseFunctionsResponse,
   LangameChannel,
   LangameNotification,
-  LangameUser,
+  LangameUser, Question,
 } from "./models";
 import {
-  filterOutSendLangameCalls, findQuestionsInTopics,
+  filterOutSendLangameCalls,
   generateAgoraRtcToken, getLangame,
   getUserData,
   handleSendToDevice,
@@ -21,6 +21,8 @@ import {
   kNotificationsCollection, kUsersCollection,
 } from "./helpers";
 import {newFeedback} from "./feedback";
+import {offlineQuestionSearch,
+  onlineOpenAiQuestionGeneration} from "./questions";
 // Initialize admin firebase
 admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
@@ -305,7 +307,36 @@ exports.sendLangame = functions
             "failed to generate channel name");
       }
 
-      const questions = await findQuestionsInTopics(data.topics, 1, 0.1);
+      const t = await admin.remoteConfig().getTemplate();
+      if (!t.parameters.question_engine.defaultValue ||
+          !("value" in t.parameters.question_engine.defaultValue) ||
+          !t.parameters.offline_use_generated.defaultValue ||
+          !("value" in t.parameters.offline_use_generated.defaultValue)) {
+        functions.logger.error("invalid remote config");
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            undefined,
+            "failed to find question");
+      }
+      let questions: Question[] | undefined;
+      if (t.parameters.question_engine.defaultValue.value === "offline") {
+        questions = await offlineQuestionSearch(data.topics,
+            1,
+            0.1,
+            t.parameters.offline_use_generated.defaultValue.value === "true");
+      } else if (t.parameters.question_engine.defaultValue.value === "online") {
+        questions =
+            await onlineOpenAiQuestionGeneration(data.topics, t.parameters);
+      }
+
+      if (!questions || questions.length === 0) {
+        functions.logger.error("failed to find question");
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.INTERNAL,
+            undefined,
+            "failed to find question");
+      }
+
       functions
           .logger
           .info("found questions for topics", data.topics, questions);

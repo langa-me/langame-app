@@ -52,7 +52,7 @@ class LocalStorageProvider extends ChangeNotifier {
       _theme = t;
       notifyListeners();
     }).then((value) => firebase.analytics
-        .logEvent(name: 'setTheme', parameters: {'theme': theme.index}));
+        ?.logEvent(name: 'setTheme', parameters: {'theme': theme.index}));
     return f;
   }
 
@@ -83,7 +83,7 @@ class LocalStorageProvider extends ChangeNotifier {
     }
     notifyListeners();
     firebase.analytics
-        .logEvent(name: 'addSearchHistory', parameters: {'tag': tag});
+        ?.logEvent(name: 'addSearchHistory', parameters: {'tag': tag});
   }
 
   void placeFirstSearchHistory(String tag) {
@@ -96,7 +96,7 @@ class LocalStorageProvider extends ChangeNotifier {
     _filteredTagSearchHistory.removeWhere((e) => e == tag);
     notifyListeners();
     firebase.analytics
-        .logEvent(name: 'deleteSearchHistory', parameters: {'tag': tag});
+        ?.logEvent(name: 'deleteSearchHistory', parameters: {'tag': tag});
   }
 
   void resetFilteredSearchTagHistory() {

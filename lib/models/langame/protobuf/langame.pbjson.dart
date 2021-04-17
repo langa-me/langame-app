@@ -8,6 +8,17 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
+@$core.Deprecated('Use topicDescriptor instead')
+const Topic$json = const {
+  '1': 'Topic',
+  '2': const [
+    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    const {'1': 'content', '3': 2, '4': 1, '5': 9, '10': 'content'},
+  ],
+};
+
+/// Descriptor for `Topic`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List topicDescriptor = $convert.base64Decode('CgVUb3BpYxIOCgJpZBgBIAEoCVICaWQSGAoHY29udGVudBgCIAEoCVIHY29udGVudA==');
 @$core.Deprecated('Use questionDescriptor instead')
 const Question$json = const {
   '1': 'Question',
@@ -28,11 +39,12 @@ const Tag$json = const {
     const {'1': 'score', '3': 3, '4': 1, '5': 1, '10': 'score'},
     const {'1': 'human', '3': 4, '4': 1, '5': 8, '10': 'human'},
     const {'1': 'question', '3': 5, '4': 1, '5': 9, '10': 'question'},
+    const {'1': 'generated', '3': 6, '4': 1, '5': 8, '10': 'generated'},
   ],
 };
 
 /// Descriptor for `Tag`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSDgoCaWQYASABKAlSAmlkEhgKB2NvbnRlbnQYAiABKAlSB2NvbnRlbnQSFAoFc2NvcmUYAyABKAFSBXNjb3JlEhQKBWh1bWFuGAQgASgIUgVodW1hbhIaCghxdWVzdGlvbhgFIAEoCVIIcXVlc3Rpb24=');
+final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSDgoCaWQYASABKAlSAmlkEhgKB2NvbnRlbnQYAiABKAlSB2NvbnRlbnQSFAoFc2NvcmUYAyABKAFSBXNjb3JlEhQKBWh1bWFuGAQgASgIUgVodW1hbhIaCghxdWVzdGlvbhgFIAEoCVIIcXVlc3Rpb24SHAoJZ2VuZXJhdGVkGAYgASgIUglnZW5lcmF0ZWQ=');
 @$core.Deprecated('Use userDescriptor instead')
 const User$json = const {
   '1': 'User',

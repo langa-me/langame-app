@@ -118,7 +118,7 @@ class ImplMessageApi extends MessageApi {
     }
 
     // TODO: should show "we wil ask you permission blabla.."
-    NotificationSettings settings = await firebase.messaging.requestPermission(
+    NotificationSettings settings = await firebase.messaging!.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -143,7 +143,7 @@ class ImplMessageApi extends MessageApi {
 
   @override
   Future<String> send(List<String> recipients, List<String> topics) async {
-    HttpsCallable callable = firebase.functions.httpsCallable(
+    HttpsCallable callable = firebase.functions!.httpsCallable(
         AppConst.sendLangameFunction,
         options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
 
@@ -176,7 +176,7 @@ class ImplMessageApi extends MessageApi {
 
   @override
   Future<void> sendReadyForLangame(String channelName) async {
-    HttpsCallable callable = firebase.functions.httpsCallable(
+    HttpsCallable callable = firebase.functions!.httpsCallable(
       AppConst.sendReadyForLangameFunction,
       options: HttpsCallableOptions(
         timeout: Duration(seconds: 10),
@@ -213,7 +213,7 @@ class ImplMessageApi extends MessageApi {
   @override
   Future<void> listen(Function(LangameNotification?) add) async {
     // Get the token each time the application loads
-    String? token = await firebase.messaging.getToken();
+    String? token = await firebase.messaging!.getToken();
 
     if (token == null)
       throw LangameMessageException('could_not_get_firebase_messaging_token');
@@ -227,7 +227,7 @@ class ImplMessageApi extends MessageApi {
 
     // Any time the token refreshes, store this in the database too.
     _onTokenRefresh =
-        firebase.messaging.onTokenRefresh.listen(_saveTokenToDatabase);
+        firebase.messaging!.onTokenRefresh.listen(_saveTokenToDatabase);
 
     _addCallback = add;
 
@@ -260,7 +260,7 @@ class ImplMessageApi extends MessageApi {
 
   @override
   Future<LangameNotification?> fetch(String id) async {
-    CollectionReference notifications = firebase.firestore
+    CollectionReference notifications = firebase.firestore!
         .collection(AppConst.firestoreNotificationsCollection);
 
     DocumentSnapshot doc = await notifications.doc(id).get();
@@ -280,10 +280,10 @@ class ImplMessageApi extends MessageApi {
 
   // TODO: might do a 'fetch non-acknowledged notifications'
   Future<List<LangameNotification>> fetchAll() async {
-    CollectionReference notifications = firebase.firestore
+    CollectionReference notifications = firebase.firestore!
         .collection(AppConst.firestoreNotificationsCollection);
     QuerySnapshot query = await notifications
-        .where('recipientsUid', arrayContains: firebase.auth.currentUser?.uid)
+        .where('recipientsUid', arrayContains: firebase.auth!.currentUser?.uid)
         .get();
     // If there is any non-null notifications, return all of them
     return query.docs.where((n) => n.exists).map((n) {
@@ -295,7 +295,7 @@ class ImplMessageApi extends MessageApi {
 
   @override
   Future<void> delete(String id) async {
-    firebase.firestore
+    firebase.firestore!
         .collection(AppConst.firestoreNotificationsCollection)
         .doc(id)
         .delete();
@@ -309,12 +309,12 @@ class ImplMessageApi extends MessageApi {
 
   Future<void> _saveTokenToDatabase(String token) async {
     // Assume user is logged in for this example
-    String? userId = firebase.auth.currentUser?.uid;
+    String? userId = firebase.auth!.currentUser?.uid;
 
     // Somehow the user is not authenticated anymore but in the app
     if (userId == null) throw LangameNotAuthenticatedException();
 
-    HttpsCallable callable = firebase.functions.httpsCallable(
+    HttpsCallable callable = firebase.functions!.httpsCallable(
         AppConst.saveTokenFunction,
         options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
 
@@ -328,7 +328,7 @@ class ImplMessageApi extends MessageApi {
           Map<String, dynamic>.from(result.data));
       switch (response.statusCode) {
         case FirebaseFunctionsResponseStatusCode.OK:
-          firebase.crashlytics.log('new FCM token');
+          firebase.crashlytics?.log('new FCM token');
           break;
         case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
           throw LangameMessageException(response.errorMessage ??

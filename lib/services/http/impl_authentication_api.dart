@@ -25,7 +25,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   Stream<User?> get userChanges => _authStateChanges;
 
   ImplAuthenticationApi(FirebaseApi firebase) : super(firebase) {
-    _authStateChanges = firebase.auth.userChanges();
+    _authStateChanges = firebase.auth!.userChanges();
   }
 
   @override
@@ -45,7 +45,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
     // await firebaseAuth.signOut();
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser =
-        await firebase.googleSignIn.signIn();
+        await firebase.googleSignIn!.signIn();
 
     // If Google Auth cancelled
     if (googleUser == null)
@@ -68,7 +68,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   @override
   Future<void> loginWithFirebase(OAuthCredential credential) async {
     try {
-      await firebase.auth.signInWithCredential(credential);
+      await firebase.auth!.signInWithCredential(credential);
     } on FirebaseAuthException catch (e) {
       throw LangameFirebaseSignInException(
           cause: 'failed to signInWithCredential ${e.code}');
@@ -83,20 +83,20 @@ class ImplAuthenticationApi extends AuthenticationApi {
   /// TODO: might use a transaction?
   Future<LangameUser?> getLangameUser(String uid) async {
     CollectionReference users =
-        firebase.firestore.collection(AppConst.firestoreUsersCollection);
+        firebase.firestore!.collection(AppConst.firestoreUsersCollection);
     DocumentSnapshot doc = await users.doc(uid).get();
     if (!doc.exists) return null;
     var data = doc.data();
     if (data == null) return null;
     var u = LangameUser.fromJson(data);
-    firebase.crashlytics.setUserIdentifier(u.uid!);
-    firebase.analytics.setUserId(u.uid!);
+    firebase.crashlytics?.setUserIdentifier(u.uid!);
+    firebase.analytics?.setUserId(u.uid!);
     return u;
   }
 
   Future<LangameUser> addLangameUser(User user) async {
     CollectionReference users =
-        firebase.firestore.collection(AppConst.firestoreUsersCollection);
+        firebase.firestore!.collection(AppConst.firestoreUsersCollection);
     LangameUser langameUser = LangameUser.fromFirebaseUser(user);
     var t = await _generateTag(user);
     if (user.providerData.any((e) => e.providerId == 'google.com')) {
@@ -113,7 +113,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   @override
   Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
     CollectionReference users =
-        firebase.firestore.collection(AppConst.firestoreUsersCollection);
+        firebase.firestore!.collection(AppConst.firestoreUsersCollection);
 
     tag = tag.toLowerCase();
 
@@ -127,8 +127,8 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   @override
   Future<void> logout() async {
-    if (_google != null) await firebase.googleSignIn.signOut();
-    await firebase.auth.signOut();
+    if (_google != null) await firebase.googleSignIn!.signOut();
+    await firebase.auth!.signOut();
     // TODO: Facebook, Apple
   }
 
@@ -140,13 +140,13 @@ class ImplAuthenticationApi extends AuthenticationApi {
       String? newEmail,
       String? tag,
       List<String>? topics}) async {
-    if (firebase.auth.currentUser == null)
+    if (firebase.auth!.currentUser == null)
       throw LangameUpdateProfileException(cause: kNotAuthenticated);
-    await firebase.auth.currentUser!
+    await firebase.auth!.currentUser!
         .updateProfile(displayName: displayName, photoURL: photoURL);
     if (newEmail != null)
-      await firebase.auth.currentUser!.updateEmail(newEmail);
-    HttpsCallable callable = firebase.functions.httpsCallable(
+      await firebase.auth!.currentUser!.updateEmail(newEmail);
+    HttpsCallable callable = firebase.functions!.httpsCallable(
         AppConst.updateProfileFunction,
         options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
 
@@ -224,7 +224,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   @override
   Future<String> getChannelToken(String channelName) async {
-    HttpsCallable callable = firebase.functions.httpsCallable(
+    HttpsCallable callable = firebase.functions!.httpsCallable(
         AppConst.getChannelTokenFunction,
         options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
 
@@ -258,7 +258,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   @override
   Future<LangameChannel> getChannel(String channelName) async {
-    var r = await firebase.firestore
+    var r = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)
         .where('channelName', isEqualTo: channelName)
         .get();
