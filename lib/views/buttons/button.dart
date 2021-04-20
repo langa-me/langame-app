@@ -144,6 +144,9 @@ class _ToggleButtonState extends State<ToggleButton> {
       side: BorderSide(width: 2, color: Colors.grey),
       elevation: 5,
       padding: EdgeInsets.all(5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(32.0),
+      ),
     );
     return AnimatedCrossFade(
       duration: Duration(milliseconds: 200),

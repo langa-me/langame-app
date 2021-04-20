@@ -6,6 +6,8 @@ import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
 
+import 'colors/colors.dart';
+
 class SettingsView extends StatefulWidget {
   _SettingsState createState() => _SettingsState();
 }
@@ -29,9 +31,12 @@ class _SettingsState extends State<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: IconThemeData(
+          color: isLightThenBlack(context), //change your color here
+        ),
+        backgroundColor: Colors.transparent,
         actions: [
-          buildPopupMenuWithHelpAndFeedback(),
+          buildPopupMenuWithHelpAndFeedback(context),
         ],
       ),
       body: Container(

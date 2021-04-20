@@ -191,17 +191,17 @@ class ImplMessageApi extends MessageApi {
         case FirebaseFunctionsResponseStatusCode.OK:
           break;
         case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
-          throw LangameSendReadyForLangameException(response.errorMessage ??
+          throw LangameNotifyPresenceException(response.errorMessage ??
               FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
         case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
-          throw LangameSendReadyForLangameException(response.errorMessage ??
+          throw LangameNotifyPresenceException(response.errorMessage ??
               FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
         case FirebaseFunctionsResponseStatusCode.INTERNAL:
-          throw LangameSendReadyForLangameException(response.errorMessage ??
+          throw LangameNotifyPresenceException(response.errorMessage ??
               FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
       }
     } catch (e) {
-      throw LangameSendReadyForLangameException(e.toString());
+      throw LangameNotifyPresenceException(e.toString());
     }
   }
 

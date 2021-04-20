@@ -1,0 +1,2 @@
+- More consistent colors
+- Few bugs fixed

@@ -48,7 +48,6 @@ class FakeMessageApi extends MessageApi {
 
   @override
   Future<void> notifyPresence(String channelName) {
-    // TODO: implement sendReadyForLangame
     throw UnimplementedError();
   }
 

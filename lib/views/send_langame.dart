@@ -104,9 +104,10 @@ class _SendLangameState extends State<SendLangameView>
                       builder: (context) => LangameView(channelName, false)),
                 );
               },
-              label: const Text('Join now'),
-              icon: const Icon(Icons.phone_in_talk_outlined),
-              backgroundColor: Colors.grey,
+              label: const Text('Now', style: TextStyle(color: Colors.white)),
+              icon:
+                  const Icon(Icons.phone_in_talk_outlined, color: Colors.white),
+              backgroundColor: Theme.of(context).colorScheme.primaryVariant,
             ),
             FloatingActionButton.extended(
               heroTag: 'join_later',
@@ -115,9 +116,9 @@ class _SendLangameState extends State<SendLangameView>
                 if (channelName == null) return;
                 Navigator.pop(context);
               },
-              label: const Text('Join later'),
-              icon: const Icon(Icons.send_outlined),
-              backgroundColor: Colors.grey,
+              label: const Text('Later', style: TextStyle(color: Colors.white)),
+              icon: const Icon(Icons.send_outlined, color: Colors.white),
+              backgroundColor: Theme.of(context).colorScheme.primaryVariant,
             ),
           ],
         ),

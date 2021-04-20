@@ -11,6 +11,7 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
 
+import 'colors/colors.dart';
 import 'images/image.dart';
 import 'langame.dart';
 
@@ -34,14 +35,36 @@ class _NotificationsViewState extends State<NotificationsView> {
 
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: isLightThenBlack(context), //change your color here
+        ),
         title: Text('Notifications'),
-        backgroundColor: theme.colorScheme.primary,
+        backgroundColor: Colors.transparent,
         actions: [
-          buildPopupMenuWithHelpAndFeedback(),
+          buildPopupMenuWithHelpAndFeedback(context),
         ],
       ),
       body: Consumer<AuthenticationProvider>(
         builder: (BuildContext context, p, c) {
+          if (p.notifications.length == 0) {
+            return Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                  Image(
+                    width: AppSize.blockSizeHorizontal * 30,
+                    image: AssetImage('images/logo-colourless.png'),
+                  ),
+                  SizedBox(height: AppSize.safeBlockVertical * 10),
+                  Text('All caught up!',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headline4),
+                  SizedBox(height: AppSize.safeBlockVertical * 5),
+                  Text('Invite your friends for a great conversation',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.caption),
+                ]));
+          }
           return GroupedListView<LangameNotification, String>(
             elements: p.notifications,
             groupBy: (n) => '${n.channelName!};${n.topics!.join(",")}',
@@ -63,7 +86,7 @@ class _NotificationsViewState extends State<NotificationsView> {
           Expanded(
             child: Container(
               color: Colors.black12,
-              height: 10,
+              height: 1,
             ),
           ),
           Container(
@@ -82,7 +105,7 @@ class _NotificationsViewState extends State<NotificationsView> {
           Expanded(
             child: Container(
               color: Colors.black12,
-              height: 10,
+              height: 1,
             ),
           ),
         ],

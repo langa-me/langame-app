@@ -15,7 +15,7 @@ import 'package:langame/views/settings.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
-import 'buttons/button.dart';
+import 'colors/colors.dart';
 import 'images/image.dart';
 import 'notifications.dart';
 
@@ -71,13 +71,14 @@ class _FriendsViewState extends State<FriendsView> {
     Widget notifications = InkWell(
         child: Consumer<AuthenticationProvider>(builder: (context, p, c) {
       return Badge(
+        badgeColor: Theme.of(context).colorScheme.secondary,
         badgeContent: Text(
           '${p.notifications.length}',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         child: Icon(
           Icons.notifications_outlined,
-          color: Colors.white,
+          color: isLightThenBlack(context),
         ),
         padding: const EdgeInsets.all(3.0),
         position: BadgePosition.topStart(top: 7, start: 10),
@@ -89,7 +90,7 @@ class _FriendsViewState extends State<FriendsView> {
       );
     });
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Colors.transparent,
       leading: notifications,
       actions: [
         IconButton(
@@ -99,7 +100,7 @@ class _FriendsViewState extends State<FriendsView> {
           ),
           icon: Icon(
             Icons.settings_outlined,
-            color: Colors.white,
+            color: isLightThenBlack(context),
           ),
         ),
       ],
@@ -110,10 +111,9 @@ class _FriendsViewState extends State<FriendsView> {
         builder: (context, l, child) => l.shoppingList.length == 0
             ? SizedBox.shrink()
             : FloatingActionButton(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(15.0),
-                  ),
+                  borderRadius: BorderRadius.circular(32.0),
                 ),
                 onPressed: () => Navigator.push(
                   context,
@@ -129,7 +129,8 @@ class _FriendsViewState extends State<FriendsView> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  child: Icon(Icons.shopping_cart_outlined),
+                  child:
+                      Icon(Icons.shopping_cart_outlined, color: Colors.black),
                   padding: const EdgeInsets.all(3.0),
                   position: BadgePosition.topStart(top: 7, start: 10),
                 ),
@@ -315,7 +316,7 @@ class _FriendsViewState extends State<FriendsView> {
       child: Material(
         color: Theme.of(context).brightness == Brightness.light
             ? Colors.white
-            : Theme.of(context).primaryColor,
+            : Theme.of(context).colorScheme.secondary,
         elevation: 4,
         child: Builder(builder: (context) {
           // Both query and history empty
@@ -329,7 +330,7 @@ class _FriendsViewState extends State<FriendsView> {
                 'Start searching',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.headline6,
+                style: TextStyle(color: Colors.black, fontSize: 20),
               ),
             );
           } else if (lsp.filteredTagSearchHistory.isEmpty) {
@@ -362,17 +363,14 @@ class _FriendsViewState extends State<FriendsView> {
               children: lsp.filteredTagSearchHistory
                   .map(
                     (tag) => ListTile(
-                      tileColor:
-                          Theme.of(context).brightness == Brightness.light
-                              ? Colors.white
-                              : Theme.of(context).primaryColor,
+                      tileColor: Colors.white,
                       title: Text(tag,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.headline6),
-                      leading: const Icon(Icons.history),
+                          style: TextStyle(color: Colors.black)),
+                      leading: Icon(Icons.history, color: Colors.black),
                       trailing: IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: Icon(Icons.clear, color: Colors.black),
                         onPressed: () {
                           lsp.deleteSearchHistory(tag);
                         },
@@ -441,23 +439,25 @@ class _FriendsViewState extends State<FriendsView> {
   Widget _buildBottomNavigationBar() {
     final theme = Theme.of(context);
     return BottomNavigationBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
       type: BottomNavigationBarType.shifting,
       selectedItemColor: theme.colorScheme.secondary,
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          backgroundColor: theme.colorScheme.primary,
+          backgroundColor: Colors.transparent,
           icon: Icon(Icons.home_outlined,
               color: _selectedIndex == 0
                   ? Theme.of(context).colorScheme.secondary
-                  : Colors.white),
+                  : isLightThenBlack(context)),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          backgroundColor: theme.colorScheme.primary,
+          backgroundColor: Colors.transparent,
           icon: Icon(Icons.search_outlined,
               color: _selectedIndex == 1
                   ? Theme.of(context).colorScheme.secondary
-                  : Colors.white),
+                  : isLightThenBlack(context)),
           label: 'Search',
         ),
       ],
@@ -498,32 +498,30 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       return Column(children: [
         Profile(p.selectedUser!),
         Spacer(),
-        StretchableButton(
+        OutlinedButton.icon(
           // TODO: might use ToggleButton instead? (with icon)
           onPressed: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
               ? _onRemoveFromShoppingList(context, p.selectedUser!, lp)
               : _onAddToShoppingList(context, p.selectedUser!, lp),
-          borderRadius: 1,
-          splashColor: Theme.of(context).colorScheme.secondaryVariant,
-          buttonPadding: 4,
-          buttonColor: Theme.of(context).colorScheme.secondary,
-          children: [
-            Text(
-                lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-                    ? 'Remove'
-                    : 'Add',
-                style: TextStyle(color: Colors.black)),
-            Container(
-              margin: EdgeInsets.all(10),
-              child: Icon(
-                lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-                    ? Icons.remove_shopping_cart_outlined
-                    : Icons.add_shopping_cart_outlined,
-                size: AppSize.blockSizeHorizontal * 5,
-                color: Colors.black,
-              ),
+          style: ElevatedButton.styleFrom(
+            side: BorderSide(
+                width: 2.0, color: Theme.of(context).colorScheme.secondary),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32.0),
             ),
-          ],
+          ),
+          label: Text(
+              lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
+                  ? 'Remove'
+                  : 'Add',
+              style: TextStyle(color: isLightThenBlack(context))),
+          icon: Icon(
+            lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
+                ? Icons.remove_shopping_cart_outlined
+                : Icons.add_shopping_cart_outlined,
+            size: AppSize.blockSizeHorizontal * 5,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
         ),
         Spacer(),
       ]);

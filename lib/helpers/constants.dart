@@ -24,7 +24,7 @@ class AppConst {
 
   static const String saveTokenFunction = 'saveToken';
   static const String sendLangameFunction = 'sendLangame';
-  static const String notifyPresenceFunction = 'sendReadyForLangame';
+  static const String notifyPresenceFunction = 'notifyPresence';
   static const String updateProfileFunction = 'updateProfile';
   static const String getChannelTokenFunction = 'getChannelToken';
   static const String sendLangameEndFunction = 'sendLangameEnd';

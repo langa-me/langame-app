@@ -62,8 +62,8 @@ class LangameGetChannelException extends LangameException {
   LangameGetChannelException(String cause) : super(cause);
 }
 
-class LangameSendReadyForLangameException extends LangameException {
-  LangameSendReadyForLangameException(String cause) : super(cause);
+class LangameNotifyPresenceException extends LangameException {
+  LangameNotifyPresenceException(String cause) : super(cause);
 }
 
 class LangameUpdateProfileException extends LangameException {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/views/colors/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -21,9 +22,9 @@ import 'package:url_launcher/url_launcher.dart';
 // ),
 // ),
 
-Widget buildPopupMenuWithHelpAndFeedback() {
+Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
   return PopupMenuButton(
-    icon: Icon(Icons.more_vert_outlined),
+    icon: Icon(Icons.more_vert_outlined, color: isLightThenBlack(context)),
     itemBuilder: (context) {
       return [
         PopupMenuItem(

@@ -124,7 +124,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
         .where('tag', isGreaterThanOrEqualTo: tag)
         .where('tag', isLessThan: tag + 'z')
         .get(); // TODO: ignore case
-    return doc.docs.map((e) => lg.User.fromJson(e.data().toString())).toList();
+    return doc.docs.map((e) => userFromMap(e.data())).toList();
   }
 
   @override
@@ -317,12 +317,12 @@ class ImplAuthenticationApi extends AuthenticationApi {
   Future<int?> getInteraction(String uid, String otherUid) async {
     var r = await firebase.firestore!
         .collection(AppConst.firestoreInteractionsCollection)
-        .where('$uid,$otherUid', isEqualTo: 1)
+        .where('users', isEqualTo: '$uid,$otherUid')
         .get();
     if (!r.docs.any((e) => e.exists)) {
       r = await firebase.firestore!
           .collection(AppConst.firestoreInteractionsCollection)
-          .where('$otherUid,$uid', isEqualTo: 1)
+          .where('users', isEqualTo: '$otherUid,$uid')
           .get();
     }
     // No interactions found

@@ -212,7 +212,7 @@ export const getLangame = async (channelName: string):
       .collection(kLangamesCollection)
       .where("channelName", "==", channelName)
       .get();
-  if (queryResult.docs.length === 0 ||
+  if (queryResult.empty ||
       queryResult.docs.some((d) =>
         !d.exists || !("players" in d.data()))) {
     return new FirebaseFunctionsResponse(
