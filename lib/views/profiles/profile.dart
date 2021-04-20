@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/models/user.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
+
 
 import '../images/image.dart';
 
 class Profile extends StatelessWidget {
-  final LangameUser _user;
+  final lg.User _user;
   Profile(this._user);
 
   @override
@@ -16,10 +17,10 @@ class Profile extends StatelessWidget {
       Align(
         alignment: Alignment.topCenter,
         child: Column(children: [
-          buildCroppedRoundedNetworkImage(_user.photoUrl!,
+          buildCroppedRoundedNetworkImage(_user.photoUrl,
               width: AppSize.blockSizeHorizontal * 30),
           Text(
-            _user.displayName!,
+            _user.displayName,
             style: theme.textTheme.headline6!.merge(
               TextStyle(
                   color: Theme.of(context).brightness == Brightness.light

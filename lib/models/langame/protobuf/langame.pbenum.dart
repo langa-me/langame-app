@@ -9,20 +9,22 @@
 import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-class Relation_RelationLevel extends $pb.ProtobufEnum {
-  static const Relation_RelationLevel BAD = Relation_RelationLevel._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'BAD');
-  static const Relation_RelationLevel AVERAGE = Relation_RelationLevel._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'AVERAGE');
-  static const Relation_RelationLevel GREAT = Relation_RelationLevel._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'GREAT');
+class InteractionLevel extends $pb.ProtobufEnum {
+  static const InteractionLevel BAD = InteractionLevel._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'BAD');
+  static const InteractionLevel AVERAGE = InteractionLevel._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'AVERAGE');
+  static const InteractionLevel GREAT = InteractionLevel._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'GREAT');
+  static const InteractionLevel LOVE = InteractionLevel._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'LOVE');
 
-  static const $core.List<Relation_RelationLevel> values = <Relation_RelationLevel> [
+  static const $core.List<InteractionLevel> values = <InteractionLevel> [
     BAD,
     AVERAGE,
     GREAT,
+    LOVE,
   ];
 
-  static final $core.Map<$core.int, Relation_RelationLevel> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static Relation_RelationLevel? valueOf($core.int value) => _byValue[value];
+  static final $core.Map<$core.int, InteractionLevel> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static InteractionLevel? valueOf($core.int value) => _byValue[value];
 
-  const Relation_RelationLevel._($core.int v, $core.String n) : super(v, n);
+  const InteractionLevel._($core.int v, $core.String n) : super(v, n);
 }
 

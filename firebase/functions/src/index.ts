@@ -14,7 +14,7 @@ import {
   generateAgoraRtcToken, getLangame,
   getUserData,
   handleSendToDevice,
-  hashFnv32a, kBetasCollection,
+  hashFnv32a, kBetasCollection, kInteractionsCollection,
   kInvalidRequest,
   kLangamesCollection,
   kNotAuthenticated,
@@ -123,6 +123,127 @@ exports.subscribe = functions
                 "failed to add beta email",
             );
           });
+    });
+
+
+/**
+ *
+ * @type {HttpsFunction & Runnable<any>}
+ */
+exports.sendLangameEnd = functions
+    .runWith(runtimeOpts)
+    .https
+    .onCall(async (data, context) => {
+      if (!context.auth) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
+            undefined,
+            kNotAuthenticated,
+        );
+      }
+      if (!data) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            kInvalidRequest,
+        );
+      }
+      if (!data.channelName) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            "you must provide a valid channel name",
+        );
+      }
+
+      const langame = await getLangame(data.channelName);
+      if ("statusCode" in langame) return langame;
+
+      if (langame.lefts.includes(context.auth!.uid)) {
+        return new FirebaseFunctionsResponse(
+            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
+            undefined,
+            "you already sent langame end",
+        );
+      }
+
+      functions.logger.info("updating interactions for user", context.auth.uid);
+
+      // Difference between 2 arrays, i.e. which players didn't leave yet
+      // and remove self
+      const stillPlaying = langame.players.filter((p) =>
+        p.langameUid !== context.auth!.uid && // Not self
+          !langame.lefts.includes(p.langameUid)); // And still playing
+
+      // Update interactions with all users still playing
+      // (those who have left already done that with current one)
+      for (const e of stillPlaying) {
+        let ref = await admin
+            .firestore()
+            .collection(kInteractionsCollection)
+            // Yes, array in key because
+            // firestore doesn't support "array-contains-all"
+            .where(`${context.auth!.uid},${e.langameUid}`, "==", 1)
+            .get();
+
+        if (!ref.docs.some((d) => d.exists)) {
+          ref = await admin
+              .firestore()
+              .collection(kInteractionsCollection)
+              .where(`${e.langameUid},${context.auth!.uid}`, "==", 1)
+              .get();
+        }
+
+        // TODO: might increase interaction by length of langame
+        const data = {
+          interactions: admin.firestore.FieldValue.increment(1),
+        };
+        // TODO use try-catch & stuff in case it fail to send proper response?
+        if (ref.docs.some((d) => d.exists)) {
+          await admin
+              .firestore()
+              .collection(kInteractionsCollection)
+              .doc(ref.docs[0].id)
+              .update(data);
+          functions.logger
+              .info("updating interaction with",
+                  e.langameUid,
+                  "interactions",
+                  ref.docs.map((i) => i.data()),
+              );
+        } else {
+          // @ts-ignore
+          data[`${context.auth!.uid},${e.langameUid}`] = 1;
+          await admin
+              .firestore()
+              .collection(kInteractionsCollection)
+              .add(data);
+          functions.logger
+              .info("creating new interaction with", e.langameUid);
+        }
+      }
+
+      await admin
+          .firestore()
+          .collection(kLangamesCollection)
+          .doc(langame.id!)
+          .update({ // TODO: might increase interaction by length of langame
+            lefts: admin.firestore.FieldValue.arrayUnion(context.auth.uid),
+          });
+
+      // Everybody left, clean-up, TODO: might save statistics somewhere maybe
+      if (stillPlaying.length === 0) {
+        await admin
+            .firestore()
+            .collection(kLangamesCollection)
+            .doc(langame.id!)
+            .delete();
+      }
+      return new FirebaseFunctionsResponse(
+          FirebaseFunctionsResponseStatusCode.OK,
+          undefined,
+          undefined,
+      );
     });
 
 /**
@@ -385,7 +506,7 @@ exports.sendLangame = functions
                 {
                   data: {id: notification.id},
                   notification: {
-                    tag: context.auth!.uid,
+                    tag: channelName,
                     // eslint-disable-next-line max-len
                     body: `${senderData.displayName} invited you to play ${data.topics.join(",")}`,
                     // eslint-disable-next-line max-len
@@ -503,7 +624,7 @@ exports.sendReadyForLangame = functions
             {
               data: {id: notification.id},
               notification: {
-                tag: context.auth!.uid,
+                tag: langame.channelName,
                 // eslint-disable-next-line max-len
                 body: `${senderData.displayName} is waiting you to play ${langame.topics.join(",")}`,
                 // eslint-disable-next-line max-len

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:langame/models/channel.dart';
-import 'package:langame/models/user.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'firebase.dart';
 
@@ -28,13 +28,13 @@ abstract class AuthenticationApi {
   Future<void> logout();
 
   /// Get [LangameUser] from Firestore using Firebase uid
-  Future<LangameUser?> getLangameUser(String uid);
+  Future<lg.User?> getLangameUser(String uid);
 
   /// Get [LangameUser] from Firestore using Langame [tag]
-  Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag);
+  Future<List<lg.User>> getLangameUsersStartingWithTag(String tag);
 
   /// Add [LangameUser] to Firestore using Firebase [User]
-  Future<LangameUser> addLangameUser(User user);
+  Future<lg.User> addLangameUser(User user);
 
   /// Update current authenticated user, at the firebase level
   /// and firestore [LangameUser], throw if not authenticated
@@ -47,4 +47,7 @@ abstract class AuthenticationApi {
 
   Future<String> getChannelToken(String channelName);
   Future<LangameChannel> getChannel(String channelName);
+  Future<List<lg.User>> getUserRecommendations(lg.User user);
+  Future<void> sendLangameEnd(String channelName);
+  Future<int?> getInteraction(String uid, String otherUid);
 }

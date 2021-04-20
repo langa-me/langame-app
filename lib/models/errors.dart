@@ -54,6 +54,10 @@ class LangameGetAudioTokenException extends LangameException {
   LangameGetAudioTokenException(String cause) : super(cause);
 }
 
+class LangameSendEndException extends LangameException {
+  LangameSendEndException(String cause) : super(cause);
+}
+
 class LangameGetChannelException extends LangameException {
   LangameGetChannelException(String cause) : super(cause);
 }

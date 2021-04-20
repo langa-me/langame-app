@@ -28,6 +28,7 @@ export const kLangamesCollection: string = "langames";
 export const kTagsCollection: string = "tags";
 export const kQuestionsCollection: string = "questions";
 export const kBetasCollection: string = "betas";
+export const kInteractionsCollection: string = "interactions";
 
 export const filterOutSendLangameCalls =
     (data: any, context: functions.https.CallableContext) => {
@@ -223,6 +224,7 @@ export const getLangame = async (channelName: string):
   try {
     const data = queryResult.docs[0].data();
     return new LangameChannel({
+      id: queryResult.docs[0].id,
       channelName: data.channelName,
       players: data.players,
       topics: data.topics,

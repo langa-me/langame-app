@@ -38,7 +38,7 @@ class AudioProvider extends ChangeNotifier {
       // Ignore
       if (_sub != null) return LangameResponse(LangameStatus.succeed);
       CountdownTimer countDownTimer = CountdownTimer(
-        Duration(minutes: 1),
+        Duration(minutes: 15),
         Duration(seconds: 1),
       );
 
@@ -106,12 +106,14 @@ class AudioProvider extends ChangeNotifier {
       _engine = await RtcEngine.createWithConfig(
           RtcEngineConfig(AppConst.agoraAppID));
       _engine!.setEventHandler(eventHandler);
-      await _engine!.enableAudio();
-      await _engine!.setChannelProfile(ChannelProfile.LiveBroadcasting);
-      await _engine!.setClientRole(ClientRole.Broadcaster);
-      // Usually disabling microphone by default
-      await _engine!.enableLocalAudio(_isMicrophoneEnabled);
-      await _engine!.setEnableSpeakerphone(_isSpeakerphoneEnabled);
+      await Future.wait([
+        _engine!.enableAudio(),
+        _engine!.setChannelProfile(ChannelProfile.LiveBroadcasting),
+        _engine!.setClientRole(ClientRole.Broadcaster),
+        _engine!.enableLocalAudio(_isMicrophoneEnabled),
+        _engine!.setEnableSpeakerphone(_isSpeakerphoneEnabled),
+      ]); // Usually disabling microphone by default
+
     } catch (e, s) {
       firebase.crashlytics?.log('failed to init audio engine');
       firebase.crashlytics?.recordError(e, s);
@@ -128,6 +130,8 @@ class AudioProvider extends ChangeNotifier {
       debugPrint(msg);
       firebase.crashlytics?.log(msg);
 
+      // TODO: replace by which use string uid
+      // _engine.joinChannelWithUserAccount(token, channelName, userAccount)
       final r = RetryOptions(maxAttempts: 8);
       await r.retry(
         () => _engine

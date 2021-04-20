@@ -1,6 +1,10 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/errors.dart';
+import 'package:langame/models/extension.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
@@ -27,23 +31,28 @@ class _FriendsViewState extends State<FriendsView> {
   PageController _pageController = PageController(
     initialPage: 0,
   );
-
+  // GlobalKey _toolTipKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      floatingActionButton: _buildFloatingButtons(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: _buildPageView(),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+    return WillPopScope(
+      onWillPop: _onBackPressed,
+      child: Scaffold(
+        appBar: _buildAppBar(),
+        floatingActionButton: _buildFloatingButtons(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        body: _buildPageView(),
+        bottomNavigationBar: _buildBottomNavigationBar(),
+      ),
     );
   }
 
   @override
   void initState() {
     super.initState();
-    Provider.of<CrashAnalyticsProvider>(context, listen: false).analytics.setCurrentScreen(screenName: 'friends');
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .analytics
+        .setCurrentScreen(screenName: 'friends');
     Provider.of<AuthenticationProvider>(context, listen: false)
         .fetchNotifications();
     _searchBarController = FloatingSearchBarController();
@@ -128,6 +137,8 @@ class _FriendsViewState extends State<FriendsView> {
       );
 
   Widget _buildPageView() {
+    Provider.of<AuthenticationProvider>(context, listen: false)
+        .getUserRecommendations();
     return PageView(
       onPageChanged: (i) => setState(() {
         _selectedIndex = i;
@@ -135,26 +146,114 @@ class _FriendsViewState extends State<FriendsView> {
       controller: _pageController,
       children: [
         Consumer<AuthenticationProvider>(
-          builder: (context, a, _) =>
-              a.relations == null || a.relations!.relations.length == 0
-                  ? Center(
-                      child: Text(
-                        'In the future, you will see your friends, or people with whom you interacted with here',
-                        style: Theme.of(context).textTheme.headline6,
+          builder: (context, a, _) => Column(children: [
+            // TODO: if opted-in to recommendations...
+            Expanded(
+              child: Container(
+                child: Column(
+                  children: [
+                    ListTile(
+                      // tileColor: Theme.of(context).colorScheme.primaryVariant,
+                      title: Text(
+                        'Recommendations',
                         textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline6,
                       ),
-                    )
-                  : ListView.builder(
-                      itemCount: a.relations!.relations.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(
-                              '${a.relations!.relations[index].other.displayName}'),
-                          leading: buildCroppedRoundedNetworkImage(
-                              a.relations!.relations[index].other.photoUrl),
-                        );
-                      },
+                      // trailing: Stack(children: [
+                      //   Tooltip(
+                      //     key: _toolTipKey,
+                      //     message: 'Recommendations are currently random',
+                      //   ),
+                      //   IconButton(
+                      //     icon: Icon(Icons.help_outline_outlined),
+                      //     onPressed: () {
+                      //       final dynamic tooltip = _toolTipKey.currentState;
+                      //       tooltip.ensureTooltipVisible();
+                      //     },
+                      //   ),
+                      // ]),
                     ),
+                    Divider(thickness: 3),
+                    Expanded(
+                      child: Container(
+                        height: AppSize.safeBlockVertical * 40,
+                        child: Consumer<LangameProvider>(
+                          builder: (c, lp, child) => ListView.builder(
+                            itemCount: a.userRecommendations.length,
+                            itemBuilder: (context, index) => FutureBuilder<
+                                    LangameResponse<InteractionLevel?>>(
+                                future: a.getInteraction(
+                                    a.userRecommendations[index].uid),
+                                builder: (ctx, s) {
+                                  return ListTile(
+                                    subtitle: s.hasData &&
+                                            s.data != null &&
+                                            s.data!.result != null
+                                        ? s.data!.result!.toFaIcon()
+                                        : FaIcon(
+                                            FontAwesomeIcons.questionCircle),
+                                    title: Text(
+                                        '${a.userRecommendations[index].displayName}'),
+                                    leading: buildCroppedRoundedNetworkImage(
+                                        a.userRecommendations[index].photoUrl),
+                                    trailing: MaterialButton(
+                                      // TODO: might use ToggleButton instead? (with icon)
+                                      onPressed: lp.shoppingList.any((e) =>
+                                              e.uid ==
+                                              a.userRecommendations[index].uid)
+                                          ? _onRemoveFromShoppingList(context,
+                                              a.userRecommendations[index], lp)
+                                          : _onAddToShoppingList(context,
+                                              a.userRecommendations[index], lp),
+                                      splashColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondaryVariant,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      shape: CircleBorder(),
+                                      child: Icon(
+                                        lp.shoppingList.any((e) =>
+                                                e.uid ==
+                                                a.userRecommendations[index]
+                                                    .uid)
+                                            ? Icons
+                                                .remove_shopping_cart_outlined
+                                            : Icons.add_shopping_cart_outlined,
+                                        size: AppSize.blockSizeHorizontal * 5,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // a.relations == null || a.relations!.relations.length == 0
+            //     ? Center(
+            //         child: Text(
+            //           'You have no friends!',
+            //           style: Theme.of(context).textTheme.headline6,
+            //           textAlign: TextAlign.center,
+            //         ),
+            //       )
+            //     : ListView.builder(
+            //         itemCount: a.relations!.relations.length,
+            //         itemBuilder: (context, index) {
+            //           return ListTile(
+            //             title: Text(
+            //                 '${a.relations!.relations[index].other.displayName}'),
+            //             leading: buildCroppedRoundedNetworkImage(
+            //                 a.relations!.relations[index].other.photoUrl),
+            //           );
+            //         },
+            //       ),
+          ]),
         ),
         Consumer2<LocalStorageProvider, AuthenticationProvider>(
           builder: (context, lsp, ap, _) => FloatingSearchBar(
@@ -173,7 +272,7 @@ class _FriendsViewState extends State<FriendsView> {
             transition: CircularFloatingSearchBarTransition(),
             physics: BouncingScrollPhysics(),
             title: Text(
-              lsp.selectedTag ?? 'Search for new faces',
+              lsp.selectedTag ?? 'Search for people',
               style: Theme.of(context).textTheme.headline6,
             ),
             hint: 'Search and find out...',
@@ -186,7 +285,7 @@ class _FriendsViewState extends State<FriendsView> {
                 return;
               }
               ap.getLangameUsersStartingWithTag(query).then((v) =>
-                  lsp.filteredTagSearchHistory = v.map((e) => e.tag!).toList());
+                  lsp.filteredTagSearchHistory = v.map((e) => e.tag).toList());
             },
             onSubmitted: (query) {
               lsp.addSearchHistory(query);
@@ -284,10 +383,10 @@ class _FriendsViewState extends State<FriendsView> {
                           if (users.length == 1) {
                             lsp.selectedTag = users.first.tag;
                             lsp.selectedUser = users.first;
-                            lsp.addSearchHistory(users.first.tag!);
+                            lsp.addSearchHistory(users.first.tag);
 
                             /// Place first
-                            lsp.placeFirstSearchHistory(users.first.tag!);
+                            lsp.placeFirstSearchHistory(users.first.tag);
                           } else {
                             // TODO: should notify "no user found" or several found ...
                             lsp.selectedTag = null;
@@ -308,6 +407,26 @@ class _FriendsViewState extends State<FriendsView> {
       ),
     );
   }
+
+  Future<bool> _onBackPressed() async =>
+      await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Exit?', textAlign: TextAlign.center),
+          actions: [
+            GestureDetector(
+              onTap: () => Navigator.of(context).pop(false),
+              child: const Text('NO', textAlign: TextAlign.center),
+            ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () => Navigator.of(context).pop(true),
+              child: const Text('YES', textAlign: TextAlign.center),
+            ),
+          ],
+        ),
+      ) ??
+      false;
 
   void _onBottomBarItemTapped(int index) {
     setState(() {
@@ -382,8 +501,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         StretchableButton(
           // TODO: might use ToggleButton instead? (with icon)
           onPressed: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-              ? _onRemoveFromShoppingList(p, lp)
-              : _onAddToShoppingList(p, lp),
+              ? _onRemoveFromShoppingList(context, p.selectedUser!, lp)
+              : _onAddToShoppingList(context, p.selectedUser!, lp),
           borderRadius: 1,
           splashColor: Theme.of(context).colorScheme.secondaryVariant,
           buttonPadding: 4,
@@ -410,26 +529,25 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       ]);
     });
   }
+}
 
-  void Function() _onAddToShoppingList(
-      LocalStorageProvider p, LangameProvider lp) {
-    return () {
-      lp.add(p.selectedUser!);
-      final snackBar = SnackBar(
-          content: Text(
-              '${p.selectedUser!.displayName} has been added to current Langame'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    };
-  }
+void Function() _onAddToShoppingList(
+    BuildContext ctx, User u, LangameProvider lp) {
+  return () {
+    lp.add(u);
+    final snackBar = SnackBar(
+        content: Text('${u.displayName} has been added to current Langame'));
+    ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+  };
+}
 
-  void Function() _onRemoveFromShoppingList(
-      LocalStorageProvider p, LangameProvider lp) {
-    return () {
-      lp.remove(p.selectedUser!);
-      final snackBar = SnackBar(
-          content: Text(
-              '${p.selectedUser!.displayName} has been removed from current Langame'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    };
-  }
+void Function() _onRemoveFromShoppingList(
+    BuildContext ctx, User u, LangameProvider lp) {
+  return () {
+    lp.remove(u);
+    final snackBar = SnackBar(
+        content:
+            Text('${u.displayName} has been removed from current Langame'));
+    ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
+  };
 }

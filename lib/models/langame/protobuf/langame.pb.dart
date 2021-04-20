@@ -9,8 +9,6 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'langame.pbenum.dart';
-
 export 'langame.pbenum.dart';
 
 class Topic extends $pb.GeneratedMessage {
@@ -441,66 +439,64 @@ class User extends $pb.GeneratedMessage {
   $core.List<$core.String> get tokens => $_getList(11);
 }
 
-class Relation extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Relation', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
-    ..aOM<User>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'other', subBuilder: User.create)
-    ..e<Relation_RelationLevel>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: Relation_RelationLevel.BAD, valueOf: Relation_RelationLevel.valueOf, enumValues: Relation_RelationLevel.values)
+class UserPreferences extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserPreferences', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'uid')
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'unknownPeopleRecommendations')
     ..hasRequiredFields = false
   ;
 
-  Relation._() : super();
-  factory Relation({
-    User? other,
-    Relation_RelationLevel? level,
+  UserPreferences._() : super();
+  factory UserPreferences({
+    $core.String? uid,
+    $core.bool? unknownPeopleRecommendations,
   }) {
     final _result = create();
-    if (other != null) {
-      _result.other = other;
+    if (uid != null) {
+      _result.uid = uid;
     }
-    if (level != null) {
-      _result.level = level;
+    if (unknownPeopleRecommendations != null) {
+      _result.unknownPeopleRecommendations = unknownPeopleRecommendations;
     }
     return _result;
   }
-  factory Relation.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Relation.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory UserPreferences.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory UserPreferences.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  Relation clone() => Relation()..mergeFromMessage(this);
+  UserPreferences clone() => UserPreferences()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  Relation copyWith(void Function(Relation) updates) => super.copyWith((message) => updates(message as Relation)) as Relation; // ignore: deprecated_member_use
+  UserPreferences copyWith(void Function(UserPreferences) updates) => super.copyWith((message) => updates(message as UserPreferences)) as UserPreferences; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static Relation create() => Relation._();
-  Relation createEmptyInstance() => create();
-  static $pb.PbList<Relation> createRepeated() => $pb.PbList<Relation>();
+  static UserPreferences create() => UserPreferences._();
+  UserPreferences createEmptyInstance() => create();
+  static $pb.PbList<UserPreferences> createRepeated() => $pb.PbList<UserPreferences>();
   @$core.pragma('dart2js:noInline')
-  static Relation getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Relation>(create);
-  static Relation? _defaultInstance;
+  static UserPreferences getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UserPreferences>(create);
+  static UserPreferences? _defaultInstance;
 
   @$pb.TagNumber(1)
-  User get other => $_getN(0);
+  $core.String get uid => $_getSZ(0);
   @$pb.TagNumber(1)
-  set other(User v) { setField(1, v); }
+  set uid($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasOther() => $_has(0);
+  $core.bool hasUid() => $_has(0);
   @$pb.TagNumber(1)
-  void clearOther() => clearField(1);
-  @$pb.TagNumber(1)
-  User ensureOther() => $_ensure(0);
+  void clearUid() => clearField(1);
 
   @$pb.TagNumber(2)
-  Relation_RelationLevel get level => $_getN(1);
+  $core.bool get unknownPeopleRecommendations => $_getBF(1);
   @$pb.TagNumber(2)
-  set level(Relation_RelationLevel v) { setField(2, v); }
+  set unknownPeopleRecommendations($core.bool v) { $_setBool(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasLevel() => $_has(1);
+  $core.bool hasUnknownPeopleRecommendations() => $_has(1);
   @$pb.TagNumber(2)
-  void clearLevel() => clearField(2);
+  void clearUnknownPeopleRecommendations() => clearField(2);
 }
 

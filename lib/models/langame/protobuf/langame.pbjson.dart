@@ -8,6 +8,19 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
+@$core.Deprecated('Use interactionLevelDescriptor instead')
+const InteractionLevel$json = const {
+  '1': 'InteractionLevel',
+  '2': const [
+    const {'1': 'BAD', '2': 0},
+    const {'1': 'AVERAGE', '2': 1},
+    const {'1': 'GREAT', '2': 2},
+    const {'1': 'LOVE', '2': 3},
+  ],
+};
+
+/// Descriptor for `InteractionLevel`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List interactionLevelDescriptor = $convert.base64Decode('ChBJbnRlcmFjdGlvbkxldmVsEgcKA0JBRBAAEgsKB0FWRVJBR0UQARIJCgVHUkVBVBACEggKBExPVkUQAw==');
 @$core.Deprecated('Use topicDescriptor instead')
 const Topic$json = const {
   '1': 'Topic',
@@ -66,25 +79,14 @@ const User$json = const {
 
 /// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIaCghmYWNlYm9vaxgIIAEoCFIIZmFjZWJvb2sSFAoFYXBwbGUYCSABKAhSBWFwcGxlEikKEGZhdm91cml0ZV90b3BpY3MYCiADKAlSD2Zhdm91cml0ZVRvcGljcxIQCgN0YWcYCyABKAlSA3RhZxIWCgZ0b2tlbnMYDCADKAlSBnRva2Vucw==');
-@$core.Deprecated('Use relationDescriptor instead')
-const Relation$json = const {
-  '1': 'Relation',
+@$core.Deprecated('Use userPreferencesDescriptor instead')
+const UserPreferences$json = const {
+  '1': 'UserPreferences',
   '2': const [
-    const {'1': 'other', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.User', '10': 'other'},
-    const {'1': 'level', '3': 2, '4': 1, '5': 14, '6': '.langame.protobuf.Relation.RelationLevel', '10': 'level'},
-  ],
-  '4': const [Relation_RelationLevel$json],
-};
-
-@$core.Deprecated('Use relationDescriptor instead')
-const Relation_RelationLevel$json = const {
-  '1': 'RelationLevel',
-  '2': const [
-    const {'1': 'BAD', '2': 0},
-    const {'1': 'AVERAGE', '2': 1},
-    const {'1': 'GREAT', '2': 2},
+    const {'1': 'uid', '3': 1, '4': 1, '5': 9, '10': 'uid'},
+    const {'1': 'unknown_people_recommendations', '3': 2, '4': 1, '5': 8, '10': 'unknownPeopleRecommendations'},
   ],
 };
 
-/// Descriptor for `Relation`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List relationDescriptor = $convert.base64Decode('CghSZWxhdGlvbhIsCgVvdGhlchgBIAEoCzIWLmxhbmdhbWUucHJvdG9idWYuVXNlclIFb3RoZXISPgoFbGV2ZWwYAiABKA4yKC5sYW5nYW1lLnByb3RvYnVmLlJlbGF0aW9uLlJlbGF0aW9uTGV2ZWxSBWxldmVsIjAKDVJlbGF0aW9uTGV2ZWwSBwoDQkFEEAASCwoHQVZFUkFHRRABEgkKBUdSRUFUEAI=');
+/// Descriptor for `UserPreferences`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List userPreferencesDescriptor = $convert.base64Decode('Cg9Vc2VyUHJlZmVyZW5jZXMSEAoDdWlkGAEgASgJUgN1aWQSRAoedW5rbm93bl9wZW9wbGVfcmVjb21tZW5kYXRpb25zGAIgASgIUhx1bmtub3duUGVvcGxlUmVjb21tZW5kYXRpb25z');

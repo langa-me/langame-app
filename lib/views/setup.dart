@@ -10,6 +10,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
@@ -62,13 +63,13 @@ class _SetupState extends State with AfterLayoutMixin {
       ]),
       body: PageView(
         onPageChanged: (int? i) async {
-          if (i != null && i > 3.0) {
+          if (i != null && i > 2.0) {
             // Register that this user has already done the setup
 
             Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
               'favourite topics ${favouriteTopics.map((e) => e.content).join(",")}',
               analyticsMessage: 'favourite_topics',
-              analyticsParameters: {'topics': favouriteTopics},
+              analyticsParameters: {'topics': favouriteTopics.join(',')},
             );
 
             // TODO: send mail to everyone "join langame bro"
@@ -109,41 +110,60 @@ class _SetupState extends State with AfterLayoutMixin {
         },
         controller: controller,
         children: <Widget>[
-          Center(
-            child: Container(
-              height: AppSize.safeBlockVertical * 5,
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Icon(
-                  Icons.favorite_border_outlined,
-                  size: 24,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                Text('Try to firmly shake your phone',
-                    style: Theme.of(context).textTheme.button),
-                Icon(
-                  Icons.favorite_border_outlined,
-                  size: 24,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ]),
+          Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(
+              'Want to help us by sharing a feedback anytime?',
+              style: Theme.of(context).textTheme.headline5,
+              textAlign: TextAlign.center,
             ),
-          ),
-          Container(
-            color: Theme.of(context).colorScheme.background,
-            child: Center(
-              child: OutlinedButton.icon(
-                style: Theme.of(context).elevatedButtonTheme.style,
-                onPressed: () {
-                  showBasicSnackBar(context, 'feature not implemented yet!');
+            Spacer(),
+            Consumer<FeedbackProvider>(
+              builder: (context, p, child) => ListTile(
+                onTap: () {
+                  p.detectShakes = !p.detectShakes;
                 },
-                icon: Icon(Icons.account_box_outlined,
-                    color: Theme.of(context).colorScheme.secondary),
-                label: Text('Invite friends?',
-                    style: Theme.of(context).textTheme.button),
+                leading: Icon(Icons.feedback_outlined),
+                title: Text('Shake-to-feedback'),
+                trailing: Switch(
+                    value: p.detectShakes,
+                    onChanged: (v) => p.detectShakes = !p.detectShakes),
               ),
             ),
-          ),
+            Spacer(),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(
+                Icons.favorite_border_outlined,
+                size: 24,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              Text(
+                'Try to firmly shake your phone',
+                style: Theme.of(context).textTheme.headline6,
+                textAlign: TextAlign.center,
+              ),
+              Icon(
+                Icons.favorite_border_outlined,
+                size: 24,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ]),
+            Spacer(),
+          ]),
+          // Container(
+          //   color: Theme.of(context).colorScheme.background,
+          //   child: Center(
+          //     child: OutlinedButton.icon(
+          //       style: Theme.of(context).elevatedButtonTheme.style,
+          //       onPressed: () {
+          //         showBasicSnackBar(context, 'feature not implemented yet!');
+          //       },
+          //       icon: Icon(Icons.account_box_outlined,
+          //           color: Theme.of(context).colorScheme.secondary),
+          //       label: Text('Invite friends?',
+          //           style: Theme.of(context).textTheme.button),
+          //     ),
+          //   ),
+          // ),
           Column(children: [
             Text(
               'What are your interests?',

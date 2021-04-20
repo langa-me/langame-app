@@ -24,9 +24,10 @@ class AppConst {
 
   static const String saveTokenFunction = 'saveToken';
   static const String sendLangameFunction = 'sendLangame';
-  static const String sendReadyForLangameFunction = 'sendReadyForLangame';
+  static const String notifyPresenceFunction = 'sendReadyForLangame';
   static const String updateProfileFunction = 'updateProfile';
   static const String getChannelTokenFunction = 'getChannelToken';
+  static const String sendLangameEndFunction = 'sendLangameEnd';
 
   static final navKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
 
@@ -34,6 +35,7 @@ class AppConst {
   static const String firestoreNotificationsCollection = 'notifications';
   static const String firestoreLangamesCollection = 'langames';
   static const String firestoreTopicsCollection = 'topics';
+  static const String firestoreInteractionsCollection = 'interactions';
 
   static const String helpUrl = 'https://help.langa.me';
 }

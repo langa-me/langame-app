@@ -8,8 +8,9 @@ import 'package:http/http.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/extension.dart';
 import 'package:langame/models/firebase_functions_protocol.dart';
-import 'package:langame/models/user.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 
 import 'authentication_api.dart';
@@ -81,37 +82,38 @@ class ImplAuthenticationApi extends AuthenticationApi {
   /// Query Firestore with [uid] looking for a LangameUser
   /// Throw GetUserException if it does not exist
   /// TODO: might use a transaction?
-  Future<LangameUser?> getLangameUser(String uid) async {
+  Future<lg.User?> getLangameUser(String uid) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
     DocumentSnapshot doc = await users.doc(uid).get();
     if (!doc.exists) return null;
     var data = doc.data();
     if (data == null) return null;
-    var u = LangameUser.fromJson(data);
-    firebase.crashlytics?.setUserIdentifier(u.uid!);
-    firebase.analytics?.setUserId(u.uid!);
+    var u = userFromMap(data);
+    firebase.crashlytics?.setUserIdentifier(u.uid);
+    firebase.analytics?.setUserId(u.uid);
     return u;
   }
 
-  Future<LangameUser> addLangameUser(User user) async {
+  Future<lg.User> addLangameUser(User user) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
-    LangameUser langameUser = LangameUser.fromFirebaseUser(user);
+    lg.User langameUser = userFromFirebase(user);
     var t = await _generateTag(user);
     if (user.providerData.any((e) => e.providerId == 'google.com')) {
       langameUser.google = true;
     }
     langameUser.tag = t.toLowerCase();
+
     return users
         .doc(langameUser.uid)
-        .set(langameUser.toJson())
+        .set(langameUser.toProto3Json() as Map<String, dynamic>)
         .then((value) => langameUser)
         .catchError((err) => throw LangameAddUserException(err.toString()));
   }
 
   @override
-  Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
+  Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
 
@@ -122,7 +124,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
         .where('tag', isGreaterThanOrEqualTo: tag)
         .where('tag', isLessThan: tag + 'z')
         .get(); // TODO: ignore case
-    return doc.docs.map((e) => LangameUser.fromJson(e.data())).toList();
+    return doc.docs.map((e) => lg.User.fromJson(e.data().toString())).toList();
   }
 
   @override
@@ -234,7 +236,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
           'channelName': channelName,
         },
       );
-      print(result.data);
       FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
         Map<String, dynamic>.from(result.data),
       );
@@ -265,5 +266,70 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
     Map<String, dynamic> first = r.docs.first.data();
     return LangameChannel.fromJson(first);
+  }
+
+  @override
+  Future<List<lg.User>> getUserRecommendations(lg.User user) async {
+    // TODO: now reco is random
+    var r = await firebase.firestore!
+        .collection(AppConst.firestoreUsersCollection)
+        .where('uid', isNotEqualTo: user.uid)
+        .limit(5)
+        .get();
+
+    return r.docs.map((e) => userFromMap(e.data())).toList();
+  }
+
+  @override
+  Future<void> sendLangameEnd(String channelName) async {
+    HttpsCallable callable = firebase.functions!.httpsCallable(
+        AppConst.sendLangameEndFunction,
+        options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
+
+    try {
+      final HttpsCallableResult result = await callable.call(
+        <String, dynamic>{
+          'channelName': channelName,
+        },
+      );
+      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
+        Map<String, dynamic>.from(result.data),
+      );
+      switch (response.statusCode) {
+        case FirebaseFunctionsResponseStatusCode.OK:
+          break;
+        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
+          throw LangameSendEndException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
+        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
+          throw LangameSendEndException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
+        case FirebaseFunctionsResponseStatusCode.INTERNAL:
+          throw LangameSendEndException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
+      }
+    } catch (e) {
+      throw LangameSendEndException(e.toString());
+    }
+  }
+
+  @override
+  Future<int?> getInteraction(String uid, String otherUid) async {
+    var r = await firebase.firestore!
+        .collection(AppConst.firestoreInteractionsCollection)
+        .where('$uid,$otherUid', isEqualTo: 1)
+        .get();
+    if (!r.docs.any((e) => e.exists)) {
+      r = await firebase.firestore!
+          .collection(AppConst.firestoreInteractionsCollection)
+          .where('$otherUid,$uid', isEqualTo: 1)
+          .get();
+    }
+    // No interactions found
+    if (!r.docs.any((e) => e.exists)) return null;
+    var i = r.docs.first.data()['interactions'];
+    if (i == null || !(i is int))
+      throw LangameException('interactions_invalid_fields');
+    return i;
   }
 }

@@ -1,0 +1,3 @@
+- Show recommendations on main screen
+- Relation level with people
+- Improved notification view

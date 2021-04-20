@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/models/notification.dart';
-import 'package:langame/models/user.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -41,29 +42,62 @@ class _NotificationsViewState extends State<NotificationsView> {
       ),
       body: Consumer<AuthenticationProvider>(
         builder: (BuildContext context, p, c) {
-          return ListView.builder(
-            itemCount: p.notifications.length,
+          return GroupedListView<LangameNotification, String>(
+            elements: p.notifications,
+            groupBy: (n) => '${n.channelName!};${n.topics!.join(",")}',
+            groupSeparatorBuilder: (String groupByValue) =>
+                _buildTextDivider(groupByValue.split(';')[1]),
             itemBuilder: (c, i) {
               return _buildNotificationCard(i, p, theme);
             },
+            // TODO
+            // itemComparator: (item1, item2) => item1['name'].compareTo(item2['name']), // optional
           );
         },
       ),
     );
   }
 
+  Widget _buildTextDivider(String text) => Row(
+        children: [
+          Expanded(
+            child: Container(
+              color: Colors.black12,
+              height: 10,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(13),
+              color: Colors.black12,
+            ),
+            child: Center(
+                child: Text(
+              text,
+              style: Theme.of(context).textTheme.headline6,
+              textAlign: TextAlign.center,
+            )),
+          ),
+          Expanded(
+            child: Container(
+              color: Colors.black12,
+              height: 10,
+            ),
+          ),
+        ],
+      );
+
   Widget _buildNotificationCard(
-      int i, AuthenticationProvider p, ThemeData theme) {
+      LangameNotification n, AuthenticationProvider p, ThemeData theme) {
     // if (i > p.notifications.length) {
     //   // TODO: fix (when spamming dismiss)
     //   return Scaffold();
     // }
 
-    return FutureBuilder<LangameResponse<LangameUser>>(
-        future: p.getLangameUser(p.notifications[i].senderUid),
+    return FutureBuilder<LangameResponse<lg.User>>(
+        future: p.getLangameUser(n.senderUid),
         builder: (BuildContext context, snapshot) {
-          var n = p.notifications[i];
-          print(n.toJson());
           if (snapshot.hasData &&
               snapshot.data != null &&
               snapshot.data!.result != null &&
@@ -74,8 +108,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                   Container(color: Theme.of(context).colorScheme.secondary),
               key: Key(n.id!),
               onDismissed: (direction) async {
-                if (i > p.notifications.length) return; // Already deleted?
-                var res = await p.deleteNotification(n.id!);
+                var res = await p.deleteNotification(n.channelName!);
                 res.thenShowSnackBar(
                   context: context,
                   succeedMessage: 'Notification deleted!',
@@ -89,7 +122,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 child: ListTile(
                   leading: buildCroppedRoundedNetworkImage(
                       snapshot.data!.result!.photoUrl),
-                  title: Text(snapshot.data!.result!.displayName!),
+                  title: Text(snapshot.data!.result!.displayName),
                   subtitle: Text(n.ready == null || !n.ready!
                       ? 'is ready to play ${n.topics}'
                       : n.topics!.join(',')),
@@ -97,7 +130,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                   //     theme.colorScheme.primary, 0.5), // TODO
                   onTap: () {
                     // TODO: delete notification
-                    p.deleteNotification(n.id!);
+                    p.deleteNotification(n.channelName!);
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -110,8 +143,6 @@ class _NotificationsViewState extends State<NotificationsView> {
               ),
             );
           }
-          if (kReleaseMode)
-            print('failed to get user ${p.notifications[i].senderUid}');
           return SizedBox.shrink();
         });
   }

@@ -5,7 +5,7 @@ import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:langame/helpers/fake.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/models/channel.dart';
-import 'package:langame/models/user.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/authentication_api.dart';
 
 import 'firebase.dart';
@@ -23,18 +23,18 @@ class FakeAuthenticationApi extends AuthenticationApi {
   Stream<User?> get userChanges => _userChanges.stream.asBroadcastStream();
 
   @override
-  Future<LangameUser> addLangameUser(User user) async {
+  Future<lg.User> addLangameUser(User user) async {
     return faang.pickAny()!;
   }
 
   @override
-  Future<LangameUser?> getLangameUser(String uid) async {
+  Future<lg.User?> getLangameUser(String uid) async {
     return faang.pickAny();
   }
 
   @override
-  Future<List<LangameUser>> getLangameUsersStartingWithTag(String tag) async {
-    return faang.where((e) => e.uid!.startsWith(tag)).toList();
+  Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
+    throw UnimplementedError();
   }
 
   @override
@@ -84,6 +84,24 @@ class FakeAuthenticationApi extends AuthenticationApi {
   @override
   Future<String> getChannelToken(String channelName) {
     // TODO: implement getChannelToken
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<lg.User>> getUserRecommendations(lg.User user) {
+    // TODO: implement getUserRecommendations
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> sendLangameEnd(String channelName) {
+    // TODO: implement sendLangameEnd
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<int?> getInteraction(String uid, String otherUid) {
+    // TODO: implement getInteraction
     throw UnimplementedError();
   }
 }

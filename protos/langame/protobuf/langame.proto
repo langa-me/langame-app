@@ -57,17 +57,27 @@ message User {
 }
 
 /// Evaluated relationship between users using AI + heuristics
-message Relation {
-    User other = 1;
-    RelationLevel level = 2;
+//message Interaction {
+//  // Likely to be only length 2 array
+//  string users = 1;
+//
+//  // Langame played together
+//  int64 interactions = 2;
+//}
 
-    // Langame played together
-    //  int64 interactions = 1;
-
-    enum RelationLevel {
-        BAD = 0;
-        AVERAGE = 1;
-        GREAT = 2;
-    }
+enum InteractionLevel {
+  BAD = 0;
+  AVERAGE = 1;
+  GREAT = 2;
+  LOVE = 3;
 }
 
+// Why a message for user preferences instead of local storage? The future is the cloud bro, nothing in local
+// Why another message? With scale, can't stuff everything into a message that is often used (user)
+// It's ok to make a joint from time to time
+message UserPreferences {
+  string uid = 1;
+  // Do I want to be recommended like-minded new people?
+  bool unknown_people_recommendations = 2;
+  // TODO: transfer every preferences from other messages here
+}

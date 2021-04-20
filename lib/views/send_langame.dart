@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
-import 'package:langame/models/user.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
@@ -58,7 +58,8 @@ class _SendLangameState extends State<SendLangameView>
                         .toLowerCase()
                         .startsWith(filter.toLowerCase()))
                     .toList();
-                return Expanded(
+                return Container(
+                  height: AppSize.safeBlockVertical * 70,
                   child: GridView.builder(
                     itemCount: filteredTopics.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -105,7 +106,7 @@ class _SendLangameState extends State<SendLangameView>
               },
               label: const Text('Join now'),
               icon: const Icon(Icons.phone_in_talk_outlined),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
+              backgroundColor: Colors.grey,
             ),
             FloatingActionButton.extended(
               heroTag: 'join_later',
@@ -116,7 +117,7 @@ class _SendLangameState extends State<SendLangameView>
               },
               label: const Text('Join later'),
               icon: const Icon(Icons.send_outlined),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
+              backgroundColor: Colors.grey,
             ),
           ],
         ),
@@ -129,26 +130,27 @@ class _SendLangameState extends State<SendLangameView>
       showBasicSnackBar(context, 'You must select at least one topics');
       return null;
     }
-    if (selectedTopics.length > 3) {
+    if (selectedTopics.length > 1) {
       // TODO: better UX
-      showBasicSnackBar(context, 'You must select a maximum of 3 topics');
+      showBasicSnackBar(context, 'For now, only 1 topic at once is supported');
       return null;
     }
 
     showBasicSnackBar(context,
         'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
     var res = await Provider.of<AuthenticationProvider>(context, listen: false)
-        .send(l.shoppingList, selectedTopics);
+        .send(l.shoppingList, selectedTopics, now: true);
+
     setState(selectedTopics.clear);
 
     return res.result;
   }
 
   Widget _buildPlayerCard(
-      LangameUser player, void Function(LangameUser player) remove) {
+      lg.User player, void Function(lg.User player) remove) {
     return Expanded(
       child: ListTile(
-        title: Text(player.displayName!),
+        title: Text(player.displayName),
         trailing: IconButton(
           icon: Icon(Icons.clear_outlined),
           onPressed: () {

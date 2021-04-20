@@ -166,22 +166,28 @@ export class ChannelUserLangameUser {
  * Contains information about a Langame
  */
 export class LangameChannel {
+    id?: string;
     channelName: string;
     players: Array<ChannelUserLangameUser>;
     topics: Array<string>;
     questions: Array<string>;
+    // Players who left
+    lefts: Array<string> = [];
 
     /**
      * Constructor of LangameChannel...
+     * @param{string} id
      * @param{string} channelName
      * @param{Array<ChannelUserLangameUser>} players
      * @param{Array<string>} topics
      * @param{Array<string>} questions
      */
-    constructor({channelName, players, topics, questions}:{channelName: string,
+    constructor({id, channelName, players, topics, questions}:{id?: string,
+        channelName: string,
         players: Array<ChannelUserLangameUser>,
         topics: Array<string>,
         questions: Array<string>}) {
+      this.id = id;
       this.channelName = channelName;
       this.players = players;
       this.topics = topics;

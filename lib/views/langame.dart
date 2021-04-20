@@ -9,7 +9,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/user.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -30,7 +30,7 @@ class LangameView extends StatefulWidget {
 }
 
 class Player {
-  LangameUser langameUser;
+  lg.User langameUser;
   bool isSpeaking;
 
   Player(this.langameUser, this.isSpeaking);
@@ -40,7 +40,7 @@ class _LangameViewState extends State<LangameView> {
   bool permissionRequested = false;
   String? channelToken;
   LangameChannel? channel;
-  List<LangameUser> channelLangameUsers = [];
+  List<lg.User> channelLangameUsers = [];
   bool engineInitialized = false;
   bool channelJoined = false;
   HashMap<int, Player> joinedPlayers = HashMap();
@@ -50,6 +50,9 @@ class _LangameViewState extends State<LangameView> {
 
   String _loadingMessage = '';
   String _failingMessage = '';
+
+  // final GlobalKey<State> _keyLoader =
+      // GlobalKey<State>(debugLabel: '_keyLoader');
 
   @override
   void initState() {
@@ -62,7 +65,7 @@ class _LangameViewState extends State<LangameView> {
     _failingMessage = fp.getFailingRandom();
     if (!widget.notifyOthers) return;
     Provider.of<AuthenticationProvider>(context, listen: false)
-        .sendReadyForLangame(widget.channelName);
+        .notifyPresence(widget.channelName);
   }
 
   @override
@@ -77,62 +80,72 @@ class _LangameViewState extends State<LangameView> {
         'view': 'langame_view',
         'initialized': joinedPlayers.length != channel?.players.length,
       });
-      return _buildLoading(text: 'You are offline!');
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: _buildLoading(text: 'You are offline!'),
+      );
     }
 
     Widget? permission = _handlePermission();
-    if (permission != null) return permission;
+    if (permission != null)
+      return WillPopScope(onWillPop: _onBackPressed, child: permission);
 
     // Second-step, ask for a token generation
     if (channelToken == null) {
       var p = Provider.of<AuthenticationProvider>(context, listen: false);
-      return FutureBuilder<LangameResponse<String>>(
-          future: p.getChannelToken(widget.channelName),
-          builder: (c, s) {
-            if (s.hasError) _handleError();
-            if (s.hasData &&
-                s.data != null &&
-                s.data!.status == LangameStatus.succeed) {
-              _postFrameCallback(
-                  (_) => setState(() => channelToken = s.data!.result));
-            } else if (s.hasData &&
-                s.data != null &&
-                s.data!.status == LangameStatus.failed) {
-              _handleError();
-              _postFrameCallback((_) => setState(() => channelToken = null));
-            }
-            return _buildLoading(text: _loadingMessage);
-          });
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: FutureBuilder<LangameResponse<String>>(
+            future: p.getChannelToken(widget.channelName),
+            builder: (c, s) {
+              if (s.hasError) _handleError();
+              if (s.hasData &&
+                  s.data != null &&
+                  s.data!.status == LangameStatus.succeed) {
+                _postFrameCallback(
+                    (_) => setState(() => channelToken = s.data!.result));
+              } else if (s.hasData &&
+                  s.data != null &&
+                  s.data!.status == LangameStatus.failed) {
+                _handleError();
+                _postFrameCallback((_) => setState(() => channelToken = null));
+              }
+              return _buildLoading(text: _loadingMessage);
+            }),
+      );
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .log('channelToken $channelToken');
     // Third-step, retrieve channel data
     if (channel == null) {
       var p = Provider.of<AuthenticationProvider>(context, listen: false);
-      return FutureBuilder<LangameResponse<LangameChannel>>(
-        future: p.getChannel(widget.channelName),
-        builder: (c, s) {
-          if (s.hasError) _handleError();
-          if (s.hasData &&
-              s.data != null &&
-              s.data!.status == LangameStatus.succeed) {
-            _postFrameCallback((_) {
-              setState(() {
-                channel = s.data!.result;
-                question = s.data!.result!.questions.isEmpty
-                    ? Provider.of<FunnyProvider>(context, listen: false)
-                        .getFailingRandom()
-                    : channel!.questions.first;
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: FutureBuilder<LangameResponse<LangameChannel>>(
+          future: p.getChannel(widget.channelName),
+          builder: (c, s) {
+            if (s.hasError) _handleError();
+            if (s.hasData &&
+                s.data != null &&
+                s.data!.status == LangameStatus.succeed) {
+              _postFrameCallback((_) {
+                setState(() {
+                  channel = s.data!.result;
+                  question = s.data!.result!.questions.isEmpty
+                      ? Provider.of<FunnyProvider>(context, listen: false)
+                          .getFailingRandom()
+                      : channel!.questions.first;
+                });
               });
-            });
-          } else if (s.hasData &&
-              s.data != null &&
-              s.data!.status == LangameStatus.failed) {
-            _handleError();
-            _postFrameCallback((_) => setState(() => channel = null));
-          }
-          return _buildLoading(text: _loadingMessage);
-        },
+            } else if (s.hasData &&
+                s.data != null &&
+                s.data!.status == LangameStatus.failed) {
+              _handleError();
+              _postFrameCallback((_) => setState(() => channel = null));
+            }
+            return _buildLoading(text: _loadingMessage);
+          },
+        ),
       );
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
@@ -141,24 +154,28 @@ class _LangameViewState extends State<LangameView> {
     // Fourth-step, retrieve langame users data
     if (channelLangameUsers.isEmpty) {
       var p = Provider.of<AuthenticationProvider>(context, listen: false);
-      return FutureBuilder<LangameResponse<List<LangameUser>>>(
-        future: p.getLangameUsers(
-            channel!.players.map((e) => e.langameUid).toList()),
-        builder: (c, s) {
-          if (s.hasError) _handleError();
-          if (s.hasData &&
-              s.data != null &&
-              s.data!.status == LangameStatus.succeed) {
-            _postFrameCallback(
-                (_) => setState(() => channelLangameUsers = s.data!.result!));
-          } else if (s.hasData &&
-              s.data != null &&
-              s.data!.status == LangameStatus.failed) {
-            _handleError();
-            _postFrameCallback((_) => setState(() => channelLangameUsers = []));
-          }
-          return _buildLoading(text: _loadingMessage);
-        },
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: FutureBuilder<LangameResponse<List<lg.User>>>(
+          future: p.getLangameUsers(
+              channel!.players.map((e) => e.langameUid).toList()),
+          builder: (c, s) {
+            if (s.hasError) _handleError();
+            if (s.hasData &&
+                s.data != null &&
+                s.data!.status == LangameStatus.succeed) {
+              _postFrameCallback(
+                  (_) => setState(() => channelLangameUsers = s.data!.result!));
+            } else if (s.hasData &&
+                s.data != null &&
+                s.data!.status == LangameStatus.failed) {
+              _handleError();
+              _postFrameCallback(
+                  (_) => setState(() => channelLangameUsers = []));
+            }
+            return _buildLoading(text: _loadingMessage);
+          },
+        ),
       );
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
@@ -167,23 +184,27 @@ class _LangameViewState extends State<LangameView> {
     // Fifth-step, initialize audio engine
     if (!engineInitialized) {
       var p = Provider.of<AudioProvider>(context, listen: false);
-      return FutureBuilder<LangameResponse<void>>(
-        future: p.initEngine(_buildEventHandler()),
-        builder: (c, s) {
-          if (s.hasError) _handleError();
-          if (s.hasData &&
-              s.data != null &&
-              s.data!.status == LangameStatus.succeed) {
-            _postFrameCallback((_) => setState(() => engineInitialized = true));
-          } else if (s.hasData &&
-              s.data != null &&
-              s.data!.status == LangameStatus.failed) {
-            _handleError();
-            _postFrameCallback(
-                (_) => setState(() => engineInitialized = false));
-          }
-          return _buildLoading(text: _loadingMessage);
-        },
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: FutureBuilder<LangameResponse<void>>(
+          future: p.initEngine(_buildEventHandler()),
+          builder: (c, s) {
+            if (s.hasError) _handleError();
+            if (s.hasData &&
+                s.data != null &&
+                s.data!.status == LangameStatus.succeed) {
+              _postFrameCallback(
+                  (_) => setState(() => engineInitialized = true));
+            } else if (s.hasData &&
+                s.data != null &&
+                s.data!.status == LangameStatus.failed) {
+              _handleError();
+              _postFrameCallback(
+                  (_) => setState(() => engineInitialized = false));
+            }
+            return _buildLoading(text: _loadingMessage);
+          },
+        ),
       );
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
@@ -195,23 +216,27 @@ class _LangameViewState extends State<LangameView> {
       var ap = Provider.of<AuthenticationProvider>(context, listen: false);
       ChannelUserLangameUser player =
           channel!.players.firstWhere((p) => p.langameUid == ap.user?.uid);
-      return FutureBuilder<LangameResponse<void>>(
-          future: p.joinChannel(
-              channelToken!, widget.channelName, player.channelUid),
-          builder: (c, s) {
-            if (s.hasError) _handleError();
-            if (s.hasData &&
-                s.data != null &&
-                s.data!.status == LangameStatus.succeed) {
-              _postFrameCallback((_) => setState(() => channelJoined = true));
-            } else if (s.hasData &&
-                s.data != null &&
-                s.data!.status == LangameStatus.failed) {
-              _handleError();
-              _postFrameCallback((_) => setState(() => channelJoined = false));
-            }
-            return _buildLoading(text: _loadingMessage);
-          });
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: FutureBuilder<LangameResponse<void>>(
+            future: p.joinChannel(
+                channelToken!, widget.channelName, player.channelUid),
+            builder: (c, s) {
+              if (s.hasError) _handleError();
+              if (s.hasData &&
+                  s.data != null &&
+                  s.data!.status == LangameStatus.succeed) {
+                _postFrameCallback((_) => setState(() => channelJoined = true));
+              } else if (s.hasData &&
+                  s.data != null &&
+                  s.data!.status == LangameStatus.failed) {
+                _handleError();
+                _postFrameCallback(
+                    (_) => setState(() => channelJoined = false));
+              }
+              return _buildLoading(text: _loadingMessage);
+            }),
+      );
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .log('channelJoined $channelJoined');
@@ -222,42 +247,78 @@ class _LangameViewState extends State<LangameView> {
         !engineInitialized ||
         !channelJoined) {
       // TODO: turn mic off
-      _buildLoading(text: _loadingMessage);
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: _buildLoading(text: _loadingMessage),
+      );
     }
     Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
         'joinedPlayers ${joinedPlayers.values.map((e) => e.langameUser.displayName).join(',')}');
 
-    return joinedPlayers.length != channel?.players.length
-        ? _buildWaitingScreen()
-        : Scaffold(
-            // appBar: AppBar(
-            //   automaticallyImplyLeading: false,
-            //   actions: [
-            //     IconButton(
-            //       icon: Icon(Icons.record_voice_over_outlined),
-            //       onPressed: () {},
-            //     ),
-            //   ],
-            // ),
-            body: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _buildTimerText(),
-                _buildQuestion(),
-                _buildBottomHalf(),
-              ],
+    return WillPopScope(
+      onWillPop: _onBackPressed,
+      child: joinedPlayers.length != channel?.players.length
+          ? _buildWaitingScreen()
+          : Scaffold(
+              // appBar: AppBar(
+              //   automaticallyImplyLeading: false,
+              //   actions: [
+              //     IconButton(
+              //       icon: Icon(Icons.record_voice_over_outlined),
+              //       onPressed: () {},
+              //     ),
+              //   ],
+              // ),
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _buildTimerText(),
+                  _buildQuestion(),
+                  _buildBottomHalf(),
+                ],
+              ),
             ),
-          );
+    );
   }
 
   @override
   void dispose() {
-    super.dispose();
     Provider.of<AudioProvider>(AppConst.navKey.currentContext!, listen: false)
         .stopTimer();
     Provider.of<AudioProvider>(AppConst.navKey.currentContext!, listen: false)
-        .leaveChannel(); // TODO: might fail?
+        .leaveChannel();
+    super.dispose();
+// TODO: might fail?
   }
+
+  Future<bool> _onBackPressed() async =>
+      await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Exit the langame?', textAlign: TextAlign.center),
+          actions: [
+            OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).pop(false),
+              icon: Icon(Icons.cancel_outlined),
+              label: Text('CANCEL', textAlign: TextAlign.center),
+            ),
+            Spacer(),
+            OutlinedButton.icon(
+              onPressed: () async {
+                await _onEnd();
+                // Dialogs.showLoadingDialog(
+                //     context, _keyLoader, 'terminating...');
+                // f.whenComplete(
+                //     () => Navigator.of(context, rootNavigator: true).pop());
+                Navigator.of(context).pop(true);
+              },
+              icon: Icon(Icons.exit_to_app_rounded),
+              label: Text('YES', textAlign: TextAlign.center),
+            ),
+          ],
+        ),
+      ) ??
+      false;
 
   void _goBackToMainMenu() => Navigator.pushReplacement(
         context,
@@ -284,7 +345,7 @@ class _LangameViewState extends State<LangameView> {
                   OutlinedButton.icon(
                     onPressed: _goBackToMainMenu,
                     icon: Icon(Icons.cancel_outlined),
-                    label: Text('CANCEL'),
+                    label: Text('CANCEL', textAlign: TextAlign.center),
                   ),
                   OutlinedButton.icon(
                     onPressed: () async {
@@ -309,7 +370,7 @@ class _LangameViewState extends State<LangameView> {
                       );
                     },
                     icon: Icon(Icons.check_circle_outline),
-                    label: Text('UNDERSTOOD'),
+                    label: Text('UNDERSTOOD', textAlign: TextAlign.center),
                   ),
                 ],
               );
@@ -392,7 +453,7 @@ class _LangameViewState extends State<LangameView> {
           setState(() {
             joinedPlayers.remove(uid);
           });
-          _onEnd(left: displayName);
+          _onEnd(left: displayName, showDialog: true);
         },
         userJoined: (int uid, int _) {
           var joinerIds =
@@ -434,10 +495,24 @@ class _LangameViewState extends State<LangameView> {
         },
       );
 
-  void _onEnd({String? left}) {
-    Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .log('langame end', analyticsMessage: 'langame_end');
-    Future.delayed(Duration.zero, () => _showEndDialog(context, left: left));
+  Future<void> _onEnd({String? left, bool showDialog = false}) async {
+    try {
+      Provider.of<CrashAnalyticsProvider>(context, listen: false)
+          .log('langame end', analyticsMessage: 'langame_end');
+      var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+      Provider.of<AudioProvider>(context, listen: false).stopTimer();
+      await Future.wait([
+        ap.sendLangameEnd(channel!.channelName),
+        Provider.of<AudioProvider>(context, listen: false).leaveChannel(),
+        ap.deleteNotification(channel!.channelName),
+      ]);
+    } catch (e, s) {
+      Provider.of<CrashAnalyticsProvider>(context, listen: false)
+          .crashlytics
+          .recordError(e, s);
+    }
+    if (showDialog)
+      Future.delayed(Duration.zero, () => _showEndDialog(context, left: left));
   }
 
   Widget _buildWaitingScreen() {
@@ -453,7 +528,7 @@ class _LangameViewState extends State<LangameView> {
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             SpinKitWave(
               color: Theme.of(context).colorScheme.primary,
-              size: AppSize.blockSizeHorizontal * 3,
+              size: AppSize.blockSizeHorizontal * 8,
             ),
             SizedBox(width: AppSize.blockSizeVertical * 3),
             Expanded(
@@ -461,6 +536,7 @@ class _LangameViewState extends State<LangameView> {
                 /// Exclusion between 'supposed to join' and 'joined ones' joined by ','
                 'Waiting for ${channelLangameUsers.where((e) => !joinedPlayers.values.map((e) => e.langameUser.uid).contains(e)).map((e) => e.displayName).join(',')}...',
                 style: Theme.of(context).textTheme.headline6,
+                textAlign: TextAlign.center,
               ),
             ),
           ]),
@@ -512,7 +588,7 @@ class _LangameViewState extends State<LangameView> {
               stream: p.remaining,
               builder: (c, s) {
                 if (s.hasData && s.data != null && s.data!.inSeconds == 1) {
-                  _onEnd();
+                  _onEnd(showDialog: true);
                 }
                 return Center(
                   child: Container(
@@ -640,6 +716,7 @@ class _LangameViewState extends State<LangameView> {
   }
 
   Future<void> _showEndDialog(BuildContext context, {String? left}) async {
+    // TODO: ask feedback questions... human supervision
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!

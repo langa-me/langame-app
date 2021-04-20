@@ -31,9 +31,6 @@ class ImplMessageApi extends MessageApi {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  /// [localNotifications] stores the mapping Langame notification id -> local notification id
-  final Map<String, int> localNotifications = {};
-
   ImplMessageApi(FirebaseApi firebase,
       void Function(LangameNotification?) onBackgroundOrForegroundOpened)
       : super(firebase, onBackgroundOrForegroundOpened);
@@ -42,30 +39,28 @@ class ImplMessageApi extends MessageApi {
     RemoteNotification? notification = m.notification;
     AndroidNotification? android = m.notification?.android;
     if (notification != null && android != null) {
-      flutterLocalNotificationsPlugin
-          .show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              iOS: IOSNotificationDetails(),
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channel.description,
-                // TODO add a proper drawable resource to android, for now using
-                //      one that already exists in example app.
-                icon: '@mipmap/ic_launcher',
-                importance: Importance.max,
-                priority: Priority.high,
-                tag: notification.android?.tag,
-              ),
-            ),
-            payload: jsonEncode(m.data),
-            // Then add id to local notifications
-          )
-          .then((value) =>
-              localNotifications[m.data['id']] = notification.hashCode);
+      flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          iOS: IOSNotificationDetails(),
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channel.description,
+            // TODO add a proper drawable resource to android, for now using
+            //      one that already exists in example app.
+            icon: '@mipmap/ic_launcher',
+            importance:
+                Importance.max, // Seems only to work on other people phones :)
+            priority: Priority.high,
+            tag: notification.android?.tag,
+          ),
+        ),
+        payload: jsonEncode(m.data),
+        // Then add id to local notifications
+      );
     }
     if (_addCallback != null) {
       fetch(m.data['id']).then((n) {
@@ -117,7 +112,7 @@ class ImplMessageApi extends MessageApi {
           ?.createNotificationChannel(channel);
     }
 
-    // TODO: should show "we wil ask you permission blabla.."
+    // TODO: should show "we wil ask you permission bla bla.."
     NotificationSettings settings = await firebase.messaging!.requestPermission(
       alert: true,
       announcement: false,
@@ -175,9 +170,9 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<void> sendReadyForLangame(String channelName) async {
+  Future<void> notifyPresence(String channelName) async {
     HttpsCallable callable = firebase.functions!.httpsCallable(
-      AppConst.sendReadyForLangameFunction,
+      AppConst.notifyPresenceFunction,
       options: HttpsCallableOptions(
         timeout: Duration(seconds: 10),
       ),
@@ -294,17 +289,19 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<void> delete(String id) async {
-    firebase.firestore!
+  Future<void> delete(String channelName) async {
+    var ns = await firebase.firestore!
         .collection(AppConst.firestoreNotificationsCollection)
-        .doc(id)
-        .delete();
-    // TODO: not sure it every worked? (trying to delete notifications in status bar)
-    int? localNotification = localNotifications[id];
-    if (localNotification == null) return;
-    Future f = flutterLocalNotificationsPlugin.cancel(localNotification);
-    f.then((_) => localNotifications.remove(id));
-    return f;
+        .where('channelName', isEqualTo: channelName)
+        .where('recipientsUid', arrayContains: firebase.auth!.currentUser!.uid)
+        .get();
+    ns.docs.where((e) => e.exists).forEach((e) => firebase.firestore!
+        .collection(AppConst.firestoreNotificationsCollection)
+        .doc(e.id)
+        .delete());
+
+    // TODO: not sure it ever worked? (trying to delete notifications in status bar)
+    return await flutterLocalNotificationsPlugin.cancel(0, tag: channelName);
   }
 
   Future<void> _saveTokenToDatabase(String token) async {

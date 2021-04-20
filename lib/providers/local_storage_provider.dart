@@ -1,12 +1,12 @@
 import 'package:async/async.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/models/user.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/storage/storage_service.dart';
 import 'package:langame/services/storage/storage_service_fake.dart';
 import 'package:langame/services/storage/storage_service_implementation.dart';
 import 'package:ordered_set/ordered_set.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 class LocalStorageProvider extends ChangeNotifier {
   static const _historyLength = 5;
@@ -39,9 +39,9 @@ class LocalStorageProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  LangameUser? _selectedUser;
-  LangameUser? get selectedUser => _selectedUser;
-  set selectedUser(LangameUser? v) {
+  lg.User? _selectedUser;
+  lg.User? get selectedUser => _selectedUser;
+  set selectedUser(lg.User? v) {
     _selectedUser = v;
     notifyListeners();
   }

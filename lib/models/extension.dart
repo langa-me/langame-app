@@ -1,15 +1,64 @@
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/material.dart';
-import 'package:langame/models/relation.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart';
 
-extension relationExtensions on RelationLevel {
-  Color? toColor() {
+extension interactionExtensions on InteractionLevel {
+  Color toColor() {
     switch (this) {
-      case RelationLevel.BAD:
-        return Colors.red;
-      case RelationLevel.AVERAGE:
+      case InteractionLevel.AVERAGE:
         return Colors.yellow;
-      case RelationLevel.GREAT:
+      case InteractionLevel.GREAT:
         return Colors.green;
+      case InteractionLevel.LOVE:
+        return Colors.pinkAccent;
+      default:
+        return Colors.red;
+    }
+  }
+
+  FaIcon toFaIcon() {
+    switch (this) {
+      case InteractionLevel.AVERAGE:
+        return FaIcon(FontAwesomeIcons.meh);
+      case InteractionLevel.GREAT:
+        return FaIcon(FontAwesomeIcons.laugh);
+      case InteractionLevel.LOVE:
+        return FaIcon(FontAwesomeIcons.grinHearts);
+      default:
+        return FaIcon(FontAwesomeIcons.frown);
     }
   }
 }
+
+extension interactionIntExtensions on int {
+  InteractionLevel toInteractionLevel() {
+    if (this > 10) return InteractionLevel.LOVE;
+    if (this > 5) return InteractionLevel.GREAT;
+    if (this > 2) return InteractionLevel.AVERAGE;
+
+    return InteractionLevel.BAD;
+  }
+}
+
+User userFromMap(Map<String, dynamic> m) => User(
+    uid: m['uid'],
+    email: m['email'],
+    displayName: m['displayName'],
+    phoneNumber: m['phoneNumber'],
+    photoUrl: m['photoUrl'],
+    online: m['online'],
+    google: m['google'],
+    facebook: m['facebook'],
+    apple: m['apple'],
+    favouriteTopics:
+        (m['favouriteTopics'] as List<dynamic>?)?.map((e) => e as String),
+    tag: m['tag'],
+    tokens: (m['tokens'] as List<dynamic>?)?.map((e) => e as String));
+
+User userFromFirebase(fb.User user) => User(
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName,
+    phoneNumber: user.phoneNumber,
+    photoUrl: user.photoURL);

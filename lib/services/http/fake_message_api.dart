@@ -35,13 +35,6 @@ class FakeMessageApi extends MessageApi {
   void cancel() {
     // TODO: implement cancel
   }
-
-  @override
-  Future<void> delete(String id) {
-    // TODO: implement delete
-    throw UnimplementedError();
-  }
-
   @override
   Future<LangameNotification?> getInitialMessage() {
     // TODO: implement getInitialMessage
@@ -54,7 +47,7 @@ class FakeMessageApi extends MessageApi {
   }
 
   @override
-  Future<void> sendReadyForLangame(String channelName) {
+  Future<void> notifyPresence(String channelName) {
     // TODO: implement sendReadyForLangame
     throw UnimplementedError();
   }
@@ -62,6 +55,12 @@ class FakeMessageApi extends MessageApi {
   @override
   Future<void> listen(void Function(LangameNotification p1) add) {
     // TODO: implement listen
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> delete(String channelName) {
+    // TODO: implement delete
     throw UnimplementedError();
   }
 }

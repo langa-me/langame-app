@@ -21,6 +21,10 @@ service cloud.firestore {
         match /topics/{topicId} {
             allow read: if request.auth != null;
         }
+        match /interactions/{interactionId} {
+            // TODO: allow only see self interactions?
+            allow read: if request.auth != null;
+        }
     }
 }
 

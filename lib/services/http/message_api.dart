@@ -20,7 +20,7 @@ abstract class MessageApi {
   Future<String> send(List<String> recipients, List<String> topics);
 
   /// Response to a Langame message to say "I am ready and waiting"
-  Future<void> sendReadyForLangame(String channelName);
+  Future<void> notifyPresence(String channelName);
 
   /// Start listening to messages
   Future<void> listen(void Function(LangameNotification?) add);
@@ -35,5 +35,5 @@ abstract class MessageApi {
   /// Fetch a message
   Future<LangameNotification?> fetch(String id);
   Future<List<LangameNotification>> fetchAll();
-  Future<void> delete(String id);
+  Future<void> delete(String channelName);
 }

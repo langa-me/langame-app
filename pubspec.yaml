@@ -1,6 +1,6 @@
 name: langame
 description: AI Augmented human conversations
-version: 1.0.7+12
+version: 1.0.8+13
 authors:
   - Langame <mail@langa.me>
 
@@ -60,6 +60,8 @@ dependencies:
   retry: ^3.1.0
   simple_animations: ^3.0.3
   supercharged: ^2.0.0
+  tuple: ^2.0.0
+  font_awesome_flutter: ^9.0.0
   flutter:
     sdk: flutter
 
