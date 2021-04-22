@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/models/notification.dart';
@@ -109,11 +108,11 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<LangameChannel>> getChannel(String channelName) async {
+  Future<LangameResponse<lg.Langame>> getChannel(String channelName) async {
     try {
       var r = await authenticationApi.getChannel(channelName);
       _log('getChannel ${r.channelName}');
-      return LangameResponse<LangameChannel>(LangameStatus.succeed, result: r);
+      return LangameResponse<lg.Langame>(LangameStatus.succeed, result: r);
     } catch (e, s) {
       _log('failed to get channel $channelName');
       firebase.crashlytics?.recordError(e, s);

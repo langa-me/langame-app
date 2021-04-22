@@ -38,11 +38,12 @@ const Question$json = const {
   '2': const [
     const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     const {'1': 'content', '3': 2, '4': 1, '5': 9, '10': 'content'},
+    const {'1': 'contexts', '3': 3, '4': 3, '5': 9, '10': 'contexts'},
   ],
 };
 
 /// Descriptor for `Question`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List questionDescriptor = $convert.base64Decode('CghRdWVzdGlvbhIOCgJpZBgBIAEoCVICaWQSGAoHY29udGVudBgCIAEoCVIHY29udGVudA==');
+final $typed_data.Uint8List questionDescriptor = $convert.base64Decode('CghRdWVzdGlvbhIOCgJpZBgBIAEoCVICaWQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIaCghjb250ZXh0cxgDIAMoCVIIY29udGV4dHM=');
 @$core.Deprecated('Use tagDescriptor instead')
 const Tag$json = const {
   '1': 'Tag',
@@ -90,3 +91,27 @@ const UserPreferences$json = const {
 
 /// Descriptor for `UserPreferences`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List userPreferencesDescriptor = $convert.base64Decode('Cg9Vc2VyUHJlZmVyZW5jZXMSEAoDdWlkGAEgASgJUgN1aWQSRAoedW5rbm93bl9wZW9wbGVfcmVjb21tZW5kYXRpb25zGAIgASgIUhx1bmtub3duUGVvcGxlUmVjb21tZW5kYXRpb25z');
+@$core.Deprecated('Use channelUserLangameUserDescriptor instead')
+const ChannelUserLangameUser$json = const {
+  '1': 'ChannelUserLangameUser',
+  '2': const [
+    const {'1': 'channel_uid', '3': 1, '4': 1, '5': 13, '10': 'channelUid'},
+    const {'1': 'langame_uid', '3': 2, '4': 1, '5': 9, '10': 'langameUid'},
+  ],
+};
+
+/// Descriptor for `ChannelUserLangameUser`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List channelUserLangameUserDescriptor = $convert.base64Decode('ChZDaGFubmVsVXNlckxhbmdhbWVVc2VyEh8KC2NoYW5uZWxfdWlkGAEgASgNUgpjaGFubmVsVWlkEh8KC2xhbmdhbWVfdWlkGAIgASgJUgpsYW5nYW1lVWlk');
+@$core.Deprecated('Use langameDescriptor instead')
+const Langame$json = const {
+  '1': 'Langame',
+  '2': const [
+    const {'1': 'channelName', '3': 1, '4': 1, '5': 9, '10': 'channelName'},
+    const {'1': 'players', '3': 2, '4': 3, '5': 11, '6': '.langame.protobuf.ChannelUserLangameUser', '10': 'players'},
+    const {'1': 'topics', '3': 3, '4': 3, '5': 9, '10': 'topics'},
+    const {'1': 'questions', '3': 4, '4': 3, '5': 11, '6': '.langame.protobuf.Question', '10': 'questions'},
+  ],
+};
+
+/// Descriptor for `Langame`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiAKC2NoYW5uZWxOYW1lGAEgASgJUgtjaGFubmVsTmFtZRJCCgdwbGF5ZXJzGAIgAygLMigubGFuZ2FtZS5wcm90b2J1Zi5DaGFubmVsVXNlckxhbmdhbWVVc2VyUgdwbGF5ZXJzEhYKBnRvcGljcxgDIAMoCVIGdG9waWNzEjgKCXF1ZXN0aW9ucxgEIAMoCzIaLmxhbmdhbWUucHJvdG9idWYuUXVlc3Rpb25SCXF1ZXN0aW9ucw==');

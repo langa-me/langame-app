@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:langame/models/channel.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'firebase.dart';
@@ -46,7 +45,7 @@ abstract class AuthenticationApi {
       List<String>? topics});
 
   Future<String> getChannelToken(String channelName);
-  Future<LangameChannel> getChannel(String channelName);
+  Future<lg.Langame> getChannel(String channelName);
   Future<List<lg.User>> getUserRecommendations(lg.User user);
   Future<void> sendLangameEnd(String channelName);
   Future<int?> getInteraction(String uid, String otherUid);

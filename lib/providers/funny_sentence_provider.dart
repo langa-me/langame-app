@@ -4,6 +4,28 @@ import 'package:langame/helpers/random.dart';
 /// Temporary brute force funny sentences
 class FunnyProvider extends ChangeNotifier {
   final _loadingSentences = [
+    'Generating witty dialog...',
+    'Swapping time and space...',
+    'Tokenizing real life...',
+    'Checking the gravitational constant in your locale...',
+    'keep calm and npm install',
+    'Creating time-loop inversion field',
+    'Computing chance of success',
+    'I feel like im supposed to be loading something...',
+    'Is this Windows?',
+    'Don\'t break your screen yet!',
+    'I swear it\'s almost done.',
+    'Computing the secret to life, the universe, and everything.',
+    'Simulating traveling salesman...',
+    'Proving P=NP...',
+    'Trying to sort in O(n)...',
+    'Looking for sense of humour, please hold on.',
+    'Please wait while the intern refills his coffee.',
+    'Kindly hold on as we convert this bug to a feature...',
+    'We\'re working very Hard .... Really',
+    'Me busy. Leave me alone!',
+    'Something need doing?',
+    'More work?',
     'Booting the singularity...',
     'HAL-9000 is processing your request...',
     'Terminator is powering up...',
@@ -12,7 +34,7 @@ class FunnyProvider extends ChangeNotifier {
     'Oops! An asteroid has fallen on the data center',
     'Unfortunately, an extra-terrestrial intervention blocked your request!',
     'We are sorry, the CIA has blocked your request!',
-    'Santa fell off his sled, he will not be able to deliver you the awesome gift that is Langame! Try again later',
+    'Eh! The data center is burning',
   ];
 
   String getLoadingRandom() => _loadingSentences.pickAny()!;

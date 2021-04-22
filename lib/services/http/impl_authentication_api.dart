@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/models/channel.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/firebase_functions_protocol.dart';
@@ -258,14 +257,14 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<LangameChannel> getChannel(String channelName) async {
+  Future<lg.Langame> getChannel(String channelName) async {
     var r = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)
         .where('channelName', isEqualTo: channelName)
         .get();
 
     Map<String, dynamic> first = r.docs.first.data();
-    return LangameChannel.fromJson(first);
+    return langameFromMap(first);
   }
 
   @override

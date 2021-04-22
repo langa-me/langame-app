@@ -170,7 +170,7 @@ export class LangameChannel {
     channelName: string;
     players: Array<ChannelUserLangameUser>;
     topics: Array<string>;
-    questions: Array<string>;
+    questions: Array<Question>;
     // Players who left
     lefts: Array<string> = [];
 
@@ -180,13 +180,13 @@ export class LangameChannel {
      * @param{string} channelName
      * @param{Array<ChannelUserLangameUser>} players
      * @param{Array<string>} topics
-     * @param{Array<string>} questions
+     * @param{Array<Question>} questions
      */
     constructor({id, channelName, players, topics, questions}:{id?: string,
         channelName: string,
         players: Array<ChannelUserLangameUser>,
         topics: Array<string>,
-        questions: Array<string>}) {
+        questions: Array<Question>}) {
       this.id = id;
       this.channelName = channelName;
       this.players = players;
@@ -260,17 +260,26 @@ export class Tag {
     question: string;
     content: string;
     score: number;
+    generated: boolean;
 
     /**
      * constructor...
      * @param{string} question
      * @param{string} content
      * @param{number} score
+     * @param{boolean} generated
      */
-    constructor(question: string, content: string, score: number) {
+    constructor({question,
+      content,
+      score,
+      generated}:{question: string,
+        content: string,
+        score: number,
+        generated: boolean}) {
       this.question = question;
       this.content = content;
       this.score = score;
+      this.generated = generated;
     }
 }
 
@@ -279,12 +288,16 @@ export class Tag {
  */
 export class Question {
     content: string;
+    contexts: Array<string>;
 
     /**
      * constructor...
      * @param{string} content
+     * @param{Array<string>} contexts
      */
-    constructor(content: string) {
+    constructor({content,
+      contexts}:{content: string, contexts: Array<string>}) {
       this.content = content;
+      this.contexts = contexts;
     }
 }

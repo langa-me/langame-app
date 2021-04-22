@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:langame/helpers/fake.dart';
 import 'package:langame/helpers/random.dart';
-import 'package:langame/models/channel.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/authentication_api.dart';
 
@@ -76,7 +75,7 @@ class FakeAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<LangameChannel> getChannel(String channelName) {
+  Future<lg.Langame> getChannel(String channelName) {
     // TODO: implement getChannel
     throw UnimplementedError();
   }

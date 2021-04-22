@@ -12,6 +12,7 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
+import 'colors/colors.dart';
 import 'langame.dart';
 
 class SendLangameView extends StatefulWidget {
@@ -38,8 +39,12 @@ class _SendLangameState extends State<SendLangameView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           _buildSearchBar(),
         ],
@@ -168,22 +173,27 @@ class _SendLangameState extends State<SendLangameView>
 
     return Expanded(
       child: FloatingSearchBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        backdropColor: Theme.of(context).colorScheme.primary,
+        border: BorderSide(),
+        // shadowColor: Colors.transparent,
+        // accentColor: Colors.transparent,
+        // iconColor: Colors.transparent,
+        // elevation: 0,
+        // backgroundColor: Colors.transparent,
+        // backdropColor: Colors.transparent,
         hint: 'Search topics...',
         leadingActions: [
-          BackButton(color: Colors.white),
+          BackButton(color: isLightThenBlack(context)),
         ],
         automaticallyImplyBackButton: false,
-        hintStyle: TextStyle(color: Colors.white),
-        queryStyle: TextStyle(color: Colors.white),
+        hintStyle: TextStyle(color: isLightThenBlack(context)),
+        queryStyle: TextStyle(color: isLightThenBlack(context)),
         scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
         transitionDuration: const Duration(milliseconds: 800),
         transitionCurve: Curves.easeInOut,
         physics: const BouncingScrollPhysics(),
         axisAlignment: isPortrait ? 0.0 : -1.0,
         openAxisAlignment: 0.0,
-        width: isPortrait ? 600 : 500,
+        // width: AppSize.safeBlockHorizontal * 80,
         debounceDelay: const Duration(milliseconds: 500),
         onQueryChanged: (query) {
           // Call your model, bloc, controller here.
@@ -196,24 +206,12 @@ class _SendLangameState extends State<SendLangameView>
         transition: CircularFloatingSearchBarTransition(),
         actions: [
           FloatingSearchBarAction.searchToClear(
-            color: Colors.white,
+            color: isLightThenBlack(context),
             showIfClosed: true,
           ),
         ],
         builder: (context, transition) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Material(
-              color: Colors.white,
-              elevation: 4.0,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: Colors.accents.map((color) {
-                  return Container(height: 112, color: color);
-                }).toList(),
-              ),
-            ),
-          );
+          return SizedBox.shrink();
         },
       ),
     );

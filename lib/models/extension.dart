@@ -62,3 +62,23 @@ User userFromFirebase(fb.User user) => User(
     displayName: user.displayName,
     phoneNumber: user.phoneNumber,
     photoUrl: user.photoURL);
+
+Langame langameFromMap(Map<String, dynamic> m) => Langame(
+  channelName: m['channelName'],
+  players: (m['players'] as List<dynamic>?)?.map((e) => channelUserLangameUserFromMap(e)),
+  topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
+  questions: (m['questions'] as List<dynamic>?)?.map((e) => questionFromMap(e)),
+);
+
+ChannelUserLangameUser channelUserLangameUserFromMap(Map<String, dynamic> m) =>
+    ChannelUserLangameUser(
+      channelUid: m['channelUid'],
+      langameUid: m['langameUid'],
+    );
+
+Question questionFromMap(Map<String, dynamic> m) =>
+    Question(
+      id: m['id'],
+      content: m['content'],
+      contexts: (m['contexts'] as List<dynamic>?)?.map((e) => e as String),
+    );

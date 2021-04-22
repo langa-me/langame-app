@@ -129,7 +129,7 @@ class _SetupState extends State with AfterLayoutMixin {
                     onChanged: (v) => p.detectShakes = !p.detectShakes),
               ),
             ),
-            Spacer(),
+            SizedBox(height: AppSize.safeBlockVertical*5),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Icon(
                 Icons.favorite_border_outlined,

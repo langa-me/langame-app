@@ -76,6 +76,7 @@ class Question extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Question', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'contexts')
     ..hasRequiredFields = false
   ;
 
@@ -83,6 +84,7 @@ class Question extends $pb.GeneratedMessage {
   factory Question({
     $core.String? id,
     $core.String? content,
+    $core.Iterable<$core.String>? contexts,
   }) {
     final _result = create();
     if (id != null) {
@@ -90,6 +92,9 @@ class Question extends $pb.GeneratedMessage {
     }
     if (content != null) {
       _result.content = content;
+    }
+    if (contexts != null) {
+      _result.contexts.addAll(contexts);
     }
     return _result;
   }
@@ -131,6 +136,9 @@ class Question extends $pb.GeneratedMessage {
   $core.bool hasContent() => $_has(1);
   @$pb.TagNumber(2)
   void clearContent() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.String> get contexts => $_getList(2);
 }
 
 class Tag extends $pb.GeneratedMessage {
@@ -498,5 +506,137 @@ class UserPreferences extends $pb.GeneratedMessage {
   $core.bool hasUnknownPeopleRecommendations() => $_has(1);
   @$pb.TagNumber(2)
   void clearUnknownPeopleRecommendations() => clearField(2);
+}
+
+class ChannelUserLangameUser extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ChannelUserLangameUser', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'channelUid', $pb.PbFieldType.OU3)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'langameUid')
+    ..hasRequiredFields = false
+  ;
+
+  ChannelUserLangameUser._() : super();
+  factory ChannelUserLangameUser({
+    $core.int? channelUid,
+    $core.String? langameUid,
+  }) {
+    final _result = create();
+    if (channelUid != null) {
+      _result.channelUid = channelUid;
+    }
+    if (langameUid != null) {
+      _result.langameUid = langameUid;
+    }
+    return _result;
+  }
+  factory ChannelUserLangameUser.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ChannelUserLangameUser.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ChannelUserLangameUser clone() => ChannelUserLangameUser()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ChannelUserLangameUser copyWith(void Function(ChannelUserLangameUser) updates) => super.copyWith((message) => updates(message as ChannelUserLangameUser)) as ChannelUserLangameUser; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static ChannelUserLangameUser create() => ChannelUserLangameUser._();
+  ChannelUserLangameUser createEmptyInstance() => create();
+  static $pb.PbList<ChannelUserLangameUser> createRepeated() => $pb.PbList<ChannelUserLangameUser>();
+  @$core.pragma('dart2js:noInline')
+  static ChannelUserLangameUser getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ChannelUserLangameUser>(create);
+  static ChannelUserLangameUser? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get channelUid => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set channelUid($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasChannelUid() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelUid() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get langameUid => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set langameUid($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasLangameUid() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLangameUid() => clearField(2);
+}
+
+class Langame extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Langame', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'channelName', protoName: 'channelName')
+    ..pc<ChannelUserLangameUser>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'players', $pb.PbFieldType.PM, subBuilder: ChannelUserLangameUser.create)
+    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topics')
+    ..pc<Question>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'questions', $pb.PbFieldType.PM, subBuilder: Question.create)
+    ..hasRequiredFields = false
+  ;
+
+  Langame._() : super();
+  factory Langame({
+    $core.String? channelName,
+    $core.Iterable<ChannelUserLangameUser>? players,
+    $core.Iterable<$core.String>? topics,
+    $core.Iterable<Question>? questions,
+  }) {
+    final _result = create();
+    if (channelName != null) {
+      _result.channelName = channelName;
+    }
+    if (players != null) {
+      _result.players.addAll(players);
+    }
+    if (topics != null) {
+      _result.topics.addAll(topics);
+    }
+    if (questions != null) {
+      _result.questions.addAll(questions);
+    }
+    return _result;
+  }
+  factory Langame.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Langame.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Langame clone() => Langame()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Langame copyWith(void Function(Langame) updates) => super.copyWith((message) => updates(message as Langame)) as Langame; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Langame create() => Langame._();
+  Langame createEmptyInstance() => create();
+  static $pb.PbList<Langame> createRepeated() => $pb.PbList<Langame>();
+  @$core.pragma('dart2js:noInline')
+  static Langame getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Langame>(create);
+  static Langame? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get channelName => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set channelName($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasChannelName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearChannelName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<ChannelUserLangameUser> get players => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.String> get topics => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.List<Question> get questions => $_getList(3);
 }
 
