@@ -82,8 +82,11 @@ jobs:
           flutter-version: 2.0.4
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign --flavor prod
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.2'
       - name: Deploy iOS Beta to TestFlight via Fastlane
-        uses: maierj/fastlane-action@v1.4.0
+        uses: maierj/fastlane-action@v2.0.1
         with:
           lane: closed_beta
           subdirectory: ios
@@ -93,7 +96,7 @@ jobs:
           DEVELOPER_APP_IDENTIFIER: '${{ secrets.DEVELOPER_APP_IDENTIFIER }}'
           DEVELOPER_PORTAL_TEAM_ID: '${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}'
           FASTLANE_APPLE_ID: '${{ secrets.FASTLANE_APPLE_ID }}'
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}'
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.DELIVER_PASSWORD }}'
           MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
           GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
           PROVISIONING_PROFILE_SPECIFIER: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}'

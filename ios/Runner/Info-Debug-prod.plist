@@ -59,7 +59,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need your microphone to talk to others</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>YOUR DESCRIPTION</string>
+	<string>We use speech recognition to improve user experience</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -83,5 +83,21 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+    <key>NSContactsUsageDescription</key>
+    <string>We need some of your contact information to help others recognize you</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>We need some of your contact information to help others recognize you</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>We need some of your contact information to help others recognize you</string>
+    <key>NSCameraUsageDescription</key>
+    <string>We need some of your contact information to help others recognize you</string>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>We need some of your contact information to help others recognize you</string>
+    <key>NSMotionUsageDescription</key>
+    <string>We need some of your contact information to help others recognize you</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need some of your contact information to help others recognize you</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>We need some of your contact information to help others recognize you</string>
 </dict>
 </plist>
