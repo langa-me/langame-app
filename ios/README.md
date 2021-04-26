@@ -2,7 +2,7 @@
 ## Zip
 
 ```bash
-zip release.zip Config
+zip release.zip -r Config
 gpg --symmetric --cipher-algo AES256 release.zip
 rm -rf release.zip Config
 ```

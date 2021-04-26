@@ -36,6 +36,7 @@ jobs:
         run: flutter test
   # CD
   deploy_android:
+    name: Deploy beta to Google Play
     runs-on: ubuntu-latest
     needs: [build_android]
     steps:
