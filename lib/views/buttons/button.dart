@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:langame/views/colors/colors.dart';
 
 const double defaultBorderRadius = 3.0;
 
@@ -140,8 +141,9 @@ class _ToggleButtonState extends State<ToggleButton> {
   @override
   Widget build(BuildContext context) {
     var s = ElevatedButton.styleFrom(
-      primary: Theme.of(context).colorScheme.primary,
-      side: BorderSide(width: 2, color: Colors.grey),
+      primary: isLightThenBlack(context, reverse: true),
+      side: BorderSide(
+          width: 2.0, color: Theme.of(context).colorScheme.secondary),
       elevation: 5,
       padding: EdgeInsets.all(5),
       shape: RoundedRectangleBorder(
@@ -156,11 +158,13 @@ class _ToggleButtonState extends State<ToggleButton> {
         width: width,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).colorScheme.secondary)
+                  primary: Theme.of(context).colorScheme.primary)
               .merge(s),
           child: Text(textSelected,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, color: Colors.white)),
+              style: TextStyle(
+                  fontSize: 18,
+                  color: isLightThenBlack(context, reverse: true))),
           onPressed: onLongPress ? null : _onFirstChildChange,
           onLongPress: onLongPress ? _onFirstChildChange : null,
         ),
@@ -172,7 +176,9 @@ class _ToggleButtonState extends State<ToggleButton> {
           style: s,
           child: Text(textUnselected,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, color: Colors.white)),
+              style: TextStyle(
+                  fontSize: 18,
+                  color: isLightThenBlack(context, reverse: false))),
           onPressed: onLongPress ? null : _onSecondChildChange,
           onLongPress: onLongPress ? _onSecondChildChange : null,
         ),

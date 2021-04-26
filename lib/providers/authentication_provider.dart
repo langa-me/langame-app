@@ -229,7 +229,7 @@ class AuthenticationProvider extends ChangeNotifier {
   // TODO langame response
   Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
     _log('getLangameUsersStartingWithTag $tag');
-    return await authenticationApi.getLangameUsersStartingWithTag(tag);
+    return await authenticationApi.getLangameUsersStartingWithTag(_user!.tag, tag);
   }
 
   Future<LangameResponse<lg.User>> getLangameUser(String uid) async {

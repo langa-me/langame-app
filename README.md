@@ -6,6 +6,12 @@ You should use **Idea IntelliJ** and create at least these configurations:
 - Flutter with flavor "dev"
 - Flutter with flavor "prod" (but you should not develop in production)
 
+Using CLI:
+```bash
+flutter run --flavor dev
+flutter run --flavor prod
+```
+
 ### Json
 
 For using models Dart models:

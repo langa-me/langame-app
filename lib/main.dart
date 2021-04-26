@@ -145,7 +145,6 @@ class _MyAppState extends State<MyApp> {
             //           Theme.of(context).textTheme.headline6)),
             // ),
             ),
-        // home: Scaffold(),
         home: Login(),
         navigatorKey: AppConst.navKey,
         navigatorObservers: [

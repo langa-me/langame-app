@@ -112,7 +112,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
+  Future<List<lg.User>> getLangameUsersStartingWithTag(String ignoreTag, String tag) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
 
@@ -120,6 +120,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
     /// Query users with tag starting with [tag]
     QuerySnapshot doc = await users
+        .where('tag', isNotEqualTo: ignoreTag)
         .where('tag', isGreaterThanOrEqualTo: tag)
         .where('tag', isLessThan: tag + 'z')
         .get(); // TODO: ignore case
@@ -201,7 +202,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
     String tag = user.displayName!;
     int tries = 0;
     int maxTries = 5;
-    while ((await getLangameUsersStartingWithTag(tag)).isNotEmpty) {
+    while ((await getLangameUsersStartingWithTag('', tag)).isNotEmpty) {
       var r = await post(
         Uri.parse('https://uzby.com/api.php'),
         body: 'min=4&max=6',

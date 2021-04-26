@@ -69,7 +69,7 @@ class _SendLangameState extends State<SendLangameView>
                     itemCount: filteredTopics.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 3,
+                      childAspectRatio: 6,
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 0,
                     ),
@@ -81,7 +81,7 @@ class _SendLangameState extends State<SendLangameView>
                             selectedTopics.removeWhere(
                                 (e) => e.content == filteredTopics[i].content);
                         },
-                        width: AppSize.blockSizeHorizontal * 70,
+                        width: AppSize.blockSizeHorizontal * 50,
                         textUnselected: filteredTopics[i].content,
                         textSelected: filteredTopics[i].content),
                   ),
@@ -99,7 +99,7 @@ class _SendLangameState extends State<SendLangameView>
             FloatingActionButton.extended(
               heroTag: 'join_now',
               onPressed: () async {
-                var channelName = await _handleFloatingPressed(l);
+                var channelName = await _handleFloatingPressed(l, now: true);
                 if (channelName == null) {
                   return;
                 }
@@ -112,18 +112,18 @@ class _SendLangameState extends State<SendLangameView>
               label: const Text('Now', style: TextStyle(color: Colors.white)),
               icon:
                   const Icon(Icons.phone_in_talk_outlined, color: Colors.white),
-              backgroundColor: Theme.of(context).colorScheme.primaryVariant,
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
             FloatingActionButton.extended(
               heroTag: 'join_later',
               onPressed: () async {
-                var channelName = await _handleFloatingPressed(l);
+                var channelName = await _handleFloatingPressed(l, now: false);
                 if (channelName == null) return;
                 Navigator.pop(context);
               },
-              label: const Text('Later', style: TextStyle(color: Colors.white)),
-              icon: const Icon(Icons.send_outlined, color: Colors.white),
-              backgroundColor: Theme.of(context).colorScheme.primaryVariant,
+              label: Text('Later', style: TextStyle(color: Colors.white)),
+              icon: Icon(Icons.send_outlined, color: Colors.white),
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           ],
         ),
@@ -131,7 +131,8 @@ class _SendLangameState extends State<SendLangameView>
     );
   }
 
-  Future<String?> _handleFloatingPressed(LangameProvider l) async {
+  Future<String?> _handleFloatingPressed(LangameProvider l,
+      {bool now = true}) async {
     if (selectedTopics.isEmpty) {
       showBasicSnackBar(context, 'You must select at least one topics');
       return null;
@@ -145,7 +146,7 @@ class _SendLangameState extends State<SendLangameView>
     showBasicSnackBar(context,
         'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
     var res = await Provider.of<AuthenticationProvider>(context, listen: false)
-        .send(l.shoppingList, selectedTopics, now: true);
+        .send(l.shoppingList, selectedTopics, now: now);
 
     setState(selectedTopics.clear);
 

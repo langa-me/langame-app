@@ -15,6 +15,8 @@ import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:material_dialogs/material_dialogs.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:provider/provider.dart';
 
 import 'colors/colors.dart';
@@ -46,12 +48,14 @@ class _LangameViewState extends State<LangameView> {
   bool engineInitialized = false;
   bool channelJoined = false;
   HashMap<int, Player> joinedPlayers = HashMap();
-  lg.Question? question; // TODO!!!!!!!!!!!!!!!
+  lg.Question? question;
   int errors = 0;
   static const int maxErrors = 3;
 
   String _loadingMessage = '';
   String _failingMessage = '';
+
+  bool isOver = false;
 
   // final GlobalKey<State> _keyLoader =
   // GlobalKey<State>(debugLabel: '_keyLoader');
@@ -72,6 +76,32 @@ class _LangameViewState extends State<LangameView> {
 
   @override
   Widget build(BuildContext context) {
+    if (isOver) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image(
+              width: AppSize.blockSizeHorizontal * 30,
+              image: AssetImage('images/logo-colourless.png'),
+            ),
+            SizedBox(height: AppSize.safeBlockVertical * 10),
+            Text(
+              'It is over!',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headline4,
+            ),
+            SizedBox(height: AppSize.safeBlockVertical * 5),
+            Text(
+              'What did you learn? What do you think?',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.caption,
+            ),
+          ],
+        ),
+      );
+    }
+
     // TODO: might do that on other pages too
     var network = Provider.of<ConnectivityResult>(context, listen: false);
     if (network != ConnectivityResult.wifi &&
@@ -261,15 +291,16 @@ class _LangameViewState extends State<LangameView> {
       child: joinedPlayers.length != langame?.players.length
           ? _buildWaitingScreen()
           : Scaffold(
-              // appBar: AppBar(
-              //   automaticallyImplyLeading: false,
-              //   actions: [
-              //     IconButton(
-              //       icon: Icon(Icons.record_voice_over_outlined),
-              //       onPressed: () {},
-              //     ),
-              //   ],
-              // ),
+              appBar: AppBar(
+                automaticallyImplyLeading: false,
+                backgroundColor: Colors.transparent,
+                actions: [
+                  // IconButton(
+                  //   icon: Icon(Icons.record_voice_over_outlined),
+                  //   onPressed: () {},
+                  // ),
+                ],
+              ),
               body: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -296,12 +327,26 @@ class _LangameViewState extends State<LangameView> {
       await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(32.0),
+          ),
           title: const Text('Exit the langame?', textAlign: TextAlign.center),
           actions: [
             OutlinedButton.icon(
               onPressed: () => Navigator.of(context).pop(false),
-              icon: Icon(Icons.cancel_outlined),
-              label: Text('CANCEL', textAlign: TextAlign.center),
+              icon: Icon(Icons.cancel_outlined,
+                  color: Theme.of(context).colorScheme.secondary),
+              label: Text('CANCEL',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: isLightThenBlack(context))),
+              style: ElevatedButton.styleFrom(
+                side: BorderSide(
+                    width: 2.0, color: Theme.of(context).colorScheme.secondary),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                ),
+              ),
             ),
             Spacer(),
             OutlinedButton.icon(
@@ -313,8 +358,18 @@ class _LangameViewState extends State<LangameView> {
                 //     () => Navigator.of(context, rootNavigator: true).pop());
                 Navigator.of(context).pop(true);
               },
-              icon: Icon(Icons.exit_to_app_rounded),
-              label: Text('YES', textAlign: TextAlign.center),
+              style: ElevatedButton.styleFrom(
+                side: BorderSide(
+                    width: 2.0, color: Theme.of(context).colorScheme.secondary),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                ),
+              ),
+              icon: Icon(Icons.exit_to_app_rounded,
+                  color: Theme.of(context).colorScheme.secondary),
+              label: Text('YES',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: isLightThenBlack(context))),
             ),
           ],
         ),
@@ -340,41 +395,8 @@ class _LangameViewState extends State<LangameView> {
                   (_) => setState(() => permissionRequested = true));
             } else {
               // Not requested / denied in the past
-              return AlertDialog(
-                title: Text('We need your permission to use your microphone.'),
-                actions: [
-                  OutlinedButton.icon(
-                    onPressed: _goBackToMainMenu,
-                    icon: Icon(Icons.cancel_outlined),
-                    label: Text('CANCEL', textAlign: TextAlign.center),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () async {
-                      var p =
-                          Provider.of<AudioProvider>(context, listen: false);
-                      var res = await p.requestPermission();
-                      res.thenShowToast(
-                        'Understood!',
-                        _failingMessage,
-                        onSucceed: () {
-                          // Permission granted!
-                          if (res.result != null && res.result!) {
-                            _postFrameCallback((duration) =>
-                                setState(() => permissionRequested = true));
-                            return;
-                          }
-                          showToast(
-                              'You can\'t play Langame without microphone :(, you can still enable it in your settings later.');
-                          _goBackToMainMenu();
-                        },
-                        onFailure: _goBackToMainMenu,
-                      );
-                    },
-                    icon: Icon(Icons.check_circle_outline),
-                    label: Text('UNDERSTOOD', textAlign: TextAlign.center),
-                  ),
-                ],
-              );
+              _buildPermissionDialog();
+              return SizedBox.shrink();
             }
           }
           return _buildLoading(text: _loadingMessage);
@@ -384,6 +406,56 @@ class _LangameViewState extends State<LangameView> {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .log('permissionRequested $permissionRequested');
   }
+
+  Future<void> _buildPermissionDialog() => Dialogs.materialDialog(
+          barrierDismissible: false,
+          color: Theme.of(context).colorScheme.primary,
+          title: 'We need your permission to use your microphone',
+          animation: 'animations/microphone.json',
+          context: context,
+          actions: [
+            IconsButton(
+              onPressed: _goBackToMainMenu,
+              text: 'Leave',
+              iconData: FontAwesomeIcons.doorOpen,
+              color: isLightThenBlack(context, reverse: true),
+              textStyle:
+                  TextStyle(color: isLightThenBlack(context, reverse: false)),
+              iconColor: isLightThenBlack(context, reverse: false),
+            ),
+            IconsButton(
+              onPressed: () async {
+                var p = Provider.of<AudioProvider>(context, listen: false);
+                var res = await p.requestPermission();
+
+                res.thenShowSnackBar(
+                  context: context,
+                  succeedMessage: 'Great!',
+                  failedMessage: _failingMessage,
+                  onSucceed: () {
+                    // Permission granted!
+                    if (res.result != null && res.result!) {
+                      _postFrameCallback((duration) =>
+                          setState(() => permissionRequested = true));
+                      return;
+                    }
+                    showToast(
+                        'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
+                        color: isLightThenBlack(context, reverse: true),
+                        textColor: isLightThenBlack(context, reverse: false));
+                    _goBackToMainMenu();
+                  },
+                  onFailure: _goBackToMainMenu,
+                );
+              },
+              text: 'Accept',
+              iconData: FontAwesomeIcons.doorOpen,
+              color: isLightThenBlack(context, reverse: true),
+              textStyle:
+                  TextStyle(color: isLightThenBlack(context, reverse: false)),
+              iconColor: isLightThenBlack(context, reverse: false),
+            ),
+          ]);
 
   void _handleError() {
     if (errors > maxErrors) {
@@ -447,11 +519,13 @@ class _LangameViewState extends State<LangameView> {
               'userOffline $uid $reason',
               analyticsMessage: 'langame_user_leave',
               analyticsParameters: {
-                'uid': joinedPlayers[uid]?.langameUser.uid
+                'uid': joinedPlayers[uid]?.langameUser.uid,
+                'reason': reason,
               });
           final String? displayName =
               joinedPlayers[uid]?.langameUser.displayName;
           setState(() {
+            isOver = true;
             joinedPlayers.remove(uid);
           });
           _onEnd(left: displayName, showDialog: true);
@@ -600,16 +674,17 @@ class _LangameViewState extends State<LangameView> {
                     child: Container(
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
+                          color: isLightThenBlack(context, reverse: true),
                           borderRadius: const BorderRadius.all(
                               const Radius.circular(10.0))),
                       child: new Center(
                         child: new Text(
                           !s.hasData
-                              ? '15:00'
+                              ? ''
                               : '${s.data!.inMinutes}:${s.data!.inSeconds.remainder(60).toString().length == 2 ? '' : '0'}${s.data!.inSeconds.remainder(60)}',
                           textAlign: TextAlign.center,
-                          style: theme.primaryTextTheme.button,
+                          style: theme.textTheme.headline6!.merge(
+                              TextStyle(color: isLightThenBlack(context))),
                         ),
                       ),
                     ),
@@ -623,28 +698,55 @@ class _LangameViewState extends State<LangameView> {
     var theme = Theme.of(context);
     return Center(
       child: Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 5,
+            ),
+            color: isLightThenBlack(context, reverse: true),
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
         height: AppSize.blockSizeVertical * 30,
         width: AppSize.blockSizeHorizontal * 85,
-        color: Colors.transparent,
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryVariant,
-                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
               child: Center(
                 child: Text(
                   question!.content,
                   textAlign: TextAlign.center,
-                  style: theme.primaryTextTheme.button,
+                  style: theme.textTheme.headline6!.merge(TextStyle(
+                      color: isLightThenBlack(context, reverse: false))),
                 ),
               ),
             ),
-            IconButton(
-                icon: FaIcon(FontAwesomeIcons.brain),
+            Spacer(),
+            Row(children: [
+              IconButton(
+                icon: FaIcon(FontAwesomeIcons.brain,
+                    color: isLightThenBlack(context, reverse: false)),
                 onPressed: () =>
-                    _showContexts(question!.content, question!.contexts)),
+                    _showContexts(question!.content, question!.contexts),
+              ),
+              IconButton(
+                icon: Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                onPressed: () => Dialogs.materialDialog(
+                    color: Theme.of(context).colorScheme.primary,
+                    msg:
+                        'The question and context features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
+                    title: 'Warning!',
+                    titleStyle: Theme.of(context)
+                        .textTheme
+                        .headline3!
+                        .merge(TextStyle(color: Colors.white)),
+                    msgStyle: TextStyle(
+                        fontSize: AppSize.safeBlockHorizontal * 2,
+                        color: isLightThenBlack(context, reverse: false)),
+                    animation: 'animations/warning.json',
+                    context: context,
+                    actions: []),
+              ),
+            ]),
           ],
         ),
       ),
@@ -655,13 +757,24 @@ class _LangameViewState extends State<LangameView> {
         context: context,
         builder: (_) => AlertDialog(
           title: Text(
-            title,
-            style: Theme.of(context).textTheme.headline6,
+            'CONTEXTS',
+            style: Theme.of(context).textTheme.headline4,
             textAlign: TextAlign.center,
           ),
           content: Container(
             width: AppSize.safeBlockHorizontal * 70,
             height: AppSize.safeBlockVertical * 50,
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 5,
+              ),
+              color: isLightThenBlack(context, reverse: true),
+              borderRadius: BorderRadius.all(
+                Radius.circular(10.0),
+              ),
+            ),
             child: PageView(
               children: contexts
                   .map(
@@ -671,7 +784,7 @@ class _LangameViewState extends State<LangameView> {
                         c,
                         style: TextStyle(
                           color: isLightThenBlack(context),
-                          fontSize: AppSize.blockSizeHorizontal * 5,
+                          fontSize: AppSize.blockSizeHorizontal * 2,
                         ),
                       ),
                     ),
@@ -692,12 +805,12 @@ class _LangameViewState extends State<LangameView> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(40.0)),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primaryVariant,
+                color: Theme.of(context).colorScheme.primary,
                 width: 5,
               ),
-              color: Theme.of(context).colorScheme.primary,
+              color: isLightThenBlack(context, reverse: true),
             ),
-            width: AppSize.blockSizeHorizontal * 80,
+            width: AppSize.blockSizeHorizontal * 85,
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: joinedPlayers.values
@@ -710,7 +823,7 @@ class _LangameViewState extends State<LangameView> {
                                 Radius.circular(40),
                               ),
                               border: Border.all(
-                                width: 10,
+                                width: 1,
                                 color: p.isSpeaking
                                     ? Colors.red
                                     : Theme.of(context).colorScheme.primary,
@@ -753,31 +866,25 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  Future<void> _showEndDialog(BuildContext context, {String? left}) async {
-    // TODO: ask feedback questions... human supervision
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Langame is over!'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(left != null
-                    ? '$left left the Langame, it terminated it'
-                    : 'Time elapsed'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Leave'),
+  Future<void> _showEndDialog(BuildContext context, {String? left}) async =>
+      Dialogs.materialDialog(
+          barrierDismissible: false,
+          color: Theme.of(context).colorScheme.primary,
+          msg: left != null
+              ? '$left left the Langame, it terminated it'
+              : 'Time elapsed',
+          title: 'Langame is over!',
+          animation: 'animations/congratulations.json',
+          context: context,
+          actions: [
+            IconsButton(
               onPressed: _goBackToMainMenu,
+              text: 'Leave',
+              iconData: FontAwesomeIcons.doorOpen,
+              color: Colors.white,
+              textStyle:
+                  TextStyle(color: isLightThenBlack(context, reverse: false)),
+              iconColor: isLightThenBlack(context, reverse: false),
             ),
-          ],
-        );
-      },
-    );
-  }
+          ]);
 }

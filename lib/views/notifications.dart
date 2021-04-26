@@ -48,9 +48,9 @@ class _NotificationsViewState extends State<NotificationsView> {
         builder: (BuildContext context, p, c) {
           if (p.notifications.length == 0) {
             return Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Image(
                     width: AppSize.blockSizeHorizontal * 30,
                     image: AssetImage('images/logo-colourless.png'),
@@ -63,7 +63,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                   Text('Invite your friends for a great conversation',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.caption),
-                ]));
+                ],
+              ),
+            );
           }
           return GroupedListView<LangameNotification, String>(
             elements: p.notifications,

@@ -38,6 +38,7 @@ class _FriendsViewState extends State<FriendsView> {
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: _buildAppBar(),
         floatingActionButton: _buildFloatingButtons(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -221,7 +222,6 @@ class _FriendsViewState extends State<FriendsView> {
                                             ? Icons
                                                 .remove_shopping_cart_outlined
                                             : Icons.add_shopping_cart_outlined,
-                                        size: AppSize.blockSizeHorizontal * 5,
                                         color: Colors.black,
                                       ),
                                     ),
@@ -314,9 +314,7 @@ class _FriendsViewState extends State<FriendsView> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Material(
-        color: Theme.of(context).brightness == Brightness.light
-            ? Colors.white
-            : Theme.of(context).colorScheme.secondary,
+        color: Colors.white,
         elevation: 4,
         child: Builder(builder: (context) {
           // Both query and history empty
@@ -368,7 +366,7 @@ class _FriendsViewState extends State<FriendsView> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(color: Colors.black)),
-                      leading: Icon(Icons.history, color: Colors.black),
+                      //leading: Icon(Icons.history, color: Colors.black),
                       trailing: IconButton(
                         icon: Icon(Icons.clear, color: Colors.black),
                         onPressed: () {
@@ -504,6 +502,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
               ? _onRemoveFromShoppingList(context, p.selectedUser!, lp)
               : _onAddToShoppingList(context, p.selectedUser!, lp),
           style: ElevatedButton.styleFrom(
+            primary: isLightThenBlack(context, reverse: true),
             side: BorderSide(
                 width: 2.0, color: Theme.of(context).colorScheme.secondary),
             shape: RoundedRectangleBorder(
@@ -519,7 +518,6 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
                 ? Icons.remove_shopping_cart_outlined
                 : Icons.add_shopping_cart_outlined,
-            size: AppSize.blockSizeHorizontal * 5,
             color: Theme.of(context).colorScheme.secondary,
           ),
         ),

@@ -13,7 +13,7 @@ import 'package:uuid/uuid.dart';
 
 class FeedbackProvider extends ChangeNotifier {
   FirebaseApi firebase;
-  bool _detectShakes = true;
+  bool _detectShakes = false;
 
   FeedbackProvider(this.firebase);
 

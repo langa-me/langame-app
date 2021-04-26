@@ -30,7 +30,7 @@ abstract class AuthenticationApi {
   Future<lg.User?> getLangameUser(String uid);
 
   /// Get [LangameUser] from Firestore using Langame [tag]
-  Future<List<lg.User>> getLangameUsersStartingWithTag(String tag);
+  Future<List<lg.User>> getLangameUsersStartingWithTag(String ignoreTag, String tag);
 
   /// Add [LangameUser] to Firestore using Firebase [User]
   Future<lg.User> addLangameUser(User user);

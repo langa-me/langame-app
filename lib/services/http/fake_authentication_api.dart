@@ -32,7 +32,7 @@ class FakeAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
+  Future<List<lg.User>> getLangameUsersStartingWithTag(String ignoreTag, String tag) async {
     throw UnimplementedError();
   }
 

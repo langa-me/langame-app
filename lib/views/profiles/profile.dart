@@ -17,18 +17,14 @@ class Profile extends StatelessWidget {
       Align(
         alignment: Alignment.topCenter,
         child: Column(children: [
-          buildCroppedRoundedNetworkImage(_user.photoUrl,
-              width: AppSize.blockSizeHorizontal * 30),
           Text(
             _user.displayName,
-            style: theme.textTheme.headline6!.merge(
-              TextStyle(
-                  color: Theme.of(context).brightness == Brightness.light
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.white),
-            ),
+            style: theme.textTheme.headline6,
             textAlign: TextAlign.center,
-          )
+          ),
+          buildCroppedRoundedNetworkImage(_user.photoUrl,
+              width: AppSize.blockSizeHorizontal * 20),
+
         ]),
       ),
     ];

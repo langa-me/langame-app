@@ -60,7 +60,7 @@ class _LoginState extends State<Login> {
       // from a terminated state (app closed, have notification in bar)
       // and the user is properly authenticated, will open directly langame view
       // otherwise it will go to setup or friends according to auth state
-      successDialogFuture = Dialogs.showSuccessDialog(
+      successDialogFuture = LgDialogs.showSuccessDialog(
           context, _keySuccess, 'Connected as ${user.displayName}!');
       if (hasDoneSetup) {
         var ap = Provider.of<AuthenticationProvider>(context, listen: false);
@@ -180,7 +180,7 @@ class _LoginState extends State<Login> {
       Future<LangameResponse> Function() fn, String entity) async {
     // TODO: clean this mess
     var f = fn().timeout(const Duration(seconds: 5));
-    Dialogs.showLoadingDialog(context, _keyLoader,
+    LgDialogs.showLoadingDialog(context, _keyLoader,
         Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
     f.then((res) {
       Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();

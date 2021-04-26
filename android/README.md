@@ -45,9 +45,3 @@ rm -rf release.zip service_account_key.json app/langame.jks key.properties app/g
 gpg --output release.zip --decrypt release.zip.gpg && jar xvf release.zip && rm -rf release.zip
 ```
 
-## Run
-
-```bash
-flutter run --flavor dev
-flutter run --flavor prod
-```

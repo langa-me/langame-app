@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:introduction_screen/introduction_screen.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
@@ -13,13 +14,11 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
-import 'package:langame/providers/topic_provider.dart';
-import 'package:langame/views/friends.dart';
-import 'package:langame/views/icons/icons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
-import 'buttons/button.dart';
 import 'dialogs/dialogs.dart';
+import 'friends.dart';
 import 'notifications.dart';
 
 /// Setup the app for the user (topics, friends...)
@@ -46,177 +45,17 @@ class _SetupState extends State with AfterLayoutMixin {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .analytics
         .setCurrentScreen(screenName: 'setup');
-    Provider.of<TopicProvider>(context, listen: false).getAllTopics();
+    // Provider.of<TopicProvider>(context, listen: false).getAllTopics();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(actions: [
-        IconButton(
-            icon: MovingIcon(Icons.skip_next_outlined, -25, 0),
-            tooltip: 'Skip',
-            onPressed: () async {
-              controller.nextPage(
-                  duration: new Duration(seconds: 1), curve: Curves.bounceOut);
-            }),
-      ]),
-      body: PageView(
-        onPageChanged: (int? i) async {
-          if (i != null && i > 2.0) {
-            // Register that this user has already done the setup
-
-            Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
-              'favourite topics ${favouriteTopics.map((e) => e.content).join(",")}',
-              analyticsMessage: 'favourite_topics',
-              analyticsParameters: {'topics': favouriteTopics.join(',')},
-            );
-
-            // TODO: send mail to everyone "join langame bro"
-
-            Future<LangameResponse> f =
-                Provider.of<AuthenticationProvider>(context, listen: false)
-                    .initializeMessageApi(onBackgroundOrForegroundOpened);
-            Dialogs.showLoadingDialog(
-                context,
-                _keyLoader,
-                Provider.of<FunnyProvider>(context, listen: false)
-                    .getLoadingRandom());
-
-            f.then((res) {
-              Navigator.of(_keyLoader.currentContext!, rootNavigator: true)
-                  .pop();
-              res.thenShowSnackBar(
-                context: context,
-                failedMessage: !kReleaseMode
-                    ? 'failed to initialize the application, ${res.error.toString()}'
-                    : Provider.of<FunnyProvider>(context, listen: false)
-                        .getFailingRandom(),
-                onSucceed: () {
-                  Provider.of<LocalStorageProvider>(context, listen: false)
-                      .saveHasDoneSetup(true);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => FriendsView(),
-                    ),
-                  );
-                },
-                onFailure: () => controller.previousPage(
-                    duration: new Duration(seconds: 1), curve: Curves.bounceIn),
-              );
-            });
-          }
-        },
-        controller: controller,
-        children: <Widget>[
-          Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(
-              'Want to help us by sharing a feedback anytime?',
-              style: Theme.of(context).textTheme.headline5,
-              textAlign: TextAlign.center,
-            ),
-            Spacer(),
-            Consumer<FeedbackProvider>(
-              builder: (context, p, child) => ListTile(
-                onTap: () {
-                  p.detectShakes = !p.detectShakes;
-                },
-                leading: Icon(Icons.feedback_outlined),
-                title: Text('Shake-to-feedback'),
-                trailing: Switch(
-                    value: p.detectShakes,
-                    onChanged: (v) => p.detectShakes = !p.detectShakes),
-              ),
-            ),
-            SizedBox(height: AppSize.safeBlockVertical*5),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(
-                Icons.favorite_border_outlined,
-                size: 24,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              Text(
-                'Try to firmly shake your phone',
-                style: Theme.of(context).textTheme.headline6,
-                textAlign: TextAlign.center,
-              ),
-              Icon(
-                Icons.favorite_border_outlined,
-                size: 24,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-            ]),
-            Spacer(),
-          ]),
-          // Container(
-          //   color: Theme.of(context).colorScheme.background,
-          //   child: Center(
-          //     child: OutlinedButton.icon(
-          //       style: Theme.of(context).elevatedButtonTheme.style,
-          //       onPressed: () {
-          //         showBasicSnackBar(context, 'feature not implemented yet!');
-          //       },
-          //       icon: Icon(Icons.account_box_outlined,
-          //           color: Theme.of(context).colorScheme.secondary),
-          //       label: Text('Invite friends?',
-          //           style: Theme.of(context).textTheme.button),
-          //     ),
-          //   ),
-          // ),
-          Column(children: [
-            Text(
-              'What are your interests?',
-              style: Theme.of(context).textTheme.headline6,
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              'It will influence your recommendations',
-              style: Theme.of(context).textTheme.caption,
-              textAlign: TextAlign.center,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Consumer<TopicProvider>(
-                  builder: (context, t, child) {
-                    return ListView.separated(
-                      itemCount: t.topics.length,
-                      separatorBuilder: (BuildContext context, int index) =>
-                          Divider(
-                        color: Theme.of(context).colorScheme.secondaryVariant,
-                      ),
-                      itemBuilder: (context, int i) {
-                        return Center(
-                          child: ToggleButton(
-                              onChange: (bool selected) {
-                                showBasicSnackBar(
-                                    context, 'this feature has no impact yet');
-                                if (selected)
-                                  favouriteTopics.add(t.topics[i]);
-                                else
-                                  favouriteTopics.removeWhere(
-                                      (e) => e.content == t.topics[i].content);
-                              },
-                              width: AppSize.blockSizeHorizontal * 70,
-                              textUnselected: t.topics[i].content,
-                              textSelected: t.topics[i].content),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-          ]),
-          Container(
-            color: Theme.of(context).colorScheme.background,
-            child: Center(
-              child: _buildTagForm(),
-            ),
-          ),
-          Container(),
-        ],
+      body: IntroductionScreen(
+        done: Text("Done"),
+        next: Text("Next"),
+        pages: _buildPageModels(),
+        onDone: _onDone, // TODO: ask permission notification
       ),
     );
   }
@@ -272,4 +111,76 @@ class _SetupState extends State with AfterLayoutMixin {
       ),
     );
   }
+
+  void _onDone() {
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
+      'favourite topics ${favouriteTopics.map((e) => e.content).join(",")}',
+      analyticsMessage: 'favourite_topics',
+      analyticsParameters: {'topics': favouriteTopics.join(',')},
+    );
+
+    // TODO: send mail to everyone "join langame bro"
+
+    Future<LangameResponse> f =
+        Provider.of<AuthenticationProvider>(context, listen: false)
+            .initializeMessageApi(onBackgroundOrForegroundOpened);
+    LgDialogs.showLoadingDialog(context, _keyLoader,
+        Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
+
+    f.then((res) {
+      Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
+      res.thenShowSnackBar(
+        context: context,
+        failedMessage: !kReleaseMode
+            ? 'failed to initialize the application, ${res.error.toString()}'
+            : Provider.of<FunnyProvider>(context, listen: false)
+                .getFailingRandom(),
+        onSucceed: () {
+          Provider.of<LocalStorageProvider>(context, listen: false)
+              .saveHasDoneSetup(true);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FriendsView(),
+            ),
+          );
+        },
+        onFailure: () => controller.previousPage(
+            duration: new Duration(seconds: 1), curve: Curves.bounceIn),
+      );
+    });
+  }
+
+  List<PageViewModel> _buildPageModels() => [
+        PageViewModel(
+          title: 'Send us a feedback anytime?',
+          bodyWidget: Consumer<FeedbackProvider>(
+            builder: (context, p, child) => Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                Lottie.asset(
+                  'animations/feedback.json',
+                  height: AppSize.safeBlockVertical * 70,
+                  width: AppSize.safeBlockHorizontal * 50,
+                  alignment: Alignment.center,
+                ),
+                ListTile(
+                  onTap: () {
+                    p.detectShakes = !p.detectShakes;
+                  },
+                  leading: Icon(Icons.feedback_outlined),
+                  title: Text('Shake-to-feedback'),
+                  trailing: Switch(
+                      value: p.detectShakes,
+                      onChanged: (v) => p.detectShakes = !p.detectShakes),
+                )
+              ],
+            ),
+          ),
+        ),
+        PageViewModel(
+          title: 'Choose a tag',
+          bodyWidget: _buildTagForm(),
+        ),
+      ];
 }

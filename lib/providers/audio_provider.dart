@@ -86,13 +86,13 @@ class AudioProvider extends ChangeNotifier {
 
   Future<LangameResponse<bool>> requestPermission() async {
     try {
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        var s = await Permission.microphone.request();
-        return LangameResponse(LangameStatus.succeed, result: s.isGranted);
-      } else {
-        // iOS? TODO: how it works
-        return LangameResponse(LangameStatus.succeed, result: true);
-      }
+      // if (defaultTargetPlatform == TargetPlatform.android) {
+      var s = await Permission.microphone.request();
+      return LangameResponse(LangameStatus.succeed, result: s.isGranted);
+      // } else {
+      // iOS? TODO: how it works
+      // return LangameResponse(LangameStatus.succeed, result: true);
+      // }
     } catch (e, s) {
       firebase.crashlytics?.log('failed to requestPermission');
       firebase.crashlytics?.recordError(e, s);
@@ -111,6 +111,8 @@ class AudioProvider extends ChangeNotifier {
         _engine!.setChannelProfile(ChannelProfile.LiveBroadcasting),
         _engine!.setClientRole(ClientRole.Broadcaster),
         _engine!.enableLocalAudio(_isMicrophoneEnabled),
+        // switchMicrophone(),
+        // switchMicrophone(),
         _engine!.setEnableSpeakerphone(_isSpeakerphoneEnabled),
       ]); // Usually disabling microphone by default
 
