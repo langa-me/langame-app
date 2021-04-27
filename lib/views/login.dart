@@ -182,6 +182,9 @@ class _LoginState extends State<Login> {
     var f = fn().timeout(const Duration(seconds: 5));
     LgDialogs.showLoadingDialog(context, _keyLoader,
         Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
+    f.catchError(() {
+      Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
+    });
     f.then((res) {
       Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
       if (res.status == LangameStatus.succeed) {

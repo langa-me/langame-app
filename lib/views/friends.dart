@@ -16,6 +16,7 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
 import 'colors/colors.dart';
+import 'dialogs/dialogs.dart';
 import 'images/image.dart';
 import 'notifications.dart';
 
@@ -36,7 +37,7 @@ class _FriendsViewState extends State<FriendsView> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onBackPressed,
+      onWillPop: () => basicOnWillPopScope(context),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: _buildAppBar(),
@@ -403,26 +404,6 @@ class _FriendsViewState extends State<FriendsView> {
       ),
     );
   }
-
-  Future<bool> _onBackPressed() async =>
-      await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Exit?', textAlign: TextAlign.center),
-          actions: [
-            GestureDetector(
-              onTap: () => Navigator.of(context).pop(false),
-              child: const Text('NO', textAlign: TextAlign.center),
-            ),
-            const SizedBox(height: 16),
-            GestureDetector(
-              onTap: () => Navigator.of(context).pop(true),
-              child: const Text('YES', textAlign: TextAlign.center),
-            ),
-          ],
-        ),
-      ) ??
-      false;
 
   void _onBottomBarItemTapped(int index) {
     setState(() {

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/models/notification.dart';
 import 'package:langame/services/http/authentication_api.dart';
@@ -13,7 +14,6 @@ import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
 import 'package:langame/services/http/message_api.dart';
-import 'package:langame/models/extension.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   FirebaseApi firebase;
@@ -212,14 +212,14 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse> loginWithGoogle() async {
     return authenticationApi
         .loginWithGoogle() // TODO: catch error here
+        .catchError((e, s) {
+          _log('failed to loginWithGoogle');
+          firebase.crashlytics?.recordError(e, s);
+          LangameResponse(LangameStatus.failed, error: e.toString());
+        })
         .then(_loginWith)
         .catchError((err) => LangameResponse(LangameStatus.cancelled),
-            test: (e) => e is LangameGoogleSignInException)
-        .catchError((e, s) {
-      _log('failed to loginWithGoogle');
-      firebase.crashlytics?.recordError(e, s);
-      LangameResponse(LangameStatus.failed, error: e.toString());
-    });
+            test: (e) => e is LangameGoogleSignInException);
   }
 
   Future<LangameResponse> getRelations() async {
@@ -229,7 +229,8 @@ class AuthenticationProvider extends ChangeNotifier {
   // TODO langame response
   Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
     _log('getLangameUsersStartingWithTag $tag');
-    return await authenticationApi.getLangameUsersStartingWithTag(_user!.tag, tag);
+    return await authenticationApi.getLangameUsersStartingWithTag(
+        _user!.tag, tag);
   }
 
   Future<LangameResponse<lg.User>> getLangameUser(String uid) async {
@@ -287,12 +288,15 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<lg.InteractionLevel?>> getInteraction(String otherUid) async {
+  Future<LangameResponse<lg.InteractionLevel?>> getInteraction(
+      String otherUid) async {
     try {
       var r = await authenticationApi.getInteraction(_user!.uid, otherUid);
       _log('getInteraction $otherUid');
-      if (r == null) return LangameResponse(LangameStatus.failed, error: 'no interactions');
-      return LangameResponse(LangameStatus.succeed, result: r.toInteractionLevel());
+      if (r == null)
+        return LangameResponse(LangameStatus.failed, error: 'no interactions');
+      return LangameResponse(LangameStatus.succeed,
+          result: r.toInteractionLevel());
     } catch (e, s) {
       _log('failed to getInteraction $otherUid');
       firebase.crashlytics?.recordError(e, s);

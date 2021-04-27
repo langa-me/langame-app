@@ -155,15 +155,9 @@ class _SetupState extends State with AfterLayoutMixin {
         PageViewModel(
           title: 'Send us a feedback anytime?',
           bodyWidget: Consumer<FeedbackProvider>(
-            builder: (context, p, child) => Stack(
-              alignment: AlignmentDirectional.center,
+            builder: (context, p, child) => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Lottie.asset(
-                  'animations/feedback.json',
-                  height: AppSize.safeBlockVertical * 70,
-                  width: AppSize.safeBlockHorizontal * 50,
-                  alignment: Alignment.center,
-                ),
                 ListTile(
                   onTap: () {
                     p.detectShakes = !p.detectShakes;
@@ -173,7 +167,13 @@ class _SetupState extends State with AfterLayoutMixin {
                   trailing: Switch(
                       value: p.detectShakes,
                       onChanged: (v) => p.detectShakes = !p.detectShakes),
-                )
+                ),
+                Lottie.asset(
+                  'animations/feedback.json',
+                  height: AppSize.safeBlockVertical * 70,
+                  width: AppSize.safeBlockHorizontal * 70,
+                  alignment: Alignment.center,
+                ),
               ],
             ),
           ),

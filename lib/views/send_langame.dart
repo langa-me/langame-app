@@ -69,7 +69,7 @@ class _SendLangameState extends State<SendLangameView>
                     itemCount: filteredTopics.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 6,
+                      childAspectRatio: 3,
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 0,
                     ),
@@ -101,6 +101,7 @@ class _SendLangameState extends State<SendLangameView>
               onPressed: () async {
                 var channelName = await _handleFloatingPressed(l, now: true);
                 if (channelName == null) {
+                  setState(selectedTopics.clear);
                   return;
                 }
                 Navigator.pushReplacement(
@@ -118,7 +119,10 @@ class _SendLangameState extends State<SendLangameView>
               heroTag: 'join_later',
               onPressed: () async {
                 var channelName = await _handleFloatingPressed(l, now: false);
-                if (channelName == null) return;
+                if (channelName == null) {
+                  setState(selectedTopics.clear);
+                  return;
+                }
                 Navigator.pop(context);
               },
               label: Text('Later', style: TextStyle(color: Colors.white)),
@@ -143,12 +147,10 @@ class _SendLangameState extends State<SendLangameView>
       return null;
     }
 
-    showBasicSnackBar(context,
-        'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
+    // showBasicSnackBar(context,
+    //     'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
     var res = await Provider.of<AuthenticationProvider>(context, listen: false)
         .send(l.shoppingList, selectedTopics, now: now);
-
-    setState(selectedTopics.clear);
 
     return res.result;
   }

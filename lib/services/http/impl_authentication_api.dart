@@ -43,26 +43,31 @@ class ImplAuthenticationApi extends AuthenticationApi {
   Future<OAuthCredential> loginWithGoogle() async {
     // await googleSignIn.signOut();
     // await firebaseAuth.signOut();
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser =
-        await firebase.googleSignIn!.signIn();
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser =
+          await firebase.googleSignIn!.signIn();
 
-    // If Google Auth cancelled
-    if (googleUser == null)
+      // If Google Auth cancelled
+      if (googleUser == null)
+        throw LangameGoogleSignInException(
+            'authentication likely have been cancelled');
+
+      _google = googleUser;
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create a new credential
+      return GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+    } catch (e) {
       throw LangameGoogleSignInException(
-          'authentication likely have been cancelled');
-
-    _google = googleUser;
-
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-
-    // Create a new credential
-    return GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+          'authentication failed ${e.toString()}');
+    }
   }
 
   @override
@@ -112,7 +117,8 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<List<lg.User>> getLangameUsersStartingWithTag(String ignoreTag, String tag) async {
+  Future<List<lg.User>> getLangameUsersStartingWithTag(
+      String ignoreTag, String tag) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
 

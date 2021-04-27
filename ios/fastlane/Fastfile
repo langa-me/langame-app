@@ -61,7 +61,7 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "Reworked on-boarding, new animation system"
+      changelog: "Fixed notifications and improved UX a bit"
     )
 
     delete_temp_keychain(keychain_name)

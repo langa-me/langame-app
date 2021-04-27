@@ -1,0 +1,2 @@
+- Slight UX improvement
+- Fixed crashing Langame

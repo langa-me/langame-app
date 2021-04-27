@@ -332,6 +332,7 @@ class _LangameViewState extends State<LangameView> {
             borderRadius: BorderRadius.circular(32.0),
           ),
           title: const Text('Exit the langame?', textAlign: TextAlign.center),
+          titleTextStyle: Theme.of(context).textTheme.headline4!.merge(TextStyle(color: Colors.white)),
           actions: [
             OutlinedButton.icon(
               onPressed: () => Navigator.of(context).pop(false),
@@ -339,7 +340,7 @@ class _LangameViewState extends State<LangameView> {
                   color: Theme.of(context).colorScheme.secondary),
               label: Text('CANCEL',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: isLightThenBlack(context))),
+                  style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 side: BorderSide(
                     width: 2.0, color: Theme.of(context).colorScheme.secondary),
@@ -369,7 +370,7 @@ class _LangameViewState extends State<LangameView> {
                   color: Theme.of(context).colorScheme.secondary),
               label: Text('YES',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: isLightThenBlack(context))),
+                  style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -411,6 +412,10 @@ class _LangameViewState extends State<LangameView> {
           barrierDismissible: false,
           color: Theme.of(context).colorScheme.primary,
           title: 'We need your permission to use your microphone',
+          titleStyle: Theme.of(context)
+              .textTheme
+              .headline4!
+              .merge(TextStyle(color: Colors.white)),
           animation: 'animations/microphone.json',
           context: context,
           actions: [
@@ -435,6 +440,7 @@ class _LangameViewState extends State<LangameView> {
                   onSucceed: () {
                     // Permission granted!
                     if (res.result != null && res.result!) {
+                      Navigator.of(context).pop();
                       _postFrameCallback((duration) =>
                           setState(() => permissionRequested = true));
                       return;
@@ -449,7 +455,7 @@ class _LangameViewState extends State<LangameView> {
                 );
               },
               text: 'Accept',
-              iconData: FontAwesomeIcons.doorOpen,
+              iconData: FontAwesomeIcons.checkCircle,
               color: isLightThenBlack(context, reverse: true),
               textStyle:
                   TextStyle(color: isLightThenBlack(context, reverse: false)),
@@ -740,8 +746,8 @@ class _LangameViewState extends State<LangameView> {
                         .headline3!
                         .merge(TextStyle(color: Colors.white)),
                     msgStyle: TextStyle(
-                        fontSize: AppSize.safeBlockHorizontal * 2,
-                        color: isLightThenBlack(context, reverse: false)),
+                        fontSize: AppSize.safeBlockVertical * 2,
+                        color: Colors.white),
                     animation: 'animations/warning.json',
                     context: context,
                     actions: []),
@@ -784,7 +790,7 @@ class _LangameViewState extends State<LangameView> {
                         c,
                         style: TextStyle(
                           color: isLightThenBlack(context),
-                          fontSize: AppSize.blockSizeHorizontal * 2,
+                          fontSize: AppSize.blockSizeVertical * 2,
                         ),
                       ),
                     ),
@@ -881,7 +887,7 @@ class _LangameViewState extends State<LangameView> {
               onPressed: _goBackToMainMenu,
               text: 'Leave',
               iconData: FontAwesomeIcons.doorOpen,
-              color: Colors.white,
+              color: isLightThenBlack(context, reverse: true),
               textStyle:
                   TextStyle(color: isLightThenBlack(context, reverse: false)),
               iconColor: isLightThenBlack(context, reverse: false),
