@@ -50,7 +50,7 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
             dense: true,
             minVerticalPadding: 2,
             onTap: () => Provider.of<FeedbackProvider>(context, listen: false)
-                .show(context: context, fromShaking: false),
+                .show(fromShaking: false),
             leading: Icon(Icons.feedback_outlined),
             title: Text('Feedback'),
           ),

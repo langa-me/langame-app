@@ -1,7 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:langame/helpers/toast.dart';
-
 /// API / service level errors
 class LangameException implements Exception {
   String cause;
@@ -92,19 +88,6 @@ const String kUserDoesNotExists = 'user_does_not_exist';
 const String kNotAuthenticated = 'not_authenticated';
 const String kFailedToUpdateProfile = 'failed_to_update_profile';
 
-_showSnackBar(BuildContext context, String message) {
-  final snackBar = SnackBar(
-    behavior: SnackBarBehavior.floating,
-    content: Text(message),
-    action: SnackBarAction(
-      label: 'dismiss',
-      onPressed: () {},
-    ),
-  );
-
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-}
-
 /// Front-end level responses
 class LangameResponse<T> {
   final LangameStatus status;
@@ -112,65 +95,6 @@ class LangameResponse<T> {
   final Object? error;
 
   LangameResponse(this.status, {this.result, this.error});
-
-  void thenShowSnackBar(
-      {BuildContext? context,
-      String? succeedMessage,
-      String? failedMessage,
-      Function? onSucceed,
-      Function? onCancelled,
-      Function? onFailure}) {
-    switch (status) {
-      case LangameStatus.cancelled:
-        if (onCancelled != null) onCancelled();
-        break;
-      case LangameStatus.failed:
-        if (context != null && failedMessage != null)
-          _showSnackBar(context, failedMessage);
-        if (onFailure != null) onFailure();
-        break;
-      case LangameStatus.succeed:
-        if (context != null && succeedMessage != null)
-          _showSnackBar(context, succeedMessage);
-        if (onSucceed != null) onSucceed();
-        break;
-    }
-  }
-
-  void thenShowToast(String succeedMessage, String failedMessage,
-      {Function? onSucceed, Function? onFailure}) {
-    switch (status) {
-      case LangameStatus.cancelled:
-        break;
-      case LangameStatus.failed:
-        showToast(failedMessage, color: Colors.red);
-        if (onFailure != null) onFailure();
-        if (!kReleaseMode) throw LangameException(failedMessage);
-        break;
-      case LangameStatus.succeed:
-        showToast(succeedMessage, color: Colors.green);
-        if (onSucceed != null) onSucceed();
-        break;
-    }
-  }
-
-  void thenShowToastWithContext(
-      BuildContext context, String succeedMessage, String failedMessage,
-      {Function? onSucceed, Function? onFailure}) {
-    switch (status) {
-      case LangameStatus.cancelled:
-        break;
-      case LangameStatus.failed:
-        showToastWithContext(context, failedMessage, color: Colors.red);
-        if (onFailure != null) onFailure();
-        if (!kReleaseMode) throw LangameException(failedMessage);
-        break;
-      case LangameStatus.succeed:
-        showToastWithContext(context, succeedMessage);
-        if (onSucceed != null) onSucceed();
-        break;
-    }
-  }
 }
 
 enum LangameStatus { cancelled, failed, succeed }

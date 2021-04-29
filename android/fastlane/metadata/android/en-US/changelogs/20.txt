@@ -1,0 +1,4 @@
+- Fixed broken dialogs
+- More user feedback on loadings
+- interaction levels now reduces over time
+- main screen shows both recommendations and recent interactions

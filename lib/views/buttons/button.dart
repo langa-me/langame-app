@@ -143,12 +143,11 @@ class _ToggleButtonState extends State<ToggleButton> {
     var s = ElevatedButton.styleFrom(
       primary: isLightThenBlack(context, reverse: true),
       side: BorderSide(
-          width: 2.0, color: Theme.of(context).colorScheme.secondary),
-      elevation: 5,
+          width: 1.0, color: Theme.of(context).colorScheme.secondary),
       padding: EdgeInsets.all(5),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(32.0),
-      ),
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: BorderRadius.circular(64.0),
+      // ),
     );
     return AnimatedCrossFade(
       duration: Duration(milliseconds: 200),

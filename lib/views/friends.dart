@@ -1,3 +1,4 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,6 +7,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
@@ -26,13 +28,26 @@ class FriendsView extends StatefulWidget {
 }
 
 /// Main page of Langame (temporary name...)
-class _FriendsViewState extends State<FriendsView> {
+class _FriendsViewState extends State<FriendsView>
+    with AfterLayoutMixin<FriendsView> {
   int _selectedIndex = 0;
   late FloatingSearchBarController _searchBarController;
   PageController _pageController = PageController(
     initialPage: 0,
   );
-  // GlobalKey _toolTipKey = GlobalKey();
+  GlobalKey _toolTipKey = GlobalKey();
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .analytics
+        .setCurrentScreen(screenName: 'send_langame');
+    var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+    ap.fetchNotifications();
+    ap.getUserRecommendations();
+    ap.getRecentInteractions();
+    _searchBarController = FloatingSearchBarController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,20 +65,10 @@ class _FriendsViewState extends State<FriendsView> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .analytics
-        .setCurrentScreen(screenName: 'friends');
-    Provider.of<AuthenticationProvider>(context, listen: false)
-        .fetchNotifications();
-    _searchBarController = FloatingSearchBarController();
-  }
-
-  @override
   void dispose() {
-    Provider.of<LocalStorageProvider>(context, listen: false)
-        .saveSearchHistory();
+    // TODO:
+    // Provider.of<LocalStorageProvider>(context, listen: false)
+    //     .saveSearchHistory();
     _searchBarController.dispose();
     _pageController.dispose();
     super.dispose();
@@ -110,38 +115,35 @@ class _FriendsViewState extends State<FriendsView> {
   }
 
   Widget _buildFloatingButtons() => Consumer<LangameProvider>(
-        builder: (context, l, child) => l.shoppingList.length == 0
-            ? SizedBox.shrink()
-            : FloatingActionButton(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32.0),
-                ),
-                onPressed: () => Navigator.push(
+        builder: (context, l, child) => FloatingActionButton(
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(32.0),
+          ),
+          onPressed: () => l.shoppingList.length > 0
+              ? Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => SendLangameView(),
                   ),
-                ),
-                child: Badge(
-                  badgeContent: Text(
-                    '${l.shoppingList.length}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  child:
-                      Icon(Icons.shopping_cart_outlined, color: Colors.black),
-                  padding: const EdgeInsets.all(3.0),
-                  position: BadgePosition.topStart(top: 7, start: 10),
-                ),
+                )
+              : null,
+          child: Badge(
+            badgeContent: Text(
+              '${l.shoppingList.length}',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
               ),
+            ),
+            child: Icon(Icons.shopping_cart_outlined, color: Colors.black),
+            padding: const EdgeInsets.all(3.0),
+            position: BadgePosition.topStart(top: 7, start: 10),
+          ),
+        ),
       );
 
   Widget _buildPageView() {
-    Provider.of<AuthenticationProvider>(context, listen: false)
-        .getUserRecommendations();
     return PageView(
       onPageChanged: (i) => setState(() {
         _selectedIndex = i;
@@ -150,111 +152,8 @@ class _FriendsViewState extends State<FriendsView> {
       children: [
         Consumer<AuthenticationProvider>(
           builder: (context, a, _) => Column(children: [
-            // TODO: if opted-in to recommendations...
-            Expanded(
-              child: Container(
-                child: Column(
-                  children: [
-                    ListTile(
-                      // tileColor: Theme.of(context).colorScheme.primaryVariant,
-                      title: Text(
-                        'Recommendations',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                      // trailing: Stack(children: [
-                      //   Tooltip(
-                      //     key: _toolTipKey,
-                      //     message: 'Recommendations are currently random',
-                      //   ),
-                      //   IconButton(
-                      //     icon: Icon(Icons.help_outline_outlined),
-                      //     onPressed: () {
-                      //       final dynamic tooltip = _toolTipKey.currentState;
-                      //       tooltip.ensureTooltipVisible();
-                      //     },
-                      //   ),
-                      // ]),
-                    ),
-                    Divider(thickness: 3),
-                    Expanded(
-                      child: Container(
-                        height: AppSize.safeBlockVertical * 40,
-                        child: Consumer<LangameProvider>(
-                          builder: (c, lp, child) => ListView.builder(
-                            itemCount: a.userRecommendations.length,
-                            itemBuilder: (context, index) => FutureBuilder<
-                                    LangameResponse<InteractionLevel?>>(
-                                future: a.getInteraction(
-                                    a.userRecommendations[index].uid),
-                                builder: (ctx, s) {
-                                  return ListTile(
-                                    subtitle: s.hasData &&
-                                            s.data != null &&
-                                            s.data!.result != null
-                                        ? s.data!.result!.toFaIcon()
-                                        : FaIcon(
-                                            FontAwesomeIcons.questionCircle),
-                                    title: Text(
-                                        '${a.userRecommendations[index].displayName}'),
-                                    leading: buildCroppedRoundedNetworkImage(
-                                        a.userRecommendations[index].photoUrl),
-                                    trailing: MaterialButton(
-                                      // TODO: might use ToggleButton instead? (with icon)
-                                      onPressed: lp.shoppingList.any((e) =>
-                                              e.uid ==
-                                              a.userRecommendations[index].uid)
-                                          ? _onRemoveFromShoppingList(context,
-                                              a.userRecommendations[index], lp)
-                                          : _onAddToShoppingList(context,
-                                              a.userRecommendations[index], lp),
-                                      splashColor: Theme.of(context)
-                                          .colorScheme
-                                          .secondaryVariant,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      shape: CircleBorder(),
-                                      child: Icon(
-                                        lp.shoppingList.any((e) =>
-                                                e.uid ==
-                                                a.userRecommendations[index]
-                                                    .uid)
-                                            ? Icons
-                                                .remove_shopping_cart_outlined
-                                            : Icons.add_shopping_cart_outlined,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // a.relations == null || a.relations!.relations.length == 0
-            //     ? Center(
-            //         child: Text(
-            //           'You have no friends!',
-            //           style: Theme.of(context).textTheme.headline6,
-            //           textAlign: TextAlign.center,
-            //         ),
-            //       )
-            //     : ListView.builder(
-            //         itemCount: a.relations!.relations.length,
-            //         itemBuilder: (context, index) {
-            //           return ListTile(
-            //             title: Text(
-            //                 '${a.relations!.relations[index].other.displayName}'),
-            //             leading: buildCroppedRoundedNetworkImage(
-            //                 a.relations!.relations[index].other.photoUrl),
-            //           );
-            //         },
-            //       ),
+            _buildLatestInteractions(a),
+            _buildRecommendations(a),
           ]),
         ),
         Consumer2<LocalStorageProvider, AuthenticationProvider>(
@@ -309,6 +208,144 @@ class _FriendsViewState extends State<FriendsView> {
       ],
     );
   }
+
+  Widget _buildUserTile(LangameProvider lp, AuthenticationProvider a, User u,
+          InteractionLevel? l) =>
+      ListTile(
+        subtitle:
+            l != null ? l.toFaIcon() : FaIcon(FontAwesomeIcons.questionCircle),
+        title: Text('${u.displayName}'),
+        leading: buildCroppedRoundedNetworkImage(u.photoUrl),
+        trailing: MaterialButton(
+          // TODO: might use ToggleButton instead? (with icon)
+          onPressed: lp.shoppingList.any((e) => e.uid == u.uid)
+              ? _onRemoveFromShoppingList(context, u, lp)
+              : _onAddToShoppingList(context, u, lp),
+          splashColor: Theme.of(context).colorScheme.secondaryVariant,
+          color: Theme.of(context).colorScheme.secondary,
+          shape: CircleBorder(),
+          child: Icon(
+            lp.shoppingList.any((e) => e.uid == u.uid)
+                ? Icons.remove_shopping_cart_outlined
+                : Icons.add_shopping_cart_outlined,
+            color: Colors.black,
+          ),
+        ),
+      );
+
+  Widget _buildRecommendations(AuthenticationProvider a) =>
+      Consumer<LocalStorageProvider>(
+        builder: (context, lsp, c) => !lsp.recommendations
+            ? SizedBox.shrink()
+            : Container(
+                height: AppSize.safeBlockVertical * 40,
+                child: Column(
+                  children: [
+                    ListTile(
+                      // tileColor: Theme.of(context).colorScheme.primaryVariant,
+                      title: Text(
+                        'Recommendations',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      leading: Switch(
+                          value: lsp.recommendations,
+                          onChanged: (v) {
+                            Provider.of<ContextProvider>(context, listen: false)
+                                .showSnackBar(
+                                    'Understood, you can still reactivate recommendations in settings later');
+                            lsp.recommendations = !lsp.recommendations;
+                          }),
+                      trailing: Stack(children: [
+                        Tooltip(
+                          key: _toolTipKey,
+                          message: 'Recommendations feature is experimental',
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.help_outline_outlined),
+                          onPressed: () {
+                            final dynamic tooltip = _toolTipKey.currentState;
+                            tooltip.ensureTooltipVisible();
+                          },
+                        ),
+                      ]),
+                    ),
+                    Divider(thickness: 3),
+                    Expanded(
+                      child: Container(
+                        height: AppSize.safeBlockVertical * 40,
+                        child: Consumer<LangameProvider>(
+                          builder: (c, lp, child) => ListView.builder(
+                            itemCount: a.userRecommendations.length,
+                            itemBuilder: (context, index) => FutureBuilder<
+                                    LangameResponse<InteractionLevel?>>(
+                                future: a.getInteraction(
+                                    a.userRecommendations[index].uid),
+                                builder: (ctx, s) => _buildUserTile(
+                                    lp,
+                                    a,
+                                    a.userRecommendations[index],
+                                    s.hasData &&
+                                            s.data != null &&
+                                            s.data!.result != null
+                                        ? s.data!.result
+                                        : null)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+      );
+
+  Widget _buildLatestInteractions(AuthenticationProvider a) => Container(
+        height: AppSize.safeBlockVertical * 40,
+        child: Column(
+          children: [
+            ListTile(
+              // tileColor: Theme.of(context).colorScheme.primaryVariant,
+              title: Text(
+                'Recent',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            ),
+            Divider(thickness: 3),
+            Expanded(
+              child: Container(
+                height: AppSize.safeBlockVertical * 40,
+                child: Consumer<LangameProvider>(
+                  builder: (c, lp, child) => a.recentInteractions.length == 0
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('No recent interactions, launch a Langame!',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.headline4),
+                              SizedBox(height: AppSize.safeBlockVertical * 5),
+                              Text(
+                                  'Invite your friends for a great conversation',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.caption),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: a.recentInteractions.length,
+                          itemBuilder: (context, index) => _buildUserTile(
+                              lp,
+                              a,
+                              a.recentInteractions.elementAt(index).item1,
+                              a.recentInteractions.elementAt(index).item2),
+                        ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildExpandableBody(
       LocalStorageProvider lsp, AuthenticationProvider ap) {
@@ -511,9 +548,12 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
 void Function() _onAddToShoppingList(
     BuildContext ctx, User u, LangameProvider lp) {
   return () {
-    lp.add(u);
-    final snackBar = SnackBar(
-        content: Text('${u.displayName} has been added to current Langame'));
+    var msg = 'The Langame is full!';
+    if (lp.shoppingList.length < 4) {
+      lp.add(u);
+      msg = '${u.displayName} has been added to current Langame';
+    }
+    final snackBar = SnackBar(content: Text(msg));
     ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
   };
 }

@@ -10,6 +10,7 @@ import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -129,8 +130,9 @@ class _SetupState extends State with AfterLayoutMixin {
 
     f.then((res) {
       Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
-      res.thenShowSnackBar(
-        context: context,
+      var cp = Provider.of<ContextProvider>(context, listen: false);
+      cp.handleLangameResponse(
+        res,
         failedMessage: !kReleaseMode
             ? 'failed to initialize the application, ${res.error.toString()}'
             : Provider.of<FunnyProvider>(context, listen: false)

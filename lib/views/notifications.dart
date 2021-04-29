@@ -6,6 +6,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/models/notification.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
@@ -134,8 +135,9 @@ class _NotificationsViewState extends State<NotificationsView> {
               key: Key(n.id!),
               onDismissed: (direction) async {
                 var res = await p.deleteNotification(n.channelName!);
-                res.thenShowSnackBar(
-                  context: context,
+                var cp = Provider.of<ContextProvider>(context, listen: false);
+                cp.handleLangameResponse(
+                  res,
                   succeedMessage: 'Notification deleted!',
                   failedMessage:
                       Provider.of<FunnyProvider>(context, listen: false)
@@ -178,7 +180,7 @@ class _NotificationsViewState extends State<NotificationsView> {
 void onBackgroundOrForegroundOpened(LangameNotification? n) {
   // TODO: should delete notification then?
   if (n?.channelName != null) {
-    AppConst.navKey.currentState?.pushReplacement(
+    AppConst.navKey?.currentState?.pushReplacement(
       MaterialPageRoute(
         builder: (context) =>
             LangameView(n!.channelName!, n.ready == null || !n.ready!),

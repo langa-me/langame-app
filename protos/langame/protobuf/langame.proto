@@ -55,6 +55,8 @@ message User {
 
   /// Device [tokens] used for Cloud Messaging
   repeated string tokens = 12;
+
+  repeated string latest_interactions = 13;
 }
 
 /// Evaluated relationship between users using AI + heuristics

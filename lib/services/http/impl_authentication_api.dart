@@ -11,6 +11,7 @@ import 'package:langame/models/extension.dart';
 import 'package:langame/models/firebase_functions_protocol.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
+import 'package:tuple/tuple.dart';
 
 import 'authentication_api.dart';
 
@@ -118,18 +119,21 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   @override
   Future<List<lg.User>> getLangameUsersStartingWithTag(
-      String ignoreTag, String tag) async {
+      String ignoreTag, String tag,
+      {int limit = 5}) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
 
     tag = tag.toLowerCase();
 
+    // https://medium.com/@ken11zer01/firebase-firestore-text-search-and-pagination-91a0df8131ef
     /// Query users with tag starting with [tag]
     QuerySnapshot doc = await users
         .where('tag', isNotEqualTo: ignoreTag)
         .where('tag', isGreaterThanOrEqualTo: tag)
         .where('tag', isLessThan: tag + 'z')
-        .get(); // TODO: ignore case
+        .limit(limit)
+        .get();
     return doc.docs.map((e) => userFromMap(e.data())).toList();
   }
 
@@ -337,5 +341,23 @@ class ImplAuthenticationApi extends AuthenticationApi {
     if (i == null || !(i is int))
       throw LangameException('interactions_invalid_fields');
     return i;
+  }
+
+  @override
+  Future<List<Tuple2<String, int>>> getInteractions(String uid,
+      {int limit = 5}) async {
+    var r = await firebase.firestore!
+        .collection(AppConst.firestoreInteractionsCollection)
+        .where('usersArray', arrayContains: uid)
+        .limit(limit)
+        .get();
+
+    return r.docs
+        .where((e) => e.exists && e.data()['interactions'] != null)
+        .map((e) => Tuple2(
+            (e.data()['usersArray'] as List).firstWhere((u) => u != uid)
+                as String,
+            e.data()['interactions'] as int))
+        .toList();
   }
 }

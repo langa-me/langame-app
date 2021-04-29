@@ -46,6 +46,13 @@ class LocalStorageProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _recommendations = true;
+  bool get recommendations => _recommendations;
+  set recommendations(bool v) {
+    _recommendations = v;
+    notifyListeners();
+  }
+
   Future<void> saveTheme(t) async {
     var f = _api.saveTheme(t);
     f.then((_) {

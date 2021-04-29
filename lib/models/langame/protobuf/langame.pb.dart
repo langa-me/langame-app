@@ -272,6 +272,7 @@ class User extends $pb.GeneratedMessage {
     ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'favouriteTopics')
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tag')
     ..pPS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tokens')
+    ..pPS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'latestInteractions')
     ..hasRequiredFields = false
   ;
 
@@ -289,6 +290,7 @@ class User extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? favouriteTopics,
     $core.String? tag,
     $core.Iterable<$core.String>? tokens,
+    $core.Iterable<$core.String>? latestInteractions,
   }) {
     final _result = create();
     if (uid != null) {
@@ -326,6 +328,9 @@ class User extends $pb.GeneratedMessage {
     }
     if (tokens != null) {
       _result.tokens.addAll(tokens);
+    }
+    if (latestInteractions != null) {
+      _result.latestInteractions.addAll(latestInteractions);
     }
     return _result;
   }
@@ -445,6 +450,9 @@ class User extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(12)
   $core.List<$core.String> get tokens => $_getList(11);
+
+  @$pb.TagNumber(13)
+  $core.List<$core.String> get latestInteractions => $_getList(12);
 }
 
 class UserPreferences extends $pb.GeneratedMessage {

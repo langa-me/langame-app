@@ -87,6 +87,7 @@ jobs:
           ruby-version: '2.7.2'
       - name: Deploy iOS Beta to TestFlight via Fastlane
         uses: maierj/fastlane-action@v2.0.1
+        continue-on-error: true
         with:
           lane: closed_beta
           subdirectory: ios
@@ -102,4 +103,4 @@ jobs:
           PROVISIONING_PROFILE_SPECIFIER: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}'
           TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
           TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
-
+      - run: fastlane env

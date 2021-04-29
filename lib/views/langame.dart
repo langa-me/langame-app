@@ -13,8 +13,10 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:provider/provider.dart';
@@ -56,9 +58,6 @@ class _LangameViewState extends State<LangameView> {
   String _failingMessage = '';
 
   bool isOver = false;
-
-  // final GlobalKey<State> _keyLoader =
-  // GlobalKey<State>(debugLabel: '_keyLoader');
 
   @override
   void initState() {
@@ -118,9 +117,18 @@ class _LangameViewState extends State<LangameView> {
       );
     }
 
-    Widget? permission = _handlePermission();
-    if (permission != null)
-      return WillPopScope(onWillPop: _onBackPressed, child: permission);
+    if (!permissionRequested) {
+      var p = Provider.of<AudioProvider>(context, listen: false);
+      p.checkPermission().then((r) {
+        // No result or no permission granted
+        if (r.result == null || !r.result!) {
+          showPermissionDialog();
+        }
+        _postFrameCallback((_) => setState(() => permissionRequested = true));
+      });
+    }
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .log('permissionRequested $permissionRequested');
 
     // Second-step, ask for a token generation
     if (channelToken == null) {
@@ -313,16 +321,6 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  @override
-  void dispose() {
-    Provider.of<AudioProvider>(AppConst.navKey.currentContext!, listen: false)
-        .stopTimer();
-    Provider.of<AudioProvider>(AppConst.navKey.currentContext!, listen: false)
-        .leaveChannel();
-    super.dispose();
-// TODO: might fail?
-  }
-
   Future<bool> _onBackPressed() async =>
       await showDialog<bool>(
         context: context,
@@ -332,7 +330,10 @@ class _LangameViewState extends State<LangameView> {
             borderRadius: BorderRadius.circular(32.0),
           ),
           title: const Text('Exit the langame?', textAlign: TextAlign.center),
-          titleTextStyle: Theme.of(context).textTheme.headline4!.merge(TextStyle(color: Colors.white)),
+          titleTextStyle: Theme.of(context)
+              .textTheme
+              .headline4!
+              .merge(TextStyle(color: Colors.white)),
           actions: [
             OutlinedButton.icon(
               onPressed: () => Navigator.of(context).pop(false),
@@ -377,91 +378,68 @@ class _LangameViewState extends State<LangameView> {
       ) ??
       false;
 
-  void _goBackToMainMenu() => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => FriendsView()),
-      );
+  void _goBackToMainMenu() => Future.delayed(
+      //https://stackoverflow.com/questions/55618717/error-thrown-on-navigator-pop-until-debuglocked-is-not-true
+      Duration.zero,
+      () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => FriendsView()),
+          ));
 
-  Widget? _handlePermission() {
-    if (!permissionRequested) {
-      var p = Provider.of<AudioProvider>(context, listen: false);
-      return FutureBuilder<LangameResponse<bool>>(
-        future: p.checkPermission(),
-        builder: (c, s) {
-          if (s.hasError) _handleError();
-          if (s.hasData && s.data != null && s.data!.result != null) {
-            // Already permission granted
-            if (s.data!.result!) {
-              _postFrameCallback(
-                  (_) => setState(() => permissionRequested = true));
-            } else {
-              // Not requested / denied in the past
-              _buildPermissionDialog();
-              return SizedBox.shrink();
-            }
-          }
-          return _buildLoading(text: _loadingMessage);
-        },
-      );
-    }
-    Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .log('permissionRequested $permissionRequested');
-  }
+  Future<void> showPermissionDialog() =>
+      Provider.of<ContextProvider>(context, listen: false).showCustomDialog([
+        Center(
+            child: Column(children: [
+          Text('We need your permission to use your microphone',
+              style: Theme.of(context).textTheme.headline5),
+          Lottie.asset('animations/microphone.json'),
+          IconsButton(
+            onPressed: _goBackToMainMenu,
+            text: 'Leave',
+            iconData: FontAwesomeIcons.doorOpen,
+            color: isLightThenBlack(context, reverse: true),
+            textStyle:
+                TextStyle(color: isLightThenBlack(context, reverse: false)),
+            iconColor: isLightThenBlack(context, reverse: false),
+          ),
+          IconsButton(
+            onPressed: () async {
+              var p = Provider.of<AudioProvider>(context, listen: false);
+              var cp = Provider.of<ContextProvider>(context, listen: false);
+              var res = await p.requestPermission();
 
-  Future<void> _buildPermissionDialog() => Dialogs.materialDialog(
-          barrierDismissible: false,
-          color: Theme.of(context).colorScheme.primary,
-          title: 'We need your permission to use your microphone',
-          titleStyle: Theme.of(context)
-              .textTheme
-              .headline4!
-              .merge(TextStyle(color: Colors.white)),
-          animation: 'animations/microphone.json',
-          context: context,
-          actions: [
-            IconsButton(
-              onPressed: _goBackToMainMenu,
-              text: 'Leave',
-              iconData: FontAwesomeIcons.doorOpen,
-              color: isLightThenBlack(context, reverse: true),
-              textStyle:
-                  TextStyle(color: isLightThenBlack(context, reverse: false)),
-              iconColor: isLightThenBlack(context, reverse: false),
-            ),
-            IconsButton(
-              onPressed: () async {
-                var p = Provider.of<AudioProvider>(context, listen: false);
-                var res = await p.requestPermission();
-
-                res.thenShowSnackBar(
-                  context: context,
-                  succeedMessage: 'Great!',
-                  failedMessage: _failingMessage,
-                  onSucceed: () {
-                    // Permission granted!
-                    if (res.result != null && res.result!) {
-                      Navigator.of(context).pop();
-                      _postFrameCallback((duration) =>
-                          setState(() => permissionRequested = true));
-                      return;
-                    }
-                    showToast(
-                        'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
-                        color: isLightThenBlack(context, reverse: true),
-                        textColor: isLightThenBlack(context, reverse: false));
-                    _goBackToMainMenu();
-                  },
-                  onFailure: _goBackToMainMenu,
-                );
-              },
-              text: 'Accept',
-              iconData: FontAwesomeIcons.checkCircle,
-              color: isLightThenBlack(context, reverse: true),
-              textStyle:
-                  TextStyle(color: isLightThenBlack(context, reverse: false)),
-              iconColor: isLightThenBlack(context, reverse: false),
-            ),
-          ]);
+              cp.handleLangameResponse(
+                res,
+                succeedMessage: 'Great!',
+                failedMessage: _failingMessage,
+                onSucceed: () {
+                  // Permission granted!
+                  if (res.result != null && res.result!) {
+                    _postFrameCallback((duration) {
+                      setState(() => permissionRequested = true);
+                    });
+                    Provider.of<ContextProvider>(context, listen: false)
+                        .dialogComplete();
+                    return;
+                  }
+                  showToast(
+                      'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
+                      color: isLightThenBlack(context, reverse: true),
+                      textColor: isLightThenBlack(context, reverse: false));
+                  _goBackToMainMenu();
+                },
+                onFailure: _goBackToMainMenu,
+              );
+            },
+            text: 'Accept',
+            iconData: FontAwesomeIcons.checkCircle,
+            color: isLightThenBlack(context, reverse: true),
+            textStyle:
+                TextStyle(color: isLightThenBlack(context, reverse: false)),
+            iconColor: isLightThenBlack(context, reverse: false),
+          ),
+        ]))
+      ]);
 
   void _handleError() {
     if (errors > maxErrors) {
@@ -526,7 +504,7 @@ class _LangameViewState extends State<LangameView> {
               analyticsMessage: 'langame_user_leave',
               analyticsParameters: {
                 'uid': joinedPlayers[uid]?.langameUser.uid,
-                'reason': reason,
+                'reason': reason.index,
               });
           final String? displayName =
               joinedPlayers[uid]?.langameUser.displayName;

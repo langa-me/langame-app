@@ -29,7 +29,7 @@ class AppConst {
   static const String getChannelTokenFunction = 'getChannelToken';
   static const String sendLangameEndFunction = 'sendLangameEnd';
 
-  static final navKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
+  static GlobalKey<NavigatorState>? navKey;
 
   static const String firestoreUsersCollection = 'users';
   static const String firestoreNotificationsCollection = 'notifications';

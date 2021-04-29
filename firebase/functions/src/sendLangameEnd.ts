@@ -140,6 +140,9 @@ export const sendLangameEnd = async (data: any,
             .collection(kInteractionsCollection).doc();
         t.create(intRef, {
           users: `${context.auth!.uid},${e.langameUid}`,
+          // Why this redundant field? Because in client-side we want to query
+          // as "contains" and not "contains-all"
+          usersArray: [context.auth!.uid, e.langameUid],
           interactions: admin.firestore.FieldValue.increment(1),
         });
         functions.logger

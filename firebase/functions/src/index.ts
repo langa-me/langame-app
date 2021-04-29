@@ -19,6 +19,7 @@ import {
 import {newFeedback} from "./feedback";
 import {sendLangameEnd} from "./sendLangameEnd";
 import {sendLangame} from "./sendLangame";
+import {interactionsDecrement} from "./scheduledFunctions";
 // Initialize admin firebase
 admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
@@ -40,6 +41,7 @@ const region = "us-central1";
 
 const callers = new Map();
 const maxCalls = 10;
+// TODO: wtf how can it work?
 // Every 10 seconds, reduce the rate limit of every caller by one
 setInterval(() => {
   callers.forEach(function(part, index, callers) {
@@ -124,16 +126,10 @@ exports.subscribe = functions // TODO: transaction!!!
     });
 
 
-// /**
-//  *
-//  * @type {HttpsFunction & Runnable<any>}
-//  */
-// exports.sendLangameEnd = functions
-//     .region(region)
-//     .runWith(runtimeOpts)
-//     .https
-//     // eslint-disable-next-line no-undef
-//     .onCall(getOnlineOpenAi);
+exports.interactionsDecrement = functions
+    .pubsub
+    .schedule("1 * * * *")
+    .onRun(interactionsDecrement);
 
 /**
  *

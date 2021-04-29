@@ -1,11 +1,14 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
@@ -63,29 +66,25 @@ class _SendLangameState extends State<SendLangameView>
                         .toLowerCase()
                         .startsWith(filter.toLowerCase()))
                     .toList();
-                return Container(
-                  height: AppSize.safeBlockVertical * 70,
-                  child: GridView.builder(
-                    itemCount: filteredTopics.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 3,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 0,
-                    ),
-                    itemBuilder: (context, int i) => ToggleButton(
-                        onChange: (bool selected) {
-                          if (selected)
-                            selectedTopics.add(filteredTopics[i]);
-                          else
-                            selectedTopics.removeWhere(
-                                (e) => e.content == filteredTopics[i].content);
-                        },
-                        width: AppSize.blockSizeHorizontal * 50,
-                        textUnselected: filteredTopics[i].content,
-                        textSelected: filteredTopics[i].content),
-                  ),
-                );
+                return Expanded(
+                    child: StaggeredGridView.extentBuilder(
+                  itemCount: filteredTopics.length,
+                  itemBuilder: (BuildContext context, int i) => ToggleButton(
+                      onChange: (bool selected) {
+                        if (selected)
+                          selectedTopics.add(filteredTopics[i]);
+                        else
+                          selectedTopics.removeWhere(
+                              (e) => e.content == filteredTopics[i].content);
+                      },
+                      textUnselected: filteredTopics[i].content,
+                      textSelected: filteredTopics[i].content),
+                  staggeredTileBuilder: (int index) =>
+                      const StaggeredTile.fit(6),
+                  mainAxisSpacing: AppSize.safeBlockVertical * 1,
+                  crossAxisSpacing: AppSize.safeBlockHorizontal * 1,
+                  maxCrossAxisExtent: 8,
+                ));
               },
             ),
           ]);
@@ -147,11 +146,14 @@ class _SendLangameState extends State<SendLangameView>
       return null;
     }
 
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    cp.showLoadingDialog(
+        Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
     // showBasicSnackBar(context,
     //     'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
     var res = await Provider.of<AuthenticationProvider>(context, listen: false)
         .send(l.shoppingList, selectedTopics, now: now);
-
+    cp.dialogComplete();
     return res.result;
   }
 
@@ -175,48 +177,47 @@ class _SendLangameState extends State<SendLangameView>
         MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Expanded(
-      child: FloatingSearchBar(
-        border: BorderSide(),
-        // shadowColor: Colors.transparent,
-        // accentColor: Colors.transparent,
-        // iconColor: Colors.transparent,
-        // elevation: 0,
-        // backgroundColor: Colors.transparent,
-        // backdropColor: Colors.transparent,
-        hint: 'Search topics...',
-        leadingActions: [
-          BackButton(color: isLightThenBlack(context)),
-        ],
-        automaticallyImplyBackButton: false,
-        hintStyle: TextStyle(color: isLightThenBlack(context)),
-        queryStyle: TextStyle(color: isLightThenBlack(context)),
-        scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-        transitionDuration: const Duration(milliseconds: 800),
-        transitionCurve: Curves.easeInOut,
-        physics: const BouncingScrollPhysics(),
-        axisAlignment: isPortrait ? 0.0 : -1.0,
-        openAxisAlignment: 0.0,
-        // width: AppSize.safeBlockHorizontal * 80,
-        debounceDelay: const Duration(milliseconds: 500),
-        onQueryChanged: (query) {
-          // Call your model, bloc, controller here.
-          setState(() {
-            filter = query;
-          });
-        },
-        // Specify a custom transition to be used for
-        // animating between opened and closed stated.
-        transition: CircularFloatingSearchBarTransition(),
-        actions: [
-          FloatingSearchBarAction.searchToClear(
-            color: isLightThenBlack(context),
-            showIfClosed: true,
-          ),
-        ],
-        builder: (context, transition) {
-          return SizedBox.shrink();
-        },
-      ),
-    );
+        child: FloatingSearchBar(
+      border: BorderSide(),
+      // shadowColor: Colors.transparent,
+      // accentColor: Colors.transparent,
+      // iconColor: Colors.transparent,
+      // elevation: 0,
+      // backgroundColor: Colors.transparent,
+      // backdropColor: Colors.transparent,
+      hint: 'Search topics...',
+      leadingActions: [
+        BackButton(color: isLightThenBlack(context)),
+      ],
+      automaticallyImplyBackButton: false,
+      hintStyle: TextStyle(color: isLightThenBlack(context)),
+      queryStyle: TextStyle(color: isLightThenBlack(context)),
+      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      transitionDuration: const Duration(milliseconds: 800),
+      transitionCurve: Curves.easeInOut,
+      physics: const BouncingScrollPhysics(),
+      axisAlignment: isPortrait ? 0.0 : -1.0,
+      openAxisAlignment: 0.0,
+      // width: AppSize.safeBlockHorizontal * 80,
+      debounceDelay: const Duration(milliseconds: 500),
+      onQueryChanged: (query) {
+        // Call your model, bloc, controller here.
+        setState(() {
+          filter = query;
+        });
+      },
+      // Specify a custom transition to be used for
+      // animating between opened and closed stated.
+      transition: CircularFloatingSearchBarTransition(),
+      actions: [
+        FloatingSearchBarAction.searchToClear(
+          color: isLightThenBlack(context),
+          showIfClosed: true,
+        ),
+      ],
+      builder: (context, transition) {
+        return SizedBox.shrink();
+      },
+    ));
   }
 }

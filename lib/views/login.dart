@@ -4,6 +4,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -26,8 +27,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final GlobalKey<State> _keyLoader =
-      GlobalKey<State>(debugLabel: '_keyLoader');
   final GlobalKey<State> _keySuccess =
       GlobalKey<State>(debugLabel: '_keySuccess');
   Future<void>? successDialogFuture;
@@ -64,9 +63,9 @@ class _LoginState extends State<Login> {
           context, _keySuccess, 'Connected as ${user.displayName}!');
       if (hasDoneSetup) {
         var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+        var cp = Provider.of<ContextProvider>(context, listen: false);
         ap.initializeMessageApi(onBackgroundOrForegroundOpened).then((res) {
-          res.thenShowSnackBar(
-              context: context,
+          cp.handleLangameResponse(res,
               failedMessage: res.error
                       .toString()
                       .contains('firebase_functions/unavailable')
@@ -180,20 +179,18 @@ class _LoginState extends State<Login> {
       Future<LangameResponse> Function() fn, String entity) async {
     // TODO: clean this mess
     var f = fn().timeout(const Duration(seconds: 5));
-    LgDialogs.showLoadingDialog(context, _keyLoader,
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    cp.showLoadingDialog(
         Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
-    f.catchError(() {
-      Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
-    });
+    f.whenComplete(() => cp.dialogComplete());
     f.then((res) {
-      Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
       if (res.status == LangameStatus.succeed) {
         Provider.of<CrashAnalyticsProvider>(context, listen: false)
             .analytics
             .logSignUp(signUpMethod: entity);
       }
-      res.thenShowSnackBar(
-        context: context,
+      cp.handleLangameResponse(
+        res,
         failedMessage: res.error
                 .toString()
                 .contains('network_error') // TODO: hack

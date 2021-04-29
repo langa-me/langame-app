@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
+import 'package:tuple/tuple.dart';
 
 import 'firebase.dart';
 
@@ -30,7 +31,9 @@ abstract class AuthenticationApi {
   Future<lg.User?> getLangameUser(String uid);
 
   /// Get [LangameUser] from Firestore using Langame [tag]
-  Future<List<lg.User>> getLangameUsersStartingWithTag(String ignoreTag, String tag);
+  Future<List<lg.User>> getLangameUsersStartingWithTag(
+      String ignoreTag, String tag,
+      {int limit = 5});
 
   /// Add [LangameUser] to Firestore using Firebase [User]
   Future<lg.User> addLangameUser(User user);
@@ -49,4 +52,6 @@ abstract class AuthenticationApi {
   Future<List<lg.User>> getUserRecommendations(lg.User user);
   Future<void> sendLangameEnd(String channelName);
   Future<int?> getInteraction(String uid, String otherUid);
+  Future<List<Tuple2<String, int>>> getInteractions(String uid,
+      {int limit = 5});
 }

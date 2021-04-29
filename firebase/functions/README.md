@@ -32,6 +32,11 @@ npm run serve
 npm run deploy
 ```
 
+Single function
+````bash
+firebase deploy --only functions:addMessage,functions:makeUppercase
+````
+
 ## Test
 
 ```bash

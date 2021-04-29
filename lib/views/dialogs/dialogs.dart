@@ -12,7 +12,7 @@ class LgDialogs {
           title: text,
           titleStyle: Theme.of(context)
               .textTheme
-              .headline4!
+              .headline5!
               .merge(TextStyle(color: Colors.white)),
           animation: 'animations/check.json',
           animationRepeat: false,

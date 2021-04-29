@@ -114,7 +114,8 @@ export class LangameUser {
         apple: boolean = false,
         favouriteTopics: string[],
         tag: string,
-        tokens: string[]) {
+        tokens: string[],
+    ) {
       this.uid = uid;
       this.email = email;
       this.displayName = displayName;

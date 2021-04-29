@@ -5,7 +5,6 @@ import 'package:device_info/device_info.dart';
 import 'package:feedback/feedback.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/helpers/constants.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shake/shake.dart';
@@ -14,8 +13,9 @@ import 'package:uuid/uuid.dart';
 class FeedbackProvider extends ChangeNotifier {
   FirebaseApi firebase;
   bool _detectShakes = false;
+  final GlobalKey<NavigatorState> navigationKey;
 
-  FeedbackProvider(this.firebase);
+  FeedbackProvider(this.firebase, this.navigationKey);
 
   bool get detectShakes => _detectShakes;
 
@@ -43,9 +43,9 @@ class FeedbackProvider extends ChangeNotifier {
     );
   }
 
-  Null show({BuildContext? context, bool fromShaking = true}) {
+  Null show({bool fromShaking = true}) {
     // TODO: isn't this hack dangerous?
-    BetterFeedback.of(context ?? AppConst.navKey.currentContext!)!
+    BetterFeedback.of(navigationKey.currentContext!)!
         .show((feedback, feedbackScreenshot) async {
       final String uid = Uuid().v4();
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -116,13 +116,13 @@ class FeedbackProvider extends ChangeNotifier {
               final snackBar = SnackBar(
                   content:
                       Text('Understood, you can enable it again in settings'));
-              ScaffoldMessenger.of(AppConst.navKey.currentContext!)
+              ScaffoldMessenger.of(navigationKey.currentContext!)
                   .showSnackBar(snackBar);
             },
           ),
         );
       }
-      ScaffoldMessenger.of(AppConst.navKey.currentContext!)
+      ScaffoldMessenger.of(navigationKey.currentContext!)
           .showSnackBar(snackBar);
     });
   }

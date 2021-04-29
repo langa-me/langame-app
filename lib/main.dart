@@ -19,6 +19,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -58,6 +59,10 @@ void main() async {
       errorAndStacktrace.last,
     );
   }).sendPort);
+  var navigationKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
+  var scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>(debugLabel: 'scaffoldKey');
+  AppConst.navKey = navigationKey;
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then(
     (_) => runApp(
@@ -80,10 +85,14 @@ void main() async {
                 value: Connectivity().onConnectivityChanged,
                 initialData: ConnectivityResult.wifi),
             ChangeNotifierProvider(
-              create: (_) => FeedbackProvider(firebase),
+              create: (_) => FeedbackProvider(firebase, navigationKey),
+            ),
+            ChangeNotifierProvider(
+              create: (_) =>
+                  ContextProvider(navigationKey, scaffoldMessengerKey),
             ),
           ],
-          child: MyApp(analytics),
+          child: MyApp(analytics, navigationKey, scaffoldMessengerKey),
         ),
       ),
     ),
@@ -92,16 +101,21 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   final FirebaseAnalytics analytics;
-  MyApp(this.analytics);
+  final GlobalKey<NavigatorState> navigationKey;
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
+  MyApp(this.analytics, this.navigationKey, this.scaffoldMessengerKey);
 
   @override
-  _MyAppState createState() => _MyAppState(this.analytics);
+  _MyAppState createState() => _MyAppState(
+      this.analytics, this.navigationKey, this.scaffoldMessengerKey);
 }
 
 // TODO: https://github.com/rydmike/flex_color_scheme/blob/master/example/lib/example5/main.dart
 class _MyAppState extends State<MyApp> {
   final FirebaseAnalytics analytics;
-  _MyAppState(this.analytics);
+  final GlobalKey<NavigatorState> navigationKey;
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
+  _MyAppState(this.analytics, this.navigationKey, this.scaffoldMessengerKey);
 
   @override
   initState() {
@@ -122,43 +136,21 @@ class _MyAppState extends State<MyApp> {
           fontFamily: AppFont.mainFont,
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
           background: Colors.transparent,
-        ).toTheme.copyWith(
-            // elevatedButtonTheme: ElevatedButtonThemeData(
-            //   style: ButtonStyle(
-            //       backgroundColor: MaterialStateProperty.all(
-            //           ThemeData.),
-            //       textStyle: MaterialStateProperty.all(
-            //           Theme.of(context).textTheme.headline6)),
-            // ),
-            ),
+        ).toTheme,
         darkTheme: FlexColorScheme.dark(
           scheme: scheme,
           fontFamily: AppFont.mainFont,
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
           background: Colors.transparent,
-        ).toTheme.copyWith(
-            // elevatedButtonTheme: ElevatedButtonThemeData(
-            //   style: ButtonStyle(
-            //       backgroundColor: MaterialStateProperty.all(
-            //           Theme.of(context).colorScheme.primary),
-            //       textStyle: MaterialStateProperty.all(
-            //           Theme.of(context).textTheme.headline6)),
-            // ),
-            ),
+        ).toTheme,
         home: Login(),
-        navigatorKey: AppConst.navKey,
+        navigatorKey: navigationKey,
+        scaffoldMessengerKey: scaffoldMessengerKey,
         navigatorObservers: [
           FirebaseAnalyticsObserver(analytics: analytics),
         ],
         debugShowCheckedModeBanner: false,
       );
     });
-  }
-
-  @override
-  void dispose() {
-    // Provider.of<AuthenticationProvider>(context, listen: false)
-    //     .stopNotifications();
-    super.dispose();
   }
 }

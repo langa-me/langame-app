@@ -6,6 +6,7 @@ import 'package:langame/helpers/fake.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/authentication_api.dart';
+import 'package:tuple/tuple.dart';
 
 import 'firebase.dart';
 
@@ -32,7 +33,9 @@ class FakeAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<List<lg.User>> getLangameUsersStartingWithTag(String ignoreTag, String tag) async {
+  Future<List<lg.User>> getLangameUsersStartingWithTag(
+      String ignoreTag, String tag,
+      {int limit = 5}) async {
     throw UnimplementedError();
   }
 
@@ -101,6 +104,13 @@ class FakeAuthenticationApi extends AuthenticationApi {
   @override
   Future<int?> getInteraction(String uid, String otherUid) {
     // TODO: implement getInteraction
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Tuple2<String, int>>> getInteractions(String uid,
+      {int limit = 5}) {
+    // TODO: implement getInteractions
     throw UnimplementedError();
   }
 }

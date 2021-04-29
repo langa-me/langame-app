@@ -14,6 +14,9 @@ import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
 import 'package:langame/services/http/message_api.dart';
+import 'package:ordered_set/comparing.dart';
+import 'package:ordered_set/ordered_set.dart';
+import 'package:tuple/tuple.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   FirebaseApi firebase;
@@ -41,6 +44,14 @@ class AuthenticationProvider extends ChangeNotifier {
 
   List<lg.User> get userRecommendations {
     return _userRecommendations;
+  }
+
+  OrderedSet<Tuple2<lg.User, lg.InteractionLevel>> _recentInteractions =
+      OrderedSet<Tuple2<lg.User, lg.InteractionLevel>>(
+          Comparing.on((e) => e.item2.value));
+
+  OrderedSet<Tuple2<lg.User, lg.InteractionLevel>> get recentInteractions {
+    return _recentInteractions;
   }
 
   /// Messages, notifications ///
@@ -271,6 +282,31 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse<void>(LangameStatus.succeed);
     } catch (e, s) {
       _log('failed to getUserRecommendations ${user?.uid}');
+      firebase.crashlytics?.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
+
+  Future<LangameResponse<void>> getRecentInteractions() async {
+    try {
+      var interactions = await authenticationApi.getInteractions(_user!.uid);
+      var users = await Future.wait(
+          interactions.map((i) => authenticationApi.getLangameUser(i.item1)));
+      _recentInteractions = OrderedSet<Tuple2<lg.User, lg.InteractionLevel>>(
+          Comparing.on((e) => e.item2.value));
+      users.asMap().forEach((i, u) {
+        if (u != null) {
+          _recentInteractions
+              .add(Tuple2(u, interactions[i].item2.toInteractionLevel()));
+        }
+      });
+      notifyListeners();
+
+      _log('getRecentInteractions ${user!.uid}');
+      notifyListeners();
+      return LangameResponse<void>(LangameStatus.succeed);
+    } catch (e, s) {
+      _log('failed to getRecentInteractions ${user?.uid}');
       firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

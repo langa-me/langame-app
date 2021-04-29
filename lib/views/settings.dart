@@ -4,6 +4,7 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
+import 'package:langame/views/texts/texts.dart';
 import 'package:provider/provider.dart';
 
 import 'colors/colors.dart';
@@ -42,6 +43,7 @@ class _SettingsState extends State<SettingsView> {
       body: Container(
         child: ListView(
           children: <Widget>[
+            TextDivider('Style'),
             Padding(
               padding: const EdgeInsets.all(12),
               child:
@@ -55,19 +57,7 @@ class _SettingsState extends State<SettingsView> {
                 );
               }),
             ),
-            Divider(thickness: 4),
-            Consumer<FeedbackProvider>(
-                builder: (context, p, child) => ListTile(
-                      onTap: () {
-                        p.detectShakes = !p.detectShakes;
-                      },
-                      leading: Icon(Icons.feedback_outlined),
-                      title: Text('Shake-to-feedback'),
-                      trailing: Switch(
-                          value: p.detectShakes,
-                          onChanged: (v) => p.detectShakes = !p.detectShakes),
-                    )),
-            Divider(thickness: 4),
+            TextDivider('General'),
             ListTile(
               onTap: () {
                 final snackBar = SnackBar(content: Text('Coming soon!'));
@@ -99,6 +89,31 @@ class _SettingsState extends State<SettingsView> {
               },
               leading: Icon(Icons.whatshot_outlined),
               title: Text('Delete my account and all my data'),
+            ),
+            TextDivider('Experimental features'),
+            Consumer<FeedbackProvider>(
+              builder: (context, p, child) => ListTile(
+                onTap: () {
+                  p.detectShakes = !p.detectShakes;
+                },
+                leading: Icon(Icons.feedback_outlined),
+                title: Text('Shake-to-feedback'),
+                trailing: Switch(
+                    value: p.detectShakes,
+                    onChanged: (v) => p.detectShakes = !p.detectShakes),
+              ),
+            ),
+            Consumer<LocalStorageProvider>(
+              builder: (context, p, child) => ListTile(
+                onTap: () {
+                  p.recommendations = !p.recommendations;
+                },
+                leading: Icon(Icons.recommend),
+                title: Text('User recommendations'),
+                trailing: Switch(
+                    value: p.recommendations,
+                    onChanged: (v) => p.recommendations = !p.recommendations),
+              ),
             ),
           ],
         ),
