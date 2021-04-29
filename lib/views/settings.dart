@@ -1,13 +1,19 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
+import 'package:langame/providers/authentication_provider.dart';
+import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/local_storage_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/texts/texts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import 'colors/colors.dart';
+import 'login.dart';
 
 class SettingsView extends StatefulWidget {
   _SettingsState createState() => _SettingsState();
@@ -84,11 +90,53 @@ class _SettingsState extends State<SettingsView> {
             ),
             ListTile(
               onTap: () {
-                final snackBar = SnackBar(content: Text('Coming soon!'));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                var cp = Provider.of<ContextProvider>(context, listen: false);
+                cp.showCustomDialog([
+                  Center(
+                    child: Column(children: [
+                      Lottie.asset(
+                        'animations/sad2.json',
+                        width: AppSize.safeBlockHorizontal * 20,
+                        repeat: false,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Are you sure to leave us?',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline6!.merge(
+                              TextStyle(color: Colors.white),
+                            ),
+                      ),
+                      OutlinedButton.icon(
+                          style:
+                              OutlinedButton.styleFrom(primary: Colors.white),
+                          onPressed: () {
+                            cp.dialogComplete();
+                            _delete();
+                          },
+                          icon: Icon(Icons.delete_forever_outlined),
+                          label: Text('Delete my account'))
+                    ]),
+                  )
+                ], canBack: true);
               },
               leading: Icon(Icons.whatshot_outlined),
               title: Text('Delete my account and all my data'),
+            ),
+            ListTile(
+              onTap: () {
+                var cp = Provider.of<ContextProvider>(context, listen: false);
+                cp.showLoadingDialog(
+                    Provider.of<FunnyProvider>(context, listen: false)
+                        .getLoadingRandom());
+                Provider.of<AuthenticationProvider>(context, listen: false)
+                    .logout()
+                    .whenComplete(() => cp.pushReplacement(Login()));
+              },
+              leading: Icon(Icons.login_outlined),
+              title: Text('Log out'),
             ),
             TextDivider('Experimental features'),
             Consumer<FeedbackProvider>(
@@ -119,5 +167,27 @@ class _SettingsState extends State<SettingsView> {
         ),
       ),
     );
+  }
+
+  void _delete() {
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    cp.showLoadingDialog(
+        Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
+    Provider.of<AuthenticationProvider>(context, listen: false)
+        .delete()
+        .then((r) {
+      cp.handleLangameResponse(r, onSucceed: () async {
+        cp.showSuccessDialog(
+            'We are very sorry that you are leaving us, but we nevertheless wish you a life full of joy and love. Sincerely, Langame team.');
+        await Future.delayed(Duration(seconds: 2));
+        cp.dialogComplete();
+        cp.pushReplacement(Login());
+      }, onFailure: () async {
+        cp.showFailureDialog(
+            'We are deeply sorry to announce that we could not execute your request, please contact support');
+        await Future.delayed(Duration(seconds: 2));
+        cp.dialogComplete();
+      });
+    });
   }
 }

@@ -58,9 +58,11 @@ class AuthenticationProvider extends ChangeNotifier {
 
   /// Defines whether it's fake API or real
   late final MessageApi messageApi;
+  bool _isMessageApiInitialized = false;
 
   /// In-memory local notifications
   List<LangameNotification> _notifications = [];
+
   List<LangameNotification> get notifications => _notifications;
 
   void _log(String msg) {
@@ -197,14 +199,14 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse> loginWithApple() async {
     return authenticationApi
         .loginWithApple()
-        .then(_loginWith)
-        .catchError(() => LangameResponse(LangameStatus.cancelled),
-            test: (e) => e is LangameAppleSignInException)
         .catchError((e, s) {
-      _log('failed to loginWithApple');
-      firebase.crashlytics?.recordError(e, s);
-      LangameResponse(LangameStatus.failed, error: e.toString());
-    });
+          _log('failed to loginWithApple');
+          firebase.crashlytics?.recordError(e, s);
+          LangameResponse(LangameStatus.failed, error: e.toString());
+        })
+        .then(_loginWith)
+        .catchError((err) => LangameResponse(LangameStatus.cancelled),
+            test: (e) => e is LangameAppleSignInException);
   }
 
   Future<LangameResponse> loginWithFacebook() async {
@@ -222,7 +224,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LangameResponse> loginWithGoogle() async {
     return authenticationApi
-        .loginWithGoogle() // TODO: catch error here
+        .loginWithGoogle()
         .catchError((e, s) {
           _log('failed to loginWithGoogle');
           firebase.crashlytics?.recordError(e, s);
@@ -233,8 +235,16 @@ class AuthenticationProvider extends ChangeNotifier {
             test: (e) => e is LangameGoogleSignInException);
   }
 
-  Future<LangameResponse> getRelations() async {
-    throw UnimplementedError();
+  Future<LangameResponse> logout() async {
+    try {
+      await authenticationApi.logout();
+      _log('logout');
+      return LangameResponse<lg.User>(LangameStatus.succeed);
+    } catch (e, s) {
+      _log('failed to logout');
+      firebase.crashlytics?.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
   }
 
   // TODO langame response
@@ -375,11 +385,13 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse> initializeMessageApi(
       void Function(LangameNotification?) onBackgroundOrForegroundOpened,
       {bool fake = false}) async {
+    if (_isMessageApiInitialized) return LangameResponse(LangameStatus.succeed);
     messageApi = fake
         ? FakeMessageApi(
             authenticationApi.firebase, onBackgroundOrForegroundOpened)
         : ImplMessageApi(
             authenticationApi.firebase, onBackgroundOrForegroundOpened);
+    _isMessageApiInitialized = true;
     try {
       await messageApi.initializePermissions();
       await messageApi.listen(_onNotificationHandler);
@@ -387,6 +399,40 @@ class AuthenticationProvider extends ChangeNotifier {
       // TODO  Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
     } catch (e, s) {
       _log('failed to initializeMessageApi');
+      firebase.crashlytics?.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+    return LangameResponse(LangameStatus.succeed);
+  }
+
+  Future<LangameResponse> updateProfile(
+      {String? displayName,
+      String? photoURL,
+      String? newEmail,
+      String? tag,
+      List<String>? topics}) async {
+    try {
+      await authenticationApi.updateProfile(
+          displayName: displayName,
+          photoURL: photoURL,
+          newEmail: newEmail,
+          tag: tag,
+          topics: topics);
+      _log('updateProfile');
+    } catch (e, s) {
+      _log('failed to updateProfile');
+      firebase.crashlytics?.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+    return LangameResponse(LangameStatus.succeed);
+  }
+
+  Future<LangameResponse> delete() async {
+    try {
+      await authenticationApi.delete();
+      _log('delete');
+    } catch (e, s) {
+      _log('failed to delete');
       firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

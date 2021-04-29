@@ -113,4 +113,10 @@ class FakeAuthenticationApi extends AuthenticationApi {
     // TODO: implement getInteractions
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> delete() {
+    // TODO: implement delete
+    throw UnimplementedError();
+  }
 }

@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -18,7 +17,6 @@ import 'package:langame/providers/local_storage_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
-import 'dialogs/dialogs.dart';
 import 'friends.dart';
 import 'notifications.dart';
 
@@ -32,30 +30,24 @@ class _SetupState extends State with AfterLayoutMixin {
   List<Topic> favouriteTopics = [];
   final controller = PageController(initialPage: 0, viewportFraction: 0.9);
 
-  // Create a global key that uniquely identifies the Form widget
-  // and allows validation of the form.
-  //
-  // Note: This is a GlobalKey<FormState>,
-  // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>(debugLabel: '_formKey');
-  final GlobalKey<State> _keyLoader =
-      new GlobalKey<State>(debugLabel: '_keyLoader');
+  bool hasFinishedOnBoarding = false;
 
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .analytics
         .setCurrentScreen(screenName: 'setup');
-    // Provider.of<TopicProvider>(context, listen: false).getAllTopics();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IntroductionScreen(
-        done: Text("Done"),
-        next: Text("Next"),
+        done: Text('Done'),
+        next: Text('Next'),
         pages: _buildPageModels(),
+        showDoneButton: hasFinishedOnBoarding,
         onDone: _onDone, // TODO: ask permission notification
       ),
     );
@@ -84,13 +76,24 @@ class _SetupState extends State with AfterLayoutMixin {
             maxLength: 8,
             // The validator receives the text that the user has entered.
             validator: (value) {
-              showBasicSnackBar(context, 'this is not implemented yet!');
+              // showBasicSnackBar(context, 'this is not implemented yet!');
               // TODO: validation should at least check availability of tag
               // TODO: and maybe check profanity (funniest part)
               if (value == null || value.isEmpty) {
                 return 'Please enter some text';
               }
-              return null;
+              var cp = Provider.of<ContextProvider>(context, listen: false);
+              cp.showLoadingDialog('Validating...');
+              Provider.of<AuthenticationProvider>(context, listen: false)
+                  .updateProfile(tag: value)
+                  .then((res) {
+                cp.handleLangameResponse(
+                  res,
+                  succeedMessage: 'Tag is available',
+                  failedMessage: 'Tag is not available',
+                  onSucceed: () => setState(() => hasFinishedOnBoarding = true),
+                );
+              }).whenComplete(cp.dialogComplete);
             },
           ),
           Padding(
@@ -115,22 +118,20 @@ class _SetupState extends State with AfterLayoutMixin {
 
   void _onDone() {
     Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
-      'favourite topics ${favouriteTopics.map((e) => e.content).join(",")}',
+      'favourite topics ${favouriteTopics.map((e) => e.content).join(',')}',
       analyticsMessage: 'favourite_topics',
       analyticsParameters: {'topics': favouriteTopics.join(',')},
     );
 
-    // TODO: send mail to everyone "join langame bro"
-
     Future<LangameResponse> f =
         Provider.of<AuthenticationProvider>(context, listen: false)
             .initializeMessageApi(onBackgroundOrForegroundOpened);
-    LgDialogs.showLoadingDialog(context, _keyLoader,
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    cp.showLoadingDialog(
         Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
 
     f.then((res) {
-      Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
-      var cp = Provider.of<ContextProvider>(context, listen: false);
+      cp.pop();
       cp.handleLangameResponse(
         res,
         failedMessage: !kReleaseMode
@@ -140,12 +141,7 @@ class _SetupState extends State with AfterLayoutMixin {
         onSucceed: () {
           Provider.of<LocalStorageProvider>(context, listen: false)
               .saveHasDoneSetup(true);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FriendsView(),
-            ),
-          );
+          cp.pushReplacement(FriendsView());
         },
         onFailure: () => controller.previousPage(
             duration: new Duration(seconds: 1), curve: Curves.bounceIn),

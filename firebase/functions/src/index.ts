@@ -20,6 +20,7 @@ import {newFeedback} from "./feedback";
 import {sendLangameEnd} from "./sendLangameEnd";
 import {sendLangame} from "./sendLangame";
 import {interactionsDecrement} from "./scheduledFunctions";
+import {deleteData} from "./deleteData";
 // Initialize admin firebase
 admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
@@ -131,15 +132,17 @@ exports.interactionsDecrement = functions
     .schedule("1 * * * *")
     .onRun(interactionsDecrement);
 
-/**
- *
- * @type {HttpsFunction & Runnable<any>}
- */
 exports.sendLangameEnd = functions
     .region(region)
     .runWith(runtimeOpts)
     .https
     .onCall(sendLangameEnd);
+
+exports.deleteData = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .https
+    .onCall(deleteData);
 
 /**
  * Generate an audio channel token for the user
@@ -216,17 +219,21 @@ exports.updateProfile = functions
             kInvalidRequest,
         );
       }
-      return await admin
+
+      // TODO: more checks
+      return admin
           .firestore()
           .collection(kUsersCollection)
           .doc(context.auth.uid)
           .update(data).then((_) => {
+            functions.logger.info("updated", context.auth!.uid, data);
             return new FirebaseFunctionsResponse(
                 FirebaseFunctionsResponseStatusCode.OK,
                 undefined,
                 undefined,
             );
           }).catch((e) => {
+            functions.logger.info("failed to update", context.auth!.uid, data);
             return new FirebaseFunctionsResponse(
                 FirebaseFunctionsResponseStatusCode.INTERNAL,
                 undefined,

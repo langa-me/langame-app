@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/random.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/services/context/dialog_service.dart';
 import 'package:langame/services/context/navigation_service.dart';
 import 'package:langame/services/context/snack_bar_service.dart';
+import 'package:lottie/lottie.dart';
+
+enum spinKitType { SpinKitChasingDots, SpinKitDualRing, SpinKitWanderingCubes }
+
+List<Function(Color)> _loaders = [
+  (Color c) => SpinKitChasingDots(color: c),
+  (Color c) => SpinKitDualRing(color: c),
+  (Color c) => SpinKitWanderingCubes(color: c),
+  (Color c) => SpinKitPouringHourglass(color: c),
+  (Color c) => SpinKitFoldingCube(color: c),
+  (Color c) => SpinKitDoubleBounce(color: c),
+];
 
 class ContextProvider extends ChangeNotifier {
   final GlobalKey<NavigatorState> _navigationKey;
@@ -35,9 +49,10 @@ class ContextProvider extends ChangeNotifier {
 
   void pop() => _navigationService.pop();
 
-  Future showCustomDialog(List<Widget> children) => _showDialog(
+  Future showCustomDialog(List<Widget> children, {bool canBack = false}) =>
+      _showDialog(
         () => WillPopScope(
-          onWillPop: () async => false,
+          onWillPop: () async => canBack,
           child: SimpleDialog(
             backgroundColor:
                 Theme.of(_navigationKey.currentContext!).colorScheme.primary,
@@ -50,13 +65,11 @@ class ContextProvider extends ChangeNotifier {
         [
           Center(
             child: Column(children: [
-              // TODO: random SpinKit :)
-              SpinKitChasingDots(
-                color: Theme.of(_navigationKey.currentContext!).brightness ==
-                        Brightness.dark
-                    ? Colors.black
-                    : Colors.white,
-              ),
+              _loaders.pickAny()!(
+                  Theme.of(_navigationKey.currentContext!).brightness ==
+                          Brightness.dark
+                      ? Colors.black
+                      : Colors.white),
               SizedBox(
                 height: 10,
               ),
@@ -74,6 +87,55 @@ class ContextProvider extends ChangeNotifier {
           )
         ],
       );
+
+  Future<void> showSuccessDialog(String text) => showCustomDialog([
+        Center(
+          child: Column(children: [
+            Lottie.asset(
+              'animations/check.json',
+              width: AppSize.safeBlockHorizontal * 30,
+              repeat: false,
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: Theme.of(_navigationKey.currentContext!)
+                  .textTheme
+                  .headline6!
+                  .merge(
+                    TextStyle(color: Colors.white),
+                  ),
+            )
+          ]),
+        )
+      ]);
+
+  Future<void> showFailureDialog(String text) => showCustomDialog([
+        Center(
+          child: Column(children: [
+            Lottie.asset(
+              'animations/sad.json',
+              width: AppSize.safeBlockHorizontal * 30,
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: Theme.of(_navigationKey.currentContext!)
+                  .textTheme
+                  .headline6!
+                  .merge(
+                    TextStyle(color: Colors.white),
+                  ),
+            )
+          ]),
+        )
+      ]);
 
   void handleLangameResponse(LangameResponse res,
       {String? succeedMessage,

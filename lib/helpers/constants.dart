@@ -28,6 +28,7 @@ class AppConst {
   static const String updateProfileFunction = 'updateProfile';
   static const String getChannelTokenFunction = 'getChannelToken';
   static const String sendLangameEndFunction = 'sendLangameEnd';
+  static const String deleteDataFunction = 'deleteData';
 
   static GlobalKey<NavigatorState>? navKey;
 

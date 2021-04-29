@@ -27,6 +27,9 @@ abstract class AuthenticationApi {
   /// Login with firebase with previously acquired credential
   Future<void> logout();
 
+  /// Delete user
+  Future<void> delete();
+
   /// Get [LangameUser] from Firestore using Firebase uid
   Future<lg.User?> getLangameUser(String uid);
 

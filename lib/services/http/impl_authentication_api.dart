@@ -1,25 +1,23 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/string.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/firebase_functions_protocol.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:tuple/tuple.dart';
 
 import 'authentication_api.dart';
 
 class ImplAuthenticationApi extends AuthenticationApi {
   GoogleSignInAccount? _google;
-
+  AuthorizationCredentialAppleID? _apple;
   // FacebookUser? _facebook;
-  // AppleUser? _apple;
   late Stream<User?> _authStateChanges;
 
   @override
@@ -31,7 +29,32 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   @override
   Future<OAuthCredential> loginWithApple() async {
-    throw UnimplementedError('nop');
+    try {
+      // To prevent replay attacks with the credential returned from Apple, we
+      // include a nonce in the credential request. When signing in in with
+      // Firebase, the nonce in the id token returned by Apple, is expected to
+      // match the sha256 hash of `rawNonce`.
+      final rawNonce = generateNonce();
+      final nonce = sha256ofString(rawNonce);
+
+      // Request credential for the currently signed in Apple account.
+      _apple = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      // Create an `OAuthCredential` from the credential returned by Apple.
+      return OAuthProvider('apple.com').credential(
+        idToken: _apple!.identityToken,
+        rawNonce: rawNonce,
+      );
+    } catch (e) {
+      throw LangameAppleSignInException(
+          'authentication failed ${e.toString()}');
+    }
   }
 
   @override
@@ -42,8 +65,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
   @override
   Future<OAuthCredential> loginWithGoogle() async {
-    // await googleSignIn.signOut();
-    // await firebaseAuth.signOut();
     try {
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser =
@@ -104,11 +125,13 @@ class ImplAuthenticationApi extends AuthenticationApi {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
     lg.User langameUser = userFromFirebase(user);
-    var t = await _generateTag(user);
     if (user.providerData.any((e) => e.providerId == 'google.com')) {
       langameUser.google = true;
     }
-    langameUser.tag = t.toLowerCase();
+    if (user.providerData.any((e) => e.providerId == 'apple.com')) {
+      langameUser.apple = true;
+    }
+    // TODO: facebook
 
     return users
         .doc(langameUser.uid)
@@ -140,6 +163,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   @override
   Future<void> logout() async {
     if (_google != null) await firebase.googleSignIn!.signOut();
+    // if (_apple != null) await SignInWithApple.
     await firebase.auth!.signOut();
     // TODO: Facebook, Apple
   }
@@ -152,30 +176,37 @@ class ImplAuthenticationApi extends AuthenticationApi {
       String? newEmail,
       String? tag,
       List<String>? topics}) async {
+    if (newEmail != null)
+      throw LangameUpdateProfileException(cause: 'email_not_implemented');
     if (firebase.auth!.currentUser == null)
       throw LangameUpdateProfileException(cause: kNotAuthenticated);
-    await firebase.auth!.currentUser!
-        .updateProfile(displayName: displayName, photoURL: photoURL);
-    if (newEmail != null)
-      await firebase.auth!.currentUser!.updateEmail(newEmail);
+    // If the user want to change tag and someone already has this tag, fail
+    if (tag != null &&
+        (await getLangameUsersStartingWithTag('', tag))
+            .any((e) => e.tag == tag))
+      throw LangameUpdateProfileException(cause: 'tag_already_existing');
     HttpsCallable callable = firebase.functions!.httpsCallable(
         AppConst.updateProfileFunction,
         options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
 
     try {
+      var data = <String, dynamic>{};
+      if (displayName != null) data['displayName'] = displayName;
+      if (photoURL != null) data['photoUrl'] = photoURL;
+      if (newEmail != null) data['email'] = newEmail;
+      if (tag != null) data['tag'] = tag;
+      if (topics != null) data['topics'] = topics;
       final HttpsCallableResult result = await callable.call(
-        <String, dynamic>{
-          'displayName': displayName,
-          'photoUrl': photoURL,
-          'email': newEmail,
-          'tag': tag,
-          'topics': topics,
-        },
+        data,
       );
       FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
           Map<String, dynamic>.from(result.data));
       switch (response.statusCode) {
         case FirebaseFunctionsResponseStatusCode.OK:
+          await firebase.auth!.currentUser!
+              .updateProfile(displayName: displayName, photoURL: photoURL);
+          if (newEmail != null)
+            await firebase.auth!.currentUser!.updateEmail(newEmail);
           break;
         case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
           LangameUpdateProfileException(
@@ -204,34 +235,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
     //     codeSent: codeSent,
     //     codeAutoRetrievalTimeout: codeAutoRetrievalTimeout)
     // firebase.auth.currentUser.updatePhoneNumber()
-  }
-
-  Future<String> _generateTag(User user) async {
-    if (user.displayName == null)
-      throw LangameAuthException('The user has no displayName');
-    String tag = user.displayName!;
-    int tries = 0;
-    int maxTries = 5;
-    while ((await getLangameUsersStartingWithTag('', tag)).isNotEmpty) {
-      var r = await post(
-        Uri.parse('https://uzby.com/api.php'),
-        body: 'min=4&max=6',
-        encoding: Encoding.getByName('utf-8'),
-        headers: {
-          'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        },
-      );
-      if (r.statusCode != 200)
-        throw LangameAuthException(
-            'Could not generate a tag for ${user.displayName}, ${r.statusCode}:${r.body}');
-      if (r.body == '') continue;
-      tag = '${user.displayName!}-${r.body}';
-      tries++;
-      if (tries > maxTries)
-        throw LangameAuthException(
-            'Could not generate a tag for ${user.displayName}');
-    }
-    return tag;
   }
 
   @override
@@ -359,5 +362,39 @@ class ImplAuthenticationApi extends AuthenticationApi {
                 as String,
             e.data()['interactions'] as int))
         .toList();
+  }
+
+  @override
+  Future<void> delete() async {
+    HttpsCallable callable = firebase.functions!.httpsCallable(
+      AppConst.deleteDataFunction,
+      options: HttpsCallableOptions(
+        timeout: Duration(seconds: 10),
+      ),
+    );
+    // TODO: should also purge local data etc?
+    // TODO: clean local storage share_prefere !!! like has done setup & stuff
+    try {
+      final HttpsCallableResult result = await callable.call();
+      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
+        Map<String, dynamic>.from(result.data),
+      );
+      switch (response.statusCode) {
+        case FirebaseFunctionsResponseStatusCode.OK:
+          logout();
+          break;
+        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
+          throw LangameAuthException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
+        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
+          throw LangameAuthException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
+        case FirebaseFunctionsResponseStatusCode.INTERNAL:
+          throw LangameAuthException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
+      }
+    } catch (e) {
+      throw LangameAuthException(e.toString());
+    }
   }
 }
