@@ -17,6 +17,7 @@ import 'authentication_api.dart';
 class ImplAuthenticationApi extends AuthenticationApi {
   GoogleSignInAccount? _google;
   AuthorizationCredentialAppleID? _apple;
+
   // FacebookUser? _facebook;
   late Stream<User?> _authStateChanges;
 
@@ -93,9 +94,9 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<void> loginWithFirebase(OAuthCredential credential) async {
+  Future<UserCredential> loginWithFirebase(OAuthCredential credential) async {
     try {
-      await firebase.auth!.signInWithCredential(credential);
+      return await firebase.auth!.signInWithCredential(credential);
     } on FirebaseAuthException catch (e) {
       throw LangameFirebaseSignInException(
           cause: 'failed to signInWithCredential ${e.code}');
@@ -169,72 +170,57 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<void> updateProfile(
-      // TODO: use firebase rules instead of functions?
-      {String? displayName,
-      String? photoURL,
-      String? newEmail,
-      String? tag,
-      List<String>? topics}) async {
+  Future<void> updateProfile({
+    String? displayName,
+    String? photoURL,
+    String? newEmail,
+    String? newPhoneNumber,
+    String? tag,
+    List<String>? topics,
+    bool google = false,
+    bool apple = false,
+  }) async {
+    Map<String, dynamic> data = {};
+    if (displayName != null) data['displayName'] = displayName;
+    if (photoURL != null) data['photoUrl'] = photoURL;
     if (newEmail != null)
       throw LangameUpdateProfileException(cause: 'email_not_implemented');
+    if (newPhoneNumber != null)
+      throw LangameUpdateProfileException(
+          cause: 'phone_number_not_implemented');
+    if (tag != null) data['tag'] = tag;
+    if (topics != null) data['favouriteTopics'] = topics;
+    if (google) data['google'] = google;
+    if (apple) data['apple'] = apple;
+
     if (firebase.auth!.currentUser == null)
       throw LangameUpdateProfileException(cause: kNotAuthenticated);
     // If the user want to change tag and someone already has this tag, fail
     if (tag != null &&
-        (await getLangameUsersStartingWithTag('', tag))
-            .any((e) => e.tag == tag))
+        (await getLangameUsersStartingWithTag('', tag)).any(
+            (e) => firebase.auth!.currentUser!.uid != e.uid && e.tag == tag))
       throw LangameUpdateProfileException(cause: 'tag_already_existing');
-    HttpsCallable callable = firebase.functions!.httpsCallable(
-        AppConst.updateProfileFunction,
-        options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
 
-    try {
-      var data = <String, dynamic>{};
-      if (displayName != null) data['displayName'] = displayName;
-      if (photoURL != null) data['photoUrl'] = photoURL;
-      if (newEmail != null) data['email'] = newEmail;
-      if (tag != null) data['tag'] = tag;
-      if (topics != null) data['topics'] = topics;
-      final HttpsCallableResult result = await callable.call(
-        data,
-      );
-      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
-          Map<String, dynamic>.from(result.data));
-      switch (response.statusCode) {
-        case FirebaseFunctionsResponseStatusCode.OK:
-          await firebase.auth!.currentUser!
-              .updateProfile(displayName: displayName, photoURL: photoURL);
-          if (newEmail != null)
-            await firebase.auth!.currentUser!.updateEmail(newEmail);
-          break;
-        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
-          LangameUpdateProfileException(
-              cause: response.errorMessage ??
-                  FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
-          break;
-        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
-          LangameUpdateProfileException(
-              cause: response.errorMessage ??
-                  FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
-          break;
-        case FirebaseFunctionsResponseStatusCode.INTERNAL:
-          LangameUpdateProfileException(
-              cause: response.errorMessage ??
-                  FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
-          break;
-      }
-      // return response.result;
-    } catch (e) {
-      throw LangameUpdateProfileException(cause: e.toString());
-    }
-    // TODO: phone
-    // firebase.auth.verifyPhoneNumber(phoneNumber: phoneNumber,
-    //     verificationCompleted: verificationCompleted,
-    //     verificationFailed: verificationFailed,
-    //     codeSent: codeSent,
-    //     codeAutoRetrievalTimeout: codeAutoRetrievalTimeout)
-    // firebase.auth.currentUser.updatePhoneNumber()
+    data['uid'] = firebase.auth!.currentUser!.uid;
+    var f = firebase.firestore!
+        .collection(AppConst.firestoreUsersCollection)
+        .doc(firebase.auth!.currentUser!.uid)
+        .update(data);
+
+    return f.then((_) async {
+      await firebase.auth!.currentUser!
+          .updateProfile(displayName: displayName, photoURL: photoURL);
+      if (newEmail != null)
+        await firebase.auth!.currentUser!.updateEmail(newEmail);
+
+      // TODO: phone
+      // firebase.auth.verifyPhoneNumber(phoneNumber: phoneNumber,
+      //     verificationCompleted: verificationCompleted,
+      //     verificationFailed: verificationFailed,
+      //     codeSent: codeSent,
+      //     codeAutoRetrievalTimeout: codeAutoRetrievalTimeout)
+      // firebase.auth.currentUser.updatePhoneNumber()
+    });
   }
 
   @override
@@ -294,39 +280,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<void> sendLangameEnd(String channelName) async {
-    HttpsCallable callable = firebase.functions!.httpsCallable(
-        AppConst.sendLangameEndFunction,
-        options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
-
-    try {
-      final HttpsCallableResult result = await callable.call(
-        <String, dynamic>{
-          'channelName': channelName,
-        },
-      );
-      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
-        Map<String, dynamic>.from(result.data),
-      );
-      switch (response.statusCode) {
-        case FirebaseFunctionsResponseStatusCode.OK:
-          break;
-        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
-          throw LangameSendEndException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
-        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
-          throw LangameSendEndException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
-        case FirebaseFunctionsResponseStatusCode.INTERNAL:
-          throw LangameSendEndException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
-      }
-    } catch (e) {
-      throw LangameSendEndException(e.toString());
-    }
-  }
-
-  @override
   Future<int?> getInteraction(String uid, String otherUid) async {
     var r = await firebase.firestore!
         .collection(AppConst.firestoreInteractionsCollection)
@@ -352,7 +305,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
     var r = await firebase.firestore!
         .collection(AppConst.firestoreInteractionsCollection)
         .where('usersArray', arrayContains: uid)
-        .limit(limit)
+        .limit(limit) // TODO: snapshots()
         .get();
 
     return r.docs
@@ -381,7 +334,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
       );
       switch (response.statusCode) {
         case FirebaseFunctionsResponseStatusCode.OK:
-          logout();
           break;
         case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
           throw LangameAuthException(response.errorMessage ??

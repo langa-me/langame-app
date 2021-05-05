@@ -21,6 +21,7 @@ List<Function(Color)> _loaders = [
 
 class ContextProvider extends ChangeNotifier {
   final GlobalKey<NavigatorState> _navigationKey;
+  GlobalKey<NavigatorState> get navigationKey => _navigationKey;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey;
   late DialogService _dialogService;
   late SnackBarService _snackBarService;
@@ -34,8 +35,8 @@ class ContextProvider extends ChangeNotifier {
       ));
 
   /// Calls the dialog listener and returns a Future that will wait for dialogComplete.
-  Future _showDialog(Function showDialogListener) =>
-      _dialogService.showDialog(() => showDialog(
+  Future _showDialog(Function showDialogListener) async =>
+      await _dialogService.showDialog(() async => await showDialog(
           context: _navigationKey.currentContext!,
           builder: (BuildContext context) => showDialogListener()));
 

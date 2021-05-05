@@ -30,13 +30,12 @@ class AppConst {
   static const String sendLangameEndFunction = 'sendLangameEnd';
   static const String deleteDataFunction = 'deleteData';
 
-  static GlobalKey<NavigatorState>? navKey;
-
   static const String firestoreUsersCollection = 'users';
   static const String firestoreNotificationsCollection = 'notifications';
   static const String firestoreLangamesCollection = 'langames';
   static const String firestoreTopicsCollection = 'topics';
   static const String firestoreInteractionsCollection = 'interactions';
+  static const String firestorePreferencesCollection = 'preferences';
 
   static const String helpUrl = 'https://help.langa.me';
 }

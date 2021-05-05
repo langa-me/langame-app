@@ -10,17 +10,17 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/providers/local_storage_provider.dart';
+import 'package:langame/providers/message_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/facebook.dart';
 import 'package:langame/views/buttons/google.dart';
-import 'package:langame/views/setup.dart';
+import 'package:langame/views/on_boarding.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/apple.dart';
 import 'friends.dart';
 import 'langame.dart';
-import 'notifications.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -34,35 +34,38 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .analytics
-        .setCurrentScreen(screenName: 'login');
+    var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
+    cap.setCurrentScreen('login');
     final provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
     Provider.of<FeedbackProvider>(context, listen: false).initShake();
     // Bunch of spaghetti code to check if it is a new user or already authenticated
     provider.userStream.first.then((user) {
+      cap.log('login - userStream - ${user?.writeToJson()}');
       if (user == null || successDialogFuture != null) return null;
 
-      var hasDoneSetup =
-          Provider.of<LocalStorageProvider>(context, listen: false)
-              .hasDoneSetup;
+      var hasDoneOnBoarding =
+          Provider.of<PreferenceProvider>(context, listen: false)
+              .preference
+              .hasDoneOnBoarding;
       var cp = Provider.of<ContextProvider>(context, listen: false);
       // Once arriving on login page, if coming from a notification tap coming
       // from a terminated state (app closed, have notification in bar)
       // and the user is properly authenticated, will open directly langame view
       // otherwise it will go to setup or friends according to auth state
-      cp.showSuccessDialog('Connected as ${user.displayName}!');
-      if (hasDoneSetup) {
-        var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+      var displayName =
+          user.displayName.isNotEmpty ? ' as ${user.displayName}' : '';
+      cp.showSuccessDialog('Connected$displayName!');
+      if (hasDoneOnBoarding) {
         // Probably logged-out, skip message api init
-        initMessageApi(ap, cp);
+        initMessageApi(
+            Provider.of<MessageProvider>(context, listen: false), cp);
       } else {
         // User previously authenticated but didn't do setup
         Future.delayed(Duration(seconds: 1), () {
           cp.pop();
           // User is not opening the app from a notification
-          cp.pushReplacement(Setup());
+          cp.pushReplacement(OnBoarding());
         });
       }
     });
@@ -135,8 +138,8 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Future initMessageApi(AuthenticationProvider ap, ContextProvider cp) =>
-      ap.initializeMessageApi(onBackgroundOrForegroundOpened).then((res) {
+  Future initMessageApi(MessageProvider mp, ContextProvider cp) =>
+      mp.initializeMessageApi().then((res) {
         cp.handleLangameResponse(res,
             failedMessage: res.error
                     .toString()
@@ -146,13 +149,16 @@ class _LoginState extends State<Login> {
                     ? 'failed to initializeMessageApi ${res.error.toString()}'
                     : Provider.of<FunnyProvider>(context, listen: false)
                         .getFailingRandom(),
-            onSucceed: () {
+            onSucceed: () async {
               cp.dialogComplete();
-
-              ap.messageApi.getInitialMessage().then((n) {
-                if (n != null && n.channelName != null) {
+              var messages = await mp.getInitialMessage();
+              cp.handleLangameResponse(messages, onSucceed: () {
+                if (messages.result != null &&
+                    messages.result!.channelName != null) {
                   cp.pushReplacement(LangameView(
-                      n.channelName!, n.ready == null || !n.ready!));
+                      messages.result!.channelName!,
+                      messages.result!.ready == null ||
+                          !messages.result!.ready!));
                 } else {
                   cp.pushReplacement(FriendsView());
                   // User is not opening the app from a notification
@@ -166,7 +172,7 @@ class _LoginState extends State<Login> {
       Future<LangameResponse> Function() fn, String entity) async {
     setState(() => isAuthenticating = true);
     // TODO: clean this mess
-    var f = fn().timeout(const Duration(seconds: 5));
+    var f = fn().timeout(const Duration(seconds: 10));
     var cp = Provider.of<ContextProvider>(context, listen: false);
     cp.showLoadingDialog(
         Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());

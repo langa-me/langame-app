@@ -132,16 +132,6 @@ export class LangameUser {
 }
 
 /**
- * Check if object is a LangameUser
- * @param{any} obj
- * @return{boolean}
- */
-export function isLangameUser(obj: any): obj is LangameUser {
-  // Checking typical LangameUser properties
-  return typeof obj.uid === "string" && typeof obj.google === "boolean";
-}
-
-/**
  * ChannelUserLangameUser is the mapping between channel uid (number)
  * and langame uid (string)
  */

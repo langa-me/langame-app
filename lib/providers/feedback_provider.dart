@@ -5,39 +5,40 @@ import 'package:device_info/device_info.dart';
 import 'package:feedback/feedback.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/providers/context_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shake/shake.dart';
 import 'package:uuid/uuid.dart';
 
+import 'crash_analytics_provider.dart';
+
 class FeedbackProvider extends ChangeNotifier {
   FirebaseApi firebase;
-  bool _detectShakes = false;
-  final GlobalKey<NavigatorState> navigationKey;
-
-  FeedbackProvider(this.firebase, this.navigationKey);
-
-  bool get detectShakes => _detectShakes;
-
+  final CrashAnalyticsProvider _crashAnalyticsProvider;
+  final ContextProvider _contextProvider;
+  final PreferenceProvider _preferenceProvider;
   ShakeDetector? _detector;
-  // TODO: store in local storage preference shake ...
-  set detectShakes(value) {
-    if (value) {
+
+  FeedbackProvider(this.firebase, this._crashAnalyticsProvider,
+      this._contextProvider, this._preferenceProvider) {
+    if (_preferenceProvider.preference.shakeToFeedback) {
       _detector?.startListening();
     } else {
       _detector?.stopListening();
     }
-    _detectShakes = value;
-    notifyListeners();
   }
 
   initShake() {
     _detector = ShakeDetector.autoStart(
       shakeThresholdGravity: 2,
       onPhoneShake: () {
-        firebase.analytics?.logEvent(name: 'shake', parameters: {
-          'user': firebase.auth?.currentUser!.displayName,
-        });
+        _crashAnalyticsProvider.log('shake detector initialized',
+            analyticsMessage: 'shake',
+            analyticsParameters: {
+              'user': firebase.auth?.currentUser!.displayName,
+            });
         show();
       },
     );
@@ -45,7 +46,7 @@ class FeedbackProvider extends ChangeNotifier {
 
   Null show({bool fromShaking = true}) {
     // TODO: isn't this hack dangerous?
-    BetterFeedback.of(navigationKey.currentContext!)!
+    BetterFeedback.of(_contextProvider.navigationKey.currentContext!)!
         .show((feedback, feedbackScreenshot) async {
       final String uid = Uuid().v4();
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -73,7 +74,7 @@ class FeedbackProvider extends ChangeNotifier {
           ),
         );
         uploadTask
-            .catchError((e, s) => firebase.crashlytics?.recordError(e, s));
+            .catchError((e, s) => _crashAnalyticsProvider.recordError(e, s));
       };
       if (Platform.isAndroid) {
         // TODO: maybe wrap this device info stuff into helper
@@ -112,17 +113,18 @@ class FeedbackProvider extends ChangeNotifier {
           action: SnackBarAction(
             label: 'Disable shaking',
             onPressed: () {
-              detectShakes = false;
+              _preferenceProvider.setShakeToFeedback(false);
               final snackBar = SnackBar(
                   content:
                       Text('Understood, you can enable it again in settings'));
-              ScaffoldMessenger.of(navigationKey.currentContext!)
+              ScaffoldMessenger.of(
+                      _contextProvider.navigationKey.currentContext!)
                   .showSnackBar(snackBar);
             },
           ),
         );
       }
-      ScaffoldMessenger.of(navigationKey.currentContext!)
+      ScaffoldMessenger.of(_contextProvider.navigationKey.currentContext!)
           .showSnackBar(snackBar);
     });
   }

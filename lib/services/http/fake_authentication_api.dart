@@ -17,8 +17,10 @@ class FakeAuthenticationApi extends AuthenticationApi {
       _userChanges.add(_user);
     });
   }
+
   late StreamController<MockUser?> _userChanges = StreamController.broadcast();
   MockUser _user = getMockUser();
+
   @override
   Stream<User?> get userChanges => _userChanges.stream.asBroadcastStream();
 
@@ -52,7 +54,9 @@ class FakeAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<void> loginWithFirebase(OAuthCredential credential) async {}
+  Future<UserCredential> loginWithFirebase(OAuthCredential credential) {
+    throw UnimplementedError();
+  }
 
   @override
   Future<OAuthCredential> loginWithGoogle() async {
@@ -67,12 +71,16 @@ class FakeAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<void> updateProfile(
-      {String? displayName,
-      String? photoURL,
-      String? newEmail,
-      String? tag,
-      List<String>? topics}) async {
+  Future<void> updateProfile({
+    String? displayName,
+    String? photoURL,
+    String? newEmail,
+    String? newPhoneNumber,
+    String? tag,
+    List<String>? topics,
+    bool google = false,
+    bool apple = false,
+  }) async {
     _user =
         MockUser(displayName: displayName, photoURL: photoURL, email: newEmail);
   }
@@ -92,12 +100,6 @@ class FakeAuthenticationApi extends AuthenticationApi {
   @override
   Future<List<lg.User>> getUserRecommendations(lg.User user) {
     // TODO: implement getUserRecommendations
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> sendLangameEnd(String channelName) {
-    // TODO: implement sendLangameEnd
     throw UnimplementedError();
   }
 

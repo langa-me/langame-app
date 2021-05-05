@@ -278,7 +278,7 @@ PODS:
   - Firebase/Storage (7.11.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 7.11.0)
-  - firebase_analytics (8.0.0-dev.0):
+  - firebase_analytics (8.0.2):
     - Firebase/Analytics (= 7.11.0)
     - firebase_core
     - Flutter
@@ -297,7 +297,7 @@ PODS:
     - Firebase/Messaging (= 7.11.0)
     - firebase_core
     - Flutter
-  - firebase_remote_config (0.9.0-dev.2):
+  - firebase_remote_config (0.10.0-dev.2):
     - Firebase/RemoteConfig (= 7.11.0)
     - firebase_core
     - Flutter
@@ -620,20 +620,20 @@ SPEC CHECKSUMS:
   AgoraRtcEngine_iOS: 17e55feec1bde14adc30fd9d743332d1e7821b62
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
-  cloud_firestore: 5dbb01f115c77f4380e2248852518f52830d631f
-  cloud_functions: 8ad7b93ab559864aa6511ec1db4340cb9cc07c00
+  cloud_firestore: 00b5ea5dc1c72aa220fbe4a3c42395078cf94f1e
+  cloud_functions: 5f6c03989bb43d2f73b98f57e5746ee87c1a1e14
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   FBSDKCoreKit: a00fe2efd780c195a5e09201bf51c56106245b40
   FBSDKLoginKit: d98498c598ec09de657385a9349a1f21119b7f86
   Firebase: c121feb35e4126c0b355e3313fa9b487d47319fd
-  firebase_analytics: 7972f75a16bae1da88f4eed3bcf2ecd8f8da3cb3
-  firebase_auth: e7065954aa2a7c8ef1a8502fba3009bcdd8fc91a
-  firebase_core: 84dcd80ac6d29c3d1039071b7306ee99688eb9c7
-  firebase_crashlytics: 1bf37e6bace6394a2bab8f316de395f49a836189
-  firebase_messaging: 7aecb08eada5e5cde85b10875141706a8d18b818
-  firebase_remote_config: f1bc5838ace63a9de26603fd21e0080a8db5d8ef
-  firebase_storage: c92e1108d723373191eafd442e21cb2bd96d2b08
+  firebase_analytics: 620e8cc1705feb6b9c40b6127bea9b39e03e3970
+  firebase_auth: c5e4f1c5e3ed4f2b56ca91a52cbe6a4220cf8b5e
+  firebase_core: 41e8a5c7c03e9deaae464e5b3faeee73768910d9
+  firebase_crashlytics: d032ac04e0374b90c8b4752f5c5fa374aeb72408
+  firebase_messaging: c209abbdf49f9f0420891aad89bdf1df74971d6c
+  firebase_remote_config: f855065886b7d6ccc38144c9a3cecbdc7887f33e
+  firebase_storage: f391372537cbe3e889f166ee69e10e0bffdbf1ab
   FirebaseABTesting: e66f1f80747792630d9b292966de206d5df9853b
   FirebaseAnalytics: cd3bd84d722a24a8923918af8af8e5236f615d77
   FirebaseAuth: 5fe4585c2ed847319f0ea68bd1d82c77e49ff9a0

@@ -196,51 +196,6 @@ exports.getChannelToken = functions
       );
     });
 
-/**
- * Update user profile (Firebase Auth and Firestore LangameUser)
- * @type {HttpsFunction & Runnable<any>}
- */
-exports.updateProfile = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(async (data, context) => {
-      if (!context.auth) {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
-            undefined,
-            kNotAuthenticated,
-        );
-      }
-      if (!data) {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-            undefined,
-            kInvalidRequest,
-        );
-      }
-
-      // TODO: more checks
-      return admin
-          .firestore()
-          .collection(kUsersCollection)
-          .doc(context.auth.uid)
-          .update(data).then((_) => {
-            functions.logger.info("updated", context.auth!.uid, data);
-            return new FirebaseFunctionsResponse(
-                FirebaseFunctionsResponseStatusCode.OK,
-                undefined,
-                undefined,
-            );
-          }).catch((e) => {
-            functions.logger.info("failed to update", context.auth!.uid, data);
-            return new FirebaseFunctionsResponse(
-                FirebaseFunctionsResponseStatusCode.INTERNAL,
-                undefined,
-                e,
-            );
-          });
-    });
 
 /**
  *

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/services/http/firebase.dart';
@@ -8,13 +10,12 @@ class ImplTopicApi extends TopicApi {
   ImplTopicApi(FirebaseApi firebase) : super(firebase);
 
   @override
-  Future<List<Topic>> getTopics() async {
-    var query = await firebase.firestore!
+  Stream<Iterable<Topic>> streamTopics() {
+    return firebase.firestore!
         .collection(AppConst.firestoreTopicsCollection)
-        .get();
-    return query.docs
-        .where((e) => e.exists == true && e.data()['content'] != null)
-        .map((e) => Topic(id: e.id, content: e.data()['content']))
-        .toList();
+        .snapshots()
+        .map((s) => s.docs
+            .where((e) => e.exists && e.data()['content'] != null)
+            .map((e) => Topic(id: e.id, content: e.data()['content'])));
   }
 }

@@ -4,7 +4,6 @@ import {RtcRole, RtcTokenBuilder} from "agora-access-token";
 import {
   FirebaseFunctionsResponse,
   FirebaseFunctionsResponseStatusCode,
-  isLangameUser,
   LangameChannel,
   LangameUser,
 } from "./models";
@@ -29,6 +28,7 @@ export const kTagsCollection: string = "tags";
 export const kQuestionsCollection: string = "questions";
 export const kBetasCollection: string = "betas";
 export const kInteractionsCollection: string = "interactions";
+export const kPreferencesCollection: string = "preferences";
 
 export const filterOutSendLangameCalls =
     (data: any, context: functions.https.CallableContext) => {
@@ -73,6 +73,7 @@ export const getUserData = async (id: string) => {
       .doc(id)
       .get();
   if (!recipient.exists) {
+    functions.logger.error(kUserDoesNotExist(id), "not present in db");
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
@@ -84,14 +85,7 @@ export const getUserData = async (id: string) => {
   const data = recipient.data();
 
   if (!data) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        kUserDoesNotExist(id),
-    );
-  }
-
-  if (!isLangameUser(data)) {
+    functions.logger.error(kUserDoesNotExist(id), "has not data");
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
@@ -102,6 +96,7 @@ export const getUserData = async (id: string) => {
   const dataAsLangameUser = data as LangameUser;
 
   if (!dataAsLangameUser.tokens) {
+    functions.logger.error(kUserDoesNotExist(id), "has no devices");
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,
@@ -110,6 +105,7 @@ export const getUserData = async (id: string) => {
   }
 
   if (!dataAsLangameUser.uid) {
+    functions.logger.error(kUserDoesNotExist(id), "has no uid");
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,
@@ -118,6 +114,7 @@ export const getUserData = async (id: string) => {
   }
 
   if (!dataAsLangameUser.displayName) {
+    functions.logger.error(kUserDoesNotExist(id), "has not display name");
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,

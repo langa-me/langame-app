@@ -75,14 +75,15 @@ enum InteractionLevel {
   LOVE = 3;
 }
 
-// Why a message for user preferences instead of local storage? The future is the cloud bro, nothing in local
-// Why another message? With scale, can't stuff everything into a message that is often used (user)
-// It's ok to make a joint from time to time
-message UserPreferences {
-  string uid = 1;
+message UserPreference {
+  string user_id = 2;
   // Do I want to be recommended like-minded new people?
-  bool unknown_people_recommendations = 2;
-  // TODO: transfer every preferences from other messages here
+  bool unknown_people_recommendations = 3;
+  int32 theme_index = 4;
+  bool has_done_on_boarding = 5;
+  // Searched user tags
+  repeated string search_history = 6;
+  bool shake_to_feedback = 7;
 }
 
 
@@ -97,3 +98,4 @@ message Langame {
   repeated string topics = 3;
   repeated Question questions = 4;
 }
+

@@ -1,5 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CrashAnalyticsProvider extends ChangeNotifier {
@@ -7,12 +8,21 @@ class CrashAnalyticsProvider extends ChangeNotifier {
   FirebaseAnalytics analytics;
   CrashAnalyticsProvider(this.crashlytics, this.analytics);
 
-  log(String message,
+  void log(String message,
       {String? analyticsMessage, Map<String, Object?>? analyticsParameters}) {
-    debugPrint(message);
+    if (!kReleaseMode) debugPrint(message);
     crashlytics.log(message);
     if (analyticsMessage != null)
       analytics.logEvent(
           name: analyticsMessage, parameters: analyticsParameters);
+  }
+
+  void setCurrentScreen(String screenName) {
+    analytics.setCurrentScreen(screenName: screenName);
+    crashlytics.setCustomKey('screenName', screenName);
+  }
+
+  void recordError(dynamic exception, StackTrace? stack) {
+    crashlytics.recordError(exception, stack, printDetails: !kReleaseMode);
   }
 }

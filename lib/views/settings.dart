@@ -1,12 +1,12 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/providers/local_storage_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/texts/texts.dart';
 import 'package:lottie/lottie.dart';
@@ -23,15 +23,34 @@ class SettingsView extends StatefulWidget {
 // based application theming. The critical parts are in the above MaterialApp
 // theme definitions. The HomePage just contains UI to visually show what the
 // defined example looks like in an application and with commonly used Widgets.
-class _SettingsState extends State<SettingsView> {
+class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
   final FlexSchemeData flexSchemeData = FlexColor.schemes[FlexScheme.mandyRed]!;
+  PreferenceProvider? writeOnlyPreferenceProvider;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Save on background
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      writeOnlyPreferenceProvider?.save();
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .analytics
-        .setCurrentScreen(screenName: 'settings');
+        .setCurrentScreen('settings');
+    writeOnlyPreferenceProvider =
+        Provider.of<PreferenceProvider>(context, listen: false);
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
+  @override
+  void dispose() async {
+    WidgetsBinding.instance?.removeObserver(this);
+    writeOnlyPreferenceProvider?.save();
+    super.dispose();
   }
 
   @override
@@ -52,13 +71,12 @@ class _SettingsState extends State<SettingsView> {
             TextDivider('Style'),
             Padding(
               padding: const EdgeInsets.all(12),
-              child:
-                  Consumer<LocalStorageProvider>(builder: (context, s, child) {
+              child: Consumer<PreferenceProvider>(builder: (context, s, child) {
                 return FlexThemeModeSwitch(
                   title: Text('Theme'),
                   padding: EdgeInsets.all(5),
-                  themeMode: s.theme,
-                  onThemeModeChanged: s.saveTheme,
+                  themeMode: ThemeMode.values[s.preference.themeIndex],
+                  onThemeModeChanged: s.setTheme,
                   flexSchemeData: flexSchemeData,
                 );
               }),
@@ -91,6 +109,11 @@ class _SettingsState extends State<SettingsView> {
             ListTile(
               onTap: () {
                 var cp = Provider.of<ContextProvider>(context, listen: false);
+                // Only safe in dev mode yet
+                if (kReleaseMode) {
+                  cp.showSnackBar('Coming soon!');
+                  return;
+                }
                 cp.showCustomDialog([
                   Center(
                     child: Column(children: [
@@ -126,41 +149,50 @@ class _SettingsState extends State<SettingsView> {
               title: Text('Delete my account and all my data'),
             ),
             ListTile(
-              onTap: () {
+              onTap: () async {
                 var cp = Provider.of<ContextProvider>(context, listen: false);
+                // Only safe in dev mode yet
+                if (kReleaseMode) {
+                  cp.showSnackBar('Coming soon!');
+                  return;
+                }
                 cp.showLoadingDialog(
                     Provider.of<FunnyProvider>(context, listen: false)
                         .getLoadingRandom());
-                Provider.of<AuthenticationProvider>(context, listen: false)
-                    .logout()
-                    .whenComplete(() => cp.pushReplacement(Login()));
+                await writeOnlyPreferenceProvider?.save();
+                await Provider.of<AuthenticationProvider>(context,
+                        listen: false)
+                    .logout();
+                await Future.delayed(Duration(seconds: 1));
+                cp.dialogComplete();
+                cp.pushReplacement(Login());
               },
               leading: Icon(Icons.login_outlined),
               title: Text('Log out'),
             ),
             TextDivider('Experimental features'),
-            Consumer<FeedbackProvider>(
+            Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
-                onTap: () {
-                  p.detectShakes = !p.detectShakes;
-                },
+                onTap: () =>
+                    p.setShakeToFeedback(!p.preference.shakeToFeedback),
                 leading: Icon(Icons.feedback_outlined),
                 title: Text('Shake-to-feedback'),
                 trailing: Switch(
-                    value: p.detectShakes,
-                    onChanged: (v) => p.detectShakes = !p.detectShakes),
+                    value: p.preference.shakeToFeedback,
+                    onChanged: (v) =>
+                        p.setShakeToFeedback(!p.preference.shakeToFeedback)),
               ),
             ),
-            Consumer<LocalStorageProvider>(
+            Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
-                onTap: () {
-                  p.recommendations = !p.recommendations;
-                },
+                onTap: () => p.setRecommendations(
+                    !p.preference.unknownPeopleRecommendations),
                 leading: Icon(Icons.recommend),
                 title: Text('User recommendations'),
                 trailing: Switch(
-                    value: p.recommendations,
-                    onChanged: (v) => p.recommendations = !p.recommendations),
+                    value: p.preference.unknownPeopleRecommendations,
+                    onChanged: (v) => p.setRecommendations(
+                        !p.preference.unknownPeopleRecommendations)),
               ),
             ),
           ],
@@ -169,25 +201,24 @@ class _SettingsState extends State<SettingsView> {
     );
   }
 
-  void _delete() {
+  void _delete() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     cp.showLoadingDialog(
         Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
-    Provider.of<AuthenticationProvider>(context, listen: false)
-        .delete()
-        .then((r) {
-      cp.handleLangameResponse(r, onSucceed: () async {
-        cp.showSuccessDialog(
-            'We are very sorry that you are leaving us, but we nevertheless wish you a life full of joy and love. Sincerely, Langame team.');
-        await Future.delayed(Duration(seconds: 2));
-        cp.dialogComplete();
-        cp.pushReplacement(Login());
-      }, onFailure: () async {
-        cp.showFailureDialog(
-            'We are deeply sorry to announce that we could not execute your request, please contact support');
-        await Future.delayed(Duration(seconds: 2));
-        cp.dialogComplete();
-      });
+    var r = await Provider.of<AuthenticationProvider>(context, listen: false)
+        .delete();
+    cp.handleLangameResponse(r, onSucceed: () async {
+      cp.dialogComplete();
+      cp.showSuccessDialog('You will miss us!');
+      await Future.delayed(Duration(seconds: 2));
+      cp.dialogComplete();
+      cp.pushReplacement(Login());
+    }, onFailure: () async {
+      cp.dialogComplete();
+      cp.showFailureDialog(
+          'We are deeply sorry to announce that we could not execute your request, please contact support');
+      await Future.delayed(Duration(seconds: 2));
+      cp.dialogComplete();
     });
   }
 }

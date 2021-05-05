@@ -6,6 +6,7 @@ import 'firebase.dart';
 
 abstract class AuthenticationApi {
   final FirebaseApi firebase;
+
   Stream<User?> get userChanges;
 
   AuthenticationApi(
@@ -22,7 +23,7 @@ abstract class AuthenticationApi {
   Future<OAuthCredential> loginWithApple();
 
   /// Login with firebase with previously acquired credential
-  Future<void> loginWithFirebase(OAuthCredential credential);
+  Future<UserCredential> loginWithFirebase(OAuthCredential credential);
 
   /// Login with firebase with previously acquired credential
   Future<void> logout();
@@ -43,18 +44,25 @@ abstract class AuthenticationApi {
 
   /// Update current authenticated user, at the firebase level
   /// and firestore [LangameUser], throw if not authenticated
-  Future<void> updateProfile(
-      {String? displayName,
-      String? photoURL,
-      String? newEmail,
-      String? tag,
-      List<String>? topics});
+  Future<void> updateProfile({
+    String? displayName,
+    String? photoURL,
+    String? newEmail,
+    String? newPhoneNumber,
+    String? tag,
+    List<String>? topics,
+    bool google = false,
+    bool apple = false,
+  });
 
   Future<String> getChannelToken(String channelName);
+
   Future<lg.Langame> getChannel(String channelName);
+
   Future<List<lg.User>> getUserRecommendations(lg.User user);
-  Future<void> sendLangameEnd(String channelName);
+
   Future<int?> getInteraction(String uid, String otherUid);
+
   Future<List<Tuple2<String, int>>> getInteractions(String uid,
       {int limit = 5});
 }

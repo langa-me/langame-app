@@ -1,9 +1,11 @@
 import {https} from "firebase-functions";
 import {FirebaseFunctionsResponse,
   FirebaseFunctionsResponseStatusCode} from "./models";
-import {kInteractionsCollection,
-  kNotAuthenticated,
-  kUsersCollection} from "./helpers";
+import {
+  kInteractionsCollection,
+  kNotAuthenticated, kPreferencesCollection,
+  kUsersCollection,
+} from "./helpers";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
@@ -23,6 +25,11 @@ export const deleteData = async (data: any,
       .where("usersArray", "array-contains", context.auth.uid)
       .get();
 
+  const preferencesToDelete = await db
+      .collection(kPreferencesCollection)
+      .where("userId", "==", context.auth.uid)
+      .get();
+
   const userToDelete = db
       .collection(kUsersCollection)
       .doc(context.auth.uid);
@@ -32,6 +39,9 @@ export const deleteData = async (data: any,
 
   for (const interactionToDelete of interactionsToDelete.docs) {
     batch.delete(interactionToDelete.ref);
+  }
+  for (const preferenceToDelete of preferencesToDelete.docs) {
+    batch.delete(preferenceToDelete.ref);
   }
   batch.delete(userToDelete);
   return batch.commit().then(async () => {
