@@ -16,6 +16,14 @@ jobs:
       - uses: subosito/flutter-action@v1
         with: # flutter --version
           flutter-version: 2.0.5
+      - name: Decrypt Android keys
+        run: sh ./android/decrypt.sh
+        env:
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      - name: Decrypt iOS keys
+        run: sh ./ios/decrypt.sh
+        env:
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
       - run: flutter pub get
 
       # Statically analyze the Dart code for any errors.
@@ -26,7 +34,7 @@ jobs:
 
       # Builds.
       - run: flutter build apk --release --flavor dev
-      - run: flutter build ios --release --flavor dev
+      - run: flutter build ios --release --flavor dev --no-codesign
       - run: find build -name \* -print
       # Upload generated apk to the artifacts.
       - uses: actions/upload-artifact@v2

@@ -34,7 +34,7 @@ jarsigner -verify -verbose -certs my_application.apk
 ## Zip
 
 ```bash
-zip release.zip service_account_key.json app/langame.jks key.properties app/google-services.json
+zip release.zip service_account_key.json app/langame.jks key.properties app/src/dev/google-services.json app/src/main/google-services.json
 gpg --symmetric --cipher-algo AES256 release.zip
 rm -rf release.zip service_account_key.json app/langame.jks key.properties app/google-services.json
 ```
