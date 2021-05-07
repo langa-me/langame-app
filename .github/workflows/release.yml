@@ -37,7 +37,7 @@ jobs:
   deploy_android:
     name: Deploy beta to Google Play
     runs-on: ubuntu-latest
-    needs: [build_android]
+    needs: [analyze_code_and_test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -49,6 +49,8 @@ jobs:
         run: sh ./android/decrypt.sh
         env:
           RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      # Hack because somehow refuse building if not in root (works in debug though)
+      - run: cp android/app/src/main/google-services.json android/app
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
