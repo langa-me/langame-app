@@ -10,7 +10,9 @@ import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
-import 'package:langame/providers/local_storage_provider.dart';
+import 'package:langame/providers/message_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/providers/relation_provider.dart';
 import 'package:langame/views/profiles/profile.dart';
 import 'package:langame/views/send_langame.dart';
 import 'package:langame/views/settings.dart';
@@ -40,12 +42,12 @@ class _FriendsViewState extends State<FriendsView>
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .analytics
-        .setCurrentScreen(screenName: 'send_langame');
-    var ap = Provider.of<AuthenticationProvider>(context, listen: false);
-    ap.fetchNotifications();
-    ap.getUserRecommendations();
-    ap.getRecentInteractions();
+        .setCurrentScreen('send_langame');
+    var mp = Provider.of<MessageProvider>(context, listen: false);
+    mp.fetchNotifications();
+    var rp = Provider.of<RelationProvider>(context, listen: false);
+    rp.getUserRecommendations();
+    rp.getRecentInteractions();
     _searchBarController = FloatingSearchBarController();
   }
 
@@ -75,36 +77,31 @@ class _FriendsViewState extends State<FriendsView>
   }
 
   PreferredSizeWidget? _buildAppBar() {
+    var cp = Provider.of<ContextProvider>(context, listen: false);
     Widget notifications = InkWell(
-        child: Consumer<AuthenticationProvider>(builder: (context, p, c) {
-      return Badge(
-        badgeColor: Theme.of(context).colorScheme.secondary,
-        badgeContent: Text(
-          '${p.notifications.length}',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        child: Icon(
-          Icons.notifications_outlined,
-          color: isLightThenBlack(context),
-        ),
-        padding: const EdgeInsets.all(3.0),
-        position: BadgePosition.topStart(top: 7, start: 10),
-      );
-    }), onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => NotificationsView()),
-      );
-    });
+        child: Consumer<MessageProvider>(builder: (context, p, c) {
+          return Badge(
+            badgeColor: Theme.of(context).colorScheme.secondary,
+            badgeContent: Text(
+              '${p.notifications.length}',
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            child: Icon(
+              Icons.notifications_outlined,
+              color: isLightThenBlack(context),
+            ),
+            padding: const EdgeInsets.all(3.0),
+            position: BadgePosition.topStart(top: 7, start: 10),
+          );
+        }),
+        onTap: () => cp.push(NotificationsView()));
     return AppBar(
       backgroundColor: Colors.transparent,
       leading: notifications,
       actions: [
         IconButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SettingsView()),
-          ),
+          onPressed: () => cp.push(SettingsView()),
           icon: Icon(
             Icons.settings_outlined,
             color: isLightThenBlack(context),
@@ -121,12 +118,8 @@ class _FriendsViewState extends State<FriendsView>
             borderRadius: BorderRadius.circular(32.0),
           ),
           onPressed: () => l.shoppingList.length > 0
-              ? Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SendLangameView(),
-                  ),
-                )
+              ? Provider.of<ContextProvider>(context, listen: false)
+                  .push(SendLangameView())
               : null,
           child: Badge(
             badgeContent: Text(
@@ -150,13 +143,16 @@ class _FriendsViewState extends State<FriendsView>
       }),
       controller: _pageController,
       children: [
-        Consumer<AuthenticationProvider>(
-          builder: (context, a, _) => Column(children: [
-            _buildLatestInteractions(a),
-            _buildRecommendations(a),
+        Consumer<RelationProvider>(
+          builder: (context, r, _) => Flex(direction: Axis.vertical, children: [
+            Expanded(
+                child: Column(children: [
+              Expanded(child: _buildLatestInteractions(r)),
+              Expanded(child: _buildRecommendations(r)),
+            ]))
           ]),
         ),
-        Consumer2<LocalStorageProvider, AuthenticationProvider>(
+        Consumer2<PreferenceProvider, AuthenticationProvider>(
           builder: (context, lsp, ap, _) => FloatingSearchBar(
             queryStyle: Theme.of(context).textTheme.headline6,
             controller: _searchBarController,
@@ -209,8 +205,7 @@ class _FriendsViewState extends State<FriendsView>
     );
   }
 
-  Widget _buildUserTile(LangameProvider lp, AuthenticationProvider a, User u,
-          InteractionLevel? l) =>
+  Widget _buildUserTile(LangameProvider lp, User u, InteractionLevel? l) =>
       ListTile(
         subtitle:
             l != null ? l.toFaIcon() : FaIcon(FontAwesomeIcons.questionCircle),
@@ -233,9 +228,9 @@ class _FriendsViewState extends State<FriendsView>
         ),
       );
 
-  Widget _buildRecommendations(AuthenticationProvider a) =>
-      Consumer<LocalStorageProvider>(
-        builder: (context, lsp, c) => !lsp.recommendations
+  Widget _buildRecommendations(RelationProvider r) =>
+      Consumer<PreferenceProvider>(
+        builder: (context, pp, c) => !pp.preference.unknownPeopleRecommendations
             ? SizedBox.shrink()
             : Container(
                 height: AppSize.safeBlockVertical * 40,
@@ -249,12 +244,13 @@ class _FriendsViewState extends State<FriendsView>
                         style: Theme.of(context).textTheme.headline6,
                       ),
                       leading: Switch(
-                          value: lsp.recommendations,
+                          value: pp.preference.unknownPeopleRecommendations,
                           onChanged: (v) {
                             Provider.of<ContextProvider>(context, listen: false)
                                 .showSnackBar(
                                     'Understood, you can still reactivate recommendations in settings later');
-                            lsp.recommendations = !lsp.recommendations;
+                            pp.setRecommendations(
+                                !pp.preference.unknownPeopleRecommendations);
                           }),
                       trailing: Stack(children: [
                         Tooltip(
@@ -276,15 +272,14 @@ class _FriendsViewState extends State<FriendsView>
                         height: AppSize.safeBlockVertical * 40,
                         child: Consumer<LangameProvider>(
                           builder: (c, lp, child) => ListView.builder(
-                            itemCount: a.userRecommendations.length,
+                            itemCount: r.userRecommendations.length,
                             itemBuilder: (context, index) => FutureBuilder<
                                     LangameResponse<InteractionLevel?>>(
-                                future: a.getInteraction(
-                                    a.userRecommendations[index].uid),
+                                future: r.getInteraction(
+                                    r.userRecommendations[index].uid),
                                 builder: (ctx, s) => _buildUserTile(
                                     lp,
-                                    a,
-                                    a.userRecommendations[index],
+                                    r.userRecommendations[index],
                                     s.hasData &&
                                             s.data != null &&
                                             s.data!.result != null
@@ -299,7 +294,7 @@ class _FriendsViewState extends State<FriendsView>
               ),
       );
 
-  Widget _buildLatestInteractions(AuthenticationProvider a) => Container(
+  Widget _buildLatestInteractions(RelationProvider r) => Container(
         height: AppSize.safeBlockVertical * 40,
         child: Column(
           children: [
@@ -316,7 +311,7 @@ class _FriendsViewState extends State<FriendsView>
               child: Container(
                 height: AppSize.safeBlockVertical * 40,
                 child: Consumer<LangameProvider>(
-                  builder: (c, lp, child) => a.recentInteractions.length == 0
+                  builder: (c, lp, child) => r.recentInteractions.length == 0
                       ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -333,12 +328,11 @@ class _FriendsViewState extends State<FriendsView>
                           ),
                         )
                       : ListView.builder(
-                          itemCount: a.recentInteractions.length,
+                          itemCount: r.recentInteractions.length,
                           itemBuilder: (context, index) => _buildUserTile(
                               lp,
-                              a,
-                              a.recentInteractions.elementAt(index).item1,
-                              a.recentInteractions.elementAt(index).item2),
+                              r.recentInteractions.elementAt(index).item1,
+                              r.recentInteractions.elementAt(index).item2),
                         ),
                 ),
               ),
@@ -348,7 +342,7 @@ class _FriendsViewState extends State<FriendsView>
       );
 
   Widget _buildExpandableBody(
-      LocalStorageProvider lsp, AuthenticationProvider ap) {
+      PreferenceProvider lsp, AuthenticationProvider ap) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Material(
@@ -491,7 +485,7 @@ class SearchResultsListView extends StatefulWidget {
 class _SearchResultsListViewState extends State<SearchResultsListView> {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<LocalStorageProvider, LangameProvider>(
+    return Consumer2<PreferenceProvider, LangameProvider>(
         builder: (c, p, lp, _) {
       if (p.selectedUser == null) {
         return Center(

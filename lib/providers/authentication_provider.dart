@@ -4,27 +4,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
-import 'package:langame/models/notification.dart';
+import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/authentication_api.dart';
-import 'package:langame/services/http/fake_authentication_api.dart';
-import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/firebase.dart';
-import 'package:langame/services/http/impl_authentication_api.dart';
-import 'package:langame/services/http/impl_message_api.dart';
-import 'package:langame/services/http/message_api.dart';
-import 'package:ordered_set/comparing.dart';
-import 'package:ordered_set/ordered_set.dart';
-import 'package:tuple/tuple.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   FirebaseApi firebase;
+  CrashAnalyticsProvider _crashAnalyticsProvider;
 
   /// Authentication, relations, users ///
 
   /// Defines whether it's fake API or real
-  late final AuthenticationApi authenticationApi;
+  final AuthenticationApi _authenticationApi;
   late Stream<User?> _firebaseUserStream;
 
   // ignore: close_sinks
@@ -40,154 +33,81 @@ class AuthenticationProvider extends ChangeNotifier {
     return _user;
   }
 
-  List<lg.User> _userRecommendations = [];
-
-  List<lg.User> get userRecommendations {
-    return _userRecommendations;
+  /// Create an authentication provider, and
+  AuthenticationProvider(
+      this.firebase, this._authenticationApi, this._crashAnalyticsProvider) {
+    _firebaseUserStream = _authenticationApi.userChanges;
+    _userStream = StreamController.broadcast();
+    _firebaseUserStream.listen((data) async {
+      _crashAnalyticsProvider
+          .log('_firebaseUserStream.listen ${data.toString()}');
+      // data.refreshToken being null means need to re-auth basically
+      if (data == null || firebase.auth!.currentUser == null) return null;
+      try {
+        await firebase.crashlytics?.setUserIdentifier(data.uid);
+        await firebase.analytics?.setUserId(data.uid);
+        _user = await _authenticationApi.getLangameUser(data.uid);
+        if (_user == null) {
+          _user = await _authenticationApi.addLangameUser(data);
+        }
+      } catch (e, s) {
+        _crashAnalyticsProvider.log(
+            'failed to setup user on firebase stream change uid: ${data.uid}');
+        _crashAnalyticsProvider.recordError(e, s);
+      }
+      _userStream.add(_user);
+      notifyListeners();
+    });
   }
-
-  OrderedSet<Tuple2<lg.User, lg.InteractionLevel>> _recentInteractions =
-      OrderedSet<Tuple2<lg.User, lg.InteractionLevel>>(
-          Comparing.on((e) => e.item2.value));
-
-  OrderedSet<Tuple2<lg.User, lg.InteractionLevel>> get recentInteractions {
-    return _recentInteractions;
-  }
-
-  /// Messages, notifications ///
-
-  /// Defines whether it's fake API or real
-  late final MessageApi messageApi;
-
-  /// In-memory local notifications
-  List<LangameNotification> _notifications = [];
-  List<LangameNotification> get notifications => _notifications;
-
-  void _log(String msg) {
-    if (kDebugMode) debugPrint(msg);
-    firebase.crashlytics?.log(msg);
-  }
-
-  void _onNotificationHandler(LangameNotification? notification) {
-    if (notification == null) return;
-    _notifications.add(notification);
-    notifyListeners();
-  }
-
-  Future<LangameResponse<String>> send(
-      List<lg.User> recipients, List<lg.Topic> topics,
-      {bool now = false}) async {
-    try {
-      final String msg =
-          'send langame to ${recipients.map((e) => e.uid).join(',')}';
-      _log(msg);
-
-      // TODO: we'd likely send the whole  topic in the future (with classifications)
-      var channelName = await messageApi.send(
-          recipients.map((e) => e.uid).toList(),
-          topics.map((e) => e.content).toList());
-      if (now) await notifyPresence(channelName);
-      return LangameResponse(LangameStatus.succeed, result: channelName);
-    } catch (e, s) {
-      _log('failed to send langame');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  Future<LangameResponse> notifyPresence(String channelName) async {
-    try {
-      await messageApi.notifyPresence(channelName);
-      _log('notifyPresence');
-    } catch (e, s) {
-      _log('failed to notifyPresence');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-    return LangameResponse(LangameStatus.succeed);
-  }
-
-  Future<LangameResponse<String>> getChannelToken(String channelName) async {
-    try {
-      var r = await authenticationApi.getChannelToken(channelName);
-      _log('getChannelToken $r');
-      return LangameResponse<String>(LangameStatus.succeed, result: r);
-    } catch (e, s) {
-      _log('failed to get channel $channelName token');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  Future<LangameResponse<lg.Langame>> getChannel(String channelName) async {
-    try {
-      var r = await authenticationApi.getChannel(channelName);
-      _log('getChannel ${r.channelName}');
-      return LangameResponse<lg.Langame>(LangameStatus.succeed, result: r);
-    } catch (e, s) {
-      _log('failed to get channel $channelName');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  /// Get a precise notification
-  Future<LangameResponse<LangameNotification>> getNotification(
-      String id) async {
-    try {
-      var r = await messageApi.fetch(id);
-      _log('getNotification ${r?.channelName}');
-      return LangameResponse<LangameNotification>(LangameStatus.succeed,
-          result: r);
-    } catch (e, s) {
-      _log('failed to getNotification');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  // TODO: use langame resp
-  Future<LangameResponse<void>> fetchNotifications() async {
-    try {
-      var r = await messageApi.fetchAll(); // TODO: make it a generator
-      r.forEach((n) {
-        _notifications.add(n);
-        notifyListeners();
-      });
-      _log('fetchNotifications');
-      return LangameResponse<LangameNotification>(LangameStatus.succeed);
-    } catch (e, s) {
-      _log('failed to fetchNotifications');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  Future<LangameResponse<void>> deleteNotification(String channelName) async {
-    try {
-      var f = messageApi.delete(channelName);
-      f
-          .then((value) => _notifications
-              .removeWhere((element) => element.channelName == channelName))
-          .then((value) => notifyListeners());
-      _log('deleteNotification');
-      return LangameResponse(LangameStatus.succeed);
-    } catch (e, s) {
-      _log('failed to deleteNotification');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  void stopNotifications() => messageApi.cancel();
 
   Future<LangameResponse> _loginWith(OAuthCredential credential) async {
     try {
-      await authenticationApi.loginWithFirebase(credential);
-      _log('_loginWith');
+      _crashAnalyticsProvider.log('_crashAnalyticsProvider.loginWith');
+      var uc = await _authenticationApi.loginWithFirebase(credential);
+      if (uc.user == null) throw LangameAuthException('null_user');
+      // Shouldn't update profile on new user at login
+      if (uc.additionalUserInfo != null && uc.additionalUserInfo!.isNewUser) {
+        firebase.analytics?.logLogin();
+        return LangameResponse(LangameStatus.succeed);
+      }
+      // If it's an existing user and it has some new data from auth
+      // i.e. updated social profile maybe? Or simply
+      // authenticated with another social provider which has more data
+      // TODO: maybe should only change photo, name when it was empty,
+      // TODO: maybe the user want  different photo, name on social and langame
+      var newDisplayName = _user != null &&
+              _user!.displayName.isEmpty &&
+              uc.user!.displayName != null &&
+              uc.user!.displayName!.isNotEmpty
+          ? uc.user!.displayName
+          : null;
+      // TODO: not implemented
+      // var newPhoneNumber = _user != null && _user!.phoneNumber.isEmpty &&
+      //     data.phoneNumber != null &&
+      //     data.phoneNumber!.isNotEmpty ? data.phoneNumber : null;
+      var newPhotoUrl = _user != null &&
+              _user!.photoUrl.isEmpty &&
+              uc.user!.photoURL != null &&
+              uc.user!.photoURL!.isNotEmpty
+          ? uc.user!.photoURL
+          : null;
+
+      var isGoogle =
+          uc.user!.providerData.any((e) => e.providerId == 'google.com');
+      var isApple =
+          uc.user!.providerData.any((e) => e.providerId == 'apple.com');
+      _crashAnalyticsProvider.log(
+          'updateProfile newDisplayName $newDisplayName newPhotoUrl $newPhotoUrl isGoogle $isGoogle isApple $isApple');
+      await _authenticationApi.updateProfile(
+        displayName: newDisplayName,
+        photoURL: newPhotoUrl,
+        google: isGoogle,
+        apple: isApple,
+      );
     } catch (e, s) {
-      _log('failed to _loginWith');
-      firebase.crashlytics?.recordError(e, s);
+      _crashAnalyticsProvider
+          .log('failed to _crashAnalyticsProvider.loginWith');
+      _crashAnalyticsProvider.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     firebase.analytics?.logLogin();
@@ -195,63 +115,65 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse> loginWithApple() async {
-    return authenticationApi
-        .loginWithApple()
-        .then(_loginWith)
-        .catchError(() => LangameResponse(LangameStatus.cancelled),
-            test: (e) => e is LangameAppleSignInException)
-        .catchError((e, s) {
-      _log('failed to loginWithApple');
-      firebase.crashlytics?.recordError(e, s);
-      LangameResponse(LangameStatus.failed, error: e.toString());
-    });
+    try {
+      var res = await _authenticationApi.loginWithApple();
+      return _loginWith(res);
+    } catch (e, s) {
+      _crashAnalyticsProvider.log('failed to loginWithApple');
+      _crashAnalyticsProvider.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e.toString());
+    }
   }
 
   Future<LangameResponse> loginWithFacebook() async {
-    return authenticationApi
-        .loginWithFacebook()
-        .then(_loginWith)
-        .catchError(() => LangameResponse(LangameStatus.cancelled),
-            test: (e) => e is LangameFacebookSignInException)
-        .catchError((e, s) {
-      _log('failed to loginWithFacebook');
-      firebase.crashlytics?.recordError(e, s);
-      LangameResponse(LangameStatus.failed, error: e.toString());
-    });
+    try {
+      var res = await _authenticationApi.loginWithFacebook();
+      return _loginWith(res);
+    } catch (e, s) {
+      _crashAnalyticsProvider.log('failed to loginWithFacebook');
+      _crashAnalyticsProvider.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e.toString());
+    }
   }
 
   Future<LangameResponse> loginWithGoogle() async {
-    return authenticationApi
-        .loginWithGoogle() // TODO: catch error here
-        .catchError((e, s) {
-          _log('failed to loginWithGoogle');
-          firebase.crashlytics?.recordError(e, s);
-          LangameResponse(LangameStatus.failed, error: e.toString());
-        })
-        .then(_loginWith)
-        .catchError((err) => LangameResponse(LangameStatus.cancelled),
-            test: (e) => e is LangameGoogleSignInException);
+    try {
+      var res = await _authenticationApi.loginWithGoogle();
+      return _loginWith(res);
+    } catch (e, s) {
+      _crashAnalyticsProvider.log('failed to loginWithGoogle');
+      _crashAnalyticsProvider.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e.toString());
+    }
   }
 
-  Future<LangameResponse> getRelations() async {
-    throw UnimplementedError();
+  Future<LangameResponse> logout() async {
+    try {
+      await _authenticationApi.logout();
+      _crashAnalyticsProvider.log('logout');
+      return LangameResponse<lg.User>(LangameStatus.succeed);
+    } catch (e, s) {
+      _crashAnalyticsProvider.log('failed to logout');
+      _crashAnalyticsProvider.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
   }
 
   // TODO langame response
   Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
-    _log('getLangameUsersStartingWithTag $tag');
-    return await authenticationApi.getLangameUsersStartingWithTag(
+    _crashAnalyticsProvider.log('getLangameUsersStartingWithTag $tag');
+    return await _authenticationApi.getLangameUsersStartingWithTag(
         _user!.tag, tag);
   }
 
   Future<LangameResponse<lg.User>> getLangameUser(String uid) async {
     try {
-      var r = await authenticationApi.getLangameUser(uid);
-      _log('getLangameUser $uid');
+      var r = await _authenticationApi.getLangameUser(uid);
+      _crashAnalyticsProvider.log('getLangameUser $uid');
       return LangameResponse<lg.User>(LangameStatus.succeed, result: r);
     } catch (e, s) {
-      _log('failed to getLangameUser $uid');
-      firebase.crashlytics?.recordError(e, s);
+      _crashAnalyticsProvider.log('failed to getLangameUser $uid');
+      _crashAnalyticsProvider.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -261,133 +183,54 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       List<lg.User> r = [];
       for (var i = 0; i < userIds.length; i++) {
-        var user = await authenticationApi.getLangameUser(userIds[i]);
+        var user = await _authenticationApi.getLangameUser(userIds[i]);
         if (user != null) r.add(user);
       }
-      _log('getLangameUsers ${userIds.join(",")}');
+      _crashAnalyticsProvider.log('getLangameUsers ${userIds.join(",")}');
       return LangameResponse<List<lg.User>>(LangameStatus.succeed, result: r);
     } catch (e, s) {
-      _log('failed to get users ${userIds.join(",")}');
-      firebase.crashlytics?.recordError(e, s);
+      _crashAnalyticsProvider.log('failed to get users ${userIds.join(",")}');
+      _crashAnalyticsProvider.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
 
-  Future<LangameResponse<void>> getUserRecommendations() async {
+  Future<LangameResponse> updateProfile(
+      {String? displayName,
+      String? photoURL,
+      String? newEmail,
+      String? tag,
+      List<String>? topics}) async {
     try {
-      _userRecommendations =
-          await authenticationApi.getUserRecommendations(_user!);
-      _log('getUserRecommendations ${user!.uid}');
-      notifyListeners();
-      return LangameResponse<void>(LangameStatus.succeed);
+      await _authenticationApi.updateProfile(
+          displayName: displayName,
+          photoURL: photoURL,
+          newEmail: newEmail,
+          tag: tag,
+          topics: topics);
+      _crashAnalyticsProvider.log('updateProfile');
     } catch (e, s) {
-      _log('failed to getUserRecommendations ${user?.uid}');
-      firebase.crashlytics?.recordError(e, s);
+      _crashAnalyticsProvider.log('failed to updateProfile');
+      _crashAnalyticsProvider.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
+    return LangameResponse(LangameStatus.succeed);
   }
 
-  Future<LangameResponse<void>> getRecentInteractions() async {
+  Future<LangameResponse> delete() async {
     try {
-      var interactions = await authenticationApi.getInteractions(_user!.uid);
-      var users = await Future.wait(
-          interactions.map((i) => authenticationApi.getLangameUser(i.item1)));
-      _recentInteractions = OrderedSet<Tuple2<lg.User, lg.InteractionLevel>>(
-          Comparing.on((e) => e.item2.value));
-      users.asMap().forEach((i, u) {
-        if (u != null) {
-          _recentInteractions
-              .add(Tuple2(u, interactions[i].item2.toInteractionLevel()));
-        }
-      });
-      notifyListeners();
-
-      _log('getRecentInteractions ${user!.uid}');
-      notifyListeners();
-      return LangameResponse<void>(LangameStatus.succeed);
+      _crashAnalyticsProvider.log('deleting all data');
+      await _authenticationApi.delete();
+      _crashAnalyticsProvider.log('logging out');
+      await logout();
+      _crashAnalyticsProvider.log('purging local storage');
+      var i = await SharedPreferences.getInstance();
+      await i.clear();
+      _crashAnalyticsProvider.log('purging local firestore');
+      await firebase.firestore!.clearPersistence();
     } catch (e, s) {
-      _log('failed to getRecentInteractions ${user?.uid}');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  Future<LangameResponse<void>> sendLangameEnd(String channelName) async {
-    try {
-      await authenticationApi.sendLangameEnd(channelName);
-      _log('sendLangameEnd $channelName');
-      return LangameResponse<void>(LangameStatus.succeed);
-    } catch (e, s) {
-      _log('failed to sendLangameEnd $channelName');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  Future<LangameResponse<lg.InteractionLevel?>> getInteraction(
-      String otherUid) async {
-    try {
-      var r = await authenticationApi.getInteraction(_user!.uid, otherUid);
-      _log('getInteraction $otherUid');
-      if (r == null)
-        return LangameResponse(LangameStatus.failed, error: 'no interactions');
-      return LangameResponse(LangameStatus.succeed,
-          result: r.toInteractionLevel());
-    } catch (e, s) {
-      _log('failed to getInteraction $otherUid');
-      firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
-  /// Create an authentication provider, and
-  AuthenticationProvider(this.firebase, {bool fake = false}) {
-    // Emulator overcome fake api
-    if (firebase.useEmulator) {
-      print('Using emulator');
-      authenticationApi = ImplAuthenticationApi(firebase);
-    } else {
-      authenticationApi = fake
-          ? FakeAuthenticationApi(firebase)
-          : ImplAuthenticationApi(firebase);
-    }
-    _firebaseUserStream = authenticationApi.userChanges;
-    _userStream = StreamController.broadcast();
-    _firebaseUserStream.listen((data) async {
-      if (data == null) return null;
-      try {
-        await firebase.crashlytics?.setUserIdentifier(data.uid);
-        await firebase.analytics?.setUserId(data.uid);
-        _user = await authenticationApi.getLangameUser(data.uid);
-        if (_user == null) {
-          _user = await authenticationApi.addLangameUser(data);
-        }
-      } catch (e, s) {
-        _log('failed to setup user on firebase stream change uid: ${data.uid}');
-        firebase.crashlytics?.recordError(e, s);
-      }
-      _log('_firebaseUserStream.listen ${_user?.uid}');
-      _userStream.add(_user);
-      notifyListeners();
-    });
-  }
-
-  Future<LangameResponse> initializeMessageApi(
-      void Function(LangameNotification?) onBackgroundOrForegroundOpened,
-      {bool fake = false}) async {
-    messageApi = fake
-        ? FakeMessageApi(
-            authenticationApi.firebase, onBackgroundOrForegroundOpened)
-        : ImplMessageApi(
-            authenticationApi.firebase, onBackgroundOrForegroundOpened);
-    try {
-      await messageApi.initializePermissions();
-      await messageApi.listen(_onNotificationHandler);
-      // i.e. no internet
-      // TODO  Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
-    } catch (e, s) {
-      _log('failed to initializeMessageApi');
-      firebase.crashlytics?.recordError(e, s);
+      _crashAnalyticsProvider.log('failed to delete');
+      _crashAnalyticsProvider.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);

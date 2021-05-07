@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/toast.dart';
+import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
-import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
+import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
@@ -34,9 +35,7 @@ class _SendLangameState extends State<SendLangameView>
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .analytics
-        .setCurrentScreen(screenName: 'send_langame');
-    Provider.of<TopicProvider>(context, listen: false).getAllTopics();
+        .setCurrentScreen('send_langame');
   }
 
   @override
@@ -147,12 +146,21 @@ class _SendLangameState extends State<SendLangameView>
     }
 
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    cp.showLoadingDialog(
-        Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
+    var fp = Provider.of<FunnyProvider>(context, listen: false);
+    cp.showLoadingDialog(fp.getLoadingRandom());
     // showBasicSnackBar(context,
     //     'Sent Langame to ${l.shoppingList.map((e) => e.displayName).join(', ')}');
-    var res = await Provider.of<AuthenticationProvider>(context, listen: false)
+    var res = await Provider.of<MessageProvider>(context, listen: false)
         .send(l.shoppingList, selectedTopics, now: now);
+    if (res.status != LangameStatus.succeed) {
+      cp.dialogComplete();
+      // TODO: use snapshot that would remove user automatically from state instead
+      cp.showFailureDialog(
+          res.error is String && (res.error as String).contains('exit')
+              ? 'This user does not exist anymore'
+              : fp.getFailingRandom());
+      await Future.delayed(Duration(seconds: 2));
+    }
     cp.dialogComplete();
     return res.result;
   }

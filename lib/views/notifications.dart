@@ -9,6 +9,7 @@ import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/message_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
 
@@ -26,14 +27,11 @@ class _NotificationsViewState extends State<NotificationsView> {
   void initState() {
     super.initState();
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .analytics
-        .setCurrentScreen(screenName: 'notifications');
+        .setCurrentScreen('notifications');
   }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
@@ -45,7 +43,7 @@ class _NotificationsViewState extends State<NotificationsView> {
           buildPopupMenuWithHelpAndFeedback(context),
         ],
       ),
-      body: Consumer<AuthenticationProvider>(
+      body: Consumer<MessageProvider>(
         builder: (BuildContext context, p, c) {
           if (p.notifications.length == 0) {
             return Center(
@@ -74,7 +72,7 @@ class _NotificationsViewState extends State<NotificationsView> {
             groupSeparatorBuilder: (String groupByValue) =>
                 _buildTextDivider(groupByValue.split(';')[1]),
             itemBuilder: (c, i) {
-              return _buildNotificationCard(i, p, theme);
+              return _buildNotificationCard(i);
             },
             // TODO
             // itemComparator: (item1, item2) => item1['name'].compareTo(item2['name']), // optional
@@ -114,15 +112,15 @@ class _NotificationsViewState extends State<NotificationsView> {
         ],
       );
 
-  Widget _buildNotificationCard(
-      LangameNotification n, AuthenticationProvider p, ThemeData theme) {
+  Widget _buildNotificationCard(LangameNotification n) {
     // if (i > p.notifications.length) {
     //   // TODO: fix (when spamming dismiss)
     //   return Scaffold();
     // }
-
+    var p = Provider.of<MessageProvider>(context, listen: false);
     return FutureBuilder<LangameResponse<lg.User>>(
-        future: p.getLangameUser(n.senderUid),
+        future: Provider.of<AuthenticationProvider>(context, listen: false)
+            .getLangameUser(n.senderUid),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData &&
               snapshot.data != null &&
@@ -172,28 +170,5 @@ class _NotificationsViewState extends State<NotificationsView> {
           }
           return SizedBox.shrink();
         });
-  }
-}
-
-/// When opened a notification with app on the background or foreground, switch to
-/// LangameView, TODO: add buttons on notification "accept" "decline"
-void onBackgroundOrForegroundOpened(LangameNotification? n) {
-  // TODO: should delete notification then?
-  if (n?.channelName != null) {
-    AppConst.navKey?.currentState?.pushReplacement(
-      MaterialPageRoute(
-        builder: (context) =>
-            LangameView(n!.channelName!, n.ready == null || !n.ready!),
-      ),
-    );
-  } else {
-    // Fluttertoast.showToast(
-    //     msg: '',
-    //     toastLength: Toast.LENGTH_SHORT,
-    //     gravity: ToastGravity.BOTTOM,
-    //     timeInSecForIosWeb: 1,
-    //     backgroundColor: Colors.red,
-    //     textColor: Colors.white,
-    //     fontSize: 16.0);
   }
 }

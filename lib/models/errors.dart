@@ -80,8 +80,8 @@ class LangameMessagePermissionException extends LangameException {
   LangameMessagePermissionException(String cause) : super(cause);
 }
 
-class LangameStorageException extends LangameException {
-  LangameStorageException(String cause) : super(cause);
+class LangamePreferencesException extends LangameException {
+  LangamePreferencesException(String cause) : super(cause);
 }
 
 const String kUserDoesNotExists = 'user_does_not_exist';

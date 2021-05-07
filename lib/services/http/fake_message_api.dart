@@ -62,4 +62,10 @@ class FakeMessageApi extends MessageApi {
     // TODO: implement delete
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> sendLangameEnd(String channelName) {
+    // TODO: implement sendLangameEnd
+    throw UnimplementedError();
+  }
 }

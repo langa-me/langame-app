@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseApi {
@@ -29,12 +28,6 @@ class FirebaseApi {
       this.analytics,
       this.storage,
       this.useEmulator = false}) {
-    if (kDebugMode) {
-      // Force disable Crashlytics collection while doing every day development.
-      // Temporarily toggle this to true if you want to test crash reporting in your app.
-      // FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    }
-    crashlytics?.setCrashlyticsCollectionEnabled(true);
     if (!useEmulator) return;
 
     // Need to clear local cache otherwise would use non-emulator data

@@ -24,18 +24,23 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
-import 'package:langame/providers/local_storage_provider.dart';
+import 'package:langame/providers/message_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/providers/topic_provider.dart';
+import 'package:langame/services/http/impl_authentication_api.dart';
+import 'package:langame/services/http/impl_message_api.dart';
+import 'package:langame/views/langame.dart';
 import 'package:langame/views/login.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/relation_provider.dart';
 import 'services/http/firebase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIOverlays([]);
   await Firebase.initializeApp();
   var crashlytics = FirebaseCrashlytics.instance;
+  await crashlytics.setCrashlyticsCollectionEnabled(true);
   var analytics = FirebaseAnalytics();
   FirebaseApi firebase = FirebaseApi(
     messaging: FirebaseMessaging.instance,
@@ -62,34 +67,92 @@ void main() async {
   var navigationKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
   var scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>(debugLabel: 'scaffoldKey');
-  AppConst.navKey = navigationKey;
+  var contextProvider = ContextProvider(navigationKey, scaffoldMessengerKey);
+  var crashAnalyticsProvider =
+      CrashAnalyticsProvider(firebase.crashlytics!, firebase.analytics!);
+  var authenticationApi = ImplAuthenticationApi(firebase);
+  var authenticationProvider = AuthenticationProvider(
+      firebase, authenticationApi, crashAnalyticsProvider);
+  var messageApi = ImplMessageApi(firebase, (n) {
+    if (n?.channelName != null) {
+      navigationKey.currentState?.pushReplacement(
+        MaterialPageRoute(
+          builder: (context) =>
+              LangameView(n!.channelName!, n.ready == null || !n.ready!),
+        ),
+      );
+    }
+  });
+  var messageProvider = MessageProvider(firebase, messageApi, authenticationApi,
+      crashAnalyticsProvider, authenticationProvider);
+  var relationProvider = RelationProvider(
+      authenticationApi, crashAnalyticsProvider, authenticationProvider);
+  var preferenceProvider = PreferenceProvider(firebase, crashAnalyticsProvider);
+
+  SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then(
     (_) => runApp(
       BetterFeedback(
         child: MultiProvider(
           providers: [
-            ChangeNotifierProvider(
-                create: (_) => LocalStorageProvider(firebase)),
-            ChangeNotifierProvider(create: (_) => TopicProvider(firebase)),
-            ChangeNotifierProvider(
-              create: (_) => AuthenticationProvider(firebase, fake: false),
-            ),
-            ChangeNotifierProvider(create: (_) => FunnyProvider()),
-            ChangeNotifierProvider(create: (_) => LangameProvider()),
-            ChangeNotifierProvider(
-                create: (_) => CrashAnalyticsProvider(
-                    firebase.crashlytics!, firebase.analytics!)),
-            ChangeNotifierProvider(create: (_) => AudioProvider(firebase)),
+            ///////////////////////////////////////////
+            ////////// Independent providers //////////
+            ///////////////////////////////////////////
+
+            ChangeNotifierProvider(create: (_) => crashAnalyticsProvider),
+            ChangeNotifierProvider(create: (_) => preferenceProvider),
+            // TODO: might be injected in all providers?
             StreamProvider<ConnectivityResult>.value(
                 value: Connectivity().onConnectivityChanged,
                 initialData: ConnectivityResult.wifi),
             ChangeNotifierProvider(
-              create: (_) => FeedbackProvider(firebase, navigationKey),
+              create: (_) => contextProvider,
             ),
-            ChangeNotifierProvider(
-              create: (_) =>
-                  ContextProvider(navigationKey, scaffoldMessengerKey),
+            ChangeNotifierProvider(create: (_) => TopicProvider(firebase)),
+            ChangeNotifierProvider(create: (_) => FunnyProvider()),
+            ChangeNotifierProvider(create: (_) => LangameProvider()),
+
+            ///////////////////////////////////////////
+            ////////// Dependent providers ////////////
+            ///////////////////////////////////////////
+
+            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
+                AuthenticationProvider>(
+              update: (_, cap, ap) =>
+                  AuthenticationProvider(firebase, authenticationApi, cap),
+              create: (_) => authenticationProvider,
+            ),
+            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
+                PreferenceProvider>(
+              update: (_, cap, ap) => PreferenceProvider(firebase, cap),
+              create: (_) => preferenceProvider,
+            ),
+            ChangeNotifierProxyProvider<CrashAnalyticsProvider, AudioProvider>(
+              update: (_, cap, ap) => AudioProvider(firebase, cap),
+              create: (_) => AudioProvider(firebase, crashAnalyticsProvider),
+            ),
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
+                AuthenticationProvider, MessageProvider>(
+              // TODO: for now does not change on auth change
+              update: (_, cap, ap, mp) => mp ?? messageProvider,
+              create: (_) => messageProvider,
+            ),
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
+                AuthenticationProvider, RelationProvider>(
+              update: (_, cap, ap, rp) => RelationProvider(
+                  // TODO: might not necessarily rebuild every time
+                  authenticationApi,
+                  cap,
+                  ap),
+              create: (_) => relationProvider,
+            ),
+            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
+                ContextProvider, PreferenceProvider, FeedbackProvider>(
+              update: (_, cap, cp, pp, fp) =>
+                  FeedbackProvider(firebase, cap, cp, pp),
+              create: (_) => FeedbackProvider(firebase, crashAnalyticsProvider,
+                  contextProvider, preferenceProvider),
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),
@@ -125,12 +188,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<LocalStorageProvider>(context, listen: false).load();
     FlexScheme scheme = FlexScheme.bigStone;
-    return Consumer<LocalStorageProvider>(builder: (context, s, child) {
+    return Consumer<PreferenceProvider>(builder: (context, s, child) {
       return MaterialApp(
         title: 'Langame',
-        themeMode: s.theme,
+        themeMode: ThemeMode.values[s.preference.themeIndex],
         theme: FlexColorScheme.light(
           scheme: scheme,
           fontFamily: AppFont.mainFont,

@@ -1,61 +1,50 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/providers/local_storage_provider.dart';
+import 'package:langame/providers/message_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
-import 'dialogs/dialogs.dart';
 import 'friends.dart';
-import 'notifications.dart';
 
 /// Setup the app for the user (topics, friends...)
-class Setup extends StatefulWidget {
+class OnBoarding extends StatefulWidget {
   @override
-  _SetupState createState() => _SetupState();
+  _OnBoardingState createState() => _OnBoardingState();
 }
 
-class _SetupState extends State with AfterLayoutMixin {
+class _OnBoardingState extends State with AfterLayoutMixin {
   List<Topic> favouriteTopics = [];
-  final controller = PageController(initialPage: 0, viewportFraction: 0.9);
 
-  // Create a global key that uniquely identifies the Form widget
-  // and allows validation of the form.
-  //
-  // Note: This is a GlobalKey<FormState>,
-  // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>(debugLabel: '_formKey');
-  final GlobalKey<State> _keyLoader =
-      new GlobalKey<State>(debugLabel: '_keyLoader');
+  bool hasFinishedOnBoarding = false;
 
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .analytics
-        .setCurrentScreen(screenName: 'setup');
-    // Provider.of<TopicProvider>(context, listen: false).getAllTopics();
+        .setCurrentScreen('setup');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IntroductionScreen(
-        done: Text("Done"),
-        next: Text("Next"),
+        done: Text('Done'),
+        next: Text('Next'),
         pages: _buildPageModels(),
+        isBottomSafeArea: true,
+        showDoneButton: hasFinishedOnBoarding,
         onDone: _onDone, // TODO: ask permission notification
       ),
     );
@@ -79,18 +68,37 @@ class _SetupState extends State with AfterLayoutMixin {
                   color: Theme.of(context).colorScheme.secondary),
             ),
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp('^[a-zA-Z0-9]*\$')),
+              FilteringTextInputFormatter.allow(RegExp('^[a-zA-Z]*\$')),
             ],
             maxLength: 8,
             // The validator receives the text that the user has entered.
             validator: (value) {
-              showBasicSnackBar(context, 'this is not implemented yet!');
+              // showBasicSnackBar(context, 'this is not implemented yet!');
               // TODO: validation should at least check availability of tag
               // TODO: and maybe check profanity (funniest part)
               if (value == null || value.isEmpty) {
                 return 'Please enter some text';
               }
-              return null;
+              var cp = Provider.of<ContextProvider>(context, listen: false);
+              cp.showLoadingDialog('Validating...');
+              var ap =
+                  Provider.of<AuthenticationProvider>(context, listen: false);
+              ap // Sometimes the user has no displayName (apple hidden mail), using the tag then
+                  .updateProfile(
+                      tag: value,
+                      displayName: ap.user!.displayName.isEmpty ? value : null)
+                  .then((res) {
+                cp.handleLangameResponse(
+                  res,
+                  succeedMessage: 'This tag is available',
+                  failedMessage: 'Tag is not available',
+                  onSucceed: () => setState(() => hasFinishedOnBoarding = true),
+                );
+              }).whenComplete(() {
+                cp.dialogComplete();
+                // Hide keyboard
+                FocusScope.of(context).requestFocus(FocusNode());
+              });
             },
           ),
           Padding(
@@ -113,65 +121,83 @@ class _SetupState extends State with AfterLayoutMixin {
     );
   }
 
-  void _onDone() {
+  void _onDone() async {
     Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
-      'favourite topics ${favouriteTopics.map((e) => e.content).join(",")}',
+      'favourite topics ${favouriteTopics.map((e) => e.content).join(',')}',
       analyticsMessage: 'favourite_topics',
       analyticsParameters: {'topics': favouriteTopics.join(',')},
     );
 
-    // TODO: send mail to everyone "join langame bro"
-
-    Future<LangameResponse> f =
-        Provider.of<AuthenticationProvider>(context, listen: false)
-            .initializeMessageApi(onBackgroundOrForegroundOpened);
-    LgDialogs.showLoadingDialog(context, _keyLoader,
-        Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
-
-    f.then((res) {
-      Navigator.of(_keyLoader.currentContext!, rootNavigator: true).pop();
-      var cp = Provider.of<ContextProvider>(context, listen: false);
-      cp.handleLangameResponse(
-        res,
-        failedMessage: !kReleaseMode
-            ? 'failed to initialize the application, ${res.error.toString()}'
-            : Provider.of<FunnyProvider>(context, listen: false)
-                .getFailingRandom(),
-        onSucceed: () {
-          Provider.of<LocalStorageProvider>(context, listen: false)
-              .saveHasDoneSetup(true);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FriendsView(),
-            ),
-          );
-        },
-        onFailure: () => controller.previousPage(
-            duration: new Duration(seconds: 1), curve: Curves.bounceIn),
-      );
-    });
+    LangameResponse res =
+        await Provider.of<MessageProvider>(context, listen: false)
+            .initializeMessageApi();
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    var fp = Provider.of<FunnyProvider>(context, listen: false);
+    cp.showLoadingDialog(fp.getLoadingRandom());
+    var showFailure = () async {
+      cp.dialogComplete();
+      cp.showFailureDialog(fp.getFailingRandom());
+      await Future.delayed(Duration(seconds: 2));
+      cp.dialogComplete();
+    };
+    cp.handleLangameResponse(res, onSucceed: () async {
+      var pp = Provider.of<PreferenceProvider>(context, listen: false);
+      pp.preference.hasDoneOnBoarding = true;
+      var r = await pp.save();
+      cp.handleLangameResponse(r, onFailure: showFailure, onSucceed: () {
+        cp.dialogComplete();
+        cp.pushReplacement(FriendsView());
+      });
+    }, onFailure: showFailure);
   }
 
   List<PageViewModel> _buildPageModels() => [
         PageViewModel(
           title: 'Send us a feedback anytime?',
-          bodyWidget: Consumer<FeedbackProvider>(
+          bodyWidget: Consumer<PreferenceProvider>(
             builder: (context, p, child) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ListTile(
-                  onTap: () {
-                    p.detectShakes = !p.detectShakes;
-                  },
+                  onTap: () =>
+                      p.setShakeToFeedback(!p.preference.shakeToFeedback),
                   leading: Icon(Icons.feedback_outlined),
                   title: Text('Shake-to-feedback'),
                   trailing: Switch(
-                      value: p.detectShakes,
-                      onChanged: (v) => p.detectShakes = !p.detectShakes),
+                    value: p.preference.shakeToFeedback,
+                    onChanged: (v) =>
+                        p.setShakeToFeedback(!p.preference.shakeToFeedback),
+                  ),
                 ),
                 Lottie.asset(
                   'animations/feedback.json',
+                  height: AppSize.safeBlockVertical * 70,
+                  width: AppSize.safeBlockHorizontal * 70,
+                  alignment: Alignment.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        PageViewModel(
+          title: 'Get user recommendations?',
+          bodyWidget: Consumer<PreferenceProvider>(
+            builder: (context, p, child) => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ListTile(
+                  onTap: () => p.setRecommendations(
+                      !p.preference.unknownPeopleRecommendations),
+                  leading: Icon(Icons.recommend),
+                  title: Text('Unknown user recommendations'),
+                  trailing: Switch(
+                    value: p.preference.unknownPeopleRecommendations,
+                    onChanged: (v) => p.setRecommendations(
+                        !p.preference.unknownPeopleRecommendations),
+                  ),
+                ),
+                Lottie.asset(
+                  'animations/recommendations.json',
                   height: AppSize.safeBlockVertical * 70,
                   width: AppSize.safeBlockHorizontal * 70,
                   alignment: Alignment.center,

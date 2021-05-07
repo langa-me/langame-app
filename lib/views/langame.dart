@@ -16,6 +16,7 @@ import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/message_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
@@ -63,13 +64,12 @@ class _LangameViewState extends State<LangameView> {
   void initState() {
     super.initState();
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .analytics
-        .setCurrentScreen(screenName: 'langame');
+        .setCurrentScreen('langame');
     var fp = Provider.of<FunnyProvider>(context, listen: false);
     _loadingMessage = fp.getLoadingRandom();
     _failingMessage = fp.getFailingRandom();
     if (!widget.notifyOthers) return;
-    Provider.of<AuthenticationProvider>(context, listen: false)
+    Provider.of<MessageProvider>(context, listen: false)
         .notifyPresence(widget.channelName);
   }
 
@@ -132,7 +132,7 @@ class _LangameViewState extends State<LangameView> {
 
     // Second-step, ask for a token generation
     if (channelToken == null) {
-      var p = Provider.of<AuthenticationProvider>(context, listen: false);
+      var p = Provider.of<MessageProvider>(context, listen: false);
       return WillPopScope(
         onWillPop: _onBackPressed,
         child: FutureBuilder<LangameResponse<String>>(
@@ -158,7 +158,7 @@ class _LangameViewState extends State<LangameView> {
         .log('channelToken $channelToken');
     // Third-step, retrieve channel data
     if (langame == null) {
-      var p = Provider.of<AuthenticationProvider>(context, listen: false);
+      var p = Provider.of<MessageProvider>(context, listen: false);
       return WillPopScope(
         onWillPop: _onBackPressed,
         child: FutureBuilder<LangameResponse<lg.Langame>>(
@@ -321,125 +321,127 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  Future<bool> _onBackPressed() async =>
-      await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.0),
+  Future<bool> _onBackPressed() async {
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    return await cp.showCustomDialog(
+      [
+        Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+          Text(
+            'Exit the langame?',
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .headline4!
+                .merge(TextStyle(color: Colors.white)),
           ),
-          title: const Text('Exit the langame?', textAlign: TextAlign.center),
-          titleTextStyle: Theme.of(context)
-              .textTheme
-              .headline4!
-              .merge(TextStyle(color: Colors.white)),
-          actions: [
-            OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).pop(false),
-              icon: Icon(Icons.cancel_outlined,
-                  color: Theme.of(context).colorScheme.secondary),
-              label: Text('CANCEL',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                side: BorderSide(
-                    width: 2.0, color: Theme.of(context).colorScheme.secondary),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32.0),
-                ),
+          OutlinedButton.icon(
+            onPressed: cp.dialogComplete,
+            icon: Icon(Icons.cancel_outlined,
+                color: Theme.of(context).colorScheme.secondary),
+            label: Text('CANCEL',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              side: BorderSide(
+                  width: 2.0, color: Theme.of(context).colorScheme.secondary),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32.0),
               ),
             ),
-            Spacer(),
-            OutlinedButton.icon(
-              onPressed: () async {
-                await _onEnd();
-                // Dialogs.showLoadingDialog(
-                //     context, _keyLoader, 'terminating...');
-                // f.whenComplete(
-                //     () => Navigator.of(context, rootNavigator: true).pop());
-                Navigator.of(context).pop(true);
-              },
-              style: ElevatedButton.styleFrom(
-                side: BorderSide(
-                    width: 2.0, color: Theme.of(context).colorScheme.secondary),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32.0),
-                ),
+          ),
+          OutlinedButton.icon(
+            onPressed: () async {
+              await _onEnd();
+              cp.dialogComplete();
+            },
+            style: ElevatedButton.styleFrom(
+              side: BorderSide(
+                  width: 2.0, color: Theme.of(context).colorScheme.secondary),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32.0),
               ),
-              icon: Icon(Icons.exit_to_app_rounded,
-                  color: Theme.of(context).colorScheme.secondary),
-              label: Text('YES',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white)),
             ),
-          ],
-        ),
-      ) ??
-      false;
+            icon: Icon(Icons.exit_to_app_rounded,
+                color: Theme.of(context).colorScheme.secondary),
+            label: Text('YES',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white)),
+          ),
+        ])),
+      ],
+    );
+  }
 
   void _goBackToMainMenu() => Future.delayed(
       //https://stackoverflow.com/questions/55618717/error-thrown-on-navigator-pop-until-debuglocked-is-not-true
       Duration.zero,
-      () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => FriendsView()),
-          ));
+      () => Provider.of<ContextProvider>(context, listen: false)
+          .pushReplacement(FriendsView()));
 
-  Future<void> showPermissionDialog() =>
-      Provider.of<ContextProvider>(context, listen: false).showCustomDialog([
-        Center(
-            child: Column(children: [
-          Text('We need your permission to use your microphone',
-              style: Theme.of(context).textTheme.headline5),
-          Lottie.asset('animations/microphone.json'),
-          IconsButton(
-            onPressed: _goBackToMainMenu,
-            text: 'Leave',
-            iconData: FontAwesomeIcons.doorOpen,
-            color: isLightThenBlack(context, reverse: true),
-            textStyle:
-                TextStyle(color: isLightThenBlack(context, reverse: false)),
-            iconColor: isLightThenBlack(context, reverse: false),
-          ),
-          IconsButton(
-            onPressed: () async {
-              var p = Provider.of<AudioProvider>(context, listen: false);
-              var cp = Provider.of<ContextProvider>(context, listen: false);
-              var res = await p.requestPermission();
+  Future<void> showPermissionDialog() {
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    return cp.showCustomDialog([
+      Center(
+          child: Column(children: [
+        Text('We need your permission to use your microphone',
+            style: Theme.of(context)
+                .textTheme
+                .headline5!
+                .merge(TextStyle(color: Colors.white))),
+        Lottie.asset('animations/microphone.json'),
+        IconsButton(
+          onPressed: () {
+            cp.dialogComplete();
+            _goBackToMainMenu();
+          },
+          text: 'Leave',
+          iconData: FontAwesomeIcons.doorOpen,
+          color: isLightThenBlack(context, reverse: true),
+          textStyle:
+              TextStyle(color: isLightThenBlack(context, reverse: false)),
+          iconColor: isLightThenBlack(context, reverse: false),
+        ),
+        IconsButton(
+          onPressed: () async {
+            var p = Provider.of<AudioProvider>(context, listen: false);
+            var res = await p.requestPermission();
 
-              cp.handleLangameResponse(
-                res,
-                succeedMessage: 'Great!',
-                failedMessage: _failingMessage,
-                onSucceed: () {
-                  // Permission granted!
-                  if (res.result != null && res.result!) {
-                    _postFrameCallback((duration) {
-                      setState(() => permissionRequested = true);
-                    });
-                    Provider.of<ContextProvider>(context, listen: false)
-                        .dialogComplete();
-                    return;
-                  }
-                  showToast(
-                      'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
-                      color: isLightThenBlack(context, reverse: true),
-                      textColor: isLightThenBlack(context, reverse: false));
-                  _goBackToMainMenu();
-                },
-                onFailure: _goBackToMainMenu,
-              );
-            },
-            text: 'Accept',
-            iconData: FontAwesomeIcons.checkCircle,
-            color: isLightThenBlack(context, reverse: true),
-            textStyle:
-                TextStyle(color: isLightThenBlack(context, reverse: false)),
-            iconColor: isLightThenBlack(context, reverse: false),
-          ),
-        ]))
-      ]);
+            cp.handleLangameResponse(
+              res,
+              succeedMessage: 'Great!',
+              failedMessage: _failingMessage,
+              onSucceed: () {
+                // Permission granted!
+                if (res.result != null && res.result!) {
+                  _postFrameCallback((duration) {
+                    setState(() => permissionRequested = true);
+                  });
+                  cp.dialogComplete();
+                  return;
+                }
+                showToast(
+                    'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
+                    color: isLightThenBlack(context, reverse: true),
+                    textColor: isLightThenBlack(context, reverse: false));
+                _goBackToMainMenu();
+              },
+              onFailure: _goBackToMainMenu,
+            );
+          },
+          text: 'Accept',
+          iconData: FontAwesomeIcons.checkCircle,
+          color: isLightThenBlack(context, reverse: true),
+          textStyle:
+              TextStyle(color: isLightThenBlack(context, reverse: false)),
+          iconColor: isLightThenBlack(context, reverse: false),
+        ),
+      ]))
+    ]);
+  }
 
   void _handleError() {
     if (errors > maxErrors) {
@@ -558,12 +560,12 @@ class _LangameViewState extends State<LangameView> {
     try {
       Provider.of<CrashAnalyticsProvider>(context, listen: false)
           .log('langame end', analyticsMessage: 'langame_end');
-      var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+      var mp = Provider.of<MessageProvider>(context, listen: false);
       Provider.of<AudioProvider>(context, listen: false).stopTimer();
       await Future.wait([
-        ap.sendLangameEnd(langame!.channelName),
+        mp.sendLangameEnd(langame!.channelName),
         Provider.of<AudioProvider>(context, listen: false).leaveChannel(),
-        ap.deleteNotification(langame!.channelName),
+        mp.deleteNotification(langame!.channelName),
       ]);
     } catch (e, s) {
       Provider.of<CrashAnalyticsProvider>(context, listen: false)

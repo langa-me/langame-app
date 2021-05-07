@@ -10,7 +10,7 @@ const serviceAccount = require("../langame-86ac4-firebase-adminsdk-iojlf-2d6861b
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-test("check that we can find some questions", async () => {
+test.skip("check that we can find some questions", async () => {
   // Generated ones
   let questions = await offlineQuestionSearch(["biology"], 5, -1, true);
   console.log(JSON.stringify(questions));
@@ -21,7 +21,7 @@ test("check that we can find some questions", async () => {
   afterAll(() => setTimeout(()=>{}, 1000));
 }, 40_000);
 
-test("check", async () => {
+test.skip("check", async () => {
   // Generated ones
   let questions = await offlineQuestionSearch(["death"], 1, -1, true);
   console.log(JSON.stringify(questions));
@@ -29,11 +29,11 @@ test("check", async () => {
 }, 40_000);
 
 
-test("create Github issue", async () => {
+test.skip("create Github issue", async () => {
   await newFeedback("https://foo.bar.com", "foo: bar");
 })
 
-test("generate openai question", async () => {
+test.skip("generate openai question", async () => {
   const t = await admin.remoteConfig().getTemplate();
   const response = await onlineOpenAiCompletion(CompletionType.Question, "politics", t.parameters)
   console.log(JSON.stringify(response))
@@ -42,7 +42,7 @@ test("generate openai question", async () => {
   expect(response[0].content.length).toBeGreaterThan(0);
 }, 40_000)
 
-test("", async () => {
+test.skip("", async () => {
   const t = await admin.remoteConfig().getTemplate();
   console.log(JSON.stringify(t.parameters));
   console.log(t.parameters.offline_use_generated.defaultValue.value === "true")

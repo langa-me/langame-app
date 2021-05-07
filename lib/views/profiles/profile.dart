@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
-
 import '../images/image.dart';
 
 class Profile extends StatelessWidget {
@@ -24,7 +23,6 @@ class Profile extends StatelessWidget {
           ),
           buildCroppedRoundedNetworkImage(_user.photoUrl,
               width: AppSize.blockSizeHorizontal * 20),
-
         ]),
       ),
     ];

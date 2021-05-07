@@ -8,7 +8,7 @@ on:
 
 jobs:
   # CI
-  build_android:
+  analyze_code_and_test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,17 +23,16 @@ jobs:
           RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
-        with:
-          flutter-version: 2.0.4
+        with: # flutter --version
+          flutter-version: 2.0.5
       - name: Install Flutter dependencies
         run: flutter pub get
-        # Add build runner commands here if you have any
-#      - name: Format files
-#        run: flutter format --set-exit-if-changed .
       - name: Analyze files
         run: flutter analyze .
       - name: Run the tests
         run: flutter test
+      - name: Print outdated packages
+        run: flutter pub outdated
   # CD
   deploy_android:
     name: Deploy beta to Google Play

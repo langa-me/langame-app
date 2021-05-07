@@ -11,7 +11,6 @@ import {
   generateAgoraRtcToken, getLangame,
   getUserData,
   handleSendToDevice,
-  kBetasCollection,
   kInvalidRequest,
   kNotAuthenticated,
   kNotificationsCollection, kUsersCollection,
@@ -20,6 +19,8 @@ import {newFeedback} from "./feedback";
 import {sendLangameEnd} from "./sendLangameEnd";
 import {sendLangame} from "./sendLangame";
 import {interactionsDecrement} from "./scheduledFunctions";
+import {deleteData} from "./deleteData";
+import {subscribe} from "./subscribe";
 // Initialize admin firebase
 admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
@@ -39,16 +40,6 @@ const runtimeOpts = {
 // TODO: somehow doesn't work then on client
 const region = "us-central1";
 
-const callers = new Map();
-const maxCalls = 10;
-// TODO: wtf how can it work?
-// Every 10 seconds, reduce the rate limit of every caller by one
-setInterval(() => {
-  callers.forEach(function(part, index, callers) {
-    if (part === 0) return;
-    callers.set(index, part-1);
-  });
-}, 10_00);
 
 /**
  *
@@ -58,88 +49,24 @@ exports.subscribe = functions // TODO: transaction!!!
     .region(region)
     .runWith(runtimeOpts)
     .https
-    .onCall(async (data, context) => {
-      const caller = callers.get(context.rawRequest.headers.origin);
-      if (caller > maxCalls) {
-        return new FirebaseFunctionsResponse(
-            429,
-            undefined,
-            "too many requests",
-        );
-      }
-      callers.set(context.rawRequest.headers.origin, caller ? caller+1 : 1);
-
-      if (!data) {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-            undefined,
-            kInvalidRequest,
-        );
-      }
-      if (!data.email) {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-            undefined,
-            "you must provide a valid email",
-        );
-      }
-
-      functions.logger.info("trying to register new beta user", data.email);
-
-      const existing = await admin
-          .firestore()
-          .collection(kBetasCollection)
-          .where("email", "==", data.email)
-          .get();
-
-      if (existing.docs.some((d) => d.exists)) {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-            undefined,
-            "already subscribed",
-        );
-      }
-
-
-      return admin
-          .firestore()
-          .collection(kBetasCollection)
-          .add({email: data.email, date: Date.now()})
-          .then((_) => {
-            functions.logger.info("new beta user", data.email);
-            return new FirebaseFunctionsResponse(
-                FirebaseFunctionsResponseStatusCode.OK,
-                undefined,
-                undefined,
-            );
-          }).catch((e) => {
-            functions.
-                logger.
-                error("failed to add new beta user", data.email, e);
-
-            return new FirebaseFunctionsResponse(
-                FirebaseFunctionsResponseStatusCode.INTERNAL,
-                undefined,
-                "failed to add beta email",
-            );
-          });
-    });
-
+    .onCall(subscribe);
 
 exports.interactionsDecrement = functions
     .pubsub
     .schedule("1 * * * *")
     .onRun(interactionsDecrement);
 
-/**
- *
- * @type {HttpsFunction & Runnable<any>}
- */
 exports.sendLangameEnd = functions
     .region(region)
     .runWith(runtimeOpts)
     .https
     .onCall(sendLangameEnd);
+
+exports.deleteData = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .https
+    .onCall(deleteData);
 
 /**
  * Generate an audio channel token for the user
@@ -193,47 +120,6 @@ exports.getChannelToken = functions
       );
     });
 
-/**
- * Update user profile (Firebase Auth and Firestore LangameUser)
- * @type {HttpsFunction & Runnable<any>}
- */
-exports.updateProfile = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(async (data, context) => {
-      if (!context.auth) {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
-            undefined,
-            kNotAuthenticated,
-        );
-      }
-      if (!data) {
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-            undefined,
-            kInvalidRequest,
-        );
-      }
-      return await admin
-          .firestore()
-          .collection(kUsersCollection)
-          .doc(context.auth.uid)
-          .update(data).then((_) => {
-            return new FirebaseFunctionsResponse(
-                FirebaseFunctionsResponseStatusCode.OK,
-                undefined,
-                undefined,
-            );
-          }).catch((e) => {
-            return new FirebaseFunctionsResponse(
-                FirebaseFunctionsResponseStatusCode.INTERNAL,
-                undefined,
-                e,
-            );
-          });
-    });
 
 /**
  *

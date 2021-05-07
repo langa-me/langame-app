@@ -56,7 +56,7 @@ export const sendLangame = async (
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,
-        "failed to find question");
+        "question_invalid_config");
   }
   let questions: Question[] | undefined;
   if (t.parameters.question_engine.defaultValue.value === "offline") {
@@ -75,7 +75,7 @@ export const sendLangame = async (
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.INTERNAL,
         undefined,
-        "failed to find question");
+        "question_find_error");
   }
 
   functions

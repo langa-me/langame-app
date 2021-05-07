@@ -1,6 +1,6 @@
 import {Octokit} from "@octokit/rest";
 import * as functions from "firebase-functions";
-export const githubToken = functions.config().github.token;
+const githubToken = functions.config().github.token;
 
 const octokit = new Octokit({
   auth: githubToken,

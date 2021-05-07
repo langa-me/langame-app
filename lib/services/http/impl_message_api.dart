@@ -170,6 +170,39 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
+  Future<void> sendLangameEnd(String channelName) async {
+    HttpsCallable callable = firebase.functions!.httpsCallable(
+        AppConst.sendLangameEndFunction,
+        options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
+
+    try {
+      final HttpsCallableResult result = await callable.call(
+        <String, dynamic>{
+          'channelName': channelName,
+        },
+      );
+      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
+        Map<String, dynamic>.from(result.data),
+      );
+      switch (response.statusCode) {
+        case FirebaseFunctionsResponseStatusCode.OK:
+          break;
+        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
+          throw LangameSendEndException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
+        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
+          throw LangameSendEndException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
+        case FirebaseFunctionsResponseStatusCode.INTERNAL:
+          throw LangameSendEndException(response.errorMessage ??
+              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
+      }
+    } catch (e) {
+      throw LangameSendEndException(e.toString());
+    }
+  }
+
+  @override
   Future<void> notifyPresence(String channelName) async {
     HttpsCallable callable = firebase.functions!.httpsCallable(
       AppConst.notifyPresenceFunction,
@@ -235,21 +268,23 @@ class ImplMessageApi extends MessageApi {
               n?.id = m.data['id'];
               onBackgroundOrForegroundOpened(n);
             }));
-    runZonedGuarded(() {
-      FirebaseMessaging.onBackgroundMessage(
-          _firebaseMessagingBackgroundHandler);
-    },
+    runZonedGuarded(
+        () => FirebaseMessaging.onBackgroundMessage(
+            _firebaseMessagingBackgroundHandler),
         (_, __) => debugPrint(
             'ignoring usual FirebaseMessaging.onBackgroundMessage Null check'));
   }
 
+  Future<void> _emptyHandler(RemoteMessage message) async {}
   @override
   void cancel() {
     _onTokenRefresh?.cancel();
     _onForegroundMessage?.cancel();
-    // TODO: test this hack
-    Future<void> _emptyHandler(RemoteMessage message) async {}
-    FirebaseMessaging.onBackgroundMessage(_emptyHandler);
+    runZonedGuarded(
+        () => FirebaseMessaging.onBackgroundMessage(_emptyHandler),
+        (_, __) => debugPrint(
+            'ignoring usual FirebaseMessaging.onBackgroundMessage Null check'));
+
     _onNonTerminatedOpened?.cancel();
   }
 

@@ -12,7 +12,12 @@ firebase login
 ### Secrets
 
 ```bash
-firebase functions:config:set agora.id="THE AGORA APP ID" agora.certificate="THE AGORA CERTIFICATE" github.token="THE GITHUB TOKEN" openai.key="OPENAI KEY"
+firebase functions:config:set agora.id="THE AGORA APP ID"
+firebase functions:config:set agora.certificate="THE AGORA CERTIFICATE"
+firebase functions:config:set github.token="THE GITHUB TOKEN"
+firebase functions:config:set openai.key="OPENAI KEY"
+firebase functions:config:set mailchimp.key="MAILCHIMP KEY"
+firebase functions:config:set mailchimp.list="MAILCHIMP LIST ID"
 firebase functions:config:get > .runtimeconfig.json
 ```
 

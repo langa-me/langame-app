@@ -7,5 +7,5 @@ abstract class TopicApi {
 
   TopicApi(this.firebase);
 
-  Future<List<Topic>> getTopics();
+  Stream<Iterable<Topic>> streamTopics();
 }
