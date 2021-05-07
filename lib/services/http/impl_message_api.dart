@@ -268,10 +268,9 @@ class ImplMessageApi extends MessageApi {
               n?.id = m.data['id'];
               onBackgroundOrForegroundOpened(n);
             }));
-    runZonedGuarded(() {
-      FirebaseMessaging.onBackgroundMessage(
-          _firebaseMessagingBackgroundHandler);
-    },
+    runZonedGuarded(
+        () => FirebaseMessaging.onBackgroundMessage(
+            _firebaseMessagingBackgroundHandler),
         (_, __) => debugPrint(
             'ignoring usual FirebaseMessaging.onBackgroundMessage Null check'));
   }
@@ -281,7 +280,11 @@ class ImplMessageApi extends MessageApi {
   void cancel() {
     _onTokenRefresh?.cancel();
     _onForegroundMessage?.cancel();
-    FirebaseMessaging.onBackgroundMessage(_emptyHandler);
+    runZonedGuarded(
+        () => FirebaseMessaging.onBackgroundMessage(_emptyHandler),
+        (_, __) => debugPrint(
+            'ignoring usual FirebaseMessaging.onBackgroundMessage Null check'));
+
     _onNonTerminatedOpened?.cancel();
   }
 

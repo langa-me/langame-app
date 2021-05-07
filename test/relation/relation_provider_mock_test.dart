@@ -2,7 +2,6 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 // import 'package:flutter/foundation.dart';
-import 'package:flutter_test/flutter_test.dart';
 // import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
 // import 'package:langame/helpers/constants.dart';
 // import 'package:langame/helpers/fake.dart';
@@ -18,8 +17,9 @@ import 'package:flutter_test/flutter_test.dart';
 // import '../mock_firebase_crashlytics.dart';
 // import '../mock_firebase_functions.dart';
 
+import 'package:test/test.dart';
+
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
   group('Relation Provider', () {
     // late MockFirebaseAuth auth;
     // late MockFirestoreInstance firestore;

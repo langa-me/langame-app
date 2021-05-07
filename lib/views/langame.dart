@@ -325,40 +325,53 @@ class _LangameViewState extends State<LangameView> {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     return await cp.showCustomDialog(
       [
-        const Text('Exit the langame?', textAlign: TextAlign.center),
-        OutlinedButton.icon(
-          onPressed: cp.dialogComplete,
-          icon: Icon(Icons.cancel_outlined,
-              color: Theme.of(context).colorScheme.secondary),
-          label: Text('CANCEL',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white)),
-          style: ElevatedButton.styleFrom(
-            side: BorderSide(
-                width: 2.0, color: Theme.of(context).colorScheme.secondary),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(32.0),
+        Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+          Text(
+            'Exit the langame?',
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .headline4!
+                .merge(TextStyle(color: Colors.white)),
+          ),
+          OutlinedButton.icon(
+            onPressed: cp.dialogComplete,
+            icon: Icon(Icons.cancel_outlined,
+                color: Theme.of(context).colorScheme.secondary),
+            label: Text('CANCEL',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              side: BorderSide(
+                  width: 2.0, color: Theme.of(context).colorScheme.secondary),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32.0),
+              ),
             ),
           ),
-        ),
-        OutlinedButton.icon(
-          onPressed: () async {
-            await _onEnd();
-            cp.dialogComplete();
-          },
-          style: ElevatedButton.styleFrom(
-            side: BorderSide(
-                width: 2.0, color: Theme.of(context).colorScheme.secondary),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(32.0),
+          OutlinedButton.icon(
+            onPressed: () async {
+              await _onEnd();
+              cp.dialogComplete();
+            },
+            style: ElevatedButton.styleFrom(
+              side: BorderSide(
+                  width: 2.0, color: Theme.of(context).colorScheme.secondary),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32.0),
+              ),
             ),
+            icon: Icon(Icons.exit_to_app_rounded,
+                color: Theme.of(context).colorScheme.secondary),
+            label: Text('YES',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white)),
           ),
-          icon: Icon(Icons.exit_to_app_rounded,
-              color: Theme.of(context).colorScheme.secondary),
-          label: Text('YES',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white)),
-        ),
+        ])),
       ],
     );
   }

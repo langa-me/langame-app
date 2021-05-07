@@ -31,6 +31,8 @@ jobs:
         run: flutter analyze .
       - name: Run the tests
         run: flutter test
+      - name: Print outdated packages
+        run: flutter pub outdated
   # CD
   deploy_android:
     name: Deploy beta to Google Play

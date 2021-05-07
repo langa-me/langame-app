@@ -90,9 +90,12 @@ class PreferenceProvider extends ChangeNotifier {
   Future<LangameResponse> save() async {
     try {
       await _api.savePreference(firebase.auth!.currentUser?.uid, _preference);
-      firebase.analytics?.logEvent(
-          name: 'save_preference',
-          parameters: _preference.toProto3Json() as Map<String, dynamic>);
+      firebase.analytics?.logEvent(name: 'save_preference', parameters: {
+        'shakeToFeedback': preference.shakeToFeedback,
+        'hasDoneOnBoarding': preference.hasDoneOnBoarding,
+        'unknownPeopleRecommendations': preference.unknownPeopleRecommendations,
+        'themeIndex': preference.themeIndex,
+      });
       _crashAnalyticsProvider.log('save ${_preference.writeToJson()}');
     } catch (e, s) {
       _crashAnalyticsProvider.log('failed to notifyPresence');

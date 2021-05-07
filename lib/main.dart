@@ -134,13 +134,8 @@ void main() async {
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, MessageProvider>(
-              update: (_, cap, ap, mp) => MessageProvider(
-                  // TODO: might not necessarily rebuild every time
-                  firebase,
-                  messageApi,
-                  authenticationApi,
-                  cap,
-                  ap),
+              // TODO: for now does not change on auth change
+              update: (_, cap, ap, mp) => mp ?? messageProvider,
               create: (_) => messageProvider,
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,

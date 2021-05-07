@@ -57,7 +57,10 @@ class ImplPreferenceService extends PreferenceService {
                         e.data()!['unknownPeopleRecommendations'],
                     themeIndex: e.data()!['themeIndex'],
                     hasDoneOnBoarding: e.data()!['hasDoneOnBoarding'],
-                    searchHistory: e.data()!['searchHistory'],
+                    searchHistory: e.data()!['searchHistory'] != null
+                        ? (e.data()!['searchHistory'] as Iterable<dynamic>)
+                            .map((e) => e.toString())
+                        : [],
                     shakeToFeedback: e.data()!['shakeToFeedback'],
                   ));
       },

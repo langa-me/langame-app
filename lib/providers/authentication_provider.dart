@@ -41,10 +41,8 @@ class AuthenticationProvider extends ChangeNotifier {
     _firebaseUserStream.listen((data) async {
       _crashAnalyticsProvider
           .log('_firebaseUserStream.listen ${data.toString()}');
-
-      if (data == null ||
-          firebase.auth!.currentUser == null ||
-          data.refreshToken == null) return null;
+      // data.refreshToken being null means need to re-auth basically
+      if (data == null || firebase.auth!.currentUser == null) return null;
       try {
         await firebase.crashlytics?.setUserIdentifier(data.uid);
         await firebase.analytics?.setUserId(data.uid);

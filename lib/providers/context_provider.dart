@@ -50,12 +50,13 @@ class ContextProvider extends ChangeNotifier {
 
   void pop() => _navigationService.pop();
 
-  Future showCustomDialog(List<Widget> children, {bool canBack = false}) =>
+  Future showCustomDialog(List<Widget> children,
+          {bool canBack = false, Color? backgroundColor}) =>
       _showDialog(
         () => WillPopScope(
           onWillPop: () async => canBack,
           child: SimpleDialog(
-            backgroundColor:
+            backgroundColor: backgroundColor ??
                 Theme.of(_navigationKey.currentContext!).colorScheme.primary,
             children: children,
           ),
