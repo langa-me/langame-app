@@ -23,6 +23,10 @@ class FeedbackProvider extends ChangeNotifier {
 
   FeedbackProvider(this.firebase, this._crashAnalyticsProvider,
       this._contextProvider, this._preferenceProvider) {
+    _onPreferenceChange();
+  }
+
+  _onPreferenceChange() {
     if (_preferenceProvider.preference.shakeToFeedback) {
       _detector?.startListening();
     } else {
@@ -31,7 +35,7 @@ class FeedbackProvider extends ChangeNotifier {
   }
 
   initShake() {
-    _detector = ShakeDetector.autoStart(
+    _detector = ShakeDetector.waitForStart(
       shakeThresholdGravity: 2,
       onPhoneShake: () {
         _crashAnalyticsProvider.log('shake detector initialized',
@@ -42,6 +46,7 @@ class FeedbackProvider extends ChangeNotifier {
         show();
       },
     );
+    _onPreferenceChange();
   }
 
   Null show({bool fromShaking = true}) {

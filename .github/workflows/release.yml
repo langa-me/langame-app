@@ -24,7 +24,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with: # flutter --version
-          flutter-version: 2.0.5
+          flutter-version: 2.0.6
       - name: Install Flutter dependencies
         run: flutter pub get
       - name: Analyze files
@@ -54,7 +54,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.0.4
+          flutter-version: 2.0.6
       - name: Install Flutter dependencies
         run: flutter pub get
       - run: flutter build apk --release --flavor prod
@@ -80,7 +80,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.0.4
+          flutter-version: 2.0.6
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign --flavor prod
       - uses: ruby/setup-ruby@v1
@@ -104,4 +104,3 @@ jobs:
           PROVISIONING_PROFILE_SPECIFIER: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}'
           TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
           TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
-      - run: fastlane env

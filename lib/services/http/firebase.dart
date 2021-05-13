@@ -6,6 +6,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 class FirebaseApi {
   final FirebaseMessaging? messaging;
@@ -16,7 +17,7 @@ class FirebaseApi {
   final FirebaseCrashlytics? crashlytics;
   final FirebaseAnalytics? analytics;
   final FirebaseStorage? storage;
-  // final FirebaseRemoteConfig remoteConfig;
+  final RemoteConfig? remoteConfig;
   final bool useEmulator;
   FirebaseApi(
       {this.messaging,
@@ -27,6 +28,7 @@ class FirebaseApi {
       this.crashlytics,
       this.analytics,
       this.storage,
+      this.remoteConfig,
       this.useEmulator = false}) {
     if (!useEmulator) return;
 

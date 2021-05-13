@@ -17,6 +17,8 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/message_provider.dart';
+import 'package:langame/providers/paint_provider.dart';
+import 'package:langame/views/painters/mutliplayer_painting.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
@@ -59,7 +61,8 @@ class _LangameViewState extends State<LangameView> {
   String _failingMessage = '';
 
   bool isOver = false;
-
+  int _selectedIndex = 0;
+  final PageController controller = PageController(initialPage: 0);
   @override
   void initState() {
     super.initState();
@@ -68,6 +71,8 @@ class _LangameViewState extends State<LangameView> {
     var fp = Provider.of<FunnyProvider>(context, listen: false);
     _loadingMessage = fp.getLoadingRandom();
     _failingMessage = fp.getFailingRandom();
+    Provider.of<PaintingProvider>(context, listen: false)
+        .init(widget.channelName);
     if (!widget.notifyOthers) return;
     Provider.of<MessageProvider>(context, listen: false)
         .notifyPresence(widget.channelName);
@@ -285,7 +290,6 @@ class _LangameViewState extends State<LangameView> {
         channelLangameUsers.isEmpty ||
         !engineInitialized ||
         !channelJoined) {
-      // TODO: turn mic off
       return WillPopScope(
         onWillPop: _onBackPressed,
         child: _buildLoading(text: _loadingMessage),
@@ -309,17 +313,64 @@ class _LangameViewState extends State<LangameView> {
                   // ),
                 ],
               ),
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+              body: Row(
                 children: [
-                  _buildTimerText(),
-                  _buildQuestion(),
-                  _buildBottomHalf(),
+                  NavigationRail(
+                    selectedIndex: _selectedIndex,
+                    onDestinationSelected: (int index) {
+                      setState(() => _selectedIndex = index);
+                      controller.animateToPage(
+                        _selectedIndex,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeIn,
+                      );
+                    },
+                    labelType: NavigationRailLabelType.selected,
+                    destinations: const [
+                      NavigationRailDestination(
+                        icon: Icon(Icons.home_outlined),
+                        selectedIcon: Icon(Icons.home_outlined),
+                        label: Text('Home'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.format_paint_outlined),
+                        selectedIcon: Icon(Icons.format_paint_outlined),
+                        label: Text('Paint'),
+                      ),
+                    ],
+                  ),
+                  const VerticalDivider(thickness: 1, width: 1),
+                  Expanded(
+                    child: PageView(
+                      scrollDirection: Axis.vertical,
+                      controller: controller,
+                      // Prevent swiping on draw view
+                      physics: _selectedIndex == 1
+                          ? NeverScrollableScrollPhysics()
+                          : null,
+                      onPageChanged: (v) {
+                        setState(() => _selectedIndex = v);
+                      },
+                      children: [
+                        _buildHome(),
+                        MultiplayerPainting(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
     );
   }
+
+  Widget _buildHome() => Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          _buildTimerText(),
+          _buildQuestion(),
+          _buildBottomHalf(),
+        ],
+      );
 
   Future<bool> _onBackPressed() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);
@@ -327,60 +378,63 @@ class _LangameViewState extends State<LangameView> {
       [
         Padding(
             padding: EdgeInsets.all(10),
-            child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-          Text(
-            'Exit the langame?',
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .headline4!
-                .merge(TextStyle(color: Colors.white)),
-          ),
-          OutlinedButton.icon(
-            onPressed: cp.dialogComplete,
-            icon: Icon(Icons.cancel_outlined,
-                color: Theme.of(context).colorScheme.secondary),
-            label: Text('CANCEL',
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(
+                'Exit the langame?',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(
-              side: BorderSide(
-                  width: 2.0, color: Theme.of(context).colorScheme.secondary),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(32.0),
+                style: Theme.of(context)
+                    .textTheme
+                    .headline4!
+                    .merge(TextStyle(color: Colors.white)),
               ),
-            ),
-          ),
-          OutlinedButton.icon(
-            onPressed: () async {
-              await _onEnd();
-              cp.dialogComplete();
-            },
-            style: ElevatedButton.styleFrom(
-              side: BorderSide(
-                  width: 2.0, color: Theme.of(context).colorScheme.secondary),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(32.0),
+              OutlinedButton.icon(
+                onPressed: cp.dialogComplete,
+                icon: Icon(Icons.cancel_outlined,
+                    color: Theme.of(context).colorScheme.secondary),
+                label: Text('CANCEL',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  side: BorderSide(
+                      width: 2.0,
+                      color: Theme.of(context).colorScheme.secondary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32.0),
+                  ),
+                ),
               ),
-            ),
-            icon: Icon(Icons.exit_to_app_rounded,
-                color: Theme.of(context).colorScheme.secondary),
-            label: Text('YES',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white)),
-          ),
-        ])),
+              OutlinedButton.icon(
+                onPressed: () async {
+                  await _onEnd();
+                  cp.dialogComplete();
+                  _goBackToMainMenu();
+                },
+                style: ElevatedButton.styleFrom(
+                  side: BorderSide(
+                      width: 2.0,
+                      color: Theme.of(context).colorScheme.secondary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32.0),
+                  ),
+                ),
+                icon: Icon(Icons.exit_to_app_rounded,
+                    color: Theme.of(context).colorScheme.secondary),
+                label: Text('YES',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white)),
+              ),
+            ])),
       ],
     );
   }
 
   void _goBackToMainMenu() => Future.delayed(
-      //https://stackoverflow.com/questions/55618717/error-thrown-on-navigator-pop-until-debuglocked-is-not-true
-      Duration.zero,
-      () => Provider.of<ContextProvider>(context, listen: false)
-          .pushReplacement(FriendsView()));
+          //https://stackoverflow.com/questions/55618717/error-thrown-on-navigator-pop-until-debuglocked-is-not-true
+          Duration.zero, () {
+        var cp = Provider.of<ContextProvider>(context, listen: false);
+        cp.pushReplacement(FriendsView());
+      });
 
   Future<void> showPermissionDialog() {
     var cp = Provider.of<ContextProvider>(context, listen: false);
@@ -390,7 +444,7 @@ class _LangameViewState extends State<LangameView> {
         Text('We need your permission to use your microphone',
             style: Theme.of(context)
                 .textTheme
-                .headline5!
+                .headline6!
                 .merge(TextStyle(color: Colors.white))),
         Lottie.asset('animations/microphone.json'),
         IconsButton(
@@ -566,6 +620,7 @@ class _LangameViewState extends State<LangameView> {
         mp.sendLangameEnd(langame!.channelName),
         Provider.of<AudioProvider>(context, listen: false).leaveChannel(),
         mp.deleteNotification(langame!.channelName),
+        Provider.of<PaintingProvider>(context, listen: false).stop()
       ]);
     } catch (e, s) {
       Provider.of<CrashAnalyticsProvider>(context, listen: false)
@@ -585,7 +640,7 @@ class _LangameViewState extends State<LangameView> {
         ),
         SizedBox(height: AppSize.blockSizeVertical * 5),
         Container(
-          width: AppSize.blockSizeHorizontal * 80,
+          width: AppSize.blockSizeHorizontal * 70,
           height: AppSize.blockSizeVertical * 40,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primary,
@@ -660,7 +715,7 @@ class _LangameViewState extends State<LangameView> {
                     child: Container(
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                          color: isLightThenBlack(context, reverse: true),
+                          color: Colors.transparent,
                           borderRadius: const BorderRadius.all(
                               const Radius.circular(10.0))),
                       child: new Center(
@@ -692,8 +747,8 @@ class _LangameViewState extends State<LangameView> {
             ),
             color: isLightThenBlack(context, reverse: true),
             borderRadius: BorderRadius.all(Radius.circular(10.0))),
-        height: AppSize.blockSizeVertical * 30,
-        width: AppSize.blockSizeHorizontal * 85,
+        height: AppSize.blockSizeVertical * 40,
+        width: AppSize.safeBlockHorizontal * 70,
         child: Column(
           children: [
             Container(
@@ -739,6 +794,77 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
+  Widget _buildBottomHalf() {
+    return Expanded(
+      child: Column(
+        children: [
+          Divider(),
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(40.0)),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 5,
+              ),
+              color: isLightThenBlack(context, reverse: true),
+            ),
+            width: AppSize.safeBlockHorizontal * 70,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: joinedPlayers.values
+                    .map(
+                      (p) => Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(40),
+                              ),
+                              border: Border.all(
+                                width: 1,
+                                color: p.isSpeaking
+                                    ? Colors.red
+                                    : Theme.of(context).colorScheme.primary,
+                                style: BorderStyle.solid,
+                              ),
+                            ),
+                            child: Center(
+                              child: buildCroppedRoundedNetworkImage(
+                                  p.langameUser.photoUrl),
+                            ),
+                          ),
+                          // Icon(Icons
+                          //     .mic_rounded), // TODO: use show if other has mic on or not
+                        ],
+                      ),
+                    )
+                    .toList()),
+          ),
+          SizedBox(height: AppSize.safeBlockVertical * 2),
+          Consumer<AudioProvider>(
+              builder: (context, p, child) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IconButton(
+                          icon: Icon(p.isMicrophoneEnabled
+                              ? Icons.mic_rounded
+                              : Icons.mic_off_rounded),
+                          onPressed: () => p.switchMicrophone(),
+                        ),
+                        // TODO: does not work somehow, not rly mandatory
+                        // IconButton(
+                        //   icon: Icon(p.isSpeakerphoneEnabled
+                        //       ? Icons.speaker_notes_outlined
+                        //       : Icons.speaker_notes_off_outlined),
+                        //   onPressed: () => p.switchSpeakerphone(),
+                        // )
+                      ])),
+        ],
+      ),
+    );
+  }
+
   Future _showContexts(String title, List<String> contexts) => showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -780,77 +906,6 @@ class _LangameViewState extends State<LangameView> {
           ),
         ),
       );
-
-  Widget _buildBottomHalf() {
-    return Expanded(
-      child: Column(
-        children: [
-          Divider(),
-          Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(40.0)),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.primary,
-                width: 5,
-              ),
-              color: isLightThenBlack(context, reverse: true),
-            ),
-            width: AppSize.blockSizeHorizontal * 85,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: joinedPlayers.values
-                    .map(
-                      (p) => Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(40),
-                              ),
-                              border: Border.all(
-                                width: 1,
-                                color: p.isSpeaking
-                                    ? Colors.red
-                                    : Theme.of(context).colorScheme.primary,
-                                style: BorderStyle.solid,
-                              ),
-                            ),
-                            child: Center(
-                              child: buildCroppedRoundedNetworkImage(
-                                  p.langameUser.photoUrl),
-                            ),
-                          ),
-                          // Icon(Icons
-                          //     .mic_rounded), // TODO: use show if other has mic on or not
-                        ],
-                      ),
-                    )
-                    .toList()),
-          ),
-          SizedBox(height: AppSize.safeBlockVertical * 5),
-          Consumer<AudioProvider>(
-              builder: (context, p, child) => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        IconButton(
-                          icon: Icon(p.isMicrophoneEnabled
-                              ? Icons.mic_rounded
-                              : Icons.mic_off_rounded),
-                          onPressed: () => p.switchMicrophone(),
-                        ),
-                        // TODO: does not work somehow, not rly mandatory
-                        // IconButton(
-                        //   icon: Icon(p.isSpeakerphoneEnabled
-                        //       ? Icons.speaker_notes_outlined
-                        //       : Icons.speaker_notes_off_outlined),
-                        //   onPressed: () => p.switchSpeakerphone(),
-                        // )
-                      ])),
-        ],
-      ),
-    );
-  }
 
   Future<void> _showEndDialog(BuildContext context, {String? left}) async =>
       Dialogs.materialDialog(

@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,7 +26,9 @@ import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
+import 'package:langame/providers/paint_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/providers/remote_config_providert.dart';
 import 'package:langame/providers/topic_provider.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
@@ -42,6 +45,7 @@ void main() async {
   var crashlytics = FirebaseCrashlytics.instance;
   await crashlytics.setCrashlyticsCollectionEnabled(true);
   var analytics = FirebaseAnalytics();
+  var remoteConfig = RemoteConfig.instance;
   FirebaseApi firebase = FirebaseApi(
     messaging: FirebaseMessaging.instance,
     firestore: FirebaseFirestore.instance,
@@ -53,6 +57,7 @@ void main() async {
     crashlytics: crashlytics,
     analytics: analytics,
     storage: FirebaseStorage.instance,
+    remoteConfig: remoteConfig,
     useEmulator: false,
   );
   // Pass all uncaught errors from the framework to Crashlytics.
@@ -88,6 +93,7 @@ void main() async {
   var relationProvider = RelationProvider(
       authenticationApi, crashAnalyticsProvider, authenticationProvider);
   var preferenceProvider = PreferenceProvider(firebase, crashAnalyticsProvider);
+  var remoteConfigProvider = RemoteConfigProvider(crashAnalyticsProvider, remoteConfig);
 
   SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
@@ -118,18 +124,22 @@ void main() async {
             ///////////////////////////////////////////
 
             ChangeNotifierProxyProvider<CrashAnalyticsProvider,
+                RemoteConfigProvider>(
+              update: (_, cap, rcp) => rcp!,
+              create: (_) => remoteConfigProvider,
+            ),
+            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
                 AuthenticationProvider>(
-              update: (_, cap, ap) =>
-                  AuthenticationProvider(firebase, authenticationApi, cap),
+              update: (_, cap, ap) => ap!,
               create: (_) => authenticationProvider,
             ),
             ChangeNotifierProxyProvider<CrashAnalyticsProvider,
                 PreferenceProvider>(
-              update: (_, cap, ap) => PreferenceProvider(firebase, cap),
+              update: (_, cap, pp) => pp!,
               create: (_) => preferenceProvider,
             ),
             ChangeNotifierProxyProvider<CrashAnalyticsProvider, AudioProvider>(
-              update: (_, cap, ap) => AudioProvider(firebase, cap),
+              update: (_, cap, ap) => ap!,
               create: (_) => AudioProvider(firebase, crashAnalyticsProvider),
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
@@ -153,6 +163,12 @@ void main() async {
                   FeedbackProvider(firebase, cap, cp, pp),
               create: (_) => FeedbackProvider(firebase, crashAnalyticsProvider,
                   contextProvider, preferenceProvider),
+            ),
+            ChangeNotifierProxyProvider4<CrashAnalyticsProvider, ContextProvider, 
+            AuthenticationProvider, RemoteConfigProvider, PaintingProvider>(
+              update: (_, cap, cp, ap, rcp, pp) => pp!,
+              create: (_) =>
+                  PaintingProvider(crashAnalyticsProvider, contextProvider, authenticationProvider, remoteConfigProvider),
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),

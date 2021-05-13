@@ -69,6 +69,7 @@ class _LoginState extends State<Login> {
         });
       }
     });
+    // TODO: fix button on/off according to state
     setState(() => isAuthenticating = false);
   }
 

@@ -61,10 +61,9 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Fixed broken dialogs
-                  - More user feedback on loadings
-                  - interaction levels now reduces over time
-                  - main screen shows both recommendations and recent interactions"
+      changelog: "- Fixed shake-to-feedback settings
+      - Implement collaborative painting during Langame, to exchange visually
+      - minor fixes"
     )
 
     delete_temp_keychain(keychain_name)

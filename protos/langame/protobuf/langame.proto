@@ -99,3 +99,101 @@ message Langame {
   repeated Question questions = 4;
 }
 
+message Paint {
+  oneof action {
+    SelectionRectangle selection_rectangle = 1;
+    SelectionCircle selection_circle = 2;
+    SelectionLine selection_line = 3;
+    SelectionText selection_text = 4;
+    DrawRectangle draw_rectangle = 5;
+    DrawCircle draw_circle = 6;
+    DrawLine draw_line = 7;
+    DrawPoints draw_points = 8;
+    DrawText draw_text = 9;
+    Clear clear_all = 10;
+    EditText edit_text = 11;
+  }
+
+  message SelectionRectangle {
+    DrawShape shape_properties = 1;
+    double shift_x = 2;
+    double shift_y = 3;
+  }
+
+  message SelectionCircle {
+    DrawShape shape_properties = 1;
+    double shift_x = 2;
+    double shift_y = 3;
+  }
+
+  message SelectionLine {
+    DrawShape shape_properties = 1;
+    bool is_p1 = 2;
+    double new_x = 3;
+    double new_y = 4;
+  }
+
+  message SelectionText {
+    DrawShape shape_properties = 1;
+    double new_x = 2;
+    double new_y = 3;
+  }
+  
+  message DrawShape {
+    string id = 1;
+    int32 r = 6;
+    int32 g = 7;
+    int32 b = 8;
+    double screenWidth = 9;
+    double screenHeight = 10;
+  }
+
+  message DrawRectangle {
+    DrawShape shape_properties = 1;
+    double bottom_left_x = 2;
+    double bottom_left_y = 3;
+    double top_right_x = 4;
+    double top_right_y = 5;
+  }
+
+  message DrawCircle {
+    DrawShape shape_properties = 1;
+    double center_x = 2;
+    double center_y = 3;
+    double radius = 4;
+  }
+
+  message DrawLine {
+    DrawShape shape_properties = 1;
+    double p1_x = 2;
+    double p1_y = 3;
+    double p2_x = 4;
+    double p2_y = 5;
+  }
+
+  message DrawPoints {
+    DrawShape shape_properties = 1;
+    double position_x = 4;
+    double position_y = 5;
+  }
+
+  message DrawText {
+    DrawShape shape_properties = 1;
+    double position_x = 4;
+    double position_y = 5;
+  }
+
+  message Clear {}
+
+  message EditText {
+    string id = 1;
+    string text = 2;
+  }
+
+  enum Shape {
+    Rectangle = 0;
+    Circle = 1;
+    Line = 2;
+    Text = 3;
+  }
+}

@@ -1,0 +1,3 @@
+- Fixed shake-to-feedback settings
+- Implement collaborative painting during Langame, to exchange visually
+- minor fixes

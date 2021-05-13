@@ -100,6 +100,15 @@ class _FriendsViewState extends State<FriendsView>
       backgroundColor: Colors.transparent,
       leading: notifications,
       actions: [
+        // kReleaseMode
+        //     ? SizedBox.shrink()
+        //     : IconButton(
+        //         onPressed: () => cp.push(MultiplayerPainting('foo')),
+        //         icon: Icon(
+        //           Icons.format_paint_outlined,
+        //           color: isLightThenBlack(context),
+        //         ),
+        //       ),
         IconButton(
           onPressed: () => cp.push(SettingsView()),
           icon: Icon(
