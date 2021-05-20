@@ -15,7 +15,7 @@ abstract class PreferenceService {
   final FirebaseApi firebase;
   PreferenceService(this.firebase);
 
-  Stream<lg.UserPreference> streamPreference(User user);
+  Stream<lg.UserPreference> streamPreference(lg.User user);
   Future<void> savePreference(String? userId, lg.UserPreference preferences);
   Future<lg.UserPreference?> tryFetchFromLocalStorage();
 }

@@ -47,13 +47,17 @@ class AuthenticationProvider extends ChangeNotifier {
         await firebase.crashlytics?.setUserIdentifier(data.uid);
         await firebase.analytics?.setUserId(data.uid);
         _user = await _authenticationApi.getLangameUser(data.uid);
+      } catch (e) {
+        _crashAnalyticsProvider.log('failed to get user uid: ${data.uid}, $e');
+      }
+      try {
         if (_user == null) {
           _user = await _authenticationApi.addLangameUser(data);
         }
       } catch (e, s) {
-        _crashAnalyticsProvider.log(
-            'failed to setup user on firebase stream change uid: ${data.uid}');
+        _crashAnalyticsProvider.log('failed to add user uid: ${data.uid}');
         _crashAnalyticsProvider.recordError(e, s);
+        // _authenticationApi.logout();
       }
       _userStream.add(_user);
       notifyListeners();

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
+import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/preference/impl_preference_service.dart';
 import 'package:langame/services/http/preference/preference_service.dart';
@@ -16,6 +17,8 @@ class PreferenceProvider extends ChangeNotifier {
 
   FirebaseApi firebase;
   CrashAnalyticsProvider _crashAnalyticsProvider;
+  AuthenticationProvider _authenticationProvider;
+
   late PreferenceService _api;
 
   Stream<UserPreference>? _stream;
@@ -23,6 +26,9 @@ class PreferenceProvider extends ChangeNotifier {
   StreamSubscription<UserPreference>? _streamSubscription;
   UserPreference _preference = PreferenceService.defaultPreference;
   UserPreference get preference => _preference;
+
+  String? _originalUserId;
+
   setTheme(ThemeMode t) {
     _preference.themeIndex = t.index;
     notifyListeners();
@@ -59,7 +65,8 @@ class PreferenceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  PreferenceProvider(this.firebase, this._crashAnalyticsProvider) {
+  PreferenceProvider(this.firebase, this._crashAnalyticsProvider,
+      this._authenticationProvider) {
     this._api = ImplPreferenceService(this.firebase);
     _api.tryFetchFromLocalStorage().then((p) {
       if (p != null) {
@@ -69,11 +76,12 @@ class PreferenceProvider extends ChangeNotifier {
     });
 
     // Whenever auth state change, renew the snapshot sub, cuz uid might change when deleting acc for ex
-    firebase.auth!.authStateChanges().listen((u) async {
+    _authenticationProvider.userStream.listen((u) async {
       // Logged out or linked another social account, no uid change
       // no need to update the stream with a new uid
       // kinda hacky :)
-      if (u == null || u.providerData.length > 1) return;
+      if (u == null || u.uid == _originalUserId) return;
+      _originalUserId = u.uid;
       if (_streamSubscription != null) {
         await _streamSubscription!.cancel();
         _streamSubscription = null;
@@ -98,7 +106,7 @@ class PreferenceProvider extends ChangeNotifier {
       });
       _crashAnalyticsProvider.log('save ${_preference.writeToJson()}');
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to notifyPresence');
+      _crashAnalyticsProvider.log('failed to save');
       firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

@@ -1,4 +1,3 @@
-import {Question} from "./models";
 import * as functions from "firebase-functions";
 import {openAiKey} from "./questions";
 const fetch = require("node-fetch");
@@ -50,7 +49,7 @@ export enum CompletionType {
 export const onlineOpenAiCompletion = async (type: CompletionType,
     topic: string,
     remoteConfig: any):
-    Promise<Question[] | undefined> => {
+    Promise<any[] | undefined> => {
   const prompt = type === CompletionType.Question ?
       `What are the hottest questions in ${topic} nowadays?\n1.` :
       `${topic} is about...`;
@@ -66,7 +65,7 @@ export const onlineOpenAiCompletion = async (type: CompletionType,
           // TODO: might retry on bad OpenAI text (i.e. recursive thing)
         }
         const questionFound = res.choices[0].text.split("?");
-        return [new Question({content: questionFound[0]+"?", contexts: []})];
+        return [{content: questionFound[0]+"?", contexts: []}];
       })
       .catch((e: any) => {
         functions.logger.error("failed to findQuestionInOpenAI", e);

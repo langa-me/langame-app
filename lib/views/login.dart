@@ -40,14 +40,10 @@ class _LoginState extends State<Login> {
         Provider.of<AuthenticationProvider>(context, listen: false);
     Provider.of<FeedbackProvider>(context, listen: false).initShake();
     // Bunch of spaghetti code to check if it is a new user or already authenticated
-    provider.userStream.first.then((user) {
+    provider.userStream.first.then((user) async {
       cap.log('login - userStream - ${user?.writeToJson()}');
       if (user == null || successDialogFuture != null) return null;
 
-      var hasDoneOnBoarding =
-          Provider.of<PreferenceProvider>(context, listen: false)
-              .preference
-              .hasDoneOnBoarding;
       var cp = Provider.of<ContextProvider>(context, listen: false);
       // Once arriving on login page, if coming from a notification tap coming
       // from a terminated state (app closed, have notification in bar)
@@ -56,6 +52,12 @@ class _LoginState extends State<Login> {
       var displayName =
           user.displayName.isNotEmpty ? ' as ${user.displayName}' : '';
       cp.showSuccessDialog('Connected$displayName!');
+      // Kind of hack to wait for preference update // TODO shouldn't need
+      await Future.delayed(Duration(seconds: 1));
+      var hasDoneOnBoarding =
+          Provider.of<PreferenceProvider>(context, listen: false)
+              .preference
+              .hasDoneOnBoarding;
       if (hasDoneOnBoarding) {
         // Probably logged-out, skip message api init
         initMessageApi(

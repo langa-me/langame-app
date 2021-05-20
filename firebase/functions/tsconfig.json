@@ -8,12 +8,19 @@
     "strict": true,
     "target": "es2017",
     "allowJs": true,
+    "esModuleInterop": true,
+    "types": [
+      "node",
+      "mocha",
+      "chai"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+    ]
   },
   "compileOnSave": true,
   "include": [
     "src",
-  ],
-  "exclude": [
-    "test"
+    ".eslintrc.js",
   ]
 }

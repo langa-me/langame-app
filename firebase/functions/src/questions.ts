@@ -1,5 +1,4 @@
 import * as functions from "firebase-functions";
-import {Question} from "./models";
 import * as admin from "firebase-admin";
 import {kQuestionsCollection, kTagsCollection} from "./helpers";
 import {firestore} from "firebase-admin/lib/firestore";
@@ -19,7 +18,7 @@ export const offlineQuestionSearch =
     async (tags: Array<string>, limit: number,
         minimumThreshold: number,
         generated: boolean):
-        Promise<Question[]> => {
+        Promise<any[]> => {
       tags = tags.map((t) => t.toLowerCase());
       // Filter questions with highest scores for these tags
       let documents: QuerySnapshot;
@@ -50,7 +49,7 @@ export const offlineQuestionSearch =
             .collection(kQuestionsCollection)
             .doc(d.data().question)
             .get();
-        questions.push(q.data() as Question);
+        questions.push(q.data());
       }
       return questions;
     };

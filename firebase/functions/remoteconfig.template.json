@@ -1,6 +1,11 @@
 {
   "conditions": [],
   "parameters": {
+    "stripe_premium_subscription_price_id": {
+      "defaultValue": {
+        "value": "TODO"
+      }
+    },
     "question_engine": {
       "defaultValue": {
         "value": "offline"

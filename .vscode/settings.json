@@ -1,0 +1,12 @@
+{
+    "eslint.workingDirectories": [
+        { 
+			"directory": "firebase/functions", 
+			"changeProcessCWD": true
+		}
+    ],
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "mochaExplorer.cwd": "firebase/functions/test"
+}

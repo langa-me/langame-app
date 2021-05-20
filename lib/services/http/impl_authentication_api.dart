@@ -109,6 +109,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   /// Query Firestore with [uid] looking for a LangameUser
   /// Throw GetUserException if it does not exist
   /// TODO: might use a transaction?
+  @override
   Future<lg.User?> getLangameUser(String uid) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
@@ -122,6 +123,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
     return u;
   }
 
+  @override
   Future<lg.User> addLangameUser(User user) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);

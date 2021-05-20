@@ -30,9 +30,33 @@ jobs:
       - name: Analyze files
         run: flutter analyze .
       - name: Run the tests
-        run: flutter test
+        run: flutter test --coverage
+      - name: Upload coverage to codecov
+        run: curl -s https://codecov.io/bash -t ${{ secrets.CODECOV_TOKEN }}
+        shell: bash
       - name: Print outdated packages
         run: flutter pub outdated
+      # Backend checks
+      - name: Move to Firebase directory
+        run: cd firebase/functions
+      - name: Decrypt service account key
+        run: |
+          gpg --quiet --batch --yes --decrypt --passphrase="$RELEASE_SECRET_PASSPHRASE" \
+          --output service-account.zip service-account.zip.gpg && unzip service-account.zip
+        env:
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: [12.x]
+      - name: npm install, build and test
+        run: | 
+          npm i
+          npm run build
+          npm run lint
+          npm run coverage
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   # CD
   deploy_android:
     name: Deploy beta to Google Play

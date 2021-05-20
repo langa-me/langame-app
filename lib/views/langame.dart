@@ -914,6 +914,8 @@ class _LangameViewState extends State<LangameView> {
           msg: left != null
               ? '$left left the Langame, it terminated it'
               : 'Time elapsed',
+          titleStyle: TextStyle(color: Colors.white),
+          msgStyle: TextStyle(color: Colors.white),
           title: 'Langame is over!',
           animation: 'animations/congratulations.json',
           context: context,

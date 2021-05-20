@@ -4,13 +4,11 @@ import {
   hashFnv32a,
   kLangamesCollection,
   kNotificationsCollection,
+  kUserDoesNotExist,
 } from "./helpers";
 import {
-  ChannelUserLangameUser,
   FirebaseFunctionsResponse,
   FirebaseFunctionsResponseStatusCode,
-  isFirebaseFunctionsResponse, LangameChannel, LangameNotification,
-  LangameUser, Question,
 } from "./models";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
@@ -23,18 +21,27 @@ export const sendLangame = async (
   const initialChecks = filterOutSendLangameCalls(data, context);
   if (initialChecks !== 0) return initialChecks;
   // Get recipients data from firestore
-  const recipientsData: Array<FirebaseFunctionsResponse | LangameUser> = [];
+  const recipientsData: Array<FirebaseFunctionsResponse | any> = [];
   for (const r of data.recipients) {
     const user = await getUserData(r);
     if ("statusCode" in user) return user;
+    if (!user.tokens) {
+      functions.logger
+          .error(kUserDoesNotExist(r.langameUid), "has no devices");
+      return new FirebaseFunctionsResponse(
+          FirebaseFunctionsResponseStatusCode.INTERNAL,
+          undefined,
+          `user ${r.langameUid} has no devices (tokens)`,
+      );
+    }
     recipientsData.push(user);
   }
 
   // Get sender data from firestore
-  const senderData: FirebaseFunctionsResponse | LangameUser =
+  const senderData: FirebaseFunctionsResponse | any =
         await getUserData(context.auth!.uid);
     // Failed ? Return error
-  if (isFirebaseFunctionsResponse(senderData)) return senderData;
+  if ("statusCode" in senderData) return senderData;
 
   // TODO: is it really 100% atomic?
   const channelName: string | number =
@@ -58,7 +65,7 @@ export const sendLangame = async (
         undefined,
         "question_invalid_config");
   }
-  let questions: Question[] | undefined;
+  let questions: any[] | undefined;
   if (t.parameters.question_engine.defaultValue.value === "offline") {
     questions = await offlineQuestionSearch(data.topics,
         1,
@@ -81,38 +88,38 @@ export const sendLangame = async (
   functions
       .logger
       .info("found questions for topics", data.topics, questions);
-  const recipientsUid = recipientsData.map((r) => (r as LangameUser).uid);
+  const recipientsUid = recipientsData.map((r) => r.uid);
   const playersLangameUid = recipientsUid.concat([senderData.uid!]);
   await admin
       .firestore()
       .collection(kLangamesCollection)
-      .add(JSON.parse(JSON.stringify(new LangameChannel({
+      .add(JSON.parse(JSON.stringify({
         channelName: channelName,
         players: playersLangameUid.map((e, i) => {
           // i.e. mapping channel user id -> Langame user id
-          return new ChannelUserLangameUser({
+          return {
             channelUid: i+1, // Agora need not start 0
             langameUid: e!,
-          });
+          };
         }),
         topics: data.topics,
         questions: questions,
-      }),
+      },
       ),
       ),
       ); // TODO: might check error?
 
   const results = await recipientsData
   // @ts-ignore
-      .map(async (e: LangameUser) => {
-        const notificationPayload = new LangameNotification({
+      .map(async (e: any) => {
+        const notificationPayload = {
           senderUid: context.auth!.uid,
           // @ts-ignore
           recipientsUid: recipientsUid,
           // Topics of the Langame
           topics: data.topics,
           channelName: channelName,
-        });
+        };
 
         const notification = await admin
             .firestore()
@@ -143,7 +150,7 @@ export const sendLangame = async (
         );
       });
   const successfulResults = results.filter((r) =>
-    !isFirebaseFunctionsResponse(r));
+    !("statusCode" in r));
     // If all failed
   if (successfulResults.length === 0) {
     return new FirebaseFunctionsResponse(

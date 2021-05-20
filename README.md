@@ -2,23 +2,51 @@
 
 ## Development
 
+### Running
+
 You should use **Idea IntelliJ** and create at least these configurations:
 - Flutter with flavor "dev"
 - Flutter with flavor "prod" (but you should not develop in production)
 
 Using CLI:
 ```bash
-flutter run --flavor dev
-flutter run --flavor prod
+flutter devices
+```
+```bash
+flutter run --flavor dev -d [MY_DEVICE]
+flutter run --flavor prod -d [MY_DEVICE]
 ```
 
-### Json
-
-For using models Dart models:
+### Payments
 
 ```bash
-flutter pub run build_runner build --delete-conflicting-outputs
-flutter pub run build_runner watch --delete-conflicting-outputs
+brew install stripe/stripe-cli/stripe
+```
+
+```bash
+# Premium product
+stripe products create \
+  --name="Billing Guide: Premium Service" \
+  --description="Premium service with extra features"
+
+# Basic product
+stripe products create \
+  --name="Billing Guide: Basic Service" \
+  --description="Basic service with minimum features"
+
+# Premium price
+stripe prices create \
+-d product=prod_JV1FPZFW99R0Ol \
+-d unit_amount=1000 \
+-d currency=usd \
+-d "recurring[interval]"=month
+
+# Basic price
+stripe prices create \
+-d product=prod_HGd6W1VUqqXGvr \
+-d unit_amount=500 \
+-d currency=usd \
+-d "recurring[interval]"=month
 ```
 
 ### How to release

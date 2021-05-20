@@ -46,6 +46,10 @@ class LangameSendLangameException extends LangameException {
   LangameSendLangameException(String cause) : super(cause);
 }
 
+class LangamePaymentException extends LangameException {
+  LangamePaymentException(String cause) : super(cause);
+}
+
 class LangameGetAudioTokenException extends LangameException {
   LangameGetAudioTokenException(String cause) : super(cause);
 }

@@ -38,7 +38,7 @@ class ImplPreferenceService extends PreferenceService {
   }
 
   @override
-  Stream<lg.UserPreference> streamPreference(User user) {
+  Stream<lg.UserPreference> streamPreference(lg.User user) {
     _streamSubscription?.cancel();
     _streamPreference = StreamController<lg.UserPreference>();
     _streamSubscription = firebase.firestore!

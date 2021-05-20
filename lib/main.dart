@@ -14,6 +14,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -27,9 +28,11 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/paint_provider.dart';
+import 'package:langame/providers/payment_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/providers/remote_config_providert.dart';
 import 'package:langame/providers/topic_provider.dart';
+import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
 import 'package:langame/views/langame.dart';
@@ -38,14 +41,16 @@ import 'package:provider/provider.dart';
 
 import 'providers/relation_provider.dart';
 import 'services/http/firebase.dart';
+import 'services/http/impl_payment_api.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   var crashlytics = FirebaseCrashlytics.instance;
-  await crashlytics.setCrashlyticsCollectionEnabled(true);
+  await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
   var analytics = FirebaseAnalytics();
   var remoteConfig = RemoteConfig.instance;
+  var useEmulator = false;
   FirebaseApi firebase = FirebaseApi(
     messaging: FirebaseMessaging.instance,
     firestore: FirebaseFirestore.instance,
@@ -58,8 +63,9 @@ void main() async {
     analytics: analytics,
     storage: FirebaseStorage.instance,
     remoteConfig: remoteConfig,
-    useEmulator: false,
+    useEmulator: useEmulator,
   );
+
   // Pass all uncaught errors from the framework to Crashlytics.
   FlutterError.onError = crashlytics.recordFlutterError;
   Isolate.current.addErrorListener(RawReceivePort((pair) async {
@@ -78,22 +84,28 @@ void main() async {
   var authenticationApi = ImplAuthenticationApi(firebase);
   var authenticationProvider = AuthenticationProvider(
       firebase, authenticationApi, crashAnalyticsProvider);
-  var messageApi = ImplMessageApi(firebase, (n) {
-    if (n?.channelName != null) {
-      navigationKey.currentState?.pushReplacement(
-        MaterialPageRoute(
-          builder: (context) =>
-              LangameView(n!.channelName!, n.ready == null || !n.ready!),
-        ),
-      );
-    }
-  });
+  // Cloud messaging is fucked-up with emulator
+  // (something with, messaging stuff have to happen on Google infra)
+  // So using fake api when using emulator
+  var messageApi = useEmulator
+      ? FakeMessageApi(firebase, (_) {})
+      : ImplMessageApi(firebase, (n) {
+          if (n?.channelName != null) {
+            navigationKey.currentState?.pushReplacement(
+              MaterialPageRoute(
+                builder: (context) =>
+                    LangameView(n!.channelName!, n.ready == null || !n.ready!),
+              ),
+            );
+          }
+        });
   var messageProvider = MessageProvider(firebase, messageApi, authenticationApi,
       crashAnalyticsProvider, authenticationProvider);
   var relationProvider = RelationProvider(
       authenticationApi, crashAnalyticsProvider, authenticationProvider);
-  var preferenceProvider = PreferenceProvider(firebase, crashAnalyticsProvider);
-  var remoteConfigProvider = RemoteConfigProvider(crashAnalyticsProvider, remoteConfig);
+  var preferenceProvider = PreferenceProvider(firebase, crashAnalyticsProvider, authenticationProvider);
+  var remoteConfigProvider =
+      RemoteConfigProvider(crashAnalyticsProvider, remoteConfig);
 
   SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
@@ -108,7 +120,6 @@ void main() async {
 
             ChangeNotifierProvider(create: (_) => crashAnalyticsProvider),
             ChangeNotifierProvider(create: (_) => preferenceProvider),
-            // TODO: might be injected in all providers?
             StreamProvider<ConnectivityResult>.value(
                 value: Connectivity().onConnectivityChanged,
                 initialData: ConnectivityResult.wifi),
@@ -133,9 +144,9 @@ void main() async {
               update: (_, cap, ap) => ap!,
               create: (_) => authenticationProvider,
             ),
-            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
-                PreferenceProvider>(
-              update: (_, cap, pp) => pp!,
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
+                AuthenticationProvider, PreferenceProvider>(
+              update: (_, cap, ap, pp) => pp!,
               create: (_) => preferenceProvider,
             ),
             ChangeNotifierProxyProvider<CrashAnalyticsProvider, AudioProvider>(
@@ -164,11 +175,27 @@ void main() async {
               create: (_) => FeedbackProvider(firebase, crashAnalyticsProvider,
                   contextProvider, preferenceProvider),
             ),
-            ChangeNotifierProxyProvider4<CrashAnalyticsProvider, ContextProvider, 
-            AuthenticationProvider, RemoteConfigProvider, PaintingProvider>(
+            ChangeNotifierProxyProvider4<
+                CrashAnalyticsProvider,
+                ContextProvider,
+                AuthenticationProvider,
+                RemoteConfigProvider,
+                PaintingProvider>(
               update: (_, cap, cp, ap, rcp, pp) => pp!,
-              create: (_) =>
-                  PaintingProvider(crashAnalyticsProvider, contextProvider, authenticationProvider, remoteConfigProvider),
+              create: (_) => PaintingProvider(
+                  crashAnalyticsProvider,
+                  contextProvider,
+                  authenticationProvider,
+                  remoteConfigProvider),
+            ),
+            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
+                ContextProvider, AuthenticationProvider, PaymentProvider>(
+              update: (_, cap, cp, ap, pp) => pp!,
+              create: (_) => PaymentProvider(
+                  crashAnalyticsProvider,
+                  contextProvider,
+                  authenticationProvider,
+                  ImplPaymentApi(firebase)),
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),

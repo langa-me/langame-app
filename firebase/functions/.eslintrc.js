@@ -3,7 +3,7 @@ module.exports = {
   env: {
     es6: true,
     node: true,
-    jest: true,
+    mocha: true,
   },
   extends: [
     "eslint:recommended",
@@ -14,13 +14,11 @@ module.exports = {
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: ["tsconfig.json", "tsconfig.dev.json"],
+    project: ["tsconfig.json", "test/tsconfig.dev.json"],
     sourceType: "module",
   },
   ignorePatterns: [
-    "test/*",
     "/lib/**/*", // Ignore built files.
-    "jest.config.js",
   ],
   plugins: [
     "@typescript-eslint",

@@ -20,15 +20,16 @@ class FakeMessageApi extends MessageApi {
   var uuid = Uuid();
 
   @override
-  Future<LangameNotification?> fetch(String id) {
+  Future<LangameNotification?> fetch(String id) async {
     // TODO: implement fetch
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 
   @override
-  Future<List<LangameNotification>> fetchAll() {
+  Future<List<LangameNotification>> fetchAll() async {
     // TODO: implement fetchAll
-    throw UnimplementedError();
+    // throw UnimplementedError();
+    return [];
   }
 
   @override
@@ -36,36 +37,37 @@ class FakeMessageApi extends MessageApi {
     // TODO: implement cancel
   }
   @override
-  Future<LangameNotification?> getInitialMessage() {
+  Future<LangameNotification?> getInitialMessage() async {
     // TODO: implement getInitialMessage
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 
   @override
   Future<String> send(List<String> recipients, List<String> topics) async {
-    throw UnimplementedError();
+    // throw UnimplementedError();
+    return 'foo';
   }
 
   @override
-  Future<void> notifyPresence(String channelName) {
-    throw UnimplementedError();
+  Future<void> notifyPresence(String channelName) async {
+    // throw UnimplementedError();
   }
 
   @override
-  Future<void> listen(void Function(LangameNotification p1) add) {
+  Future<void> listen(void Function(LangameNotification p1) add) async {
     // TODO: implement listen
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 
   @override
-  Future<void> delete(String channelName) {
+  Future<void> delete(String channelName) async {
     // TODO: implement delete
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 
   @override
-  Future<void> sendLangameEnd(String channelName) {
+  Future<void> sendLangameEnd(String channelName) async {
     // TODO: implement sendLangameEnd
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 }

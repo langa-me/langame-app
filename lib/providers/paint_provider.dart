@@ -258,6 +258,7 @@ class PaintingProvider extends ChangeNotifier {
 
   Future<LangameResponse<void>> stop() async {
     try {
+      clear();
       await _sub?.cancel();
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {

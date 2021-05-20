@@ -8,6 +8,7 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
+import 'package:langame/views/payment.dart';
 import 'package:langame/views/texts/texts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -19,10 +20,6 @@ class SettingsView extends StatefulWidget {
   _SettingsState createState() => _SettingsState();
 }
 
-// The content of the HomePage below is not relevant for using FlexColorScheme
-// based application theming. The critical parts are in the above MaterialApp
-// theme definitions. The HomePage just contains UI to visually show what the
-// defined example looks like in an application and with commonly used Widgets.
 class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
   final FlexSchemeData flexSchemeData = FlexColor.schemes[FlexScheme.mandyRed]!;
   PreferenceProvider? writeOnlyPreferenceProvider;
@@ -82,6 +79,14 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               }),
             ),
             TextDivider('General'),
+            ListTile(
+              onTap: () {
+                Provider.of<ContextProvider>(context, listen: false)
+                    .push(PaymentView());
+              },
+              leading: Icon(Icons.subscriptions_rounded),
+              title: Text('Subscribe'),
+            ),
             ListTile(
               onTap: () {
                 final snackBar = SnackBar(content: Text('Coming soon!'));
