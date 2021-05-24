@@ -12,6 +12,7 @@ import {addPaymentMethodDetails} from "../src/stripe/addPaymentMethodDetails";
 import {confirmStripePayment} from "../src/stripe/confirmStripePayment";
 import {createStripePayment} from "../src/stripe/createStripePayment";
 import {cleanup, createAndReturnCustomer} from "./stripe.helpers";
+import {createPricesAndProducts} from "../src/stripe/createPricesAndProducts";
 const cred = admin.credential.cert("./langame-dev-8ac76897c7bc.json");
 const fft = require("firebase-functions-test")({
   credential: cred,
@@ -57,21 +58,12 @@ describe("Cloud Functions", () => {
 
       const {userDoc, customerId} =
           await createAndReturnCustomer(stripe, stripeConfig, useStripeMocked);
-      const product = await stripe.products.create({
-        name: "Billing Guide: Premium Service",
-        description: "Premium service with extra features",
-      });
+
+      const {product, price} =
+          await createPricesAndProducts(stripe, stripeConfig);
+      const currency = price.currency;
+      const amount = price.unit_amount;
       expect(product.active).to.be.true;
-      const currency = "USD";
-      const amount = 1000;
-      const price = await stripe.prices.create({
-        product: product.id,
-        unit_amount: amount,
-        currency: currency,
-        recurring: {
-          interval: "month",
-        },
-      });
       expect(price.active).to.be.true;
       let paymentMethodStripe = await stripe.paymentMethods.create({
         type: "card",

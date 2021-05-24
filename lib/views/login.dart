@@ -156,12 +156,10 @@ class _LoginState extends State<Login> {
               cp.dialogComplete();
               var messages = await mp.getInitialMessage();
               cp.handleLangameResponse(messages, onSucceed: () {
-                if (messages.result != null &&
-                    messages.result!.channelName != null) {
+                if (messages.result != null) {
                   cp.pushReplacement(LangameView(
-                      messages.result!.channelName!,
-                      messages.result!.ready == null ||
-                          !messages.result!.ready!));
+                      messages.result!.channelName,
+                          !messages.result!.ready));
                 } else {
                   cp.pushReplacement(FriendsView());
                   // User is not opening the app from a notification

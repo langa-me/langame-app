@@ -36,8 +36,13 @@ service cloud.firestore {
             match /payments/{id} {
                 allow read, write: if request.auth != null && request.auth.uid == uid;
             }
+            match /subscriptions/{id} {
+                allow read: if request.auth != null && request.auth.uid == uid;
+            }
         }
-    }
+        match /products/{productId} {
+            allow read: if request.auth != null;
+        }
     }
 }
 

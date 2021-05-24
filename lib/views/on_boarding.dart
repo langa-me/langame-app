@@ -90,9 +90,12 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   .then((res) {
                 cp.handleLangameResponse(
                   res,
-                  succeedMessage: 'This tag is available',
+                  succeedMessage: 'Welcome to Langame $value',
                   failedMessage: 'Tag is not available',
-                  onSucceed: () => setState(() => hasFinishedOnBoarding = true),
+                  onSucceed: () {
+                    setState(() => hasFinishedOnBoarding = true);
+                    _onDone();
+                  },
                 );
               }).whenComplete(() {
                 cp.dialogComplete();
@@ -113,7 +116,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   //     .showSnackBar(SnackBar(content: Text('Processing Data')));
                 }
               },
-              child: Text('Submit'),
+              child: Text('Choose this tag'),
             ),
           ),
         ],
@@ -122,11 +125,11 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   }
 
   void _onDone() async {
-    Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
-      'favourite topics ${favouriteTopics.map((e) => e.content).join(',')}',
-      analyticsMessage: 'favourite_topics',
-      analyticsParameters: {'topics': favouriteTopics.join(',')},
-    );
+    // Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
+    //   'favourite topics ${favouriteTopics.map((e) => e.content).join(',')}',
+    //   analyticsMessage: 'favourite_topics',
+    //   analyticsParameters: {'topics': favouriteTopics.join(',')},
+    // );
 
     LangameResponse res =
         await Provider.of<MessageProvider>(context, listen: false)

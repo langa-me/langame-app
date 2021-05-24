@@ -10,8 +10,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/firebase_functions_protocol.dart';
-import 'package:langame/models/notification.dart';
 import 'package:langame/services/http/message_api.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'firebase.dart';
 
@@ -27,12 +27,12 @@ class ImplMessageApi extends MessageApi {
   StreamSubscription<String>? _onTokenRefresh;
   StreamSubscription<RemoteMessage>? _onForegroundMessage;
   StreamSubscription<RemoteMessage>? _onNonTerminatedOpened;
-  Function(LangameNotification?)? _addCallback;
+  Function(lg.Notification?)? _addCallback;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   ImplMessageApi(FirebaseApi firebase,
-      void Function(LangameNotification?) onBackgroundOrForegroundOpened)
+      void Function(lg.Notification?) onBackgroundOrForegroundOpened)
       : super(firebase, onBackgroundOrForegroundOpened);
 
   void _add(RemoteMessage m) async {
@@ -239,7 +239,7 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<void> listen(Function(LangameNotification?) add) async {
+  Future<void> listen(Function(lg.Notification?) add) async {
     // Get the token each time the application loads
     String? token = await firebase.messaging!.getToken();
 
@@ -276,6 +276,7 @@ class ImplMessageApi extends MessageApi {
   }
 
   Future<void> _emptyHandler(RemoteMessage message) async {}
+
   @override
   void cancel() {
     _onTokenRefresh?.cancel();
@@ -289,11 +290,17 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<LangameNotification?> fetch(String id) async {
+  Future<lg.Notification?> fetch(String id) async {
     CollectionReference notifications = firebase.firestore!
         .collection(AppConst.firestoreNotificationsCollection);
 
-    DocumentSnapshot doc = await notifications.doc(id).get();
+    var doc = await notifications
+        .doc(id)
+        .withConverter<lg.Notification>(
+            fromFirestore: (e, _) =>
+                lg.Notification.fromJson(e.data().toString()),
+            toFirestore: (e, _) => e.writeToJsonMap())
+        .get();
     if (!doc.exists) {
       throw LangameMessageException('could not fetch notification $id');
     }
@@ -301,25 +308,26 @@ class ImplMessageApi extends MessageApi {
     if (data == null) {
       throw LangameMessageException('notification $id has no data');
     }
-    // We store with format {data: ..., notification: ...}
-    // Here we only care about the data?
-    LangameNotification nResult = LangameNotification.fromJson(data);
-    nResult.id = id;
-    return nResult;
+
+    data.id = id;
+    return data;
   }
 
   // TODO: might do a 'fetch non-acknowledged notifications'
-  Future<List<LangameNotification>> fetchAll() async {
+  Future<List<lg.Notification>> fetchAll() async {
     CollectionReference notifications = firebase.firestore!
         .collection(AppConst.firestoreNotificationsCollection);
-    QuerySnapshot query = await notifications
+    var query = await notifications
         .where('recipientsUid', arrayContains: firebase.auth!.currentUser?.uid)
+                .withConverter<lg.Notification>(
+            fromFirestore: (e, _) =>
+                lg.Notification.fromJson(e.data().toString()),
+            toFirestore: (e, _) => e.writeToJsonMap())
         .get();
     // If there is any non-null notifications, return all of them
     return query.docs.where((n) => n.exists).map((n) {
-      var ln = LangameNotification.fromJson(n.data());
-      ln.id = n.id;
-      return ln;
+      n.data().id = n.id;
+      return n.data();
     }).toList();
   }
 
@@ -346,39 +354,16 @@ class ImplMessageApi extends MessageApi {
     // Somehow the user is not authenticated anymore but in the app
     if (userId == null) throw LangameNotAuthenticatedException();
 
-    HttpsCallable callable = firebase.functions!.httpsCallable(
-        AppConst.saveTokenFunction,
-        options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
-
-    try {
-      final HttpsCallableResult result = await callable.call(
-        <String, dynamic>{
-          'tokens': [token],
-        },
-      );
-      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
-          Map<String, dynamic>.from(result.data));
-      switch (response.statusCode) {
-        case FirebaseFunctionsResponseStatusCode.OK:
-          firebase.crashlytics?.log('new FCM token');
-          break;
-        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
-          throw LangameMessageException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
-        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
-          throw LangameMessageException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
-        case FirebaseFunctionsResponseStatusCode.INTERNAL:
-          throw LangameMessageException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
-      }
-    } catch (e) {
-      throw LangameMessageException(e.toString());
-    }
+    firebase.firestore!
+        .collection(AppConst.firestoreUsersCollection)
+        .doc(userId)
+        .update({
+      'tokens': FieldValue.arrayUnion([token]),
+    });
   }
 
   @override
-  Future<LangameNotification?> getInitialMessage() async {
+  Future<lg.Notification?> getInitialMessage() async {
     var rawNotification =
         await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
     if (rawNotification == null || rawNotification.payload == null) return null;

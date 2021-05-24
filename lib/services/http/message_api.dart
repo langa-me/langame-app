@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/notification.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 
 /// Handle message listening, sending,
@@ -9,7 +9,7 @@ import 'package:langame/services/http/firebase.dart';
 abstract class MessageApi {
   final FirebaseApi firebase;
 
-  final void Function(LangameNotification?) onBackgroundOrForegroundOpened;
+  final void Function(lg.Notification?) onBackgroundOrForegroundOpened;
 
   MessageApi(this.firebase, this.onBackgroundOrForegroundOpened);
 
@@ -25,17 +25,17 @@ abstract class MessageApi {
   Future<void> notifyPresence(String channelName);
 
   /// Start listening to messages
-  Future<void> listen(void Function(LangameNotification?) add);
+  Future<void> listen(void Function(lg.Notification?) add);
 
   /// Overlay on top of FirebaseMessaging.cgetInitialMessage that transform
   /// into a LangameNotification
-  Future<LangameNotification?> getInitialMessage();
+  Future<lg.Notification?> getInitialMessage();
 
   /// Stop listening to messages
   void cancel();
 
   /// Fetch a message
-  Future<LangameNotification?> fetch(String id);
-  Future<List<LangameNotification>> fetchAll();
+  Future<lg.Notification?> fetch(String id);
+  Future<List<lg.Notification>> fetchAll();
   Future<void> delete(String channelName);
 }

@@ -2,7 +2,7 @@
   "name": "functions",
   "description": "Firebase & co",
   "scripts": {
-    "lint": "eslint --ext .js,.ts .",
+    "lint": "eslint --ext .ts .",
     "build": "tsc",
     "serve": "npm run build -- --watch | firebase emulators:start",
     "serve-nowatch": "firebase emulators:start",
@@ -16,7 +16,7 @@
     "coverage": "codecov"
   },
   "engines": {
-    "node": ">=12"
+    "node": "12"
   },
   "main": "lib/index.js",
   "dependencies": {

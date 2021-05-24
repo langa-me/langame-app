@@ -279,3 +279,28 @@ const Paint_Shape$json = const {
 
 /// Descriptor for `Paint`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List paintDescriptor = $convert.base64Decode('CgVQYWludBJdChNzZWxlY3Rpb25fcmVjdGFuZ2xlGAEgASgLMioubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5TZWxlY3Rpb25SZWN0YW5nbGVIAFISc2VsZWN0aW9uUmVjdGFuZ2xlElQKEHNlbGVjdGlvbl9jaXJjbGUYAiABKAsyJy5sYW5nYW1lLnByb3RvYnVmLlBhaW50LlNlbGVjdGlvbkNpcmNsZUgAUg9zZWxlY3Rpb25DaXJjbGUSTgoOc2VsZWN0aW9uX2xpbmUYAyABKAsyJS5sYW5nYW1lLnByb3RvYnVmLlBhaW50LlNlbGVjdGlvbkxpbmVIAFINc2VsZWN0aW9uTGluZRJOCg5zZWxlY3Rpb25fdGV4dBgEIAEoCzIlLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuU2VsZWN0aW9uVGV4dEgAUg1zZWxlY3Rpb25UZXh0Ek4KDmRyYXdfcmVjdGFuZ2xlGAUgASgLMiUubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3UmVjdGFuZ2xlSABSDWRyYXdSZWN0YW5nbGUSRQoLZHJhd19jaXJjbGUYBiABKAsyIi5sYW5nYW1lLnByb3RvYnVmLlBhaW50LkRyYXdDaXJjbGVIAFIKZHJhd0NpcmNsZRI/CglkcmF3X2xpbmUYByABKAsyIC5sYW5nYW1lLnByb3RvYnVmLlBhaW50LkRyYXdMaW5lSABSCGRyYXdMaW5lEkUKC2RyYXdfcG9pbnRzGAggASgLMiIubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3UG9pbnRzSABSCmRyYXdQb2ludHMSPwoJZHJhd190ZXh0GAkgASgLMiAubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3VGV4dEgAUghkcmF3VGV4dBI8CgljbGVhcl9hbGwYCiABKAsyHS5sYW5nYW1lLnByb3RvYnVmLlBhaW50LkNsZWFySABSCGNsZWFyQWxsEj8KCWVkaXRfdGV4dBgLIAEoCzIgLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRWRpdFRleHRIAFIIZWRpdFRleHQalAEKElNlbGVjdGlvblJlY3RhbmdsZRJMChBzaGFwZV9wcm9wZXJ0aWVzGAEgASgLMiEubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3U2hhcGVSD3NoYXBlUHJvcGVydGllcxIXCgdzaGlmdF94GAIgASgBUgZzaGlmdFgSFwoHc2hpZnRfeRgDIAEoAVIGc2hpZnRZGpEBCg9TZWxlY3Rpb25DaXJjbGUSTAoQc2hhcGVfcHJvcGVydGllcxgBIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRHJhd1NoYXBlUg9zaGFwZVByb3BlcnRpZXMSFwoHc2hpZnRfeBgCIAEoAVIGc2hpZnRYEhcKB3NoaWZ0X3kYAyABKAFSBnNoaWZ0WRqcAQoNU2VsZWN0aW9uTGluZRJMChBzaGFwZV9wcm9wZXJ0aWVzGAEgASgLMiEubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3U2hhcGVSD3NoYXBlUHJvcGVydGllcxITCgVpc19wMRgCIAEoCFIEaXNQMRITCgVuZXdfeBgDIAEoAVIEbmV3WBITCgVuZXdfeRgEIAEoAVIEbmV3WRqHAQoNU2VsZWN0aW9uVGV4dBJMChBzaGFwZV9wcm9wZXJ0aWVzGAEgASgLMiEubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3U2hhcGVSD3NoYXBlUHJvcGVydGllcxITCgVuZXdfeBgCIAEoAVIEbmV3WBITCgVuZXdfeRgDIAEoAVIEbmV3WRqLAQoJRHJhd1NoYXBlEg4KAmlkGAEgASgJUgJpZBIMCgFyGAYgASgFUgFyEgwKAWcYByABKAVSAWcSDAoBYhgIIAEoBVIBYhIgCgtzY3JlZW5XaWR0aBgJIAEoAVILc2NyZWVuV2lkdGgSIgoMc2NyZWVuSGVpZ2h0GAogASgBUgxzY3JlZW5IZWlnaHQa5QEKDURyYXdSZWN0YW5nbGUSTAoQc2hhcGVfcHJvcGVydGllcxgBIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRHJhd1NoYXBlUg9zaGFwZVByb3BlcnRpZXMSIgoNYm90dG9tX2xlZnRfeBgCIAEoAVILYm90dG9tTGVmdFgSIgoNYm90dG9tX2xlZnRfeRgDIAEoAVILYm90dG9tTGVmdFkSHgoLdG9wX3JpZ2h0X3gYBCABKAFSCXRvcFJpZ2h0WBIeCgt0b3BfcmlnaHRfeRgFIAEoAVIJdG9wUmlnaHRZGqgBCgpEcmF3Q2lyY2xlEkwKEHNoYXBlX3Byb3BlcnRpZXMYASABKAsyIS5sYW5nYW1lLnByb3RvYnVmLlBhaW50LkRyYXdTaGFwZVIPc2hhcGVQcm9wZXJ0aWVzEhkKCGNlbnRlcl94GAIgASgBUgdjZW50ZXJYEhkKCGNlbnRlcl95GAMgASgBUgdjZW50ZXJZEhYKBnJhZGl1cxgEIAEoAVIGcmFkaXVzGqQBCghEcmF3TGluZRJMChBzaGFwZV9wcm9wZXJ0aWVzGAEgASgLMiEubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3U2hhcGVSD3NoYXBlUHJvcGVydGllcxIRCgRwMV94GAIgASgBUgNwMVgSEQoEcDFfeRgDIAEoAVIDcDFZEhEKBHAyX3gYBCABKAFSA3AyWBIRCgRwMl95GAUgASgBUgNwMlkamAEKCkRyYXdQb2ludHMSTAoQc2hhcGVfcHJvcGVydGllcxgBIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRHJhd1NoYXBlUg9zaGFwZVByb3BlcnRpZXMSHQoKcG9zaXRpb25feBgEIAEoAVIJcG9zaXRpb25YEh0KCnBvc2l0aW9uX3kYBSABKAFSCXBvc2l0aW9uWRqWAQoIRHJhd1RleHQSTAoQc2hhcGVfcHJvcGVydGllcxgBIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRHJhd1NoYXBlUg9zaGFwZVByb3BlcnRpZXMSHQoKcG9zaXRpb25feBgEIAEoAVIJcG9zaXRpb25YEh0KCnBvc2l0aW9uX3kYBSABKAFSCXBvc2l0aW9uWRoHCgVDbGVhchouCghFZGl0VGV4dBIOCgJpZBgBIAEoCVICaWQSEgoEdGV4dBgCIAEoCVIEdGV4dCI2CgVTaGFwZRINCglSZWN0YW5nbGUQABIKCgZDaXJjbGUQARIICgRMaW5lEAISCAoEVGV4dBADQggKBmFjdGlvbg==');
+@$core.Deprecated('Use notificationDescriptor instead')
+const Notification$json = const {
+  '1': 'Notification',
+  '2': const [
+    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    const {'1': 'sender_uid', '3': 2, '4': 1, '5': 9, '10': 'senderUid'},
+    const {'1': 'recipients_uid', '3': 3, '4': 3, '5': 9, '10': 'recipientsUid'},
+    const {'1': 'topics', '3': 4, '4': 3, '5': 9, '10': 'topics'},
+    const {'1': 'channel_name', '3': 5, '4': 1, '5': 9, '10': 'channelName'},
+    const {'1': 'ready', '3': 6, '4': 1, '5': 8, '10': 'ready'},
+  ],
+};
+
+/// Descriptor for `Notification`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List notificationDescriptor = $convert.base64Decode('CgxOb3RpZmljYXRpb24SDgoCaWQYASABKAlSAmlkEh0KCnNlbmRlcl91aWQYAiABKAlSCXNlbmRlclVpZBIlCg5yZWNpcGllbnRzX3VpZBgDIAMoCVINcmVjaXBpZW50c1VpZBIWCgZ0b3BpY3MYBCADKAlSBnRvcGljcxIhCgxjaGFubmVsX25hbWUYBSABKAlSC2NoYW5uZWxOYW1lEhQKBXJlYWR5GAYgASgIUgVyZWFkeQ==');
+@$core.Deprecated('Use subscriptionDescriptor instead')
+const Subscription$json = const {
+  '1': 'Subscription',
+  '2': const [
+    const {'1': 'status', '3': 1, '4': 1, '5': 9, '10': 'status'},
+  ],
+};
+
+/// Descriptor for `Subscription`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List subscriptionDescriptor = $convert.base64Decode('CgxTdWJzY3JpcHRpb24SFgoGc3RhdHVzGAEgASgJUgZzdGF0dXM=');

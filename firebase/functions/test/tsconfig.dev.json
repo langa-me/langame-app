@@ -1,4 +1,4 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["test.ts", "stripe.test.ts", "test", "stripe.helpers.ts"]
+  "include": ["*.ts"]
 }

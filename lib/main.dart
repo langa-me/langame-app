@@ -94,7 +94,7 @@ void main() async {
             navigationKey.currentState?.pushReplacement(
               MaterialPageRoute(
                 builder: (context) =>
-                    LangameView(n!.channelName!, n.ready == null || !n.ready!),
+                    LangameView(n!.channelName, n.ready),
               ),
             );
           }

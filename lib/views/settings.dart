@@ -81,11 +81,17 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             TextDivider('General'),
             ListTile(
               onTap: () {
-                Provider.of<ContextProvider>(context, listen: false)
-                    .push(PaymentView());
+                var cp = Provider.of<ContextProvider>(context, listen: false);
+
+                // Only safe in dev mode yet
+                if (kReleaseMode) {
+                  cp.showSnackBar('Coming soon!');
+                  return;
+                }
+                cp.push(PaymentView());
               },
               leading: Icon(Icons.subscriptions_rounded),
-              title: Text('Subscribe'),
+              title: Text('Subscription'),
             ),
             ListTile(
               onTap: () {

@@ -22,13 +22,10 @@ class AppConst {
   /// Define App ID and Token
   static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
 
-  static const String saveTokenFunction = 'saveToken';
   static const String sendLangameFunction = 'sendLangame';
   static const String notifyPresenceFunction = 'notifyPresence';
-  static const String updateProfileFunction = 'updateProfile';
   static const String getChannelTokenFunction = 'getChannelToken';
   static const String sendLangameEndFunction = 'sendLangameEnd';
-  static const String deleteDataFunction = 'deleteData';
   static const String createStripeSubscriptionFunction =
       'createStripeSubscription';
 
@@ -39,6 +36,7 @@ class AppConst {
   static const String firestoreInteractionsCollection = 'interactions';
   static const String firestorePreferencesCollection = 'preferences';
   static const String firestoreStripeCustomersCollection = 'stripe_customers';
+  static const String firestoreProductsCollection = 'products';
 
   static const String helpUrl = 'https://help.langa.me';
 }

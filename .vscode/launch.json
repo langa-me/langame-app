@@ -1,0 +1,94 @@
+{
+    "configurations": [
+        {
+            "name": "dev-pocophone",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "f9606db5",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "prod-pocophone",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "prod",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "f9606db5",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "dev-ipad",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "00008020-0001516A2E22402E",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "prod-ipad",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "prod",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "00008020-0001516A2E22402E",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "dev-huawei",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "P6LDU16A10000080",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "prod-huawei",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "prod",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "P6LDU16A10000080",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+    ]
+}

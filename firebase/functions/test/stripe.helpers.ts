@@ -1,4 +1,6 @@
-import {deleteCollection, kStripeCustomersCollection, kUsersCollection} from "../src/helpers";
+import {deleteCollection,
+  kStripeCustomersCollection,
+  kUsersCollection} from "../src/helpers";
 import {createStripeCustomer} from "../src/stripe/createStripeCustomer";
 import {expect} from "chai";
 import * as admin from "firebase-admin";

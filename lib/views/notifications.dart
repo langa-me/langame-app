@@ -4,7 +4,6 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
-import 'package:langame/models/notification.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -66,9 +65,9 @@ class _NotificationsViewState extends State<NotificationsView> {
               ),
             );
           }
-          return GroupedListView<LangameNotification, String>(
+          return GroupedListView<lg.Notification, String>(
             elements: p.notifications,
-            groupBy: (n) => '${n.channelName!};${n.topics!.join(",")}',
+            groupBy: (n) => '${n.channelName};${n.topics.join(",")}',
             groupSeparatorBuilder: (String groupByValue) =>
                 _buildTextDivider(groupByValue.split(';')[1]),
             itemBuilder: (c, i) {
@@ -112,7 +111,7 @@ class _NotificationsViewState extends State<NotificationsView> {
         ],
       );
 
-  Widget _buildNotificationCard(LangameNotification n) {
+  Widget _buildNotificationCard(lg.Notification n) {
     // if (i > p.notifications.length) {
     //   // TODO: fix (when spamming dismiss)
     //   return Scaffold();
@@ -130,9 +129,9 @@ class _NotificationsViewState extends State<NotificationsView> {
               // Show a red background as the item is swiped away.
               background:
                   Container(color: Theme.of(context).colorScheme.secondary),
-              key: Key(n.id!),
+              key: Key(n.id),
               onDismissed: (direction) async {
-                var res = await p.deleteNotification(n.channelName!);
+                var res = await p.deleteNotification(n.channelName);
                 var cp = Provider.of<ContextProvider>(context, listen: false);
                 cp.handleLangameResponse(
                   res,
@@ -148,19 +147,19 @@ class _NotificationsViewState extends State<NotificationsView> {
                   leading: buildCroppedRoundedNetworkImage(
                       snapshot.data!.result!.photoUrl),
                   title: Text(snapshot.data!.result!.displayName),
-                  subtitle: Text(n.ready == null || !n.ready!
+                  subtitle: Text(n.ready == null || !n.ready
                       ? 'is ready to play ${n.topics}'
-                      : n.topics!.join(',')),
+                      : n.topics.join(',')),
                   // tileColor: Color.lerp(p.notifications[i].relation.level.toColor(),
                   //     theme.colorScheme.primary, 0.5), // TODO
                   onTap: () {
                     // TODO: delete notification
-                    p.deleteNotification(n.channelName!);
+                    p.deleteNotification(n.channelName);
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => LangameView(
-                            n.channelName!, n.ready == null || !n.ready!),
+                            n.channelName, n.ready == null || !n.ready),
                       ),
                     );
                   },

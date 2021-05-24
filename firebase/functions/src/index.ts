@@ -8,7 +8,6 @@ import {cleanupUser} from "./deleteData";
 import {subscribe} from "./subscribe";
 import {notifyPresence} from "./notifyPresence";
 import {getChannelToken} from "./getChannelToken";
-import {saveToken} from "./saveToken";
 import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
 import {confirmStripePayment} from "./stripe/confirmStripePayment";
 import {createStripeCustomer} from "./stripe/createStripeCustomer";
@@ -32,8 +31,7 @@ const runtimeOpts = {
 // TODO: somehow doesn't work then on client
 const region = "us-central1";
 
-
-exports.subscribe = functions // TODO: transaction!!!
+exports.subscribe = functions // TODO: transaction!!! // RENAME
     .region(region)
     .runWith(runtimeOpts)
     .https
@@ -52,18 +50,11 @@ exports.sendLangameEnd = functions
 
 exports.cleanupUser = functions.auth.user().onDelete(cleanupUser);
 
-
 exports.getChannelToken = functions
     .region(region)
     .runWith(runtimeOpts)
     .https
     .onCall(getChannelToken);
-
-exports.saveToken = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(saveToken);
 
 exports.sendLangame = functions
     .region(region)

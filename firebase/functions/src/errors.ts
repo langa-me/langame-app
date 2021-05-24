@@ -7,6 +7,7 @@ const logging = process.env.GCLOUD_PROJECT ? new Logging({
 // [START reportError]
 
 export const reportError = (err: Error, context = {}) => {
+  functions.logger.error(err, context);
   // Skip StackDriver in non-production / tests
   if (!logging) {
     functions.logger.error(err, context);
@@ -52,12 +53,12 @@ export const reportError = (err: Error, context = {}) => {
 
 /**
  * Sanitize the error message for the user.
- * @param{Error} error
+ * @param{Error | null} error
  * @return{String}
  */
-export const userFacingMessage = (error: Error) => {
+export const userFacingMessage = (error: Error | null) => {
   // @ts-ignore
-  return error.type ?
+  return error && error.type ?
         error.message :
         "An error occurred, developers have been alerted";
 };

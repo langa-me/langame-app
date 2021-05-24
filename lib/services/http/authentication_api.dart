@@ -65,4 +65,6 @@ abstract class AuthenticationApi {
 
   Future<List<Tuple2<String, int>>> getInteractions(String uid,
       {int limit = 5});
+
+  Future<void> reAuthenticate(OAuthCredential credential);
 }

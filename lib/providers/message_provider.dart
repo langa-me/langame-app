@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
-import 'package:langame/models/notification.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/authentication_api.dart';
 import 'package:langame/services/http/firebase.dart';
@@ -24,9 +23,9 @@ class MessageProvider extends ChangeNotifier {
   MessageApi _messageApi;
 
   /// In-memory local notifications
-  List<LangameNotification> _notifications = [];
+  List<lg.Notification> _notifications = [];
 
-  List<LangameNotification> get notifications => _notifications;
+  List<lg.Notification> get notifications => _notifications;
 
   /// Create an authentication provider, and
   MessageProvider(this.firebase, this._messageApi, this._authenticationApi,
@@ -71,7 +70,7 @@ class MessageProvider extends ChangeNotifier {
     }
   }
 
-  void _onNotificationHandler(LangameNotification? notification) {
+  void _onNotificationHandler(lg.Notification? notification) {
     if (notification == null) return;
     _notifications.add(notification);
     notifyListeners();
@@ -123,12 +122,12 @@ class MessageProvider extends ChangeNotifier {
   }
 
   /// Get a precise notification
-  Future<LangameResponse<LangameNotification>> getNotification(
+  Future<LangameResponse<lg.Notification>> getNotification(
       String id) async {
     try {
       var r = await _messageApi.fetch(id);
       _crashAnalyticsProvider.log('getNotification ${r?.channelName}');
-      return LangameResponse<LangameNotification>(LangameStatus.succeed,
+      return LangameResponse<lg.Notification>(LangameStatus.succeed,
           result: r);
     } catch (e, s) {
       _crashAnalyticsProvider.log('failed to getNotification');
@@ -146,7 +145,7 @@ class MessageProvider extends ChangeNotifier {
         notifyListeners();
       });
       _crashAnalyticsProvider.log('fetchNotifications');
-      return LangameResponse<LangameNotification>(LangameStatus.succeed);
+      return LangameResponse<lg.Notification>(LangameStatus.succeed);
     } catch (e, s) {
       _crashAnalyticsProvider.log('failed to fetchNotifications');
       _crashAnalyticsProvider.recordError(e, s);
@@ -172,7 +171,7 @@ class MessageProvider extends ChangeNotifier {
 
   void stopNotifications() => _messageApi.cancel();
 
-  Future<LangameResponse<LangameNotification?>> getInitialMessage() async {
+  Future<LangameResponse<lg.Notification?>> getInitialMessage() async {
     try {
       var r = await _messageApi.getInitialMessage();
       _crashAnalyticsProvider.log('getInitialMessage');

@@ -1,5 +1,9 @@
 # Langame
 
+[![codecov](https://codecov.io/gh/langa-me/langame-app/branch/main/graph/badge.svg?token=4LVXERDQ5U)](https://codecov.io/gh/langa-me/langame-app)
+
+![graph-codecov](https://codecov.io/gh/langa-me/langame-app/branch/main/graphs/sunburst.svg?token=4LVXERDQ5U)
+
 ## Development
 
 ### Running
@@ -17,7 +21,7 @@ flutter run --flavor dev -d [MY_DEVICE]
 flutter run --flavor prod -d [MY_DEVICE]
 ```
 
-### Payments
+### Stripe
 
 ```bash
 brew install stripe/stripe-cli/stripe
@@ -47,6 +51,19 @@ stripe prices create \
 -d unit_amount=500 \
 -d currency=usd \
 -d "recurring[interval]"=month
+```
+
+#### Proto gen
+
+```bash
+cd ..
+git clone org-856813@github.com:stripe/openapi.git
+go get -u github.com/NYTimes/openapi2proto/cmd/openapi2proto
+cd langame-app
+mkdir -p protos/stripe/protobuf
+openapi2proto -spec ../openapi/openapi/spec3.json -out protos/stripe.proto
+wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto -P protos/google/protobuf
+make proto
 ```
 
 ### How to release

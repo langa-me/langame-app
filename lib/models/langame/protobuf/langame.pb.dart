@@ -1924,3 +1924,155 @@ class Paint extends $pb.GeneratedMessage {
   Paint_EditText ensureEditText() => $_ensure(10);
 }
 
+class Notification extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Notification', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'senderUid')
+    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'recipientsUid')
+    ..pPS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topics')
+    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'channelName')
+    ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ready')
+    ..hasRequiredFields = false
+  ;
+
+  Notification._() : super();
+  factory Notification({
+    $core.String? id,
+    $core.String? senderUid,
+    $core.Iterable<$core.String>? recipientsUid,
+    $core.Iterable<$core.String>? topics,
+    $core.String? channelName,
+    $core.bool? ready,
+  }) {
+    final _result = create();
+    if (id != null) {
+      _result.id = id;
+    }
+    if (senderUid != null) {
+      _result.senderUid = senderUid;
+    }
+    if (recipientsUid != null) {
+      _result.recipientsUid.addAll(recipientsUid);
+    }
+    if (topics != null) {
+      _result.topics.addAll(topics);
+    }
+    if (channelName != null) {
+      _result.channelName = channelName;
+    }
+    if (ready != null) {
+      _result.ready = ready;
+    }
+    return _result;
+  }
+  factory Notification.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Notification.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Notification clone() => Notification()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Notification copyWith(void Function(Notification) updates) => super.copyWith((message) => updates(message as Notification)) as Notification; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Notification create() => Notification._();
+  Notification createEmptyInstance() => create();
+  static $pb.PbList<Notification> createRepeated() => $pb.PbList<Notification>();
+  @$core.pragma('dart2js:noInline')
+  static Notification getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Notification>(create);
+  static Notification? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get senderUid => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set senderUid($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasSenderUid() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSenderUid() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.String> get recipientsUid => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.String> get topics => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $core.String get channelName => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set channelName($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasChannelName() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearChannelName() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.bool get ready => $_getBF(5);
+  @$pb.TagNumber(6)
+  set ready($core.bool v) { $_setBool(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasReady() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearReady() => clearField(6);
+}
+
+class Subscription extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Subscription', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'status')
+    ..hasRequiredFields = false
+  ;
+
+  Subscription._() : super();
+  factory Subscription({
+    $core.String? status,
+  }) {
+    final _result = create();
+    if (status != null) {
+      _result.status = status;
+    }
+    return _result;
+  }
+  factory Subscription.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Subscription.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Subscription clone() => Subscription()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Subscription copyWith(void Function(Subscription) updates) => super.copyWith((message) => updates(message as Subscription)) as Subscription; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Subscription create() => Subscription._();
+  Subscription createEmptyInstance() => create();
+  static $pb.PbList<Subscription> createRepeated() => $pb.PbList<Subscription>();
+  @$core.pragma('dart2js:noInline')
+  static Subscription getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Subscription>(create);
+  static Subscription? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get status => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set status($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasStatus() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearStatus() => clearField(1);
+}
+

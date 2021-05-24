@@ -113,21 +113,26 @@ class ImplAuthenticationApi extends AuthenticationApi {
   Future<lg.User?> getLangameUser(String uid) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
-    DocumentSnapshot doc = await users.doc(uid).get();
+    var doc = await users
+        .doc(uid)
+        .withConverter<lg.User>(
+          fromFirestore: (snapshot, _) => UserExt.fromObject(snapshot.data()!),
+          toFirestore: (user, _) => user.toMapStringDynamic(),
+        )
+        .get();
     if (!doc.exists) return null;
     var data = doc.data();
     if (data == null) return null;
-    var u = userFromMap(data);
-    firebase.crashlytics?.setUserIdentifier(u.uid);
-    firebase.analytics?.setUserId(u.uid);
-    return u;
+    firebase.crashlytics?.setUserIdentifier(data.uid);
+    firebase.analytics?.setUserId(data.uid);
+    return data;
   }
 
   @override
   Future<lg.User> addLangameUser(User user) async {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
-    lg.User langameUser = userFromFirebase(user);
+    lg.User langameUser = UserExt.fromFirebase(user);
     if (user.providerData.any((e) => e.providerId == 'google.com')) {
       langameUser.google = true;
     }
@@ -138,7 +143,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
     return users
         .doc(langameUser.uid)
-        .set(langameUser.toProto3Json() as Map<String, dynamic>)
+        .set(langameUser.toMapStringDynamic())
         .then((value) => langameUser)
         .catchError((err) => throw LangameAddUserException(err.toString()));
   }
@@ -154,13 +159,17 @@ class ImplAuthenticationApi extends AuthenticationApi {
 
     // https://medium.com/@ken11zer01/firebase-firestore-text-search-and-pagination-91a0df8131ef
     /// Query users with tag starting with [tag]
-    QuerySnapshot doc = await users
+    var doc = await users
         .where('tag', isNotEqualTo: ignoreTag)
         .where('tag', isGreaterThanOrEqualTo: tag)
         .where('tag', isLessThan: tag + 'z')
         .limit(limit)
+        .withConverter<lg.User>(
+          fromFirestore: (snapshot, _) => UserExt.fromObject(snapshot.data()!),
+          toFirestore: (user, _) => user.toMapStringDynamic(),
+        )
         .get();
-    return doc.docs.map((e) => userFromMap(e.data())).toList();
+    return doc.docs.map((e) => e.data()).toList();
   }
 
   @override
@@ -276,9 +285,13 @@ class ImplAuthenticationApi extends AuthenticationApi {
         .collection(AppConst.firestoreUsersCollection)
         .where('uid', isNotEqualTo: user.uid)
         .limit(5)
+        .withConverter<lg.User>(
+          fromFirestore: (snapshot, _) => UserExt.fromObject(snapshot.data()!),
+          toFirestore: (user, _) => user.toMapStringDynamic(),
+        )
         .get();
 
-    return r.docs.map((e) => userFromMap(e.data())).toList();
+    return r.docs.map((e) => e.data()).toList();
   }
 
   @override
@@ -320,35 +333,9 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<void> delete() async {
-    HttpsCallable callable = firebase.functions!.httpsCallable(
-      AppConst.deleteDataFunction,
-      options: HttpsCallableOptions(
-        timeout: Duration(seconds: 10),
-      ),
-    );
-    // TODO: should also purge local data etc?
-    // TODO: clean local storage share_prefere !!! like has done setup & stuff
-    try {
-      final HttpsCallableResult result = await callable.call();
-      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
-        Map<String, dynamic>.from(result.data),
-      );
-      switch (response.statusCode) {
-        case FirebaseFunctionsResponseStatusCode.OK:
-          break;
-        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
-          throw LangameAuthException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
-        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
-          throw LangameAuthException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
-        case FirebaseFunctionsResponseStatusCode.INTERNAL:
-          throw LangameAuthException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
-      }
-    } catch (e) {
-      throw LangameAuthException(e.toString());
-    }
-  }
+  Future<void> delete() => firebase.auth!.currentUser!.delete();
+
+  @override
+  Future<void> reAuthenticate(OAuthCredential credential) =>
+      firebase.auth!.currentUser!.reauthenticateWithCredential(credential);
 }

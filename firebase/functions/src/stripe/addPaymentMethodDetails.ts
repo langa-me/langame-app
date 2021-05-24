@@ -20,23 +20,33 @@ export const addPaymentMethodDetails =
       try {
         const stripe =
             new Stripe(functions.config().stripe.key, stripeConfig);
-        const paymentMethodId = snap.data().id;
+        const paymentMethodId = snap.id;
         // Retrieve the payment method
         const paymentMethod = await stripe.paymentMethods.retrieve(
             paymentMethodId
         );
         // Retrieve the customer
+        const customerId = (await snap.ref.parent.parent!.get())
+            .data()!.customer_id;
         const customer = await stripe.customers?.retrieve(
-            paymentMethod.customer as string,
+            customerId,
         ) as Stripe.Customer;
+        functions.logger.info("attaching payment method",
+            paymentMethodId,
+            "to customer",
+            customerId);
+        // Attaching the payment method to this customer
+        await stripe.paymentMethods.attach(paymentMethodId,
+            {customer: customerId});
         // If the customer has no default source, set this one as default
-        if (!customer.default_source) {
+        if (customer.default_source == null) {
+          functions.logger.info("setting this payment method as default");
           // Note the use of customer.invoice_setting.default_payment_method
           // instead of directly customer.default_payment_method,
           // it's necessary when it's the back-end that set the default source
           // on behalf of the customer
           // https://stripe.com/docs/api/customers/update#update_customer-invoice_settings-default_payment_method
-          await stripe.customers?.update(customer.id, {
+          await stripe.customers!.update(customerId, {
             invoice_settings: {
               default_payment_method: paymentMethod.id,
             },
@@ -46,7 +56,7 @@ export const addPaymentMethodDetails =
         // Create a new SetupIntent so the
         // customer can add a new method next time.
         const intent = await stripe.setupIntents.create({
-          customer: `${paymentMethod.customer}`,
+          customer: customerId,
         });
         await snap.ref.parent.parent?.set(
             {
@@ -54,8 +64,13 @@ export const addPaymentMethodDetails =
             },
             {merge: true}
         );
+        functions.logger.info("new setup intent created for",
+            customerId,
+            ", ",
+            intent
+        );
       } catch (e) {
-        await snap.ref.set({error: userFacingMessage(e)}, {merge: true});
         await reportError(e, {user: context.params.userId});
+        await snap.ref.set({error: userFacingMessage(e)}, {merge: true});
       }
     };

@@ -8,5 +8,8 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
-    "mochaExplorer.cwd": "firebase/functions/test"
+    "mochaExplorer.cwd": "firebase/functions/test",
+    "mocha.files.glob": "test/**/*.ts",
+    "mocha.subdirectory": "firebase/functions",
+    "mocha.nycPath": "/Users/louisbeaumont/.nvm/versions/node/v15.14.0/bin/nyc"
 }

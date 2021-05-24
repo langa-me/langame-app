@@ -197,3 +197,21 @@ message Paint {
     Text = 3;
   }
 }
+
+message Notification {
+  string id = 1;
+  string sender_uid = 2;
+  repeated string recipients_uid = 3;
+
+  /// Topics of the Langame
+  repeated string topics = 4;
+
+  /// Agora channel name
+  string channel_name = 5;
+
+  bool ready = 6;
+}
+
+message Subscription {
+  string status = 1;
+}

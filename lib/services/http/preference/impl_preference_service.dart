@@ -7,6 +7,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:langame/models/extension.dart';
 
 import 'preference_service.dart';
 
@@ -33,7 +34,7 @@ class ImplPreferenceService extends PreferenceService {
     return firebase.firestore!
         .collection(AppConst.firestorePreferencesCollection)
         .doc(userId)
-        .set(preferences.toProto3Json() as Map<String, dynamic>,
+        .set(preferences.toMapStringDynamic(),
             SetOptions(merge: true));
   }
 

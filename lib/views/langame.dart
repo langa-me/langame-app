@@ -628,7 +628,7 @@ class _LangameViewState extends State<LangameView> {
           .recordError(e, s);
     }
     if (showDialog)
-      Future.delayed(Duration.zero, () => _showEndDialog(context, left: left));
+      Future.delayed(Duration.zero, () => _showEndDialog(left: left));
   }
 
   Widget _buildWaitingScreen() {
@@ -907,27 +907,30 @@ class _LangameViewState extends State<LangameView> {
         ),
       );
 
-  Future<void> _showEndDialog(BuildContext context, {String? left}) async =>
-      Dialogs.materialDialog(
-          barrierDismissible: false,
-          color: Theme.of(context).colorScheme.primary,
-          msg: left != null
-              ? '$left left the Langame, it terminated it'
-              : 'Time elapsed',
-          titleStyle: TextStyle(color: Colors.white),
-          msgStyle: TextStyle(color: Colors.white),
-          title: 'Langame is over!',
-          animation: 'animations/congratulations.json',
-          context: context,
-          actions: [
-            IconsButton(
-              onPressed: _goBackToMainMenu,
-              text: 'Leave',
-              iconData: FontAwesomeIcons.doorOpen,
-              color: isLightThenBlack(context, reverse: true),
-              textStyle:
-                  TextStyle(color: isLightThenBlack(context, reverse: false)),
-              iconColor: isLightThenBlack(context, reverse: false),
-            ),
-          ]);
+  Future<void> _showEndDialog({String? left}) async =>
+      Provider.of<ContextProvider>(context, listen: false).showCustomDialog(
+        [
+          Text(
+            'Langame is over',
+            style: TextStyle(color: Colors.white),
+          ),
+          LottieBuilder.asset('animations/congratulations.json'),
+          Text(
+            left != null
+                ? '$left left the Langame, it terminated it'
+                : 'Time elapsed',
+            style: TextStyle(color: Colors.white),
+          ),
+          IconsButton(
+            onPressed: _goBackToMainMenu,
+            text: 'Leave',
+            iconData: FontAwesomeIcons.doorOpen,
+            color: Colors.white,
+            textStyle: TextStyle(color: Colors.white),
+            iconColor: Colors.white,
+          ),
+        ],
+        canBack: false,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      );
 }
