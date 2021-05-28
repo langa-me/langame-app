@@ -1,5 +1,4 @@
 import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
 import {newFeedback} from "./feedback";
 import {interactionsDecrement} from "./scheduledFunctions";
 import {cleanupUser} from "./deleteData";
@@ -13,9 +12,7 @@ import {kLangamesCollection, kStripeCustomersCollection} from "./helpers";
 import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangame} from "./onUpdateLangame";
-// Initialize admin firebase
-admin.initializeApp();
-admin.firestore().settings({ignoreUndefinedProperties: true});
+
 /*
  admin.auth() // TODO: should kick everyone
      .listUsers()

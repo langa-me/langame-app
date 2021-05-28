@@ -2,6 +2,7 @@
   "name": "functions",
   "description": "Firebase & co",
   "scripts": {
+    "clean": "echo 'TODO'",
     "lint": "eslint --ext .ts .",
     "build": "tsc",
     "serve": "npm run build -- --watch | firebase emulators:start",

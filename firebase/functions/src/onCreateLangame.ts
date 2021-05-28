@@ -6,8 +6,8 @@ import {kUsersCollection, hashFnv32a} from "./helpers";
 import * as admin from "firebase-admin";
 import {offlineQuestionSearch} from "./questions";
 import * as functions from "firebase-functions";
-import {google} from "./compiled";
-
+import {converter, db} from "./utils/firestore";
+import {langame} from "./langame/protobuf/langame.gen";
 const handleError = (
     snap: QueryDocumentSnapshot,
     msg: string,
@@ -18,7 +18,7 @@ const handleError = (
     errors: admin.firestore
         .FieldValue
         .arrayUnion(userFacingMessage(e)),
-  });
+  }, {merge: true});
   const p2 = reportError(e, {user: uid});
   return [p1, p2];
 };
@@ -33,22 +33,34 @@ export const onCreateLangame = async (
     snap: QueryDocumentSnapshot,
     _: EventContext
 ) => {
+  let lg: admin.firestore.DocumentSnapshot<langame.protobuf.Langame>;
   try {
+    lg =
+    await snap.ref.withConverter(converter<langame.protobuf.Langame>()).get();
+    if (!lg.data()) {
+      await Promise.all(
+          handleError(
+              snap,
+              "Langame is null",
+              "",
+          )
+      );
+      return;
+    }
     // TODO: maximum firestore rule check filters on the created langame
-    const db = admin.firestore();
-    const senderData = await db
-        .collection(kUsersCollection)
-    // Firestore rules should already filter non-auth
+    // const db = admin.firestore();
+    const senderData = await db.users
+        // Firestore rules should already filter non-auth
         .doc(snap.data().initiator)
         .get();
     // TODO: is it really 100% atomic?
     const channelName: string | number =
-      hashFnv32a(snap.data().initiator, true, Date.now());
+      hashFnv32a(lg.data()!.initiator, true, Date.now());
 
     functions
         .logger
         .info("langame created by",
-            snap.data().initiator,
+            lg.data()!.initiator,
             "named",
             channelName);
 
@@ -57,8 +69,8 @@ export const onCreateLangame = async (
           handleError(
               snap,
               // eslint-disable-next-line max-len
-              `failed to create channel name, requested by ${snap.data().initiator}`,
-              snap.data().initiator,
+              `failed to create channel name, requested by ${lg.data()!.initiator}`,
+              lg.data()!.initiator,
           )
       );
       return;
@@ -74,14 +86,14 @@ export const onCreateLangame = async (
           handleError(
               snap,
               "invalid remote config",
-              snap.data().initiator,
+              lg.data()!.initiator,
           )
       );
       return;
     }
     let questions: any[] | undefined;
     if (t.parameters.question_engine.defaultValue.value === "offline") {
-      questions = await offlineQuestionSearch(snap.data().topics,
+      questions = await offlineQuestionSearch(lg.data()!.topics,
           // @ts-ignore
           t.parameters.question_count.defaultValue.value*1, // Casting to number
           0.1,
@@ -96,8 +108,8 @@ export const onCreateLangame = async (
       await Promise.all(
           handleError(
               snap,
-              `failed to find question for topics, ${snap.data().topics}`,
-              snap.data().initiator,
+              `failed to find question for topics, ${lg.data()!.topics}`,
+              lg.data()!.initiator,
           )
       );
       return;
@@ -105,23 +117,23 @@ export const onCreateLangame = async (
 
     functions
         .logger
-        .info("found questions for topics", snap.data().topics, questions);
+        .info("found questions for topics", lg.data()!.topics, questions);
     snap.ref.set({
       questions: questions,
       channelName: channelName,
     }, {merge: true});
 
-    for (const playerUid of snap.data().players) {
+    for (const p of lg.data()!.players) {
       const player = await db
-          .collection(kUsersCollection)
-          .doc(playerUid)
+          .users
+          .doc(p.userId!)
           .get();
       if (!player.data() || !player.data()!.tokens) {
         // Need to wait the promise to avoid concurrency issues on the db
         await Promise.all(handleError(
             snap,
-            `${playerUid}, has no devices`,
-            playerUid,
+            `${p.userId}, has no devices`,
+            p.userId!,
         ));
         continue;
       }
@@ -133,9 +145,9 @@ export const onCreateLangame = async (
             tag: channelName,
             // TODO: date in notification?
             // eslint-disable-next-line max-len
-            body: `${senderData.data()!.displayName} invited you to play ${snap.data()!.topics.join(",")}`,
+            body: `${senderData.data()!.displayName} invited you to play ${lg.data()!.topics.join(",")}`,
             // eslint-disable-next-line max-len
-            title: `Play ${snap.data()!.topics.join(",")} with ${senderData.data()!.displayName}?`,
+            title: `Play ${lg.data()!.topics.join(",")} with ${senderData.data()!.displayName}?`,
           },
         },
         {
@@ -155,16 +167,20 @@ export const onCreateLangame = async (
           admin
               .firestore()
               .collection(kUsersCollection)
-              .doc(playerUid)
+              .doc(p.userId!)
               .update({
                 tokens: admin.firestore.FieldValue.arrayRemove(t),
               }).then(() => functions.logger.info("removed invalid token", t))
               .catch(() =>
-                handleError(snap, "failed to remove invalid token", playerUid));
+                handleError(snap, "failed to remove invalid token", p.userId!));
         }
       });
     }
   } catch (e) {
-    await Promise.all(handleError(snap, e, snap.data().initiator));
+    await Promise.all(
+        // @ts-ignore
+        handleError(snap, e, typeof lg !== "undefined" ?
+           lg!.data()!.initiator :
+            "null"));
   }
 };
