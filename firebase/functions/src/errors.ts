@@ -6,12 +6,11 @@ const logging = process.env.GCLOUD_PROJECT ? new Logging({
 
 // [START reportError]
 
-export const reportError = (err: Error, context = {}) => {
-  functions.logger.error(err, context);
+export const reportError = (err: Error, context = {}): Promise<any> => {
+  functions.logger.log(err, context);
   // Skip StackDriver in non-production / tests
   if (!logging) {
-    functions.logger.error(err, context);
-    return;
+    return Promise.resolve();
   }
   // This is the name of the StackDriver log stream that will receive the log
   // entry. This name can be any valid log stream name, but must contain "err"

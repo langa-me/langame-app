@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
+import 'package:langame/models/google/protobuf/timestamp.pb.dart' as gg;
 import 'package:protobuf/protobuf.dart';
 
 extension interactionExtensions on lg.InteractionLevel {
@@ -86,24 +87,54 @@ class NotificationExt {
   }
 }
 
-lg.Langame langameFromMap(Map<String, dynamic> m) => lg.Langame(
+class LangameExt {
+  static lg.Langame fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Langame(
       channelName: m['channelName'],
       players: (m['players'] as List<dynamic>?)
-          ?.map((e) => channelUserLangameUserFromMap(e)),
+          ?.map((e) => LangamePlayerExt.fromObject(e)),
       topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
-      questions:
-          (m['questions'] as List<dynamic>?)?.map((e) => questionFromMap(e)),
+      questions: (m['questions'] as List<dynamic>?)
+          ?.map((e) => QuestionExt.fromObject(e)),
+      initiator: m['initiator'],
+      done: m['done'],
+      currentQuestion: m['currentQuestion'],
+      date: m['date'] != null ? gg.Timestamp(nanos: DateTime.parse(m['date']).microsecond*1000) : null,
     );
+  }
+}
 
-lg.ChannelUserLangameUser channelUserLangameUserFromMap(
-        Map<String, dynamic> m) =>
-    lg.ChannelUserLangameUser(
-      channelUid: m['channelUid'],
-      langameUid: m['langameUid'],
+class LangamePlayerExt {
+  static lg.Langame_Player fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Langame_Player(
+      userId: m['userId'],
+      timeIn: m['timeIn'],
+      timeOut: m['timeOut'],
+      notes: (m['notes'] as List<dynamic>?)
+          ?.map((e) => LangameNoteExt.fromObject(e))
     );
+  }
+}
 
-lg.Question questionFromMap(Map<String, dynamic> m) => lg.Question(
+class LangameNoteExt {
+  static lg.Langame_Note fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Langame_Note(
+      content: m['content'],
+      createdAt: m['createdAt'],
+    );
+  }
+}
+
+class QuestionExt {
+  static lg.Question fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Question(
       id: m['id'],
       content: m['content'],
       contexts: (m['contexts'] as List<dynamic>?)?.map((e) => e as String),
     );
+  }
+}

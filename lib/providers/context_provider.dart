@@ -6,6 +6,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/services/context/dialog_service.dart';
 import 'package:langame/services/context/navigation_service.dart';
 import 'package:langame/services/context/snack_bar_service.dart';
+import 'package:langame/views/colors/colors.dart';
 import 'package:lottie/lottie.dart';
 
 enum spinKitType { SpinKitChasingDots, SpinKitDualRing, SpinKitWanderingCubes }
@@ -57,7 +58,7 @@ class ContextProvider extends ChangeNotifier {
           onWillPop: () async => canBack,
           child: SimpleDialog(
             backgroundColor: backgroundColor ??
-                Theme.of(_navigationKey.currentContext!).colorScheme.primary,
+                variantIsLightThenDark(_navigationKey.currentContext!, reverse: true),
             children: children,
           ),
         ),
@@ -67,11 +68,9 @@ class ContextProvider extends ChangeNotifier {
         [
           Center(
             child: Column(children: [
-              _loaders.pickAny()!(
-                  Theme.of(_navigationKey.currentContext!).brightness ==
-                          Brightness.dark
-                      ? Colors.black
-                      : Colors.white),
+              _loaders.pickAny()!(isLightThenDark(
+                  _navigationKey.currentContext!,
+                  reverse: true)),
               SizedBox(
                 height: 10,
               ),
@@ -80,10 +79,7 @@ class ContextProvider extends ChangeNotifier {
                 textAlign: TextAlign.center,
                 style: Theme.of(_navigationKey.currentContext!)
                     .textTheme
-                    .headline6!
-                    .merge(
-                      TextStyle(color: Colors.white),
-                    ),
+                    .caption!,
               )
             ]),
           )
@@ -104,12 +100,8 @@ class ContextProvider extends ChangeNotifier {
             Text(
               text,
               textAlign: TextAlign.center,
-              style: Theme.of(_navigationKey.currentContext!)
-                  .textTheme
-                  .headline6!
-                  .merge(
-                    TextStyle(color: Colors.white),
-                  ),
+              style:
+                  Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
             )
           ]),
         )
@@ -128,12 +120,8 @@ class ContextProvider extends ChangeNotifier {
             Text(
               text,
               textAlign: TextAlign.center,
-              style: Theme.of(_navigationKey.currentContext!)
-                  .textTheme
-                  .headline6!
-                  .merge(
-                    TextStyle(color: Colors.white),
-                  ),
+              style:
+                  Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
             )
           ]),
         )

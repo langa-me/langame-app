@@ -9,6 +9,8 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import '../../google/protobuf/timestamp.pb.dart' as $0;
+
 export 'langame.pbenum.dart';
 
 class Topic extends $pb.GeneratedMessage {
@@ -566,82 +568,179 @@ class UserPreference extends $pb.GeneratedMessage {
   void clearShakeToFeedback() => clearField(7);
 }
 
-class ChannelUserLangameUser extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ChannelUserLangameUser', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
-    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'channelUid', $pb.PbFieldType.OU3)
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'langameUid')
+class Langame_Player extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Langame.Player', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userId')
+    ..aOM<$0.Timestamp>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'timeIn', subBuilder: $0.Timestamp.create)
+    ..aOM<$0.Timestamp>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'timeOut', subBuilder: $0.Timestamp.create)
+    ..pc<Langame_Note>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'notes', $pb.PbFieldType.PM, subBuilder: Langame_Note.create)
     ..hasRequiredFields = false
   ;
 
-  ChannelUserLangameUser._() : super();
-  factory ChannelUserLangameUser({
-    $core.int? channelUid,
-    $core.String? langameUid,
+  Langame_Player._() : super();
+  factory Langame_Player({
+    $core.String? userId,
+    $0.Timestamp? timeIn,
+    $0.Timestamp? timeOut,
+    $core.Iterable<Langame_Note>? notes,
   }) {
     final _result = create();
-    if (channelUid != null) {
-      _result.channelUid = channelUid;
+    if (userId != null) {
+      _result.userId = userId;
     }
-    if (langameUid != null) {
-      _result.langameUid = langameUid;
+    if (timeIn != null) {
+      _result.timeIn = timeIn;
+    }
+    if (timeOut != null) {
+      _result.timeOut = timeOut;
+    }
+    if (notes != null) {
+      _result.notes.addAll(notes);
     }
     return _result;
   }
-  factory ChannelUserLangameUser.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ChannelUserLangameUser.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory Langame_Player.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Langame_Player.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  ChannelUserLangameUser clone() => ChannelUserLangameUser()..mergeFromMessage(this);
+  Langame_Player clone() => Langame_Player()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ChannelUserLangameUser copyWith(void Function(ChannelUserLangameUser) updates) => super.copyWith((message) => updates(message as ChannelUserLangameUser)) as ChannelUserLangameUser; // ignore: deprecated_member_use
+  Langame_Player copyWith(void Function(Langame_Player) updates) => super.copyWith((message) => updates(message as Langame_Player)) as Langame_Player; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static ChannelUserLangameUser create() => ChannelUserLangameUser._();
-  ChannelUserLangameUser createEmptyInstance() => create();
-  static $pb.PbList<ChannelUserLangameUser> createRepeated() => $pb.PbList<ChannelUserLangameUser>();
+  static Langame_Player create() => Langame_Player._();
+  Langame_Player createEmptyInstance() => create();
+  static $pb.PbList<Langame_Player> createRepeated() => $pb.PbList<Langame_Player>();
   @$core.pragma('dart2js:noInline')
-  static ChannelUserLangameUser getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ChannelUserLangameUser>(create);
-  static ChannelUserLangameUser? _defaultInstance;
+  static Langame_Player getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Langame_Player>(create);
+  static Langame_Player? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.int get channelUid => $_getIZ(0);
+  $core.String get userId => $_getSZ(0);
   @$pb.TagNumber(1)
-  set channelUid($core.int v) { $_setUnsignedInt32(0, v); }
+  set userId($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasChannelUid() => $_has(0);
+  $core.bool hasUserId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearChannelUid() => clearField(1);
+  void clearUserId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get langameUid => $_getSZ(1);
+  $0.Timestamp get timeIn => $_getN(1);
   @$pb.TagNumber(2)
-  set langameUid($core.String v) { $_setString(1, v); }
+  set timeIn($0.Timestamp v) { setField(2, v); }
   @$pb.TagNumber(2)
-  $core.bool hasLangameUid() => $_has(1);
+  $core.bool hasTimeIn() => $_has(1);
   @$pb.TagNumber(2)
-  void clearLangameUid() => clearField(2);
+  void clearTimeIn() => clearField(2);
+  @$pb.TagNumber(2)
+  $0.Timestamp ensureTimeIn() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  $0.Timestamp get timeOut => $_getN(2);
+  @$pb.TagNumber(3)
+  set timeOut($0.Timestamp v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasTimeOut() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearTimeOut() => clearField(3);
+  @$pb.TagNumber(3)
+  $0.Timestamp ensureTimeOut() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  $core.List<Langame_Note> get notes => $_getList(3);
+}
+
+class Langame_Note extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Langame.Note', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..aOM<$0.Timestamp>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
+    ..hasRequiredFields = false
+  ;
+
+  Langame_Note._() : super();
+  factory Langame_Note({
+    $core.String? content,
+    $0.Timestamp? createdAt,
+  }) {
+    final _result = create();
+    if (content != null) {
+      _result.content = content;
+    }
+    if (createdAt != null) {
+      _result.createdAt = createdAt;
+    }
+    return _result;
+  }
+  factory Langame_Note.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Langame_Note.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Langame_Note clone() => Langame_Note()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Langame_Note copyWith(void Function(Langame_Note) updates) => super.copyWith((message) => updates(message as Langame_Note)) as Langame_Note; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Langame_Note create() => Langame_Note._();
+  Langame_Note createEmptyInstance() => create();
+  static $pb.PbList<Langame_Note> createRepeated() => $pb.PbList<Langame_Note>();
+  @$core.pragma('dart2js:noInline')
+  static Langame_Note getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Langame_Note>(create);
+  static Langame_Note? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get content => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set content($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $0.Timestamp get createdAt => $_getN(1);
+  @$pb.TagNumber(2)
+  set createdAt($0.Timestamp v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasCreatedAt() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCreatedAt() => clearField(2);
+  @$pb.TagNumber(2)
+  $0.Timestamp ensureCreatedAt() => $_ensure(1);
 }
 
 class Langame extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Langame', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'channelName', protoName: 'channelName')
-    ..pc<ChannelUserLangameUser>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'players', $pb.PbFieldType.PM, subBuilder: ChannelUserLangameUser.create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'channelName')
+    ..pc<Langame_Player>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'players', $pb.PbFieldType.PM, subBuilder: Langame_Player.create)
     ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topics')
     ..pc<Question>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'questions', $pb.PbFieldType.PM, subBuilder: Question.create)
+    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'initiator')
+    ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'done')
+    ..a<$core.int>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentQuestion', $pb.PbFieldType.O3)
+    ..aOM<$0.Timestamp>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'date', subBuilder: $0.Timestamp.create)
     ..hasRequiredFields = false
   ;
 
   Langame._() : super();
   factory Langame({
     $core.String? channelName,
-    $core.Iterable<ChannelUserLangameUser>? players,
+    $core.Iterable<Langame_Player>? players,
     $core.Iterable<$core.String>? topics,
     $core.Iterable<Question>? questions,
+    $core.String? initiator,
+    $core.bool? done,
+    $core.int? currentQuestion,
+    $0.Timestamp? date,
   }) {
     final _result = create();
     if (channelName != null) {
@@ -655,6 +754,18 @@ class Langame extends $pb.GeneratedMessage {
     }
     if (questions != null) {
       _result.questions.addAll(questions);
+    }
+    if (initiator != null) {
+      _result.initiator = initiator;
+    }
+    if (done != null) {
+      _result.done = done;
+    }
+    if (currentQuestion != null) {
+      _result.currentQuestion = currentQuestion;
+    }
+    if (date != null) {
+      _result.date = date;
     }
     return _result;
   }
@@ -689,13 +800,51 @@ class Langame extends $pb.GeneratedMessage {
   void clearChannelName() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<ChannelUserLangameUser> get players => $_getList(1);
+  $core.List<Langame_Player> get players => $_getList(1);
 
   @$pb.TagNumber(3)
   $core.List<$core.String> get topics => $_getList(2);
 
   @$pb.TagNumber(4)
   $core.List<Question> get questions => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $core.String get initiator => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set initiator($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasInitiator() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearInitiator() => clearField(5);
+
+  @$pb.TagNumber(7)
+  $core.bool get done => $_getBF(5);
+  @$pb.TagNumber(7)
+  set done($core.bool v) { $_setBool(5, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasDone() => $_has(5);
+  @$pb.TagNumber(7)
+  void clearDone() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.int get currentQuestion => $_getIZ(6);
+  @$pb.TagNumber(8)
+  set currentQuestion($core.int v) { $_setSignedInt32(6, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasCurrentQuestion() => $_has(6);
+  @$pb.TagNumber(8)
+  void clearCurrentQuestion() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $0.Timestamp get date => $_getN(7);
+  @$pb.TagNumber(9)
+  set date($0.Timestamp v) { setField(9, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasDate() => $_has(7);
+  @$pb.TagNumber(9)
+  void clearDate() => clearField(9);
+  @$pb.TagNumber(9)
+  $0.Timestamp ensureDate() => $_ensure(7);
 }
 
 class Paint_SelectionRectangle extends $pb.GeneratedMessage {

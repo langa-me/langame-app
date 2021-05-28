@@ -15,6 +15,8 @@ service cloud.firestore {
             // TODO
             // allow read: if request.auth != null && request.auth.uid in resource.data.players;
             allow read: if request.auth != null;
+            // TODO: security!!!!
+            allow write: if request.auth != null;
         }
         match /topics/{topicId} {
             allow read: if request.auth != null;

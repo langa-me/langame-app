@@ -1,6 +1,8 @@
 syntax = "proto3";
 package langame.protobuf;
 
+import "google/protobuf/timestamp.proto";
+
 // Note: models ids are usually not stored in Firestore since it already use id to index them
 // it is mostly used within the logic of the front-end / services
 
@@ -86,17 +88,30 @@ message UserPreference {
   bool shake_to_feedback = 7;
 }
 
-
-message ChannelUserLangameUser {
-  uint32 channel_uid = 1;
-  string langame_uid = 2;
-}
-
 message Langame {
-  string channelName = 1;
-  repeated ChannelUserLangameUser players = 2;
+  string channel_name = 1;
+  repeated Player players = 2;
   repeated string topics = 3;
   repeated Question questions = 4;
+  // Who started this
+  string initiator = 5;
+  // Over, finished, nobody, can join anymore
+  bool done = 7;
+  int32 current_question = 8;
+  google.protobuf.Timestamp date = 9;
+
+  message Player {
+    string user_id = 1;
+    // Timestamp of the arrival in the Langame
+    google.protobuf.Timestamp time_in = 2;
+    // Timestamp of the departure in the Langame
+    google.protobuf.Timestamp time_out = 3;
+    repeated Note notes = 4;
+  }
+  message Note {
+    string content = 1;
+    google.protobuf.Timestamp created_at = 2;
+  }
 }
 
 message Paint {

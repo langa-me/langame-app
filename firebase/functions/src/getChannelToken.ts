@@ -33,7 +33,7 @@ export const getChannelToken = async (data: any,
   const langame = await getLangame(data.channelName);
   if ("statusCode" in langame) return langame;
   const player = langame.players
-      .find((p: any) => p.langameUid === context.auth!.uid);
+      .find((p: any) => p === context.auth!.uid);
 
   if (!player) {
     return new FirebaseFunctionsResponse(

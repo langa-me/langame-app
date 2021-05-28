@@ -15,7 +15,8 @@ export const openAiKey = functions.config().openai.key;
  * @param{boolean} generated whether to use only generated questions
  */
 export const offlineQuestionSearch =
-    async (tags: Array<string>, limit: number,
+    async (tags: Array<string>,
+        limit: number,
         minimumThreshold: number,
         generated: boolean):
         Promise<any[]> => {

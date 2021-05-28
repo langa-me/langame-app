@@ -8,6 +8,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/message_provider.dart';
@@ -19,8 +20,8 @@ import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/apple.dart';
-import 'friends.dart';
 import 'langame.dart';
+import 'main_view.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -155,13 +156,25 @@ class _LoginState extends State<Login> {
             onSucceed: () async {
               cp.dialogComplete();
               var messages = await mp.getInitialMessage();
-              cp.handleLangameResponse(messages, onSucceed: () {
-                if (messages.result != null) {
+              cp.handleLangameResponse(messages, onSucceed: () async {
+                var dl = await Provider.of<DynamicLinksProvider>(context,
+                        listen: false)
+                    .setupAndCheckDynamicLinks();
+                // Note that we ignore failures in dynamic link initialization
+                if (dl.result != null) {
+                  var view = dl.result!.split('/');
+                  // Opened a Langame link that opened the app
+                  // i.e. https://langa.page.link/CHANNEL_NAME
+                  if (view[0] == 'play')
+                    cp.pushReplacement(LangameView(view[1], false));
+                  else {
+                    // TODO
+                  }
+                } else if (messages.result != null) {
                   cp.pushReplacement(LangameView(
-                      messages.result!.channelName,
-                          !messages.result!.ready));
+                      messages.result!.channelName, !messages.result!.ready));
                 } else {
-                  cp.pushReplacement(FriendsView());
+                  cp.pushReplacement(MainView());
                   // User is not opening the app from a notification
                 }
               });

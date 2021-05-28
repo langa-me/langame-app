@@ -10,7 +10,7 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../../google/protobuf/empty.pb.dart' as $0;
+import '../../google/protobuf/empty.pb.dart' as $1;
 
 import 'stripe.pbenum.dart';
 
@@ -27401,1501 +27401,1501 @@ class StripeAPIServiceApi {
   $pb.RpcClient _client;
   StripeAPIServiceApi(this._client);
 
-  $async.Future<$0.Empty> deleteAccount($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountBankAccountsId($pb.ClientContext? ctx, DeleteAccountBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountExternalAccountsId($pb.ClientContext? ctx, DeleteAccountExternalAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountExternalAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountPeoplePerson($pb.ClientContext? ctx, DeleteAccountPeoplePersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountPeoplePerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountPersonsPerson($pb.ClientContext? ctx, DeleteAccountPersonsPersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountPersonsPerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountsAccount($pb.ClientContext? ctx, DeleteAccountsAccountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountsAccountBankAccountsId($pb.ClientContext? ctx, DeleteAccountsAccountBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccountBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountsAccountExternalAccountsId($pb.ClientContext? ctx, DeleteAccountsAccountExternalAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccountExternalAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountsAccountPeoplePerson($pb.ClientContext? ctx, DeleteAccountsAccountPeoplePersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccountPeoplePerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteAccountsAccountPersonsPerson($pb.ClientContext? ctx, DeleteAccountsAccountPersonsPersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccountPersonsPerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteApplePayDomainsDomain($pb.ClientContext? ctx, DeleteApplePayDomainsDomainRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteApplePayDomainsDomain', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCouponsCoupon($pb.ClientContext? ctx, DeleteCouponsCouponRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCouponsCoupon', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCustomersCustomer($pb.ClientContext? ctx, DeleteCustomersCustomerRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomer', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCustomersCustomerBankAccountsId($pb.ClientContext? ctx, DeleteCustomersCustomerBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCustomersCustomerCardsId($pb.ClientContext? ctx, DeleteCustomersCustomerCardsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerCardsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCustomersCustomerDiscount($pb.ClientContext? ctx, DeleteCustomersCustomerDiscountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerDiscount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCustomersCustomerSourcesId($pb.ClientContext? ctx, DeleteCustomersCustomerSourcesIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerSourcesId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCustomersCustomerSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, DeleteCustomersCustomerSubscriptionsSubscriptionExposedIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerSubscriptionsSubscriptionExposedId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount($pb.ClientContext? ctx, DeleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteCustomersCustomerTaxIdsId($pb.ClientContext? ctx, DeleteCustomersCustomerTaxIdsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerTaxIdsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteEphemeralKeysKey($pb.ClientContext? ctx, DeleteEphemeralKeysKeyRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteEphemeralKeysKey', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteInvoiceitemsInvoiceitem($pb.ClientContext? ctx, DeleteInvoiceitemsInvoiceitemRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteInvoiceitemsInvoiceitem', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteInvoicesInvoice($pb.ClientContext? ctx, DeleteInvoicesInvoiceRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteInvoicesInvoice', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deletePlansPlan($pb.ClientContext? ctx, DeletePlansPlanRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeletePlansPlan', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteProductsId($pb.ClientContext? ctx, DeleteProductsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteProductsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteRadarValueListItemsItem($pb.ClientContext? ctx, DeleteRadarValueListItemsItemRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteRadarValueListItemsItem', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteRadarValueListsValueList($pb.ClientContext? ctx, DeleteRadarValueListsValueListRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteRadarValueListsValueList', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteRecipientsId($pb.ClientContext? ctx, DeleteRecipientsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteRecipientsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteSkusId($pb.ClientContext? ctx, DeleteSkusIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteSkusId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteSubscriptionItemsItem($pb.ClientContext? ctx, DeleteSubscriptionItemsItemRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteSubscriptionItemsItem', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, DeleteSubscriptionsSubscriptionExposedIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteSubscriptionsSubscriptionExposedId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteSubscriptionsSubscriptionExposedIdDiscount($pb.ClientContext? ctx, DeleteSubscriptionsSubscriptionExposedIdDiscountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteSubscriptionsSubscriptionExposedIdDiscount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteTerminalLocationsLocation($pb.ClientContext? ctx, DeleteTerminalLocationsLocationRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteTerminalLocationsLocation', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteTerminalReadersReader($pb.ClientContext? ctx, DeleteTerminalReadersReaderRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteTerminalReadersReader', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> deleteWebhookEndpointsWebhookEndpoint($pb.ClientContext? ctx, DeleteWebhookEndpointsWebhookEndpointRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'DeleteWebhookEndpointsWebhookEndpoint', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> get3dSecureThreeDSecure($pb.ClientContext? ctx, Get3dSecureThreeDSecureRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'Get3dSecureThreeDSecure', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccount($pb.ClientContext? ctx, GetAccountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountBankAccountsId($pb.ClientContext? ctx, GetAccountBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountCapabilities($pb.ClientContext? ctx, GetAccountCapabilitiesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountCapabilities', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountCapabilitiesCapability($pb.ClientContext? ctx, GetAccountCapabilitiesCapabilityRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountCapabilitiesCapability', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountExternalAccounts($pb.ClientContext? ctx, GetAccountExternalAccountsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountExternalAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountExternalAccountsId($pb.ClientContext? ctx, GetAccountExternalAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountExternalAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountPeople($pb.ClientContext? ctx, GetAccountPeopleRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountPeople', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountPeoplePerson($pb.ClientContext? ctx, GetAccountPeoplePersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountPeoplePerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountPersons($pb.ClientContext? ctx, GetAccountPersonsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountPersons', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountPersonsPerson($pb.ClientContext? ctx, GetAccountPersonsPersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountPersonsPerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccounts($pb.ClientContext? ctx, GetAccountsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccount($pb.ClientContext? ctx, GetAccountsAccountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountBankAccountsId($pb.ClientContext? ctx, GetAccountsAccountBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountCapabilities($pb.ClientContext? ctx, GetAccountsAccountCapabilitiesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountCapabilities', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountCapabilitiesCapability($pb.ClientContext? ctx, GetAccountsAccountCapabilitiesCapabilityRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountCapabilitiesCapability', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountExternalAccounts($pb.ClientContext? ctx, GetAccountsAccountExternalAccountsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountExternalAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountExternalAccountsId($pb.ClientContext? ctx, GetAccountsAccountExternalAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountExternalAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountPeople($pb.ClientContext? ctx, GetAccountsAccountPeopleRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountPeople', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountPeoplePerson($pb.ClientContext? ctx, GetAccountsAccountPeoplePersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountPeoplePerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountPersons($pb.ClientContext? ctx, GetAccountsAccountPersonsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountPersons', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getAccountsAccountPersonsPerson($pb.ClientContext? ctx, GetAccountsAccountPersonsPersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountPersonsPerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getApplePayDomains($pb.ClientContext? ctx, GetApplePayDomainsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetApplePayDomains', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getApplePayDomainsDomain($pb.ClientContext? ctx, GetApplePayDomainsDomainRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetApplePayDomainsDomain', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getApplicationFees($pb.ClientContext? ctx, GetApplicationFeesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetApplicationFees', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getApplicationFeesFeeRefundsId($pb.ClientContext? ctx, GetApplicationFeesFeeRefundsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetApplicationFeesFeeRefundsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getApplicationFeesId($pb.ClientContext? ctx, GetApplicationFeesIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetApplicationFeesId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getApplicationFeesIdRefunds($pb.ClientContext? ctx, GetApplicationFeesIdRefundsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetApplicationFeesIdRefunds', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBalance($pb.ClientContext? ctx, GetBalanceRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBalance', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBalanceHistory($pb.ClientContext? ctx, GetBalanceHistoryRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBalanceHistory', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBalanceHistoryId($pb.ClientContext? ctx, GetBalanceHistoryIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBalanceHistoryId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBalanceTransactions($pb.ClientContext? ctx, GetBalanceTransactionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBalanceTransactions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBalanceTransactionsId($pb.ClientContext? ctx, GetBalanceTransactionsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBalanceTransactionsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBillingPortalConfigurations($pb.ClientContext? ctx, GetBillingPortalConfigurationsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBillingPortalConfigurations', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBillingPortalConfigurationsConfiguration($pb.ClientContext? ctx, GetBillingPortalConfigurationsConfigurationRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBillingPortalConfigurationsConfiguration', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBitcoinReceivers($pb.ClientContext? ctx, GetBitcoinReceiversRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBitcoinReceivers', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBitcoinReceiversId($pb.ClientContext? ctx, GetBitcoinReceiversIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBitcoinReceiversId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBitcoinReceiversReceiverTransactions($pb.ClientContext? ctx, GetBitcoinReceiversReceiverTransactionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBitcoinReceiversReceiverTransactions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getBitcoinTransactions($pb.ClientContext? ctx, GetBitcoinTransactionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetBitcoinTransactions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCharges($pb.ClientContext? ctx, GetChargesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCharges', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getChargesCharge($pb.ClientContext? ctx, GetChargesChargeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetChargesCharge', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getChargesChargeDispute($pb.ClientContext? ctx, GetChargesChargeDisputeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetChargesChargeDispute', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getChargesChargeRefunds($pb.ClientContext? ctx, GetChargesChargeRefundsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetChargesChargeRefunds', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getChargesChargeRefundsRefund($pb.ClientContext? ctx, GetChargesChargeRefundsRefundRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetChargesChargeRefundsRefund', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCheckoutSessions($pb.ClientContext? ctx, GetCheckoutSessionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCheckoutSessions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCheckoutSessionsSession($pb.ClientContext? ctx, GetCheckoutSessionsSessionRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCheckoutSessionsSession', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCheckoutSessionsSessionLineItems($pb.ClientContext? ctx, GetCheckoutSessionsSessionLineItemsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCheckoutSessionsSessionLineItems', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCountrySpecs($pb.ClientContext? ctx, GetCountrySpecsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCountrySpecs', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCountrySpecsCountry($pb.ClientContext? ctx, GetCountrySpecsCountryRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCountrySpecsCountry', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCoupons($pb.ClientContext? ctx, GetCouponsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCoupons', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCouponsCoupon($pb.ClientContext? ctx, GetCouponsCouponRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCouponsCoupon', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCreditNotes($pb.ClientContext? ctx, GetCreditNotesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCreditNotes', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCreditNotesCreditNoteLines($pb.ClientContext? ctx, GetCreditNotesCreditNoteLinesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCreditNotesCreditNoteLines', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCreditNotesId($pb.ClientContext? ctx, GetCreditNotesIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCreditNotesId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCreditNotesPreview($pb.ClientContext? ctx, GetCreditNotesPreviewRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCreditNotesPreview', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCreditNotesPreviewLines($pb.ClientContext? ctx, GetCreditNotesPreviewLinesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCreditNotesPreviewLines', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomers($pb.ClientContext? ctx, GetCustomersRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomers', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomer($pb.ClientContext? ctx, GetCustomersCustomerRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomer', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerBalanceTransactions($pb.ClientContext? ctx, GetCustomersCustomerBalanceTransactionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerBalanceTransactions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerBalanceTransactionsTransaction($pb.ClientContext? ctx, GetCustomersCustomerBalanceTransactionsTransactionRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerBalanceTransactionsTransaction', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerBankAccounts($pb.ClientContext? ctx, GetCustomersCustomerBankAccountsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerBankAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerBankAccountsId($pb.ClientContext? ctx, GetCustomersCustomerBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerCards($pb.ClientContext? ctx, GetCustomersCustomerCardsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerCards', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerCardsId($pb.ClientContext? ctx, GetCustomersCustomerCardsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerCardsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerDiscount($pb.ClientContext? ctx, GetCustomersCustomerDiscountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerDiscount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerSources($pb.ClientContext? ctx, GetCustomersCustomerSourcesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSources', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerSourcesId($pb.ClientContext? ctx, GetCustomersCustomerSourcesIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSourcesId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerSubscriptions($pb.ClientContext? ctx, GetCustomersCustomerSubscriptionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSubscriptions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, GetCustomersCustomerSubscriptionsSubscriptionExposedIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSubscriptionsSubscriptionExposedId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount($pb.ClientContext? ctx, GetCustomersCustomerSubscriptionsSubscriptionExposedIdDiscountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerTaxIds($pb.ClientContext? ctx, GetCustomersCustomerTaxIdsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerTaxIds', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getCustomersCustomerTaxIdsId($pb.ClientContext? ctx, GetCustomersCustomerTaxIdsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerTaxIdsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getDisputes($pb.ClientContext? ctx, GetDisputesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetDisputes', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getDisputesDispute($pb.ClientContext? ctx, GetDisputesDisputeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetDisputesDispute', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getEvents($pb.ClientContext? ctx, GetEventsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetEvents', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getEventsId($pb.ClientContext? ctx, GetEventsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetEventsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getExchangeRates($pb.ClientContext? ctx, GetExchangeRatesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetExchangeRates', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getExchangeRatesRateId($pb.ClientContext? ctx, GetExchangeRatesRateIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetExchangeRatesRateId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getFileLinks($pb.ClientContext? ctx, GetFileLinksRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetFileLinks', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getFileLinksLink($pb.ClientContext? ctx, GetFileLinksLinkRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetFileLinksLink', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getFiles($pb.ClientContext? ctx, GetFilesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetFiles', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getFilesFile($pb.ClientContext? ctx, GetFilesFileRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetFilesFile', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIdentityVerificationReports($pb.ClientContext? ctx, GetIdentityVerificationReportsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIdentityVerificationReports', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIdentityVerificationReportsReport($pb.ClientContext? ctx, GetIdentityVerificationReportsReportRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIdentityVerificationReportsReport', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIdentityVerificationSessions($pb.ClientContext? ctx, GetIdentityVerificationSessionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIdentityVerificationSessions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIdentityVerificationSessionsSession($pb.ClientContext? ctx, GetIdentityVerificationSessionsSessionRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIdentityVerificationSessionsSession', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getInvoiceitems($pb.ClientContext? ctx, GetInvoiceitemsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetInvoiceitems', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getInvoiceitemsInvoiceitem($pb.ClientContext? ctx, GetInvoiceitemsInvoiceitemRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetInvoiceitemsInvoiceitem', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getInvoices($pb.ClientContext? ctx, GetInvoicesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetInvoices', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getInvoicesInvoice($pb.ClientContext? ctx, GetInvoicesInvoiceRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetInvoicesInvoice', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getInvoicesInvoiceLines($pb.ClientContext? ctx, GetInvoicesInvoiceLinesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetInvoicesInvoiceLines', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getInvoicesUpcoming($pb.ClientContext? ctx, GetInvoicesUpcomingRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetInvoicesUpcoming', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getInvoicesUpcomingLines($pb.ClientContext? ctx, GetInvoicesUpcomingLinesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetInvoicesUpcomingLines', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuerFraudRecords($pb.ClientContext? ctx, GetIssuerFraudRecordsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuerFraudRecords', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuerFraudRecordsIssuerFraudRecord($pb.ClientContext? ctx, GetIssuerFraudRecordsIssuerFraudRecordRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuerFraudRecordsIssuerFraudRecord', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingAuthorizations($pb.ClientContext? ctx, GetIssuingAuthorizationsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingAuthorizations', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingAuthorizationsAuthorization($pb.ClientContext? ctx, GetIssuingAuthorizationsAuthorizationRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingAuthorizationsAuthorization', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingCardholders($pb.ClientContext? ctx, GetIssuingCardholdersRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingCardholders', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingCardholdersCardholder($pb.ClientContext? ctx, GetIssuingCardholdersCardholderRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingCardholdersCardholder', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingCards($pb.ClientContext? ctx, GetIssuingCardsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingCards', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingCardsCard($pb.ClientContext? ctx, GetIssuingCardsCardRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingCardsCard', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingDisputes($pb.ClientContext? ctx, GetIssuingDisputesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingDisputes', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingDisputesDispute($pb.ClientContext? ctx, GetIssuingDisputesDisputeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingDisputesDispute', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingSettlements($pb.ClientContext? ctx, GetIssuingSettlementsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingSettlements', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingSettlementsSettlement($pb.ClientContext? ctx, GetIssuingSettlementsSettlementRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingSettlementsSettlement', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingTransactions($pb.ClientContext? ctx, GetIssuingTransactionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingTransactions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getIssuingTransactionsTransaction($pb.ClientContext? ctx, GetIssuingTransactionsTransactionRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetIssuingTransactionsTransaction', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getMandatesMandate($pb.ClientContext? ctx, GetMandatesMandateRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetMandatesMandate', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getOrderReturns($pb.ClientContext? ctx, GetOrderReturnsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetOrderReturns', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getOrderReturnsId($pb.ClientContext? ctx, GetOrderReturnsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetOrderReturnsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getOrders($pb.ClientContext? ctx, GetOrdersRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetOrders', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getOrdersId($pb.ClientContext? ctx, GetOrdersIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetOrdersId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPaymentIntents($pb.ClientContext? ctx, GetPaymentIntentsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPaymentIntents', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPaymentIntentsIntent($pb.ClientContext? ctx, GetPaymentIntentsIntentRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPaymentIntentsIntent', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPaymentMethods($pb.ClientContext? ctx, GetPaymentMethodsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPaymentMethods', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPaymentMethodsPaymentMethod($pb.ClientContext? ctx, GetPaymentMethodsPaymentMethodRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPaymentMethodsPaymentMethod', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPayouts($pb.ClientContext? ctx, GetPayoutsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPayouts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPayoutsPayout($pb.ClientContext? ctx, GetPayoutsPayoutRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPayoutsPayout', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPlans($pb.ClientContext? ctx, GetPlansRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPlans', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPlansPlan($pb.ClientContext? ctx, GetPlansPlanRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPlansPlan', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPrices($pb.ClientContext? ctx, GetPricesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPrices', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPricesPrice($pb.ClientContext? ctx, GetPricesPriceRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPricesPrice', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getProducts($pb.ClientContext? ctx, GetProductsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetProducts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getProductsId($pb.ClientContext? ctx, GetProductsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetProductsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPromotionCodes($pb.ClientContext? ctx, GetPromotionCodesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPromotionCodes', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getPromotionCodesPromotionCode($pb.ClientContext? ctx, GetPromotionCodesPromotionCodeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetPromotionCodesPromotionCode', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRadarEarlyFraudWarnings($pb.ClientContext? ctx, GetRadarEarlyFraudWarningsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRadarEarlyFraudWarnings', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRadarEarlyFraudWarningsEarlyFraudWarning($pb.ClientContext? ctx, GetRadarEarlyFraudWarningsEarlyFraudWarningRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRadarEarlyFraudWarningsEarlyFraudWarning', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRadarValueListItems($pb.ClientContext? ctx, GetRadarValueListItemsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRadarValueListItems', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRadarValueListItemsItem($pb.ClientContext? ctx, GetRadarValueListItemsItemRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRadarValueListItemsItem', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRadarValueLists($pb.ClientContext? ctx, GetRadarValueListsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRadarValueLists', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRadarValueListsValueList($pb.ClientContext? ctx, GetRadarValueListsValueListRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRadarValueListsValueList', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRecipients($pb.ClientContext? ctx, GetRecipientsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRecipients', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRecipientsId($pb.ClientContext? ctx, GetRecipientsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRecipientsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRefunds($pb.ClientContext? ctx, GetRefundsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRefunds', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getRefundsRefund($pb.ClientContext? ctx, GetRefundsRefundRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetRefundsRefund', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getReportingReportRuns($pb.ClientContext? ctx, GetReportingReportRunsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetReportingReportRuns', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getReportingReportRunsReportRun($pb.ClientContext? ctx, GetReportingReportRunsReportRunRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetReportingReportRunsReportRun', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getReportingReportTypes($pb.ClientContext? ctx, GetReportingReportTypesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetReportingReportTypes', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getReportingReportTypesReportType($pb.ClientContext? ctx, GetReportingReportTypesReportTypeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetReportingReportTypesReportType', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getReviews($pb.ClientContext? ctx, GetReviewsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetReviews', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getReviewsReview($pb.ClientContext? ctx, GetReviewsReviewRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetReviewsReview', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSetupAttempts($pb.ClientContext? ctx, GetSetupAttemptsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSetupAttempts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSetupIntents($pb.ClientContext? ctx, GetSetupIntentsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSetupIntents', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSetupIntentsIntent($pb.ClientContext? ctx, GetSetupIntentsIntentRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSetupIntentsIntent', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSigmaScheduledQueryRuns($pb.ClientContext? ctx, GetSigmaScheduledQueryRunsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSigmaScheduledQueryRuns', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSigmaScheduledQueryRunsScheduledQueryRun($pb.ClientContext? ctx, GetSigmaScheduledQueryRunsScheduledQueryRunRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSigmaScheduledQueryRunsScheduledQueryRun', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSkus($pb.ClientContext? ctx, GetSkusRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSkus', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSkusId($pb.ClientContext? ctx, GetSkusIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSkusId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSourcesSource($pb.ClientContext? ctx, GetSourcesSourceRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSourcesSource', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSourcesSourceMandateNotificationsMandateNotification($pb.ClientContext? ctx, GetSourcesSourceMandateNotificationsMandateNotificationRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSourcesSourceMandateNotificationsMandateNotification', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSourcesSourceSourceTransactions($pb.ClientContext? ctx, GetSourcesSourceSourceTransactionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSourcesSourceSourceTransactions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSourcesSourceSourceTransactionsSourceTransaction($pb.ClientContext? ctx, GetSourcesSourceSourceTransactionsSourceTransactionRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSourcesSourceSourceTransactionsSourceTransaction', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSubscriptionItems($pb.ClientContext? ctx, GetSubscriptionItemsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionItems', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSubscriptionItemsItem($pb.ClientContext? ctx, GetSubscriptionItemsItemRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionItemsItem', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSubscriptionItemsSubscriptionItemUsageRecordSummaries($pb.ClientContext? ctx, GetSubscriptionItemsSubscriptionItemUsageRecordSummariesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionItemsSubscriptionItemUsageRecordSummaries', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSubscriptionSchedules($pb.ClientContext? ctx, GetSubscriptionSchedulesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionSchedules', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSubscriptionSchedulesSchedule($pb.ClientContext? ctx, GetSubscriptionSchedulesScheduleRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionSchedulesSchedule', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSubscriptions($pb.ClientContext? ctx, GetSubscriptionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSubscriptions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, GetSubscriptionsSubscriptionExposedIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionsSubscriptionExposedId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTaxRates($pb.ClientContext? ctx, GetTaxRatesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTaxRates', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTaxRatesTaxRate($pb.ClientContext? ctx, GetTaxRatesTaxRateRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTaxRatesTaxRate', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTerminalLocations($pb.ClientContext? ctx, GetTerminalLocationsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTerminalLocations', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTerminalLocationsLocation($pb.ClientContext? ctx, GetTerminalLocationsLocationRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTerminalLocationsLocation', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTerminalReaders($pb.ClientContext? ctx, GetTerminalReadersRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTerminalReaders', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTerminalReadersReader($pb.ClientContext? ctx, GetTerminalReadersReaderRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTerminalReadersReader', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTokensToken($pb.ClientContext? ctx, GetTokensTokenRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTokensToken', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTopups($pb.ClientContext? ctx, GetTopupsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTopups', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTopupsTopup($pb.ClientContext? ctx, GetTopupsTopupRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTopupsTopup', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTransfers($pb.ClientContext? ctx, GetTransfersRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTransfers', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTransfersIdReversals($pb.ClientContext? ctx, GetTransfersIdReversalsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTransfersIdReversals', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTransfersTransfer($pb.ClientContext? ctx, GetTransfersTransferRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTransfersTransfer', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getTransfersTransferReversalsId($pb.ClientContext? ctx, GetTransfersTransferReversalsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetTransfersTransferReversalsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getWebhookEndpoints($pb.ClientContext? ctx, GetWebhookEndpointsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetWebhookEndpoints', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> getWebhookEndpointsWebhookEndpoint($pb.ClientContext? ctx, GetWebhookEndpointsWebhookEndpointRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'GetWebhookEndpointsWebhookEndpoint', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> post3dSecure($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'Post3dSecure', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccount($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountBankAccounts($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountBankAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountBankAccountsId($pb.ClientContext? ctx, PostAccountBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountCapabilitiesCapability($pb.ClientContext? ctx, PostAccountCapabilitiesCapabilityRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountCapabilitiesCapability', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountExternalAccounts($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountExternalAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountExternalAccountsId($pb.ClientContext? ctx, PostAccountExternalAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountExternalAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountLinks($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountLinks', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountLoginLinks($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountLoginLinks', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountPeople($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountPeople', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountPeoplePerson($pb.ClientContext? ctx, PostAccountPeoplePersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountPeoplePerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountPersons($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountPersons', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountPersonsPerson($pb.ClientContext? ctx, PostAccountPersonsPersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountPersonsPerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccounts($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccount($pb.ClientContext? ctx, PostAccountsAccountRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccount', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountBankAccounts($pb.ClientContext? ctx, PostAccountsAccountBankAccountsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountBankAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountBankAccountsId($pb.ClientContext? ctx, PostAccountsAccountBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountCapabilitiesCapability($pb.ClientContext? ctx, PostAccountsAccountCapabilitiesCapabilityRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountCapabilitiesCapability', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountExternalAccounts($pb.ClientContext? ctx, PostAccountsAccountExternalAccountsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountExternalAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountExternalAccountsId($pb.ClientContext? ctx, PostAccountsAccountExternalAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountExternalAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountLoginLinks($pb.ClientContext? ctx, PostAccountsAccountLoginLinksRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountLoginLinks', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountPeople($pb.ClientContext? ctx, PostAccountsAccountPeopleRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountPeople', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountPeoplePerson($pb.ClientContext? ctx, PostAccountsAccountPeoplePersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountPeoplePerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountPersons($pb.ClientContext? ctx, PostAccountsAccountPersonsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountPersons', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountPersonsPerson($pb.ClientContext? ctx, PostAccountsAccountPersonsPersonRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountPersonsPerson', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postAccountsAccountReject($pb.ClientContext? ctx, PostAccountsAccountRejectRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountReject', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postApplePayDomains($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostApplePayDomains', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postApplicationFeesFeeRefundsId($pb.ClientContext? ctx, PostApplicationFeesFeeRefundsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostApplicationFeesFeeRefundsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postApplicationFeesIdRefund($pb.ClientContext? ctx, PostApplicationFeesIdRefundRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostApplicationFeesIdRefund', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postApplicationFeesIdRefunds($pb.ClientContext? ctx, PostApplicationFeesIdRefundsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostApplicationFeesIdRefunds', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postBillingPortalConfigurations($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostBillingPortalConfigurations', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postBillingPortalConfigurationsConfiguration($pb.ClientContext? ctx, PostBillingPortalConfigurationsConfigurationRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostBillingPortalConfigurationsConfiguration', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postBillingPortalSessions($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostBillingPortalSessions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCharges($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCharges', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postChargesCharge($pb.ClientContext? ctx, PostChargesChargeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostChargesCharge', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postChargesChargeCapture($pb.ClientContext? ctx, PostChargesChargeCaptureRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeCapture', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postChargesChargeDispute($pb.ClientContext? ctx, PostChargesChargeDisputeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeDispute', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postChargesChargeDisputeClose($pb.ClientContext? ctx, PostChargesChargeDisputeCloseRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeDisputeClose', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postChargesChargeRefund($pb.ClientContext? ctx, PostChargesChargeRefundRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeRefund', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postChargesChargeRefunds($pb.ClientContext? ctx, PostChargesChargeRefundsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeRefunds', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postChargesChargeRefundsRefund($pb.ClientContext? ctx, PostChargesChargeRefundsRefundRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeRefundsRefund', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCheckoutSessions($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCheckoutSessions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCoupons($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCoupons', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCouponsCoupon($pb.ClientContext? ctx, PostCouponsCouponRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCouponsCoupon', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCreditNotes($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCreditNotes', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCreditNotesId($pb.ClientContext? ctx, PostCreditNotesIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCreditNotesId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCreditNotesIdVoid($pb.ClientContext? ctx, PostCreditNotesIdVoidRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCreditNotesIdVoid', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomers($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomers', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomer($pb.ClientContext? ctx, PostCustomersCustomerRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomer', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerBalanceTransactions($pb.ClientContext? ctx, PostCustomersCustomerBalanceTransactionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBalanceTransactions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerBalanceTransactionsTransaction($pb.ClientContext? ctx, PostCustomersCustomerBalanceTransactionsTransactionRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBalanceTransactionsTransaction', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerBankAccounts($pb.ClientContext? ctx, PostCustomersCustomerBankAccountsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBankAccounts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerBankAccountsId($pb.ClientContext? ctx, PostCustomersCustomerBankAccountsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBankAccountsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerBankAccountsIdVerify($pb.ClientContext? ctx, PostCustomersCustomerBankAccountsIdVerifyRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBankAccountsIdVerify', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerCards($pb.ClientContext? ctx, PostCustomersCustomerCardsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerCards', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerCardsId($pb.ClientContext? ctx, PostCustomersCustomerCardsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerCardsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerSources($pb.ClientContext? ctx, PostCustomersCustomerSourcesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSources', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerSourcesId($pb.ClientContext? ctx, PostCustomersCustomerSourcesIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSourcesId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerSourcesIdVerify($pb.ClientContext? ctx, PostCustomersCustomerSourcesIdVerifyRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSourcesIdVerify', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerSubscriptions($pb.ClientContext? ctx, PostCustomersCustomerSubscriptionsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSubscriptions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, PostCustomersCustomerSubscriptionsSubscriptionExposedIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSubscriptionsSubscriptionExposedId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postCustomersCustomerTaxIds($pb.ClientContext? ctx, PostCustomersCustomerTaxIdsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerTaxIds', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postDisputesDispute($pb.ClientContext? ctx, PostDisputesDisputeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostDisputesDispute', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postDisputesDisputeClose($pb.ClientContext? ctx, PostDisputesDisputeCloseRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostDisputesDisputeClose', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postEphemeralKeys($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostEphemeralKeys', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postFileLinks($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostFileLinks', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postFileLinksLink($pb.ClientContext? ctx, PostFileLinksLinkRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostFileLinksLink', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postFiles($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostFiles', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIdentityVerificationSessions($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIdentityVerificationSessions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIdentityVerificationSessionsSession($pb.ClientContext? ctx, PostIdentityVerificationSessionsSessionRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIdentityVerificationSessionsSession', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIdentityVerificationSessionsSessionCancel($pb.ClientContext? ctx, PostIdentityVerificationSessionsSessionCancelRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIdentityVerificationSessionsSessionCancel', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIdentityVerificationSessionsSessionRedact($pb.ClientContext? ctx, PostIdentityVerificationSessionsSessionRedactRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIdentityVerificationSessionsSessionRedact', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoiceitems($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoiceitems', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoiceitemsInvoiceitem($pb.ClientContext? ctx, PostInvoiceitemsInvoiceitemRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoiceitemsInvoiceitem', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoices($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoices', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoicesInvoice($pb.ClientContext? ctx, PostInvoicesInvoiceRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoice', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoicesInvoiceFinalize($pb.ClientContext? ctx, PostInvoicesInvoiceFinalizeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoiceFinalize', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoicesInvoiceMarkUncollectible($pb.ClientContext? ctx, PostInvoicesInvoiceMarkUncollectibleRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoiceMarkUncollectible', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoicesInvoicePay($pb.ClientContext? ctx, PostInvoicesInvoicePayRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoicePay', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoicesInvoiceSend($pb.ClientContext? ctx, PostInvoicesInvoiceSendRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoiceSend', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postInvoicesInvoiceVoid($pb.ClientContext? ctx, PostInvoicesInvoiceVoidRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoiceVoid', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingAuthorizationsAuthorization($pb.ClientContext? ctx, PostIssuingAuthorizationsAuthorizationRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingAuthorizationsAuthorization', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingAuthorizationsAuthorizationApprove($pb.ClientContext? ctx, PostIssuingAuthorizationsAuthorizationApproveRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingAuthorizationsAuthorizationApprove', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingAuthorizationsAuthorizationDecline($pb.ClientContext? ctx, PostIssuingAuthorizationsAuthorizationDeclineRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingAuthorizationsAuthorizationDecline', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingCardholders($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingCardholders', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingCardholdersCardholder($pb.ClientContext? ctx, PostIssuingCardholdersCardholderRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingCardholdersCardholder', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingCards($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingCards', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingCardsCard($pb.ClientContext? ctx, PostIssuingCardsCardRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingCardsCard', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingDisputes($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingDisputes', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingDisputesDispute($pb.ClientContext? ctx, PostIssuingDisputesDisputeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingDisputesDispute', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingDisputesDisputeSubmit($pb.ClientContext? ctx, PostIssuingDisputesDisputeSubmitRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingDisputesDisputeSubmit', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingSettlementsSettlement($pb.ClientContext? ctx, PostIssuingSettlementsSettlementRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingSettlementsSettlement', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postIssuingTransactionsTransaction($pb.ClientContext? ctx, PostIssuingTransactionsTransactionRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostIssuingTransactionsTransaction', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postOrders($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostOrders', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postOrdersId($pb.ClientContext? ctx, PostOrdersIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostOrdersId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postOrdersIdPay($pb.ClientContext? ctx, PostOrdersIdPayRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostOrdersIdPay', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postOrdersIdReturns($pb.ClientContext? ctx, PostOrdersIdReturnsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostOrdersIdReturns', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentIntents($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntents', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentIntentsIntent($pb.ClientContext? ctx, PostPaymentIntentsIntentRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntentsIntent', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentIntentsIntentCancel($pb.ClientContext? ctx, PostPaymentIntentsIntentCancelRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntentsIntentCancel', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentIntentsIntentCapture($pb.ClientContext? ctx, PostPaymentIntentsIntentCaptureRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntentsIntentCapture', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentIntentsIntentConfirm($pb.ClientContext? ctx, PostPaymentIntentsIntentConfirmRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntentsIntentConfirm', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentMethods($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentMethods', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentMethodsPaymentMethod($pb.ClientContext? ctx, PostPaymentMethodsPaymentMethodRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentMethodsPaymentMethod', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentMethodsPaymentMethodAttach($pb.ClientContext? ctx, PostPaymentMethodsPaymentMethodAttachRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentMethodsPaymentMethodAttach', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPaymentMethodsPaymentMethodDetach($pb.ClientContext? ctx, PostPaymentMethodsPaymentMethodDetachRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPaymentMethodsPaymentMethodDetach', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPayouts($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPayouts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPayoutsPayout($pb.ClientContext? ctx, PostPayoutsPayoutRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPayoutsPayout', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPayoutsPayoutCancel($pb.ClientContext? ctx, PostPayoutsPayoutCancelRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPayoutsPayoutCancel', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPayoutsPayoutReverse($pb.ClientContext? ctx, PostPayoutsPayoutReverseRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPayoutsPayoutReverse', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPlans($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPlans', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPlansPlan($pb.ClientContext? ctx, PostPlansPlanRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPlansPlan', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPrices($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPrices', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPricesPrice($pb.ClientContext? ctx, PostPricesPriceRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPricesPrice', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postProducts($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostProducts', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postProductsId($pb.ClientContext? ctx, PostProductsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostProductsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPromotionCodes($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPromotionCodes', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postPromotionCodesPromotionCode($pb.ClientContext? ctx, PostPromotionCodesPromotionCodeRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostPromotionCodesPromotionCode', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postRadarValueListItems($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostRadarValueListItems', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postRadarValueLists($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostRadarValueLists', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postRadarValueListsValueList($pb.ClientContext? ctx, PostRadarValueListsValueListRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostRadarValueListsValueList', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postRecipients($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostRecipients', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postRecipientsId($pb.ClientContext? ctx, PostRecipientsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostRecipientsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postRefunds($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostRefunds', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postRefundsRefund($pb.ClientContext? ctx, PostRefundsRefundRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostRefundsRefund', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postReportingReportRuns($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostReportingReportRuns', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postReviewsReviewApprove($pb.ClientContext? ctx, PostReviewsReviewApproveRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostReviewsReviewApprove', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSetupIntents($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSetupIntents', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSetupIntentsIntent($pb.ClientContext? ctx, PostSetupIntentsIntentRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSetupIntentsIntent', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSetupIntentsIntentCancel($pb.ClientContext? ctx, PostSetupIntentsIntentCancelRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSetupIntentsIntentCancel', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSetupIntentsIntentConfirm($pb.ClientContext? ctx, PostSetupIntentsIntentConfirmRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSetupIntentsIntentConfirm', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSkus($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSkus', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSkusId($pb.ClientContext? ctx, PostSkusIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSkusId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSources($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSources', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSourcesSource($pb.ClientContext? ctx, PostSourcesSourceRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSourcesSource', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSourcesSourceVerify($pb.ClientContext? ctx, PostSourcesSourceVerifyRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSourcesSourceVerify', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptionItems($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionItems', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptionItemsItem($pb.ClientContext? ctx, PostSubscriptionItemsItemRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionItemsItem', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptionItemsSubscriptionItemUsageRecords($pb.ClientContext? ctx, PostSubscriptionItemsSubscriptionItemUsageRecordsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionItemsSubscriptionItemUsageRecords', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptionSchedules($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionSchedules', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptionSchedulesSchedule($pb.ClientContext? ctx, PostSubscriptionSchedulesScheduleRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionSchedulesSchedule', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptionSchedulesScheduleCancel($pb.ClientContext? ctx, PostSubscriptionSchedulesScheduleCancelRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionSchedulesScheduleCancel', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptionSchedulesScheduleRelease($pb.ClientContext? ctx, PostSubscriptionSchedulesScheduleReleaseRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionSchedulesScheduleRelease', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptions($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptions', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, PostSubscriptionsSubscriptionExposedIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionsSubscriptionExposedId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTaxRates($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTaxRates', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTaxRatesTaxRate($pb.ClientContext? ctx, PostTaxRatesTaxRateRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTaxRatesTaxRate', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTerminalConnectionTokens($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTerminalConnectionTokens', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTerminalLocations($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTerminalLocations', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTerminalLocationsLocation($pb.ClientContext? ctx, PostTerminalLocationsLocationRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTerminalLocationsLocation', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTerminalReaders($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTerminalReaders', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTerminalReadersReader($pb.ClientContext? ctx, PostTerminalReadersReaderRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTerminalReadersReader', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTokens($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTokens', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTopups($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTopups', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTopupsTopup($pb.ClientContext? ctx, PostTopupsTopupRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTopupsTopup', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTopupsTopupCancel($pb.ClientContext? ctx, PostTopupsTopupCancelRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTopupsTopupCancel', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTransfers($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTransfers', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTransfersIdReversals($pb.ClientContext? ctx, PostTransfersIdReversalsRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTransfersIdReversals', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTransfersTransfer($pb.ClientContext? ctx, PostTransfersTransferRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTransfersTransfer', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postTransfersTransferReversalsId($pb.ClientContext? ctx, PostTransfersTransferReversalsIdRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostTransfersTransferReversalsId', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postWebhookEndpoints($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostWebhookEndpoints', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> postWebhookEndpointsWebhookEndpoint($pb.ClientContext? ctx, PostWebhookEndpointsWebhookEndpointRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PostWebhookEndpointsWebhookEndpoint', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> putAccountLogout($pb.ClientContext? ctx, $0.Empty request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PutAccountLogout', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> putAccountsAccountLogout($pb.ClientContext? ctx, PutAccountsAccountLogoutRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'StripeAPIService', 'PutAccountsAccountLogout', request, emptyResponse);
+  $async.Future<$1.Empty> deleteAccount($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountBankAccountsId($pb.ClientContext? ctx, DeleteAccountBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountExternalAccountsId($pb.ClientContext? ctx, DeleteAccountExternalAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountExternalAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountPeoplePerson($pb.ClientContext? ctx, DeleteAccountPeoplePersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountPeoplePerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountPersonsPerson($pb.ClientContext? ctx, DeleteAccountPersonsPersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountPersonsPerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountsAccount($pb.ClientContext? ctx, DeleteAccountsAccountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountsAccountBankAccountsId($pb.ClientContext? ctx, DeleteAccountsAccountBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccountBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountsAccountExternalAccountsId($pb.ClientContext? ctx, DeleteAccountsAccountExternalAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccountExternalAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountsAccountPeoplePerson($pb.ClientContext? ctx, DeleteAccountsAccountPeoplePersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccountPeoplePerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteAccountsAccountPersonsPerson($pb.ClientContext? ctx, DeleteAccountsAccountPersonsPersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteAccountsAccountPersonsPerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteApplePayDomainsDomain($pb.ClientContext? ctx, DeleteApplePayDomainsDomainRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteApplePayDomainsDomain', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCouponsCoupon($pb.ClientContext? ctx, DeleteCouponsCouponRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCouponsCoupon', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCustomersCustomer($pb.ClientContext? ctx, DeleteCustomersCustomerRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomer', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCustomersCustomerBankAccountsId($pb.ClientContext? ctx, DeleteCustomersCustomerBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCustomersCustomerCardsId($pb.ClientContext? ctx, DeleteCustomersCustomerCardsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerCardsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCustomersCustomerDiscount($pb.ClientContext? ctx, DeleteCustomersCustomerDiscountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerDiscount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCustomersCustomerSourcesId($pb.ClientContext? ctx, DeleteCustomersCustomerSourcesIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerSourcesId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCustomersCustomerSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, DeleteCustomersCustomerSubscriptionsSubscriptionExposedIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerSubscriptionsSubscriptionExposedId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount($pb.ClientContext? ctx, DeleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteCustomersCustomerTaxIdsId($pb.ClientContext? ctx, DeleteCustomersCustomerTaxIdsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteCustomersCustomerTaxIdsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteEphemeralKeysKey($pb.ClientContext? ctx, DeleteEphemeralKeysKeyRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteEphemeralKeysKey', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteInvoiceitemsInvoiceitem($pb.ClientContext? ctx, DeleteInvoiceitemsInvoiceitemRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteInvoiceitemsInvoiceitem', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteInvoicesInvoice($pb.ClientContext? ctx, DeleteInvoicesInvoiceRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteInvoicesInvoice', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deletePlansPlan($pb.ClientContext? ctx, DeletePlansPlanRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeletePlansPlan', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteProductsId($pb.ClientContext? ctx, DeleteProductsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteProductsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteRadarValueListItemsItem($pb.ClientContext? ctx, DeleteRadarValueListItemsItemRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteRadarValueListItemsItem', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteRadarValueListsValueList($pb.ClientContext? ctx, DeleteRadarValueListsValueListRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteRadarValueListsValueList', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteRecipientsId($pb.ClientContext? ctx, DeleteRecipientsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteRecipientsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteSkusId($pb.ClientContext? ctx, DeleteSkusIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteSkusId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteSubscriptionItemsItem($pb.ClientContext? ctx, DeleteSubscriptionItemsItemRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteSubscriptionItemsItem', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, DeleteSubscriptionsSubscriptionExposedIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteSubscriptionsSubscriptionExposedId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteSubscriptionsSubscriptionExposedIdDiscount($pb.ClientContext? ctx, DeleteSubscriptionsSubscriptionExposedIdDiscountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteSubscriptionsSubscriptionExposedIdDiscount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteTerminalLocationsLocation($pb.ClientContext? ctx, DeleteTerminalLocationsLocationRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteTerminalLocationsLocation', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteTerminalReadersReader($pb.ClientContext? ctx, DeleteTerminalReadersReaderRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteTerminalReadersReader', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> deleteWebhookEndpointsWebhookEndpoint($pb.ClientContext? ctx, DeleteWebhookEndpointsWebhookEndpointRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'DeleteWebhookEndpointsWebhookEndpoint', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> get3dSecureThreeDSecure($pb.ClientContext? ctx, Get3dSecureThreeDSecureRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'Get3dSecureThreeDSecure', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccount($pb.ClientContext? ctx, GetAccountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountBankAccountsId($pb.ClientContext? ctx, GetAccountBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountCapabilities($pb.ClientContext? ctx, GetAccountCapabilitiesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountCapabilities', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountCapabilitiesCapability($pb.ClientContext? ctx, GetAccountCapabilitiesCapabilityRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountCapabilitiesCapability', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountExternalAccounts($pb.ClientContext? ctx, GetAccountExternalAccountsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountExternalAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountExternalAccountsId($pb.ClientContext? ctx, GetAccountExternalAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountExternalAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountPeople($pb.ClientContext? ctx, GetAccountPeopleRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountPeople', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountPeoplePerson($pb.ClientContext? ctx, GetAccountPeoplePersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountPeoplePerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountPersons($pb.ClientContext? ctx, GetAccountPersonsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountPersons', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountPersonsPerson($pb.ClientContext? ctx, GetAccountPersonsPersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountPersonsPerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccounts($pb.ClientContext? ctx, GetAccountsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccount($pb.ClientContext? ctx, GetAccountsAccountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountBankAccountsId($pb.ClientContext? ctx, GetAccountsAccountBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountCapabilities($pb.ClientContext? ctx, GetAccountsAccountCapabilitiesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountCapabilities', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountCapabilitiesCapability($pb.ClientContext? ctx, GetAccountsAccountCapabilitiesCapabilityRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountCapabilitiesCapability', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountExternalAccounts($pb.ClientContext? ctx, GetAccountsAccountExternalAccountsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountExternalAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountExternalAccountsId($pb.ClientContext? ctx, GetAccountsAccountExternalAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountExternalAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountPeople($pb.ClientContext? ctx, GetAccountsAccountPeopleRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountPeople', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountPeoplePerson($pb.ClientContext? ctx, GetAccountsAccountPeoplePersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountPeoplePerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountPersons($pb.ClientContext? ctx, GetAccountsAccountPersonsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountPersons', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getAccountsAccountPersonsPerson($pb.ClientContext? ctx, GetAccountsAccountPersonsPersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetAccountsAccountPersonsPerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getApplePayDomains($pb.ClientContext? ctx, GetApplePayDomainsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetApplePayDomains', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getApplePayDomainsDomain($pb.ClientContext? ctx, GetApplePayDomainsDomainRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetApplePayDomainsDomain', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getApplicationFees($pb.ClientContext? ctx, GetApplicationFeesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetApplicationFees', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getApplicationFeesFeeRefundsId($pb.ClientContext? ctx, GetApplicationFeesFeeRefundsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetApplicationFeesFeeRefundsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getApplicationFeesId($pb.ClientContext? ctx, GetApplicationFeesIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetApplicationFeesId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getApplicationFeesIdRefunds($pb.ClientContext? ctx, GetApplicationFeesIdRefundsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetApplicationFeesIdRefunds', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBalance($pb.ClientContext? ctx, GetBalanceRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBalance', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBalanceHistory($pb.ClientContext? ctx, GetBalanceHistoryRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBalanceHistory', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBalanceHistoryId($pb.ClientContext? ctx, GetBalanceHistoryIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBalanceHistoryId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBalanceTransactions($pb.ClientContext? ctx, GetBalanceTransactionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBalanceTransactions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBalanceTransactionsId($pb.ClientContext? ctx, GetBalanceTransactionsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBalanceTransactionsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBillingPortalConfigurations($pb.ClientContext? ctx, GetBillingPortalConfigurationsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBillingPortalConfigurations', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBillingPortalConfigurationsConfiguration($pb.ClientContext? ctx, GetBillingPortalConfigurationsConfigurationRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBillingPortalConfigurationsConfiguration', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBitcoinReceivers($pb.ClientContext? ctx, GetBitcoinReceiversRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBitcoinReceivers', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBitcoinReceiversId($pb.ClientContext? ctx, GetBitcoinReceiversIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBitcoinReceiversId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBitcoinReceiversReceiverTransactions($pb.ClientContext? ctx, GetBitcoinReceiversReceiverTransactionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBitcoinReceiversReceiverTransactions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getBitcoinTransactions($pb.ClientContext? ctx, GetBitcoinTransactionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetBitcoinTransactions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCharges($pb.ClientContext? ctx, GetChargesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCharges', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getChargesCharge($pb.ClientContext? ctx, GetChargesChargeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetChargesCharge', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getChargesChargeDispute($pb.ClientContext? ctx, GetChargesChargeDisputeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetChargesChargeDispute', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getChargesChargeRefunds($pb.ClientContext? ctx, GetChargesChargeRefundsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetChargesChargeRefunds', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getChargesChargeRefundsRefund($pb.ClientContext? ctx, GetChargesChargeRefundsRefundRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetChargesChargeRefundsRefund', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCheckoutSessions($pb.ClientContext? ctx, GetCheckoutSessionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCheckoutSessions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCheckoutSessionsSession($pb.ClientContext? ctx, GetCheckoutSessionsSessionRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCheckoutSessionsSession', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCheckoutSessionsSessionLineItems($pb.ClientContext? ctx, GetCheckoutSessionsSessionLineItemsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCheckoutSessionsSessionLineItems', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCountrySpecs($pb.ClientContext? ctx, GetCountrySpecsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCountrySpecs', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCountrySpecsCountry($pb.ClientContext? ctx, GetCountrySpecsCountryRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCountrySpecsCountry', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCoupons($pb.ClientContext? ctx, GetCouponsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCoupons', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCouponsCoupon($pb.ClientContext? ctx, GetCouponsCouponRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCouponsCoupon', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCreditNotes($pb.ClientContext? ctx, GetCreditNotesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCreditNotes', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCreditNotesCreditNoteLines($pb.ClientContext? ctx, GetCreditNotesCreditNoteLinesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCreditNotesCreditNoteLines', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCreditNotesId($pb.ClientContext? ctx, GetCreditNotesIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCreditNotesId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCreditNotesPreview($pb.ClientContext? ctx, GetCreditNotesPreviewRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCreditNotesPreview', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCreditNotesPreviewLines($pb.ClientContext? ctx, GetCreditNotesPreviewLinesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCreditNotesPreviewLines', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomers($pb.ClientContext? ctx, GetCustomersRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomers', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomer($pb.ClientContext? ctx, GetCustomersCustomerRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomer', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerBalanceTransactions($pb.ClientContext? ctx, GetCustomersCustomerBalanceTransactionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerBalanceTransactions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerBalanceTransactionsTransaction($pb.ClientContext? ctx, GetCustomersCustomerBalanceTransactionsTransactionRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerBalanceTransactionsTransaction', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerBankAccounts($pb.ClientContext? ctx, GetCustomersCustomerBankAccountsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerBankAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerBankAccountsId($pb.ClientContext? ctx, GetCustomersCustomerBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerCards($pb.ClientContext? ctx, GetCustomersCustomerCardsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerCards', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerCardsId($pb.ClientContext? ctx, GetCustomersCustomerCardsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerCardsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerDiscount($pb.ClientContext? ctx, GetCustomersCustomerDiscountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerDiscount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerSources($pb.ClientContext? ctx, GetCustomersCustomerSourcesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSources', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerSourcesId($pb.ClientContext? ctx, GetCustomersCustomerSourcesIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSourcesId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerSubscriptions($pb.ClientContext? ctx, GetCustomersCustomerSubscriptionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSubscriptions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, GetCustomersCustomerSubscriptionsSubscriptionExposedIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSubscriptionsSubscriptionExposedId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount($pb.ClientContext? ctx, GetCustomersCustomerSubscriptionsSubscriptionExposedIdDiscountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerTaxIds($pb.ClientContext? ctx, GetCustomersCustomerTaxIdsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerTaxIds', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getCustomersCustomerTaxIdsId($pb.ClientContext? ctx, GetCustomersCustomerTaxIdsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetCustomersCustomerTaxIdsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getDisputes($pb.ClientContext? ctx, GetDisputesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetDisputes', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getDisputesDispute($pb.ClientContext? ctx, GetDisputesDisputeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetDisputesDispute', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getEvents($pb.ClientContext? ctx, GetEventsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetEvents', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getEventsId($pb.ClientContext? ctx, GetEventsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetEventsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getExchangeRates($pb.ClientContext? ctx, GetExchangeRatesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetExchangeRates', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getExchangeRatesRateId($pb.ClientContext? ctx, GetExchangeRatesRateIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetExchangeRatesRateId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getFileLinks($pb.ClientContext? ctx, GetFileLinksRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetFileLinks', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getFileLinksLink($pb.ClientContext? ctx, GetFileLinksLinkRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetFileLinksLink', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getFiles($pb.ClientContext? ctx, GetFilesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetFiles', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getFilesFile($pb.ClientContext? ctx, GetFilesFileRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetFilesFile', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIdentityVerificationReports($pb.ClientContext? ctx, GetIdentityVerificationReportsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIdentityVerificationReports', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIdentityVerificationReportsReport($pb.ClientContext? ctx, GetIdentityVerificationReportsReportRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIdentityVerificationReportsReport', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIdentityVerificationSessions($pb.ClientContext? ctx, GetIdentityVerificationSessionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIdentityVerificationSessions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIdentityVerificationSessionsSession($pb.ClientContext? ctx, GetIdentityVerificationSessionsSessionRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIdentityVerificationSessionsSession', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getInvoiceitems($pb.ClientContext? ctx, GetInvoiceitemsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetInvoiceitems', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getInvoiceitemsInvoiceitem($pb.ClientContext? ctx, GetInvoiceitemsInvoiceitemRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetInvoiceitemsInvoiceitem', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getInvoices($pb.ClientContext? ctx, GetInvoicesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetInvoices', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getInvoicesInvoice($pb.ClientContext? ctx, GetInvoicesInvoiceRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetInvoicesInvoice', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getInvoicesInvoiceLines($pb.ClientContext? ctx, GetInvoicesInvoiceLinesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetInvoicesInvoiceLines', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getInvoicesUpcoming($pb.ClientContext? ctx, GetInvoicesUpcomingRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetInvoicesUpcoming', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getInvoicesUpcomingLines($pb.ClientContext? ctx, GetInvoicesUpcomingLinesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetInvoicesUpcomingLines', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuerFraudRecords($pb.ClientContext? ctx, GetIssuerFraudRecordsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuerFraudRecords', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuerFraudRecordsIssuerFraudRecord($pb.ClientContext? ctx, GetIssuerFraudRecordsIssuerFraudRecordRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuerFraudRecordsIssuerFraudRecord', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingAuthorizations($pb.ClientContext? ctx, GetIssuingAuthorizationsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingAuthorizations', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingAuthorizationsAuthorization($pb.ClientContext? ctx, GetIssuingAuthorizationsAuthorizationRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingAuthorizationsAuthorization', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingCardholders($pb.ClientContext? ctx, GetIssuingCardholdersRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingCardholders', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingCardholdersCardholder($pb.ClientContext? ctx, GetIssuingCardholdersCardholderRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingCardholdersCardholder', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingCards($pb.ClientContext? ctx, GetIssuingCardsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingCards', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingCardsCard($pb.ClientContext? ctx, GetIssuingCardsCardRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingCardsCard', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingDisputes($pb.ClientContext? ctx, GetIssuingDisputesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingDisputes', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingDisputesDispute($pb.ClientContext? ctx, GetIssuingDisputesDisputeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingDisputesDispute', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingSettlements($pb.ClientContext? ctx, GetIssuingSettlementsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingSettlements', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingSettlementsSettlement($pb.ClientContext? ctx, GetIssuingSettlementsSettlementRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingSettlementsSettlement', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingTransactions($pb.ClientContext? ctx, GetIssuingTransactionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingTransactions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getIssuingTransactionsTransaction($pb.ClientContext? ctx, GetIssuingTransactionsTransactionRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetIssuingTransactionsTransaction', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getMandatesMandate($pb.ClientContext? ctx, GetMandatesMandateRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetMandatesMandate', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getOrderReturns($pb.ClientContext? ctx, GetOrderReturnsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetOrderReturns', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getOrderReturnsId($pb.ClientContext? ctx, GetOrderReturnsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetOrderReturnsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getOrders($pb.ClientContext? ctx, GetOrdersRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetOrders', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getOrdersId($pb.ClientContext? ctx, GetOrdersIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetOrdersId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPaymentIntents($pb.ClientContext? ctx, GetPaymentIntentsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPaymentIntents', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPaymentIntentsIntent($pb.ClientContext? ctx, GetPaymentIntentsIntentRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPaymentIntentsIntent', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPaymentMethods($pb.ClientContext? ctx, GetPaymentMethodsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPaymentMethods', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPaymentMethodsPaymentMethod($pb.ClientContext? ctx, GetPaymentMethodsPaymentMethodRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPaymentMethodsPaymentMethod', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPayouts($pb.ClientContext? ctx, GetPayoutsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPayouts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPayoutsPayout($pb.ClientContext? ctx, GetPayoutsPayoutRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPayoutsPayout', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPlans($pb.ClientContext? ctx, GetPlansRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPlans', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPlansPlan($pb.ClientContext? ctx, GetPlansPlanRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPlansPlan', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPrices($pb.ClientContext? ctx, GetPricesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPrices', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPricesPrice($pb.ClientContext? ctx, GetPricesPriceRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPricesPrice', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getProducts($pb.ClientContext? ctx, GetProductsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetProducts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getProductsId($pb.ClientContext? ctx, GetProductsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetProductsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPromotionCodes($pb.ClientContext? ctx, GetPromotionCodesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPromotionCodes', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getPromotionCodesPromotionCode($pb.ClientContext? ctx, GetPromotionCodesPromotionCodeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetPromotionCodesPromotionCode', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRadarEarlyFraudWarnings($pb.ClientContext? ctx, GetRadarEarlyFraudWarningsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRadarEarlyFraudWarnings', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRadarEarlyFraudWarningsEarlyFraudWarning($pb.ClientContext? ctx, GetRadarEarlyFraudWarningsEarlyFraudWarningRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRadarEarlyFraudWarningsEarlyFraudWarning', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRadarValueListItems($pb.ClientContext? ctx, GetRadarValueListItemsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRadarValueListItems', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRadarValueListItemsItem($pb.ClientContext? ctx, GetRadarValueListItemsItemRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRadarValueListItemsItem', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRadarValueLists($pb.ClientContext? ctx, GetRadarValueListsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRadarValueLists', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRadarValueListsValueList($pb.ClientContext? ctx, GetRadarValueListsValueListRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRadarValueListsValueList', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRecipients($pb.ClientContext? ctx, GetRecipientsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRecipients', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRecipientsId($pb.ClientContext? ctx, GetRecipientsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRecipientsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRefunds($pb.ClientContext? ctx, GetRefundsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRefunds', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getRefundsRefund($pb.ClientContext? ctx, GetRefundsRefundRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetRefundsRefund', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getReportingReportRuns($pb.ClientContext? ctx, GetReportingReportRunsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetReportingReportRuns', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getReportingReportRunsReportRun($pb.ClientContext? ctx, GetReportingReportRunsReportRunRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetReportingReportRunsReportRun', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getReportingReportTypes($pb.ClientContext? ctx, GetReportingReportTypesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetReportingReportTypes', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getReportingReportTypesReportType($pb.ClientContext? ctx, GetReportingReportTypesReportTypeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetReportingReportTypesReportType', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getReviews($pb.ClientContext? ctx, GetReviewsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetReviews', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getReviewsReview($pb.ClientContext? ctx, GetReviewsReviewRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetReviewsReview', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSetupAttempts($pb.ClientContext? ctx, GetSetupAttemptsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSetupAttempts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSetupIntents($pb.ClientContext? ctx, GetSetupIntentsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSetupIntents', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSetupIntentsIntent($pb.ClientContext? ctx, GetSetupIntentsIntentRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSetupIntentsIntent', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSigmaScheduledQueryRuns($pb.ClientContext? ctx, GetSigmaScheduledQueryRunsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSigmaScheduledQueryRuns', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSigmaScheduledQueryRunsScheduledQueryRun($pb.ClientContext? ctx, GetSigmaScheduledQueryRunsScheduledQueryRunRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSigmaScheduledQueryRunsScheduledQueryRun', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSkus($pb.ClientContext? ctx, GetSkusRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSkus', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSkusId($pb.ClientContext? ctx, GetSkusIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSkusId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSourcesSource($pb.ClientContext? ctx, GetSourcesSourceRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSourcesSource', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSourcesSourceMandateNotificationsMandateNotification($pb.ClientContext? ctx, GetSourcesSourceMandateNotificationsMandateNotificationRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSourcesSourceMandateNotificationsMandateNotification', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSourcesSourceSourceTransactions($pb.ClientContext? ctx, GetSourcesSourceSourceTransactionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSourcesSourceSourceTransactions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSourcesSourceSourceTransactionsSourceTransaction($pb.ClientContext? ctx, GetSourcesSourceSourceTransactionsSourceTransactionRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSourcesSourceSourceTransactionsSourceTransaction', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSubscriptionItems($pb.ClientContext? ctx, GetSubscriptionItemsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionItems', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSubscriptionItemsItem($pb.ClientContext? ctx, GetSubscriptionItemsItemRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionItemsItem', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSubscriptionItemsSubscriptionItemUsageRecordSummaries($pb.ClientContext? ctx, GetSubscriptionItemsSubscriptionItemUsageRecordSummariesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionItemsSubscriptionItemUsageRecordSummaries', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSubscriptionSchedules($pb.ClientContext? ctx, GetSubscriptionSchedulesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionSchedules', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSubscriptionSchedulesSchedule($pb.ClientContext? ctx, GetSubscriptionSchedulesScheduleRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionSchedulesSchedule', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSubscriptions($pb.ClientContext? ctx, GetSubscriptionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSubscriptions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, GetSubscriptionsSubscriptionExposedIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetSubscriptionsSubscriptionExposedId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTaxRates($pb.ClientContext? ctx, GetTaxRatesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTaxRates', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTaxRatesTaxRate($pb.ClientContext? ctx, GetTaxRatesTaxRateRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTaxRatesTaxRate', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTerminalLocations($pb.ClientContext? ctx, GetTerminalLocationsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTerminalLocations', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTerminalLocationsLocation($pb.ClientContext? ctx, GetTerminalLocationsLocationRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTerminalLocationsLocation', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTerminalReaders($pb.ClientContext? ctx, GetTerminalReadersRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTerminalReaders', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTerminalReadersReader($pb.ClientContext? ctx, GetTerminalReadersReaderRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTerminalReadersReader', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTokensToken($pb.ClientContext? ctx, GetTokensTokenRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTokensToken', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTopups($pb.ClientContext? ctx, GetTopupsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTopups', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTopupsTopup($pb.ClientContext? ctx, GetTopupsTopupRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTopupsTopup', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTransfers($pb.ClientContext? ctx, GetTransfersRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTransfers', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTransfersIdReversals($pb.ClientContext? ctx, GetTransfersIdReversalsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTransfersIdReversals', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTransfersTransfer($pb.ClientContext? ctx, GetTransfersTransferRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTransfersTransfer', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getTransfersTransferReversalsId($pb.ClientContext? ctx, GetTransfersTransferReversalsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetTransfersTransferReversalsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getWebhookEndpoints($pb.ClientContext? ctx, GetWebhookEndpointsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetWebhookEndpoints', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> getWebhookEndpointsWebhookEndpoint($pb.ClientContext? ctx, GetWebhookEndpointsWebhookEndpointRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'GetWebhookEndpointsWebhookEndpoint', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> post3dSecure($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'Post3dSecure', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccount($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountBankAccounts($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountBankAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountBankAccountsId($pb.ClientContext? ctx, PostAccountBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountCapabilitiesCapability($pb.ClientContext? ctx, PostAccountCapabilitiesCapabilityRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountCapabilitiesCapability', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountExternalAccounts($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountExternalAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountExternalAccountsId($pb.ClientContext? ctx, PostAccountExternalAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountExternalAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountLinks($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountLinks', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountLoginLinks($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountLoginLinks', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountPeople($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountPeople', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountPeoplePerson($pb.ClientContext? ctx, PostAccountPeoplePersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountPeoplePerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountPersons($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountPersons', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountPersonsPerson($pb.ClientContext? ctx, PostAccountPersonsPersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountPersonsPerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccounts($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccount($pb.ClientContext? ctx, PostAccountsAccountRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccount', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountBankAccounts($pb.ClientContext? ctx, PostAccountsAccountBankAccountsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountBankAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountBankAccountsId($pb.ClientContext? ctx, PostAccountsAccountBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountCapabilitiesCapability($pb.ClientContext? ctx, PostAccountsAccountCapabilitiesCapabilityRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountCapabilitiesCapability', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountExternalAccounts($pb.ClientContext? ctx, PostAccountsAccountExternalAccountsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountExternalAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountExternalAccountsId($pb.ClientContext? ctx, PostAccountsAccountExternalAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountExternalAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountLoginLinks($pb.ClientContext? ctx, PostAccountsAccountLoginLinksRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountLoginLinks', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountPeople($pb.ClientContext? ctx, PostAccountsAccountPeopleRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountPeople', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountPeoplePerson($pb.ClientContext? ctx, PostAccountsAccountPeoplePersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountPeoplePerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountPersons($pb.ClientContext? ctx, PostAccountsAccountPersonsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountPersons', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountPersonsPerson($pb.ClientContext? ctx, PostAccountsAccountPersonsPersonRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountPersonsPerson', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postAccountsAccountReject($pb.ClientContext? ctx, PostAccountsAccountRejectRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostAccountsAccountReject', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postApplePayDomains($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostApplePayDomains', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postApplicationFeesFeeRefundsId($pb.ClientContext? ctx, PostApplicationFeesFeeRefundsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostApplicationFeesFeeRefundsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postApplicationFeesIdRefund($pb.ClientContext? ctx, PostApplicationFeesIdRefundRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostApplicationFeesIdRefund', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postApplicationFeesIdRefunds($pb.ClientContext? ctx, PostApplicationFeesIdRefundsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostApplicationFeesIdRefunds', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postBillingPortalConfigurations($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostBillingPortalConfigurations', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postBillingPortalConfigurationsConfiguration($pb.ClientContext? ctx, PostBillingPortalConfigurationsConfigurationRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostBillingPortalConfigurationsConfiguration', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postBillingPortalSessions($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostBillingPortalSessions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCharges($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCharges', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postChargesCharge($pb.ClientContext? ctx, PostChargesChargeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostChargesCharge', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postChargesChargeCapture($pb.ClientContext? ctx, PostChargesChargeCaptureRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeCapture', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postChargesChargeDispute($pb.ClientContext? ctx, PostChargesChargeDisputeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeDispute', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postChargesChargeDisputeClose($pb.ClientContext? ctx, PostChargesChargeDisputeCloseRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeDisputeClose', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postChargesChargeRefund($pb.ClientContext? ctx, PostChargesChargeRefundRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeRefund', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postChargesChargeRefunds($pb.ClientContext? ctx, PostChargesChargeRefundsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeRefunds', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postChargesChargeRefundsRefund($pb.ClientContext? ctx, PostChargesChargeRefundsRefundRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostChargesChargeRefundsRefund', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCheckoutSessions($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCheckoutSessions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCoupons($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCoupons', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCouponsCoupon($pb.ClientContext? ctx, PostCouponsCouponRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCouponsCoupon', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCreditNotes($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCreditNotes', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCreditNotesId($pb.ClientContext? ctx, PostCreditNotesIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCreditNotesId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCreditNotesIdVoid($pb.ClientContext? ctx, PostCreditNotesIdVoidRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCreditNotesIdVoid', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomers($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomers', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomer($pb.ClientContext? ctx, PostCustomersCustomerRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomer', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerBalanceTransactions($pb.ClientContext? ctx, PostCustomersCustomerBalanceTransactionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBalanceTransactions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerBalanceTransactionsTransaction($pb.ClientContext? ctx, PostCustomersCustomerBalanceTransactionsTransactionRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBalanceTransactionsTransaction', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerBankAccounts($pb.ClientContext? ctx, PostCustomersCustomerBankAccountsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBankAccounts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerBankAccountsId($pb.ClientContext? ctx, PostCustomersCustomerBankAccountsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBankAccountsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerBankAccountsIdVerify($pb.ClientContext? ctx, PostCustomersCustomerBankAccountsIdVerifyRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerBankAccountsIdVerify', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerCards($pb.ClientContext? ctx, PostCustomersCustomerCardsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerCards', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerCardsId($pb.ClientContext? ctx, PostCustomersCustomerCardsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerCardsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerSources($pb.ClientContext? ctx, PostCustomersCustomerSourcesRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSources', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerSourcesId($pb.ClientContext? ctx, PostCustomersCustomerSourcesIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSourcesId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerSourcesIdVerify($pb.ClientContext? ctx, PostCustomersCustomerSourcesIdVerifyRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSourcesIdVerify', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerSubscriptions($pb.ClientContext? ctx, PostCustomersCustomerSubscriptionsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSubscriptions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, PostCustomersCustomerSubscriptionsSubscriptionExposedIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerSubscriptionsSubscriptionExposedId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postCustomersCustomerTaxIds($pb.ClientContext? ctx, PostCustomersCustomerTaxIdsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostCustomersCustomerTaxIds', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postDisputesDispute($pb.ClientContext? ctx, PostDisputesDisputeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostDisputesDispute', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postDisputesDisputeClose($pb.ClientContext? ctx, PostDisputesDisputeCloseRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostDisputesDisputeClose', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postEphemeralKeys($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostEphemeralKeys', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postFileLinks($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostFileLinks', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postFileLinksLink($pb.ClientContext? ctx, PostFileLinksLinkRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostFileLinksLink', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postFiles($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostFiles', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIdentityVerificationSessions($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIdentityVerificationSessions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIdentityVerificationSessionsSession($pb.ClientContext? ctx, PostIdentityVerificationSessionsSessionRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIdentityVerificationSessionsSession', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIdentityVerificationSessionsSessionCancel($pb.ClientContext? ctx, PostIdentityVerificationSessionsSessionCancelRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIdentityVerificationSessionsSessionCancel', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIdentityVerificationSessionsSessionRedact($pb.ClientContext? ctx, PostIdentityVerificationSessionsSessionRedactRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIdentityVerificationSessionsSessionRedact', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoiceitems($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoiceitems', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoiceitemsInvoiceitem($pb.ClientContext? ctx, PostInvoiceitemsInvoiceitemRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoiceitemsInvoiceitem', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoices($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoices', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoicesInvoice($pb.ClientContext? ctx, PostInvoicesInvoiceRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoice', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoicesInvoiceFinalize($pb.ClientContext? ctx, PostInvoicesInvoiceFinalizeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoiceFinalize', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoicesInvoiceMarkUncollectible($pb.ClientContext? ctx, PostInvoicesInvoiceMarkUncollectibleRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoiceMarkUncollectible', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoicesInvoicePay($pb.ClientContext? ctx, PostInvoicesInvoicePayRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoicePay', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoicesInvoiceSend($pb.ClientContext? ctx, PostInvoicesInvoiceSendRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoiceSend', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postInvoicesInvoiceVoid($pb.ClientContext? ctx, PostInvoicesInvoiceVoidRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostInvoicesInvoiceVoid', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingAuthorizationsAuthorization($pb.ClientContext? ctx, PostIssuingAuthorizationsAuthorizationRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingAuthorizationsAuthorization', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingAuthorizationsAuthorizationApprove($pb.ClientContext? ctx, PostIssuingAuthorizationsAuthorizationApproveRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingAuthorizationsAuthorizationApprove', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingAuthorizationsAuthorizationDecline($pb.ClientContext? ctx, PostIssuingAuthorizationsAuthorizationDeclineRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingAuthorizationsAuthorizationDecline', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingCardholders($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingCardholders', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingCardholdersCardholder($pb.ClientContext? ctx, PostIssuingCardholdersCardholderRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingCardholdersCardholder', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingCards($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingCards', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingCardsCard($pb.ClientContext? ctx, PostIssuingCardsCardRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingCardsCard', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingDisputes($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingDisputes', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingDisputesDispute($pb.ClientContext? ctx, PostIssuingDisputesDisputeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingDisputesDispute', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingDisputesDisputeSubmit($pb.ClientContext? ctx, PostIssuingDisputesDisputeSubmitRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingDisputesDisputeSubmit', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingSettlementsSettlement($pb.ClientContext? ctx, PostIssuingSettlementsSettlementRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingSettlementsSettlement', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postIssuingTransactionsTransaction($pb.ClientContext? ctx, PostIssuingTransactionsTransactionRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostIssuingTransactionsTransaction', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postOrders($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostOrders', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postOrdersId($pb.ClientContext? ctx, PostOrdersIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostOrdersId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postOrdersIdPay($pb.ClientContext? ctx, PostOrdersIdPayRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostOrdersIdPay', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postOrdersIdReturns($pb.ClientContext? ctx, PostOrdersIdReturnsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostOrdersIdReturns', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentIntents($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntents', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentIntentsIntent($pb.ClientContext? ctx, PostPaymentIntentsIntentRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntentsIntent', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentIntentsIntentCancel($pb.ClientContext? ctx, PostPaymentIntentsIntentCancelRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntentsIntentCancel', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentIntentsIntentCapture($pb.ClientContext? ctx, PostPaymentIntentsIntentCaptureRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntentsIntentCapture', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentIntentsIntentConfirm($pb.ClientContext? ctx, PostPaymentIntentsIntentConfirmRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentIntentsIntentConfirm', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentMethods($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentMethods', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentMethodsPaymentMethod($pb.ClientContext? ctx, PostPaymentMethodsPaymentMethodRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentMethodsPaymentMethod', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentMethodsPaymentMethodAttach($pb.ClientContext? ctx, PostPaymentMethodsPaymentMethodAttachRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentMethodsPaymentMethodAttach', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPaymentMethodsPaymentMethodDetach($pb.ClientContext? ctx, PostPaymentMethodsPaymentMethodDetachRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPaymentMethodsPaymentMethodDetach', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPayouts($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPayouts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPayoutsPayout($pb.ClientContext? ctx, PostPayoutsPayoutRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPayoutsPayout', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPayoutsPayoutCancel($pb.ClientContext? ctx, PostPayoutsPayoutCancelRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPayoutsPayoutCancel', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPayoutsPayoutReverse($pb.ClientContext? ctx, PostPayoutsPayoutReverseRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPayoutsPayoutReverse', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPlans($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPlans', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPlansPlan($pb.ClientContext? ctx, PostPlansPlanRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPlansPlan', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPrices($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPrices', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPricesPrice($pb.ClientContext? ctx, PostPricesPriceRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPricesPrice', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postProducts($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostProducts', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postProductsId($pb.ClientContext? ctx, PostProductsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostProductsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPromotionCodes($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPromotionCodes', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postPromotionCodesPromotionCode($pb.ClientContext? ctx, PostPromotionCodesPromotionCodeRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostPromotionCodesPromotionCode', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postRadarValueListItems($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostRadarValueListItems', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postRadarValueLists($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostRadarValueLists', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postRadarValueListsValueList($pb.ClientContext? ctx, PostRadarValueListsValueListRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostRadarValueListsValueList', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postRecipients($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostRecipients', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postRecipientsId($pb.ClientContext? ctx, PostRecipientsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostRecipientsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postRefunds($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostRefunds', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postRefundsRefund($pb.ClientContext? ctx, PostRefundsRefundRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostRefundsRefund', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postReportingReportRuns($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostReportingReportRuns', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postReviewsReviewApprove($pb.ClientContext? ctx, PostReviewsReviewApproveRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostReviewsReviewApprove', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSetupIntents($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSetupIntents', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSetupIntentsIntent($pb.ClientContext? ctx, PostSetupIntentsIntentRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSetupIntentsIntent', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSetupIntentsIntentCancel($pb.ClientContext? ctx, PostSetupIntentsIntentCancelRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSetupIntentsIntentCancel', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSetupIntentsIntentConfirm($pb.ClientContext? ctx, PostSetupIntentsIntentConfirmRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSetupIntentsIntentConfirm', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSkus($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSkus', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSkusId($pb.ClientContext? ctx, PostSkusIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSkusId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSources($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSources', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSourcesSource($pb.ClientContext? ctx, PostSourcesSourceRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSourcesSource', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSourcesSourceVerify($pb.ClientContext? ctx, PostSourcesSourceVerifyRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSourcesSourceVerify', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptionItems($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionItems', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptionItemsItem($pb.ClientContext? ctx, PostSubscriptionItemsItemRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionItemsItem', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptionItemsSubscriptionItemUsageRecords($pb.ClientContext? ctx, PostSubscriptionItemsSubscriptionItemUsageRecordsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionItemsSubscriptionItemUsageRecords', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptionSchedules($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionSchedules', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptionSchedulesSchedule($pb.ClientContext? ctx, PostSubscriptionSchedulesScheduleRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionSchedulesSchedule', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptionSchedulesScheduleCancel($pb.ClientContext? ctx, PostSubscriptionSchedulesScheduleCancelRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionSchedulesScheduleCancel', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptionSchedulesScheduleRelease($pb.ClientContext? ctx, PostSubscriptionSchedulesScheduleReleaseRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionSchedulesScheduleRelease', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptions($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptions', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postSubscriptionsSubscriptionExposedId($pb.ClientContext? ctx, PostSubscriptionsSubscriptionExposedIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostSubscriptionsSubscriptionExposedId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTaxRates($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTaxRates', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTaxRatesTaxRate($pb.ClientContext? ctx, PostTaxRatesTaxRateRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTaxRatesTaxRate', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTerminalConnectionTokens($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTerminalConnectionTokens', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTerminalLocations($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTerminalLocations', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTerminalLocationsLocation($pb.ClientContext? ctx, PostTerminalLocationsLocationRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTerminalLocationsLocation', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTerminalReaders($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTerminalReaders', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTerminalReadersReader($pb.ClientContext? ctx, PostTerminalReadersReaderRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTerminalReadersReader', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTokens($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTokens', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTopups($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTopups', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTopupsTopup($pb.ClientContext? ctx, PostTopupsTopupRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTopupsTopup', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTopupsTopupCancel($pb.ClientContext? ctx, PostTopupsTopupCancelRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTopupsTopupCancel', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTransfers($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTransfers', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTransfersIdReversals($pb.ClientContext? ctx, PostTransfersIdReversalsRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTransfersIdReversals', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTransfersTransfer($pb.ClientContext? ctx, PostTransfersTransferRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTransfersTransfer', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postTransfersTransferReversalsId($pb.ClientContext? ctx, PostTransfersTransferReversalsIdRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostTransfersTransferReversalsId', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postWebhookEndpoints($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostWebhookEndpoints', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> postWebhookEndpointsWebhookEndpoint($pb.ClientContext? ctx, PostWebhookEndpointsWebhookEndpointRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PostWebhookEndpointsWebhookEndpoint', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> putAccountLogout($pb.ClientContext? ctx, $1.Empty request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PutAccountLogout', request, emptyResponse);
+  }
+  $async.Future<$1.Empty> putAccountsAccountLogout($pb.ClientContext? ctx, PutAccountsAccountLogoutRequest request) {
+    var emptyResponse = $1.Empty();
+    return _client.invoke<$1.Empty>(ctx, 'StripeAPIService', 'PutAccountsAccountLogout', request, emptyResponse);
   }
 }
 

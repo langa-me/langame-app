@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 
 /// Handle message listening, sending,
@@ -9,7 +9,7 @@ import 'package:langame/services/http/firebase.dart';
 abstract class MessageApi {
   final FirebaseApi firebase;
 
-  final void Function(lg.Notification?) onBackgroundOrForegroundOpened;
+  final void Function(dynamic) onBackgroundOrForegroundOpened;
 
   MessageApi(this.firebase, this.onBackgroundOrForegroundOpened);
 
@@ -17,25 +17,12 @@ abstract class MessageApi {
   /// configuration for notifications...
   Future<LangameResponse> initializePermissions();
 
-  /// Send a Langame message and return the message id retrievable in Firestore
-  Future<String> send(List<String> recipients, List<String> topics);
-  Future<void> sendLangameEnd(String channelName);
-
-  /// Response to a Langame message to say "I am ready and waiting"
-  Future<void> notifyPresence(String channelName);
-
   /// Start listening to messages
-  Future<void> listen(void Function(lg.Notification?) add);
+  Future<void> listen(void Function(dynamic)? add);
 
-  /// Overlay on top of FirebaseMessaging.cgetInitialMessage that transform
-  /// into a LangameNotification
-  Future<lg.Notification?> getInitialMessage();
+  /// Overlay on top of FirebaseMessaging.getInitialMessage that get
+  Future<dynamic> getInitialMessage();
 
   /// Stop listening to messages
   void cancel();
-
-  /// Fetch a message
-  Future<lg.Notification?> fetch(String id);
-  Future<List<lg.Notification>> fetchAll();
-  Future<void> delete(String channelName);
 }

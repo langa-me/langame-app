@@ -114,9 +114,8 @@ export const getUserData = async (id: string) => {
 };
 
 export const handleSendToDevice = (recipientData: any,
-    notificationId: string,
     promise: Promise<admin.messaging.MessagingDevicesResponse>)
-    : Promise<string | FirebaseFunctionsResponse> => {
+    : Promise<any | FirebaseFunctionsResponse> => {
   return promise.then((res) => {
     res.results.forEach((r, i) => {
       const t = recipientData.tokens![i];
@@ -137,7 +136,7 @@ export const handleSendToDevice = (recipientData: any,
               functions.logger.error("failed to remove invalid token", t));
       }
     });
-    return notificationId;
+    return Promise.resolve();
   }).catch((e) => {
     functions.logger.error("sendLangame failed", JSON.stringify(e));
     return new FirebaseFunctionsResponse(
@@ -198,9 +197,7 @@ export const getLangame = async (channelName: string):
       .collection(kLangamesCollection)
       .where("channelName", "==", channelName)
       .get();
-  if (queryResult.empty ||
-      queryResult.docs.some((d) =>
-        !d.exists || !("players" in d.data()))) {
+  if (queryResult.empty) {
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
         undefined,
@@ -211,10 +208,7 @@ export const getLangame = async (channelName: string):
     const data = queryResult.docs[0].data();
     return {
       id: queryResult.docs[0].id,
-      channelName: data.channelName,
-      players: data.players,
-      topics: data.topics,
-      questions: data.questions,
+      data,
     };
   } catch (e) {
     return new FirebaseFunctionsResponse(

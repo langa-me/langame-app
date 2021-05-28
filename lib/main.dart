@@ -9,6 +9,7 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -23,10 +24,12 @@ import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
+import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/paint_provider.dart';
 import 'package:langame/providers/payment_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
@@ -41,7 +44,9 @@ import 'package:provider/provider.dart';
 
 import 'providers/relation_provider.dart';
 import 'services/http/firebase.dart';
+import 'services/http/impl_langame_api.dart';
 import 'services/http/impl_payment_api.dart';
+import 'views/colors/colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +55,7 @@ void main() async {
   await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
   var analytics = FirebaseAnalytics();
   var remoteConfig = RemoteConfig.instance;
+  var dynamicLinks = FirebaseDynamicLinks.instance;
   var useEmulator = false;
   FirebaseApi firebase = FirebaseApi(
     messaging: FirebaseMessaging.instance,
@@ -63,6 +69,7 @@ void main() async {
     analytics: analytics,
     storage: FirebaseStorage.instance,
     remoteConfig: remoteConfig,
+    dynamicLinks: dynamicLinks,
     useEmulator: useEmulator,
   );
 
@@ -93,8 +100,7 @@ void main() async {
           if (n?.channelName != null) {
             navigationKey.currentState?.pushReplacement(
               MaterialPageRoute(
-                builder: (context) =>
-                    LangameView(n!.channelName, n.ready),
+                builder: (context) => LangameView(n!.channelName, n.ready),
               ),
             );
           }
@@ -103,7 +109,8 @@ void main() async {
       crashAnalyticsProvider, authenticationProvider);
   var relationProvider = RelationProvider(
       authenticationApi, crashAnalyticsProvider, authenticationProvider);
-  var preferenceProvider = PreferenceProvider(firebase, crashAnalyticsProvider, authenticationProvider);
+  var preferenceProvider = PreferenceProvider(
+      firebase, crashAnalyticsProvider, authenticationProvider);
   var remoteConfigProvider =
       RemoteConfigProvider(crashAnalyticsProvider, remoteConfig);
 
@@ -128,7 +135,7 @@ void main() async {
             ),
             ChangeNotifierProvider(create: (_) => TopicProvider(firebase)),
             ChangeNotifierProvider(create: (_) => FunnyProvider()),
-            ChangeNotifierProvider(create: (_) => LangameProvider()),
+            ChangeNotifierProvider(create: (_) => NewLangameProvider()),
 
             ///////////////////////////////////////////
             ////////// Dependent providers ////////////
@@ -161,17 +168,12 @@ void main() async {
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, RelationProvider>(
-              update: (_, cap, ap, rp) => RelationProvider(
-                  // TODO: might not necessarily rebuild every time
-                  authenticationApi,
-                  cap,
-                  ap),
+              update: (_, cap, ap, rp) => rp!,
               create: (_) => relationProvider,
             ),
             ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
                 ContextProvider, PreferenceProvider, FeedbackProvider>(
-              update: (_, cap, cp, pp, fp) =>
-                  FeedbackProvider(firebase, cap, cp, pp),
+              update: (_, cap, cp, pp, fp) => fp!,
               create: (_) => FeedbackProvider(firebase, crashAnalyticsProvider,
                   contextProvider, preferenceProvider),
             ),
@@ -196,6 +198,19 @@ void main() async {
                   contextProvider,
                   authenticationProvider,
                   ImplPaymentApi(firebase)),
+            ),
+            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
+                    DynamicLinksProvider>(
+                update: (_, cap, dlp) => dlp!,
+                create: (_) => DynamicLinksProvider(
+                      crashAnalyticsProvider,
+                      dynamicLinks,
+                    )),
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
+                AuthenticationProvider, LangameProvider>(
+              update: (_, cap, ap, lp) => lp!,
+              create: (_) => LangameProvider(firebase, crashAnalyticsProvider,
+                  authenticationProvider, ImplLangameApi(firebase)),
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),
@@ -241,13 +256,37 @@ class _MyAppState extends State<MyApp> {
           fontFamily: AppFont.mainFont,
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
           background: Colors.transparent,
-        ).toTheme,
+        ).toTheme.copyWith(
+              iconTheme: IconThemeData(color: Colors.black),
+              buttonTheme: ButtonThemeData(buttonColor: Colors.white),
+              textTheme: TextTheme(
+                caption: TextStyle(fontSize: 12, color: averageGrey()),
+                headline1: TextStyle(fontSize: 45, color: Colors.black),
+                headline2: TextStyle(fontSize: 40, color: Colors.black),
+                headline3: TextStyle(fontSize: 30, color: Colors.black),
+                headline4: TextStyle(fontSize: 25, color: Colors.black),
+                headline5: TextStyle(fontSize: 20, color: Colors.black),
+                headline6: TextStyle(fontSize: 15, color: Colors.black),
+              ),
+            ),
         darkTheme: FlexColorScheme.dark(
           scheme: scheme,
           fontFamily: AppFont.mainFont,
           visualDensity: FlexColorScheme.comfortablePlatformDensity,
           background: Colors.transparent,
-        ).toTheme,
+        ).toTheme.copyWith(
+              iconTheme: IconThemeData(color: Colors.white),
+              buttonTheme: ButtonThemeData(buttonColor: Colors.grey.shade800),
+              textTheme: TextTheme(
+                caption: TextStyle(fontSize: 12, color: averageGrey()),
+                headline1: TextStyle(fontSize: 45, color: Colors.white),
+                headline2: TextStyle(fontSize: 40, color: Colors.white),
+                headline3: TextStyle(fontSize: 30, color: Colors.white),
+                headline4: TextStyle(fontSize: 25, color: Colors.white),
+                headline5: TextStyle(fontSize: 20, color: Colors.white),
+                headline6: TextStyle(fontSize: 15, color: Colors.white),
+              ),
+            ),
         home: Login(),
         navigatorKey: navigationKey,
         scaffoldMessengerKey: scaffoldMessengerKey,

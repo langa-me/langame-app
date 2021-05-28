@@ -268,17 +268,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<lg.Langame> getChannel(String channelName) async {
-    var r = await firebase.firestore!
-        .collection(AppConst.firestoreLangamesCollection)
-        .where('channelName', isEqualTo: channelName)
-        .get();
-
-    Map<String, dynamic> first = r.docs.first.data();
-    return langameFromMap(first);
-  }
-
-  @override
   Future<List<lg.User>> getUserRecommendations(lg.User user) async {
     // TODO: now reco is random
     var r = await firebase.firestore!

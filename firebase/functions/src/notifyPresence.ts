@@ -1,14 +1,17 @@
 import * as functions from "firebase-functions";
-import {FirebaseFunctionsResponse,
-  FirebaseFunctionsResponseStatusCode} from "./models";
+import {
+  FirebaseFunctionsResponse,
+  FirebaseFunctionsResponseStatusCode,
+} from "./models";
 
 import * as admin from "firebase-admin";
-import {getLangame,
+import {
+  getLangame,
   getUserData,
   handleSendToDevice,
   kInvalidRequest,
-  kNotificationsCollection,
-  kUserDoesNotExist} from "./helpers";
+  kUserDoesNotExist,
+} from "./helpers";
 
 export const notifyPresence = async (data: any,
     context: functions.https.CallableContext) => {
@@ -67,49 +70,30 @@ export const notifyPresence = async (data: any,
   }
   // Get sender data from firestore
   const senderData: FirebaseFunctionsResponse | any =
-      await getUserData(context.auth!.uid);
+    await getUserData(context.auth!.uid);
   // Failed ? Return error
   if ("statusCode" in senderData) return senderData;
 
-  const recipientsUid = recipientsData.map((r) => r.uid);
-
-  const results = await recipientsData
-      // @ts-ignore
+  const results = recipientsData
       .map(async (e) => {
-        const notificationPayload =
-            {
-              senderUid: context.auth!.uid,
-              // @ts-ignore
-              recipientsUid: recipientsUid,
-              topics: langame.topics,
-              channelName: langame.channelName,
-              ready: true,
-            };
-        const notification = await admin
-            .firestore()
-            .collection(kNotificationsCollection)
-            .add(JSON.parse(JSON.stringify(notificationPayload)));
-
         return handleSendToDevice(e,
-            notification.id,
             admin.messaging().sendToDevice(
-            e.tokens!,
-            {
-              data: {id: notification.id},
-              notification: {
-                tag: langame.channelName,
-                // eslint-disable-next-line max-len
-                body: `${senderData.displayName} is waiting you to play ${langame.topics.join(",")}`,
-                // eslint-disable-next-line max-len
-                title: `Join ${senderData.displayName} to play ${langame.topics.join(",")} now?`,
-              },
+          e.tokens!,
+          {
+            notification: {
+              tag: langame.channelName,
+              // eslint-disable-next-line max-len
+              body: `${senderData.displayName} is waiting you to play ${langame.topics.join(",")}`,
+              // eslint-disable-next-line max-len
+              title: `Join ${senderData.displayName} to play ${langame.topics.join(",")} now?`,
             },
-            {
-              // Required for background/quit data-only messages on iOS
-              contentAvailable: true,
-              // Required for background/quit data-only messages on Android
-              priority: "high",
-            }
+          },
+          {
+            // Required for background/quit data-only messages on iOS
+            contentAvailable: true,
+            // Required for background/quit data-only messages on Android
+            priority: "high",
+          }
             ));
       });
 

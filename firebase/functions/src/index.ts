@@ -1,8 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {newFeedback} from "./feedback";
-import {sendLangameEnd} from "./sendLangameEnd";
-import {sendLangame} from "./sendLangame";
 import {interactionsDecrement} from "./scheduledFunctions";
 import {cleanupUser} from "./deleteData";
 import {subscribe} from "./subscribe";
@@ -11,8 +9,10 @@ import {getChannelToken} from "./getChannelToken";
 import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
 import {confirmStripePayment} from "./stripe/confirmStripePayment";
 import {createStripeCustomer} from "./stripe/createStripeCustomer";
-import {kStripeCustomersCollection} from "./helpers";
+import {kLangamesCollection, kStripeCustomersCollection} from "./helpers";
 import {createStripePayment} from "./stripe/createStripePayment";
+import {onCreateLangame} from "./onCreateLangame";
+import {onUpdateLangame} from "./onUpdateLangame";
 // Initialize admin firebase
 admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
@@ -42,11 +42,6 @@ exports.interactionsDecrement = functions
     .schedule("1 * * * *")
     .onRun(interactionsDecrement);
 
-exports.sendLangameEnd = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(sendLangameEnd);
 
 exports.cleanupUser = functions.auth.user().onDelete(cleanupUser);
 
@@ -56,11 +51,6 @@ exports.getChannelToken = functions
     .https
     .onCall(getChannelToken);
 
-exports.sendLangame = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(sendLangame);
 
 exports.notifyPresence = functions
     .region(region)
@@ -105,3 +95,13 @@ exports.confirmStripePayment = functions.firestore
     .document(`${kStripeCustomersCollection}/{userId}/payments/{pushId}`)
     .onUpdate((ch, c) =>
       confirmStripePayment(ch, c, prodStripeConfig));
+
+// Langame //
+
+exports.onCreateLangame = functions.firestore
+    .document(`${kLangamesCollection}/{pushId}`)
+    .onCreate(onCreateLangame);
+
+exports.onUpdateLangame = functions.firestore
+    .document(`${kLangamesCollection}/{langameId}`)
+    .onUpdate(onUpdateLangame);

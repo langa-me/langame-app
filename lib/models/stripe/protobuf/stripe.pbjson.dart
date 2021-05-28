@@ -8,7 +8,7 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
-import '../../google/protobuf/empty.pbjson.dart' as $0;
+import '../../google/protobuf/empty.pbjson.dart' as $1;
 
 @$core.Deprecated('Use deleteAccountBankAccountsIdRequestDescriptor instead')
 const DeleteAccountBankAccountsIdRequest$json = const {
@@ -5304,7 +5304,7 @@ const $core.Map<$core.String, $core.dynamic> StripeAPIServiceBase$json = const {
 
 @$core.Deprecated('Use stripeAPIServiceDescriptor instead')
 const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>> StripeAPIServiceBase$messageJson = const {
-  '.google.protobuf.Empty': $0.Empty$json,
+  '.google.protobuf.Empty': $1.Empty$json,
   '.stripeapi.DeleteAccountBankAccountsIdRequest': DeleteAccountBankAccountsIdRequest$json,
   '.stripeapi.DeleteAccountExternalAccountsIdRequest': DeleteAccountExternalAccountsIdRequest$json,
   '.stripeapi.DeleteAccountPeoplePersonRequest': DeleteAccountPeoplePersonRequest$json,

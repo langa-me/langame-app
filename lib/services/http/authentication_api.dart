@@ -57,8 +57,6 @@ abstract class AuthenticationApi {
 
   Future<String> getChannelToken(String channelName);
 
-  Future<lg.Langame> getChannel(String channelName);
-
   Future<List<lg.User>> getUserRecommendations(lg.User user);
 
   Future<int?> getInteraction(String uid, String otherUid);

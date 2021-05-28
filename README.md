@@ -63,6 +63,7 @@ cd langame-app
 mkdir -p protos/stripe/protobuf
 openapi2proto -spec ../openapi/openapi/spec3.json -out protos/stripe.proto
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto -P protos/google/protobuf
+wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/timestamp.proto -P protos/google/protobuf
 make proto
 ```
 

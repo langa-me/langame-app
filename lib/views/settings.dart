@@ -13,6 +13,7 @@ import 'package:langame/views/texts/texts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
+import 'buttons/button.dart';
 import 'colors/colors.dart';
 import 'login.dart';
 
@@ -52,10 +53,12 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
-          color: isLightThenBlack(context), //change your color here
+          color: isLightThenDark(context), //change your color here
         ),
         backgroundColor: Colors.transparent,
         actions: [
@@ -70,7 +73,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               padding: const EdgeInsets.all(12),
               child: Consumer<PreferenceProvider>(builder: (context, s, child) {
                 return FlexThemeModeSwitch(
-                  title: Text('Theme'),
+                  title: Text('Theme', style: Theme.of(context).textTheme.headline6),
                   padding: EdgeInsets.all(5),
                   themeMode: ThemeMode.values[s.preference.themeIndex],
                   onThemeModeChanged: s.setTheme,
@@ -81,48 +84,47 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             TextDivider('General'),
             ListTile(
               onTap: () {
-                var cp = Provider.of<ContextProvider>(context, listen: false);
-
                 // Only safe in dev mode yet
                 if (kReleaseMode) {
                   cp.showSnackBar('Coming soon!');
+                  cap.logNewFeatureClick('settings_subscription');
                   return;
                 }
                 cp.push(PaymentView());
               },
-              leading: Icon(Icons.subscriptions_rounded),
-              title: Text('Subscription'),
+              leading: Icon(Icons.subscriptions_rounded, color: isLightThenDark(context)),
+              title: Text('Subscription', style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
-                final snackBar = SnackBar(content: Text('Coming soon!'));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                cp.showSnackBar('Coming soon!');
+                cap.logNewFeatureClick('settings_profile');
               },
-              leading: Icon(Icons.account_circle_outlined),
-              title: Text('Profile'),
+              leading: Icon(Icons.account_circle_outlined, color: isLightThenDark(context)),
+              title: Text('Profile', style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
-                final snackBar = SnackBar(content: Text('Coming soon!'));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                cp.showSnackBar('Coming soon!');
+                cap.logNewFeatureClick('settings_notifications');
               },
-              leading: Icon(Icons.notifications_outlined),
-              title: Text('Notifications'),
+              leading: Icon(Icons.notifications_outlined, color: isLightThenDark(context)),
+              title: Text('Notifications', style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
-                final snackBar = SnackBar(content: Text('Coming soon!'));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                cp.showSnackBar('Coming soon!');
+                cap.logNewFeatureClick('settings_digital_wellbeing');
               },
-              leading: Icon(Icons.self_improvement_outlined),
-              title: Text('Digital Wellbeing'),
+              leading: Icon(Icons.self_improvement_outlined, color: isLightThenDark(context)),
+              title: Text('Digital Wellbeing', style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
-                var cp = Provider.of<ContextProvider>(context, listen: false);
                 // Only safe in dev mode yet
                 if (kReleaseMode) {
                   cp.showSnackBar('Coming soon!');
+                  cap.logNewFeatureClick('settings_delete_account');
                   return;
                 }
                 cp.showCustomDialog([
@@ -139,32 +141,25 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                       Text(
                         'Are you sure to leave us?',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6!.merge(
-                              TextStyle(color: Colors.white),
-                            ),
+                        style: Theme.of(context).textTheme.headline6,
                       ),
-                      OutlinedButton.icon(
-                          style:
-                              OutlinedButton.styleFrom(primary: Colors.white),
-                          onPressed: () {
+                      LangameButton(() {
                             cp.dialogComplete();
                             _delete();
-                          },
-                          icon: Icon(Icons.delete_forever_outlined),
-                          label: Text('Delete my account'))
+                          }, 'Delete my account', Icons.delete_forever_outlined)
                     ]),
                   )
                 ], canBack: true);
               },
-              leading: Icon(Icons.whatshot_outlined),
-              title: Text('Delete my account and all my data'),
+              leading: Icon(Icons.whatshot_outlined, color: isLightThenDark(context)),
+              title: Text('Delete my account and all my data', style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () async {
-                var cp = Provider.of<ContextProvider>(context, listen: false);
                 // Only safe in dev mode yet
                 if (kReleaseMode) {
                   cp.showSnackBar('Coming soon!');
+                  cap.logNewFeatureClick('settings_log_out');
                   return;
                 }
                 cp.showLoadingDialog(
@@ -178,16 +173,16 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 cp.dialogComplete();
                 cp.pushReplacement(Login());
               },
-              leading: Icon(Icons.login_outlined),
-              title: Text('Log out'),
+              leading: Icon(Icons.login_outlined, color: isLightThenDark(context)),
+              title: Text('Log out', style: Theme.of(context).textTheme.headline6),
             ),
             TextDivider('Experimental features'),
             Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
                 onTap: () =>
                     p.setShakeToFeedback(!p.preference.shakeToFeedback),
-                leading: Icon(Icons.feedback_outlined),
-                title: Text('Shake-to-feedback'),
+                leading: Icon(Icons.feedback_outlined, color: isLightThenDark(context)),
+                title: Text('Shake-to-feedback', style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
                     value: p.preference.shakeToFeedback,
                     onChanged: (v) =>
@@ -198,8 +193,8 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               builder: (context, p, child) => ListTile(
                 onTap: () => p.setRecommendations(
                     !p.preference.unknownPeopleRecommendations),
-                leading: Icon(Icons.recommend),
-                title: Text('User recommendations'),
+                leading: Icon(Icons.recommend, color: isLightThenDark(context)),
+                title: Text('User recommendations', style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
                     value: p.preference.unknownPeopleRecommendations,
                     onChanged: (v) => p.setRecommendations(
@@ -211,6 +206,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
       ),
     );
   }
+
 
   void _delete() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);

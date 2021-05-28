@@ -96,30 +96,44 @@ const UserPreference$json = const {
 
 /// Descriptor for `UserPreference`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List userPreferenceDescriptor = $convert.base64Decode('Cg5Vc2VyUHJlZmVyZW5jZRIXCgd1c2VyX2lkGAIgASgJUgZ1c2VySWQSRAoedW5rbm93bl9wZW9wbGVfcmVjb21tZW5kYXRpb25zGAMgASgIUhx1bmtub3duUGVvcGxlUmVjb21tZW5kYXRpb25zEh8KC3RoZW1lX2luZGV4GAQgASgFUgp0aGVtZUluZGV4Ei8KFGhhc19kb25lX29uX2JvYXJkaW5nGAUgASgIUhFoYXNEb25lT25Cb2FyZGluZxIlCg5zZWFyY2hfaGlzdG9yeRgGIAMoCVINc2VhcmNoSGlzdG9yeRIqChFzaGFrZV90b19mZWVkYmFjaxgHIAEoCFIPc2hha2VUb0ZlZWRiYWNr');
-@$core.Deprecated('Use channelUserLangameUserDescriptor instead')
-const ChannelUserLangameUser$json = const {
-  '1': 'ChannelUserLangameUser',
-  '2': const [
-    const {'1': 'channel_uid', '3': 1, '4': 1, '5': 13, '10': 'channelUid'},
-    const {'1': 'langame_uid', '3': 2, '4': 1, '5': 9, '10': 'langameUid'},
-  ],
-};
-
-/// Descriptor for `ChannelUserLangameUser`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List channelUserLangameUserDescriptor = $convert.base64Decode('ChZDaGFubmVsVXNlckxhbmdhbWVVc2VyEh8KC2NoYW5uZWxfdWlkGAEgASgNUgpjaGFubmVsVWlkEh8KC2xhbmdhbWVfdWlkGAIgASgJUgpsYW5nYW1lVWlk');
 @$core.Deprecated('Use langameDescriptor instead')
 const Langame$json = const {
   '1': 'Langame',
   '2': const [
-    const {'1': 'channelName', '3': 1, '4': 1, '5': 9, '10': 'channelName'},
-    const {'1': 'players', '3': 2, '4': 3, '5': 11, '6': '.langame.protobuf.ChannelUserLangameUser', '10': 'players'},
+    const {'1': 'channel_name', '3': 1, '4': 1, '5': 9, '10': 'channelName'},
+    const {'1': 'players', '3': 2, '4': 3, '5': 11, '6': '.langame.protobuf.Langame.Player', '10': 'players'},
     const {'1': 'topics', '3': 3, '4': 3, '5': 9, '10': 'topics'},
     const {'1': 'questions', '3': 4, '4': 3, '5': 11, '6': '.langame.protobuf.Question', '10': 'questions'},
+    const {'1': 'initiator', '3': 5, '4': 1, '5': 9, '10': 'initiator'},
+    const {'1': 'done', '3': 7, '4': 1, '5': 8, '10': 'done'},
+    const {'1': 'current_question', '3': 8, '4': 1, '5': 5, '10': 'currentQuestion'},
+    const {'1': 'date', '3': 9, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'date'},
+  ],
+  '3': const [Langame_Player$json, Langame_Note$json],
+};
+
+@$core.Deprecated('Use langameDescriptor instead')
+const Langame_Player$json = const {
+  '1': 'Player',
+  '2': const [
+    const {'1': 'user_id', '3': 1, '4': 1, '5': 9, '10': 'userId'},
+    const {'1': 'time_in', '3': 2, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'timeIn'},
+    const {'1': 'time_out', '3': 3, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'timeOut'},
+    const {'1': 'notes', '3': 4, '4': 3, '5': 11, '6': '.langame.protobuf.Langame.Note', '10': 'notes'},
+  ],
+};
+
+@$core.Deprecated('Use langameDescriptor instead')
+const Langame_Note$json = const {
+  '1': 'Note',
+  '2': const [
+    const {'1': 'content', '3': 1, '4': 1, '5': 9, '10': 'content'},
+    const {'1': 'created_at', '3': 2, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'createdAt'},
   ],
 };
 
 /// Descriptor for `Langame`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiAKC2NoYW5uZWxOYW1lGAEgASgJUgtjaGFubmVsTmFtZRJCCgdwbGF5ZXJzGAIgAygLMigubGFuZ2FtZS5wcm90b2J1Zi5DaGFubmVsVXNlckxhbmdhbWVVc2VyUgdwbGF5ZXJzEhYKBnRvcGljcxgDIAMoCVIGdG9waWNzEjgKCXF1ZXN0aW9ucxgEIAMoCzIaLmxhbmdhbWUucHJvdG9idWYuUXVlc3Rpb25SCXF1ZXN0aW9ucw==');
+final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSOgoHcGxheWVycxgCIAMoCzIgLmxhbmdhbWUucHJvdG9idWYuTGFuZ2FtZS5QbGF5ZXJSB3BsYXllcnMSFgoGdG9waWNzGAMgAygJUgZ0b3BpY3MSOAoJcXVlc3Rpb25zGAQgAygLMhoubGFuZ2FtZS5wcm90b2J1Zi5RdWVzdGlvblIJcXVlc3Rpb25zEhwKCWluaXRpYXRvchgFIAEoCVIJaW5pdGlhdG9yEhIKBGRvbmUYByABKAhSBGRvbmUSKQoQY3VycmVudF9xdWVzdGlvbhgIIAEoBVIPY3VycmVudFF1ZXN0aW9uEi4KBGRhdGUYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgRkYXRlGsMBCgZQbGF5ZXISFwoHdXNlcl9pZBgBIAEoCVIGdXNlcklkEjMKB3RpbWVfaW4YAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgZ0aW1lSW4SNQoIdGltZV9vdXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgd0aW1lT3V0EjQKBW5vdGVzGAQgAygLMh4ubGFuZ2FtZS5wcm90b2J1Zi5MYW5nYW1lLk5vdGVSBW5vdGVzGlsKBE5vdGUSGAoHY29udGVudBgBIAEoCVIHY29udGVudBI5CgpjcmVhdGVkX2F0GAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIJY3JlYXRlZEF0');
 @$core.Deprecated('Use paintDescriptor instead')
 const Paint$json = const {
   '1': 'Paint',

@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:core';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -116,6 +118,9 @@ class AudioProvider extends ChangeNotifier {
         // switchMicrophone(),
         // switchMicrophone(),
         _engine!.setEnableSpeakerphone(_isSpeakerphoneEnabled),
+        // @see https://docs.agora.io/en/Voice/API%20Reference/flutter/rtc_engine/RtcEngine/enableAudioVolumeIndication.html
+        // TODO: remote config
+        _engine!.enableAudioVolumeIndication(200, 3, false),
       ]); // Usually disabling microphone by default
 
     } catch (e, s) {
@@ -127,11 +132,10 @@ class AudioProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse<void>> joinChannel(
-      String token, String channel, int agoraUid) async {
+      String token, String channel, String uid) async {
     try {
       final msg =
-          'trying to join channel $channel with token $token with uid $agoraUid';
-      debugPrint(msg);
+          'trying to join channel $channel with token $token and audio id $uid';
       _crashAnalyticsProvider.log(msg);
 
       // TODO: replace by which use string uid
@@ -139,7 +143,7 @@ class AudioProvider extends ChangeNotifier {
       final r = RetryOptions(maxAttempts: 8);
       await r.retry(
         () => _engine
-            ?.joinChannel(token, channel, null, agoraUid)
+            ?.joinChannelWithUserAccount(token, channel, uid)
             .timeout(Duration(seconds: 5)),
         retryIf: (e) => e is PlatformException || e is TimeoutException,
       );
@@ -188,5 +192,21 @@ class AudioProvider extends ChangeNotifier {
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
+  }
+
+  Future<LangameResponse<String>> rtcUidToFirebaseUid(int uid) async {
+    try {
+      var u = await _engine!.getUserInfoByUid(uid);
+      if (u.userAccount == null) {
+        var e = 'could not retrieve uid';
+        _crashAnalyticsProvider.recordError(e, null);
+        return LangameResponse(LangameStatus.failed, error: e);
+      }
+      return LangameResponse(LangameStatus.succeed, result: u.userAccount);
+    } catch (e, s) {
+      _crashAnalyticsProvider.log('failed to rtcUidToFirebaseUid');
+      _crashAnalyticsProvider.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
   }
 }
