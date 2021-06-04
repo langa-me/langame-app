@@ -7,63 +7,29 @@ on:
       - main
 
 jobs:
-  # CI
-  analyze_code_and_test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11.x
-      - name: Decrypt Android keys
-        run: sh ./android/decrypt.sh
-        env:
-          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
-        with: # flutter --version
-          flutter-version: 2.2.0
-      - name: Install Flutter dependencies
-        run: flutter pub get
-      # - name: Analyze files
-        # run: flutter analyze .
-      - name: Run the tests
-        run: flutter test --coverage
-      - name: Upload coverage to codecov
-        run: curl -s https://codecov.io/bash -t ${{ secrets.CODECOV_TOKEN }}
-        shell: bash
-      - name: Print outdated packages
-        run: flutter pub outdated
-      # Backend checks
-      - name: Move to Firebase directory
-        run: cd firebase/functions
-      - name: Decrypt service account key
-        env:
-          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
-        run: |
-          gpg --quiet --batch --yes --decrypt --passphrase="$RELEASE_SECRET_PASSPHRASE" \
-          --output service-account.zip service-account.zip.gpg && unzip service-account.zip
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '12'
-      - name: npm install, build and test
-        run: | 
-          npm i
-          npm run build
-          npm run lint
-          npm run coverage
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   # CD
   deploy_android:
     name: Deploy beta to Google Play
     runs-on: ubuntu-latest
-    needs: [analyze_code_and_test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Check CI status
+        run: |
+          output=$(curl -sSL -X GET -G -H "Accept: application/vnd.github.v3+json" -d "branch=${{ env.GITHUB_REF_SLUG }}" -d "event=push" https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ github.event.inputs.ci }}/runs | jq -r '.workflow_runs[0] | "\(.conclusion)"')
+          echo "::set-output name=status::$output"
+        id: check
+
+      - name: Abort if CI not successful
+        if: steps.check.outputs.status != 'success'
+        run: |
+          echo ${{ steps.check.outputs.status }}
+          exit 1
+
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
