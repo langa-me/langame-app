@@ -1,0 +1,24 @@
+{
+    "eslint.workingDirectories": [
+        {
+            "directory": "firebase/functions",
+            "changeProcessCWD": true
+        }
+    ],
+    "eslint.format.enable": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "protoc": {
+        "options": [
+            "--proto_path=./protos",
+            "--dart_out=./lib/models"
+        ]
+    },
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.enablePreviewFromQuickOpen": false,
+    "mocha.files.glob": "test/**/*.ts",
+    "mocha.sideBarOptions": null,
+    "mocha.subdirectory": "firebase/functions",
+    "mocha.nycPath": "firebase/functions"
+}

@@ -4,8 +4,6 @@ import {RtcRole, RtcTokenBuilder} from "agora-access-token";
 import {
   FirebaseFunctionsResponse,
   FirebaseFunctionsResponseStatusCode,
-  LangameChannel,
-  LangameUser,
 } from "./models";
 
 // Agora config
@@ -13,8 +11,6 @@ import {
 export const appID = functions.config().agora.id;
 export const appCertificate = functions.config().agora.certificate;
 
-// token expire time, hardcode to 3600 seconds = 1 hour
-export const expirationTimeInSeconds = 3600;
 export const role = RtcRole.PUBLISHER;
 
 
@@ -29,6 +25,8 @@ export const kQuestionsCollection: string = "questions";
 export const kBetasCollection: string = "betas";
 export const kInteractionsCollection: string = "interactions";
 export const kPreferencesCollection: string = "preferences";
+export const kStripeCustomersCollection: string = "stripe_customers";
+export const kProductsCollection: string = "products";
 
 export const filterOutSendLangameCalls =
     (data: any, context: functions.https.CallableContext) => {
@@ -66,68 +64,10 @@ export const filterOutSendLangameCalls =
       return 0;
     };
 
-export const getUserData = async (id: string) => {
-  const recipient = await admin
-      .firestore()
-      .collection(kUsersCollection)
-      .doc(id)
-      .get();
-  if (!recipient.exists) {
-    functions.logger.error(kUserDoesNotExist(id), "not present in db");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        kUserDoesNotExist(id),
-    );
-  }
 
-
-  const data = recipient.data();
-
-  if (!data) {
-    functions.logger.error(kUserDoesNotExist(id), "has not data");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        kUserDoesNotExist(id),
-    );
-  }
-
-  const dataAsLangameUser = data as LangameUser;
-
-  if (!dataAsLangameUser.tokens) {
-    functions.logger.error(kUserDoesNotExist(id), "has no devices");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        `user ${id} has no devices (tokens)`,
-    );
-  }
-
-  if (!dataAsLangameUser.uid) {
-    functions.logger.error(kUserDoesNotExist(id), "has no uid");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        `user ${id} has no uid`,
-    );
-  }
-
-  if (!dataAsLangameUser.displayName) {
-    functions.logger.error(kUserDoesNotExist(id), "has not display name");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        `user ${id} has no displayName`,
-    );
-  }
-  return dataAsLangameUser;
-};
-
-export const handleSendToDevice = (recipientData: LangameUser,
-    notificationId: string,
+export const handleSendToDevice = (recipientData: any,
     promise: Promise<admin.messaging.MessagingDevicesResponse>)
-    : Promise<string | FirebaseFunctionsResponse> => {
+    : Promise<any | FirebaseFunctionsResponse> => {
   return promise.then((res) => {
     res.results.forEach((r, i) => {
       const t = recipientData.tokens![i];
@@ -148,7 +88,7 @@ export const handleSendToDevice = (recipientData: LangameUser,
               functions.logger.error("failed to remove invalid token", t));
       }
     });
-    return notificationId;
+    return Promise.resolve();
   }).catch((e) => {
     functions.logger.error("sendLangame failed", JSON.stringify(e));
     return new FirebaseFunctionsResponse(
@@ -159,7 +99,7 @@ export const handleSendToDevice = (recipientData: LangameUser,
 };
 
 export const generateAgoraRtcToken = (channelName: string,
-    uid: number): string => {
+    uid: number, expirationTimeInSeconds: number = 3600): string => {
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
@@ -203,35 +143,54 @@ export const hashFnv32a = (str: string, asString: boolean, seed: number):
   return hVal >>> 0;
 };
 
-export const getLangame = async (channelName: string):
-    Promise<FirebaseFunctionsResponse | LangameChannel> => {
-  const queryResult = await admin.firestore()
-      .collection(kLangamesCollection)
-      .where("channelName", "==", channelName)
-      .get();
-  if (queryResult.empty ||
-      queryResult.docs.some((d) =>
-        !d.exists || !("players" in d.data()))) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        "could not find this channel",
-    );
+
+/**
+ *
+ * @param{admin.firestore.Firestore} db
+ * @param{string} collectionPath
+ * @param{number} batchSize
+ * @return{Promise<any>}
+ */
+export async function deleteCollection(db: admin.firestore.Firestore,
+    collectionPath: string,
+    batchSize: number) {
+  const collectionRef = db.collection(collectionPath);
+  const query = collectionRef.orderBy("__name__").limit(batchSize);
+
+  return new Promise((resolve, reject) => {
+    deleteQueryBatch(db, query, resolve).catch(reject);
+  });
+}
+
+/**
+ *
+ * @param{admin.firestore.Firestore} db
+ * @param{admin.firestore.Query} query
+ * @param{any} resolve
+ * @return{void}
+ */
+async function deleteQueryBatch(db: admin.firestore.Firestore,
+    query: admin.firestore.Query,
+    resolve: any) {
+  const snapshot = await query.get();
+
+  const batchSize = snapshot.size;
+  if (batchSize === 0) {
+    // When there are no documents left, we are done
+    resolve();
+    return;
   }
-  try {
-    const data = queryResult.docs[0].data();
-    return new LangameChannel({
-      id: queryResult.docs[0].id,
-      channelName: data.channelName,
-      players: data.players,
-      topics: data.topics,
-      questions: data.questions,
-    });
-  } catch (e) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        "failed to build langame object",
-    );
-  }
-};
+
+  // Delete documents in a batch
+  const batch = db.batch();
+  snapshot.docs.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+  await batch.commit();
+
+  // Recurse on the next process tick, to avoid
+  // exploding the stack.
+  process.nextTick(() => {
+    deleteQueryBatch(db, query, resolve);
+  });
+}

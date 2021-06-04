@@ -79,8 +79,7 @@ void main() {
     // test('should have some recommended users', () async {
     //   SharedPreferences.setMockInitialValues({});
     //   await firestore.collection(AppConst.firestoreUsersCollection).add(
-    //       lg.User(uid: 'foo', displayName: 'bar').toProto3Json()
-    //           as Map<String, dynamic>);
+    //       lg.User(uid: 'foo', displayName: 'bar').toMapStringDynamic();
     //   await relationProvider.getUserRecommendations();
     //   var r = relationProvider.userRecommendations;
     //   print('r $r');

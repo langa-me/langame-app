@@ -1,3 +1,5 @@
+// TODO: convert everything to protobuf
+
 /// API / service level errors
 class LangameException implements Exception {
   String cause;
@@ -44,6 +46,10 @@ class LangameGetUserFriendsException extends LangameException {
 
 class LangameSendLangameException extends LangameException {
   LangameSendLangameException(String cause) : super(cause);
+}
+
+class LangamePaymentException extends LangameException {
+  LangamePaymentException(String cause) : super(cause);
 }
 
 class LangameGetAudioTokenException extends LangameException {

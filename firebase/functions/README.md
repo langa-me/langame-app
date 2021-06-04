@@ -18,10 +18,28 @@ firebase functions:config:set github.token="THE GITHUB TOKEN"
 firebase functions:config:set openai.key="OPENAI KEY"
 firebase functions:config:set mailchimp.key="MAILCHIMP KEY"
 firebase functions:config:set mailchimp.list="MAILCHIMP LIST ID"
+firebase functions:config:set stripe.account="ACCOUNT"
+firebase functions:config:set stripe.key="SECRET_KEY"
 firebase functions:config:get > .runtimeconfig.json
 ```
 
 Then you need to re-deploy your functions
+
+#### Service account dev
+
+
+```bash
+zip service-account.zip langame-dev-8ac76897c7bc.json
+gpg --symmetric --cipher-algo AES256 service-account.zip
+rm -rf service-account.zip
+```
+
+
+```bash
+gpg --output release.zip --decrypt release.zip.gpg && unzip release.zip && rm -rf release.zip
+```
+
+
 
 ## Usage
 

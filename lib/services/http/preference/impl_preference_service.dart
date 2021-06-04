@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:langame/models/extension.dart';
 
 import 'preference_service.dart';
 
@@ -33,12 +33,12 @@ class ImplPreferenceService extends PreferenceService {
     return firebase.firestore!
         .collection(AppConst.firestorePreferencesCollection)
         .doc(userId)
-        .set(preferences.toProto3Json() as Map<String, dynamic>,
+        .set(preferences.toMapStringDynamic(),
             SetOptions(merge: true));
   }
 
   @override
-  Stream<lg.UserPreference> streamPreference(User user) {
+  Stream<lg.UserPreference> streamPreference(lg.User user) {
     _streamSubscription?.cancel();
     _streamPreference = StreamController<lg.UserPreference>();
     _streamSubscription = firebase.firestore!

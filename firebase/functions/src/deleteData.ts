@@ -1,74 +1,86 @@
-import {https} from "firebase-functions";
-import {FirebaseFunctionsResponse,
-  FirebaseFunctionsResponseStatusCode} from "./models";
 import {
   kInteractionsCollection,
-  kNotAuthenticated, kPreferencesCollection,
+  kPreferencesCollection,
   kUsersCollection,
 } from "./helpers";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import {auth} from "firebase-admin/lib/auth";
+import UserRecord = auth.UserRecord;
+import Stripe from "stripe";
+import {reportError} from "./errors";
+const stripe = new Stripe(functions.config().stripe.key, {
+  apiVersion: "2020-08-27",
+});
 
-export const deleteData = async (data: any,
-    context: https.CallableContext) => {
-  if (!context.auth) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
-        undefined,
-        kNotAuthenticated,
-    );
-  }
-
+/**
+ * When a user deletes their account, clean up after them
+ * @param{UserRecord} user
+ * @param{functions.EventContext} context
+ */
+export const cleanupUser = async (user: UserRecord,
+    context: functions.EventContext) => {
   const db = admin.firestore();
-  const interactionsToDelete = await db
-      .collection(kInteractionsCollection)
-      .where("usersArray", "array-contains", context.auth.uid)
-      .get();
-
-  const preferencesToDelete = await db
-      .collection(kPreferencesCollection)
-      .where("userId", "==", context.auth.uid)
-      .get();
-
-  const userToDelete = db
+  const customerCollection = db.collection("stripe_customers");
+  const customerDoc = customerCollection.doc(user.uid);
+  const customer = (await customerDoc.get()).data();
+  const userDocToDelete = db
       .collection(kUsersCollection)
-      .doc(context.auth.uid);
+      .doc(user.uid);
 
-  // Get a new write batch
   const batch = db.batch();
+  // TODO: shouldn't we use transaction for read too?
+  try {
+    if (!customer) {
+      await reportError(new Error("could not retrieve Stripe customer"),
+          {user: context.params.userId});
+    } else {
+      functions.logger.info("preparing customer deletion", customerDoc.id);
+      await stripe.customers.del(customer.customer_id);
+      // Delete the customers payments & payment methods in firestore.
+      const paymentsMethodsSnapshot = await customerDoc
+          .collection("payment_methods")
+          .get();
+      paymentsMethodsSnapshot.forEach((snap) => batch.delete(snap.ref));
+      const paymentsSnapshot = await customerDoc
+          .collection("payments")
+          .get();
+      paymentsSnapshot.forEach((snap) => batch.delete(snap.ref));
+      const subscriptionsSnapshot = await customerDoc
+          .collection("subscriptions")
+          .get();
+      subscriptionsSnapshot.forEach((snap) => batch.delete(snap.ref));
+      batch.delete(customerDoc);
+    }
+    const interactionsToDelete = await db
+        .collection(kInteractionsCollection)
+        .where("usersArray", "array-contains", user.uid)
+        .get();
 
-  for (const interactionToDelete of interactionsToDelete.docs) {
-    batch.delete(interactionToDelete.ref);
+    const preferencesToDelete = await db
+        .collection(kPreferencesCollection)
+        .where("userId", "==", user.uid)
+        .get();
+
+    for (const interactionToDelete of interactionsToDelete.docs) {
+      batch.delete(interactionToDelete.ref);
+    }
+    for (const preferenceToDelete of preferencesToDelete.docs) {
+      batch.delete(preferenceToDelete.ref);
+    }
+
+    const presenceInLangames = await db
+        .collectionGroup("players")
+        .where("userId", "==", user.uid).get();
+
+    for (const p of presenceInLangames.docs) {
+      batch.delete(p.ref);
+    }
+
+    functions.logger.info("preparing interactions, preferences, user deletion");
+
+    return batch.delete(userDocToDelete).commit();
+  } catch (e) {
+    return reportError(e, {user: context.params.userId});
   }
-  for (const preferenceToDelete of preferencesToDelete.docs) {
-    batch.delete(preferenceToDelete.ref);
-  }
-  batch.delete(userToDelete);
-  return batch.commit().then(async () => {
-    return admin.auth().deleteUser(context.auth!.uid).then(() => {
-      functions.logger.info("successfully deleted user data",
-          context.auth!.uid);
-      return new FirebaseFunctionsResponse(
-          FirebaseFunctionsResponseStatusCode.OK,
-          undefined,
-          undefined,
-      );
-    }).catch((e) => {
-      functions.logger.error("failed to delete user data",
-          context.auth!.uid,
-          e);
-      return new FirebaseFunctionsResponse(
-          FirebaseFunctionsResponseStatusCode.INTERNAL,
-          undefined,
-          "delete_data_failed",
-      );
-    });
-  }).catch((e) => {
-    functions.logger.error("failed to delete user data", context.auth!.uid, e);
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        "delete_data_failed",
-    );
-  });
 };

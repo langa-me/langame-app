@@ -6,3 +6,5 @@ lib
 
 # Service account
 langame*.json
+
+remoteconfig.template.json

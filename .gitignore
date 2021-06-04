@@ -51,3 +51,6 @@ release.zip
 
 # Doc generated
 doc
+
+# Tests
+coverage

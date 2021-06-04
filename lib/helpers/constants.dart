@@ -22,13 +22,9 @@ class AppConst {
   /// Define App ID and Token
   static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
 
-  static const String saveTokenFunction = 'saveToken';
-  static const String sendLangameFunction = 'sendLangame';
   static const String notifyPresenceFunction = 'notifyPresence';
-  static const String updateProfileFunction = 'updateProfile';
-  static const String getChannelTokenFunction = 'getChannelToken';
-  static const String sendLangameEndFunction = 'sendLangameEnd';
-  static const String deleteDataFunction = 'deleteData';
+  static const String createStripeSubscriptionFunction =
+      'createStripeSubscription';
 
   static const String firestoreUsersCollection = 'users';
   static const String firestoreNotificationsCollection = 'notifications';
@@ -36,8 +32,11 @@ class AppConst {
   static const String firestoreTopicsCollection = 'topics';
   static const String firestoreInteractionsCollection = 'interactions';
   static const String firestorePreferencesCollection = 'preferences';
+  static const String firestoreStripeCustomersCollection = 'stripe_customers';
+  static const String firestoreProductsCollection = 'products';
 
   static const String helpUrl = 'https://help.langa.me';
+  static const String mainUrl = 'https://langa.me';
 }
 
 /// Fonts assets used in this application,
@@ -63,11 +62,8 @@ class AppText {
   // This class is not meant to be instantiated or extended; this constructor
   // prevents instantiation and extension.
   AppText._();
-
-  // TODO https://flutter.dev/docs/development/accessibility-and-localization/internationalization#:~:text=platform%20might%20require.-,Setting%20up%20an%20internationalized%20app%3A%20the%20Flutter_localizations%20package,include%20a%20package%20called%20flutter_localizations%20.
 }
 
-// TODO: should be singleton probably
 class AppSize {
   static late MediaQueryData _mediaQueryData;
   static late double screenWidth;

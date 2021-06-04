@@ -23,30 +23,39 @@ class FeedbackProvider extends ChangeNotifier {
 
   FeedbackProvider(this.firebase, this._crashAnalyticsProvider,
       this._contextProvider, this._preferenceProvider) {
-    _onPreferenceChange();
+    // init();
   }
 
-  _onPreferenceChange() {
-    if (_preferenceProvider.preference.shakeToFeedback) {
-      _detector?.startListening();
-    } else {
-      _detector?.stopListening();
-    }
+  disable() {
+    // _detector?.stopListening();
   }
 
-  initShake() {
-    _detector = ShakeDetector.waitForStart(
-      shakeThresholdGravity: 2,
-      onPhoneShake: () {
-        _crashAnalyticsProvider.log('shake detector initialized',
-            analyticsMessage: 'shake',
-            analyticsParameters: {
-              'user': firebase.auth?.currentUser!.displayName,
-            });
-        show();
-      },
-    );
-    _onPreferenceChange();
+  init() {
+    // _detector = ShakeDetector.waitForStart(
+    //   shakeThresholdGravity: 2,
+    //   onPhoneShake: () {
+    //     _crashAnalyticsProvider.log(
+    //       'shake detector activated',
+    //       analyticsMessage: 'shake',
+    //     );
+    //     show();
+    //   },
+    // );
+    // onPreferenceChange();
+  }
+
+  onPreferenceChange() {
+    // if (_preferenceProvider.preference.shakeToFeedback) {
+    //   _detector?.startListening();
+    // } else {
+    //   _detector?.stopListening();
+    // }
+    // _crashAnalyticsProvider.log(
+    //     'shake detector ${_preferenceProvider.preference.shakeToFeedback}',
+    //     analyticsMessage: 'shake_enable',
+    //     analyticsParameters: {
+    //       'value': _preferenceProvider.preference.shakeToFeedback,
+    //     });
   }
 
   Null show({bool fromShaking = true}) {

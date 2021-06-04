@@ -17,6 +17,11 @@ class CrashAnalyticsProvider extends ChangeNotifier {
           name: analyticsMessage, parameters: analyticsParameters);
   }
 
+  void logNewFeatureClick(String featureName) =>
+      log('click on "$featureName"',
+          analyticsMessage: 'new_feature_request',
+          analyticsParameters: {'feature': featureName});
+
   void setCurrentScreen(String screenName) {
     analytics.setCurrentScreen(screenName: screenName);
     crashlytics.setCustomKey('screenName', screenName);

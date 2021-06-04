@@ -36,6 +36,7 @@
 				<string>com.googleusercontent.apps.388264600961-6amsmva8lu3p7ro1nrd6f2lifp0aahua</string>
 			</array>
 		</dict>
+		<dict/>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
@@ -46,6 +47,7 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https://help.langa.me</string>
+		<string>https://langa.me</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -54,12 +56,28 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>We need some of your contact information to help others recognize you</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>We need some of your contact information to help others recognize you</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>We need some of your contact information to help others recognize you</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_dartobservatory._tcp</string>
 	</array>
+	<key>NSCalendarsUsageDescription</key>
+	<string>We need some of your contact information to help others recognize you</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need some of your contact information to help others recognize you</string>
+	<key>NSContactsUsageDescription</key>
+	<string>We need some of your contact information to help others recognize you</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need some of your contact information to help others recognize you</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need your microphone to talk to others</string>
+	<key>NSMotionUsageDescription</key>
+	<string>We need some of your contact information to help others recognize you</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>We use speech recognition to improve user experience</string>
 	<key>UIBackgroundModes</key>
@@ -85,21 +103,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSContactsUsageDescription</key>
-	<string>We need some of your contact information to help others recognize you</string>
-    <key>NSCalendarsUsageDescription</key>
-    <string>We need some of your contact information to help others recognize you</string>
-    <key>NSBluetoothPeripheralUsageDescription</key>
-    <string>We need some of your contact information to help others recognize you</string>
-    <key>NSCameraUsageDescription</key>
-    <string>We need some of your contact information to help others recognize you</string>
-    <key>NSAppleMusicUsageDescription</key>
-    <string>We need some of your contact information to help others recognize you</string>
-    <key>NSMotionUsageDescription</key>
-    <string>We need some of your contact information to help others recognize you</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>We need some of your contact information to help others recognize you</string>
-    <key>NSBluetoothAlwaysUsageDescription</key>
-    <string>We need some of your contact information to help others recognize you</string>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://play.langa.me</string>
+	</array>
 </dict>
 </plist>

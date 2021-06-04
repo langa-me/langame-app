@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -18,6 +19,7 @@ class FirebaseApi {
   final FirebaseAnalytics? analytics;
   final FirebaseStorage? storage;
   final RemoteConfig? remoteConfig;
+  final FirebaseDynamicLinks? dynamicLinks;
   final bool useEmulator;
   FirebaseApi(
       {this.messaging,
@@ -29,19 +31,23 @@ class FirebaseApi {
       this.analytics,
       this.storage,
       this.remoteConfig,
+      this.dynamicLinks,
       this.useEmulator = false}) {
     if (!useEmulator) return;
 
     // Need to clear local cache otherwise would use non-emulator data
-    // firestore.clearPersistence();
+    firestore!.clearPersistence();
+    auth!.currentUser?.delete();
+    auth!.signOut();
 
     /// https://firebase.google.com/docs/emulator-suite
     /// Warning: change local IP accordingly i.e. `ip a`
     /// then from mobile `telnet IP PORT`
-    auth?.useEmulator('192.168.1.19:9099');
-    functions?.useFunctionsEmulator(origin: '192.168.1.19:5001');
+    const myIp = 'http://192.168.43.41';
+    auth?.useEmulator('$myIp:9099');
+    functions?.useFunctionsEmulator(origin: '$myIp:5001');
     firestore?.settings = Settings(
-      host: '192.168.1.19:8080',
+      host: '$myIp:8080',
       sslEnabled: false,
     );
   }

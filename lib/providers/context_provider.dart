@@ -3,9 +3,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/services/context/dialog_service.dart';
 import 'package:langame/services/context/navigation_service.dart';
 import 'package:langame/services/context/snack_bar_service.dart';
+import 'package:langame/views/colors/colors.dart';
 import 'package:lottie/lottie.dart';
 
 enum spinKitType { SpinKitChasingDots, SpinKitDualRing, SpinKitWanderingCubes }
@@ -26,6 +28,14 @@ class ContextProvider extends ChangeNotifier {
   late DialogService _dialogService;
   late SnackBarService _snackBarService;
   late NavigationService _navigationService;
+  final FunnyProvider _funny;
+
+  ContextProvider(
+      this._navigationKey, this._scaffoldMessengerKey, this._funny) {
+    _dialogService = DialogService(_navigationKey);
+    _navigationService = NavigationService(_navigationKey);
+    _snackBarService = SnackBarService(_scaffoldMessengerKey);
+  }
 
   void showSnackBar(String message, {SnackBarAction? action}) =>
       _snackBarService.show(SnackBar(
@@ -35,10 +45,11 @@ class ContextProvider extends ChangeNotifier {
       ));
 
   /// Calls the dialog listener and returns a Future that will wait for dialogComplete.
-  Future _showDialog(Function showDialogListener) async =>
-      await _dialogService.showDialog(() async => await showDialog(
+  Future<T> _showDialog<T>(Function showDialogListener) async =>
+      await _dialogService.showDialog(() async => (await showDialog<T>(
           context: _navigationKey.currentContext!,
-          builder: (BuildContext context) => showDialogListener()));
+          builder: (BuildContext context) => showDialogListener()))) ??
+      false;
 
   /// Completes the _dialogCompleter to resume the Future's execution call
   void dialogComplete() => _dialogService.dialogComplete();
@@ -50,44 +61,49 @@ class ContextProvider extends ChangeNotifier {
 
   void pop() => _navigationService.pop();
 
-  Future showCustomDialog(List<Widget> children,
+  Future<T> showCustomDialog<T>(List<Widget> children,
           {bool canBack = false, Color? backgroundColor}) =>
-      _showDialog(
+      _showDialog<T>(
         () => WillPopScope(
           onWillPop: () async => canBack,
           child: SimpleDialog(
             backgroundColor: backgroundColor ??
-                Theme.of(_navigationKey.currentContext!).colorScheme.primary,
+                variantIsLightThenDark(_navigationKey.currentContext!,
+                    reverse: true),
             children: children,
           ),
         ),
       );
 
-  Future showLoadingDialog(String text) => showCustomDialog(
+  Future showLoadingDialog({String? text}) => showCustomDialog(
         [
-          Center(
-            child: Column(children: [
-              _loaders.pickAny()!(
-                  Theme.of(_navigationKey.currentContext!).brightness ==
-                          Brightness.dark
-                      ? Colors.black
-                      : Colors.white),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                text,
-                textAlign: TextAlign.center,
-                style: Theme.of(_navigationKey.currentContext!)
-                    .textTheme
-                    .headline6!
-                    .merge(
-                      TextStyle(color: Colors.white),
-                    ),
-              )
-            ]),
-          )
+          buildLoadingWidget(text: text, backgroundColor: Colors.transparent),
         ],
+      );
+
+  /// Note: Material is needed because of this
+  /// https://stackoverflow.com/questions/47114639/yellow-lines-under-text-widgets-in-flutter
+  Widget buildLoadingWidget({String? text, Color? backgroundColor}) => Material(
+        type: MaterialType.transparency,
+        child: Container(
+          color: backgroundColor ??
+              variantIsLightThenDark(_navigationKey.currentContext!,
+                  reverse: true),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _loaders.pickAny()!(isLightThenDark(
+                  _navigationKey.currentContext!,
+                  reverse: false)),
+              Text(
+                text ?? _funny.getLoadingRandom(),
+                textAlign: TextAlign.center,
+                style:
+                    Theme.of(_navigationKey.currentContext!).textTheme.caption!,
+              )
+            ],
+          ),
+        ),
       );
 
   Future<void> showSuccessDialog(String text) => showCustomDialog([
@@ -104,12 +120,8 @@ class ContextProvider extends ChangeNotifier {
             Text(
               text,
               textAlign: TextAlign.center,
-              style: Theme.of(_navigationKey.currentContext!)
-                  .textTheme
-                  .headline6!
-                  .merge(
-                    TextStyle(color: Colors.white),
-                  ),
+              style:
+                  Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
             )
           ]),
         )
@@ -128,12 +140,8 @@ class ContextProvider extends ChangeNotifier {
             Text(
               text,
               textAlign: TextAlign.center,
-              style: Theme.of(_navigationKey.currentContext!)
-                  .textTheme
-                  .headline6!
-                  .merge(
-                    TextStyle(color: Colors.white),
-                  ),
+              style:
+                  Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
             )
           ]),
         )
@@ -158,11 +166,5 @@ class ContextProvider extends ChangeNotifier {
         if (onSucceed != null) onSucceed();
         break;
     }
-  }
-
-  ContextProvider(this._navigationKey, this._scaffoldMessengerKey) {
-    _dialogService = DialogService(_navigationKey);
-    _navigationService = NavigationService(_navigationKey);
-    _snackBarService = SnackBarService(_scaffoldMessengerKey);
   }
 }

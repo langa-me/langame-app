@@ -1,26 +1,27 @@
 import 'dart:io';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
+import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
-import 'package:langame/views/buttons/facebook.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/on_boarding.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/apple.dart';
-import 'friends.dart';
 import 'langame.dart';
+import 'main_view.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -38,16 +39,20 @@ class _LoginState extends State<Login> {
     cap.setCurrentScreen('login');
     final provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-    Provider.of<FeedbackProvider>(context, listen: false).initShake();
+    Provider.of<FeedbackProvider>(context, listen: false).init();
+
+    var networkState = Provider.of<ConnectivityResult>(context, listen: false);
+    if (networkState == ConnectivityResult.none) {
+      // If no internet, skip auth stuff
+      return;
+    }
+
     // Bunch of spaghetti code to check if it is a new user or already authenticated
-    provider.userStream.first.then((user) {
+    provider.userStream.first.then((user) async {
       cap.log('login - userStream - ${user?.writeToJson()}');
       if (user == null || successDialogFuture != null) return null;
-
-      var hasDoneOnBoarding =
-          Provider.of<PreferenceProvider>(context, listen: false)
-              .preference
-              .hasDoneOnBoarding;
+      // TODO: what happen if no internet?
+      Provider.of<LangameProvider>(context, listen: false).initialize();
       var cp = Provider.of<ContextProvider>(context, listen: false);
       // Once arriving on login page, if coming from a notification tap coming
       // from a terminated state (app closed, have notification in bar)
@@ -56,6 +61,12 @@ class _LoginState extends State<Login> {
       var displayName =
           user.displayName.isNotEmpty ? ' as ${user.displayName}' : '';
       cp.showSuccessDialog('Connected$displayName!');
+      // Kind of hack to wait for preference update // TODO shouldn't need
+      await Future.delayed(Duration(seconds: 1));
+      var hasDoneOnBoarding =
+          Provider.of<PreferenceProvider>(context, listen: false)
+              .preference
+              .hasDoneOnBoarding;
       if (hasDoneOnBoarding) {
         // Probably logged-out, skip message api init
         initMessageApi(
@@ -77,34 +88,43 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     AppSize(context);
 
+    final crash = Provider.of<CrashAnalyticsProvider>(context, listen: false);
+    final cp = Provider.of<ContextProvider>(context, listen: false);
+
+    var network = Provider.of<ConnectivityResult>(context);
+
+    if (network != ConnectivityResult.wifi &&
+        network != ConnectivityResult.mobile) {
+      crash.log('I am offline',
+          analyticsMessage: 'offline',
+          analyticsParameters: {
+            'view': 'langame_view',
+          });
+      return cp.buildLoadingWidget(text: 'You are offline!');
+    }
+
     final ap = Provider.of<AuthenticationProvider>(context, listen: false);
     var logins = <Widget>[
-      FacebookSignInButton(
-          onPressed: () {
-            if (isAuthenticating) return;
-            showBasicSnackBar(
-                context, 'Facebook authentication is coming soon!');
-            // await _handleOnPressedLogin(provider.loginWithFacebook, 'Facebook');
-          },
-          splashColor: Theme.of(context).colorScheme.primary),
+      // FacebookSignInButton(
+      //     onPressed: () {
+      //       if (isAuthenticating) return;
+      //       showBasicSnackBar(
+      //           context, 'Facebook authentication is coming soon!');
+      //       // await _handleOnPressedLogin(provider.loginWithFacebook, 'Facebook');
+      //     },
+      //     splashColor: Theme.of(context).colorScheme.primary),
       GoogleSignInButton(
           onPressed: () async {
             if (isAuthenticating) return;
             await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
           },
           splashColor: Theme.of(context).colorScheme.primary),
-      AppleSignInButton(
+      Platform.isIOS ? AppleSignInButton(
           onPressed: () async {
             if (isAuthenticating) return;
-            if (Platform.isAndroid) {
-              // Apple auth does not work on Android yet https://firebase.flutter.dev/docs/auth/social#apple
-              showBasicSnackBar(
-                  context, 'Apple authentication is coming soon!');
-              return;
-            }
             await _handleOnPressedLogin(ap.loginWithApple, 'Apple');
           },
-          splashColor: Theme.of(context).colorScheme.primary)
+          splashColor: Theme.of(context).colorScheme.primary) : SizedBox.shrink()
     ];
     return Scaffold(
       body: Column(
@@ -153,15 +173,21 @@ class _LoginState extends State<Login> {
             onSucceed: () async {
               cp.dialogComplete();
               var messages = await mp.getInitialMessage();
-              cp.handleLangameResponse(messages, onSucceed: () {
-                if (messages.result != null &&
-                    messages.result!.channelName != null) {
-                  cp.pushReplacement(LangameView(
-                      messages.result!.channelName!,
-                      messages.result!.ready == null ||
-                          !messages.result!.ready!));
+              cp.handleLangameResponse(messages, onSucceed: () async {
+                await Provider.of<DynamicLinksProvider>(context, listen: false)
+                    .setupAndCheckDynamicLinks((dl) async {
+                  if (dl != null) {
+                    // Opened a Langame link that opened the app
+                    // i.e. https://langa.page.link/play/CHANNEL_NAME
+                      cp.pushReplacement(LangameView(dl.link.pathSegments[0], false));
+                  }
+                });
+                // Note that we ignore failures in dynamic link initialization
+                if (messages.result != null) {
+                  cp.pushReplacement(
+                      LangameView(messages.result!.channelName, false));
                 } else {
-                  cp.pushReplacement(FriendsView());
+                  cp.pushReplacement(MainView());
                   // User is not opening the app from a notification
                 }
               });
@@ -175,8 +201,7 @@ class _LoginState extends State<Login> {
     // TODO: clean this mess
     var f = fn().timeout(const Duration(seconds: 10));
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    cp.showLoadingDialog(
-        Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
+    cp.showLoadingDialog();
     f.whenComplete(() => cp.dialogComplete());
     f.then((res) {
       if (res.status == LangameStatus.succeed) {

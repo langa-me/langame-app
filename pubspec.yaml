@@ -1,6 +1,6 @@
 name: langame
 description: AI Augmented human conversations
-version: 1.1.5+22
+version: 1.1.6+23
 authors:
   - Langame <mail@langa.me>
 
@@ -13,7 +13,7 @@ dependencies:
 
   # Low level
 
-  async: ^2.5.0
+  async: ^2.7.0
   http: ^0.13.3
   package_info: ^2.0.0
   device_info: ^2.0.0
@@ -28,30 +28,40 @@ dependencies:
 
   # Firebase
 
-  firebase_core: ^1.1.0
-  firebase_storage: ^8.0.5
-  firebase_auth: ^1.1.3
-  cloud_firestore: ^1.0.7
-  cloud_functions: ^1.0.6
-  firebase_analytics: 8.0.3
-  firebase_messaging: ^9.1.3
-  google_sign_in: ^5.0.2
-  flutter_facebook_auth: ^3.3.3+1
-  sign_in_with_apple: ^3.0.0
-  flutter_local_notifications: ^5.0.0+3
-  firebase_crashlytics: ^2.0.2
+  firebase_core: ^1.2.0
+  firebase_auth: ^1.2.0
+  cloud_firestore: ^2.2.0
+  cloud_functions: ^1.1.0
+  firebase_storage: ^8.1.0
+  firebase_analytics: ^8.1.0
+  firebase_messaging: ^10.0.0
+  firebase_crashlytics: ^2.0.4
   firebase_remote_config: ^0.10.0-dev.3
+  firebase_dynamic_links: ^2.0.4
+  google_sign_in: ^5.0.3
+  flutter_facebook_auth: ^3.4.0
+  sign_in_with_apple: ^3.0.0
+  flutter_local_notifications: ^5.0.0+4
+  
+
+  # Other APIs
+
+  pubnub: 4.0.0-beta.0
+  agora_rtc_engine: ^4.0.1
+  flutter_stripe: ^1.0.1+2
 
 
   # Others
 
+  table_calendar: ^3.0.0
+  date_time_picker: ^2.0.0
+  clipboard: ^0.1.3
   provider: ^5.0.0
   after_layout: ^1.1.0
   flutter_staggered_grid_view: ^0.4.0
   protobuf: ^2.0.0
   flex_color_scheme: ^2.0.0-nullsafety.1
   flutter_launcher_icons: ^0.9.0
-  agora_rtc_engine: ^4.0.0-rc.3
   badges: 2.0.0-nullsafety.1
   material_floating_search_bar: ^0.3.3
   flutter_app_badger: ^1.2.0
@@ -68,12 +78,13 @@ dependencies:
   material_dialogs: ^1.0.0
   lottie: ^1.0.1
   introduction_screen: ^2.1.0
-  stripe_payment: ^1.1.0
-  pubnub: 4.0.0-beta.0
+  share: ^2.0.1
   fab_circular_menu: ^1.0.2
   touchable: ^1.0.0
   sortedmap: ^0.5.0
   holding_gesture: ^1.1.0
+  # international stuff
+  intl: ^0.17.0
   flutter:
     sdk: flutter
 
@@ -84,11 +95,9 @@ flutter_icons:
   ios: true # can specify file name here e.g. "My-Launcher-Icon"
 
 dev_dependencies:
-  firebase_auth_platform_interface: ^4.2.1
-  cloud_firestore_platform_interface: ^4.0.0
   firebase_auth_mocks: ^0.6.0
   google_sign_in_mocks: ^0.2.1
-  cloud_firestore_mocks: ^0.8.2
+  fake_cloud_firestore: ^1.1.0
   mockito: ^5.0.2
   test: ^1.17.3
   change_app_package_name: ^1.0.0

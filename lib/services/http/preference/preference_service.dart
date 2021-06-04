@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import '../firebase.dart';
@@ -15,7 +14,7 @@ abstract class PreferenceService {
   final FirebaseApi firebase;
   PreferenceService(this.firebase);
 
-  Stream<lg.UserPreference> streamPreference(User user);
+  Stream<lg.UserPreference> streamPreference(lg.User user);
   Future<void> savePreference(String? userId, lg.UserPreference preferences);
   Future<lg.UserPreference?> tryFetchFromLocalStorage();
 }

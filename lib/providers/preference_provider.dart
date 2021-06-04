@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
+import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/preference/impl_preference_service.dart';
 import 'package:langame/services/http/preference/preference_service.dart';
@@ -15,7 +16,9 @@ class PreferenceProvider extends ChangeNotifier {
   static const _historyLength = 5;
 
   FirebaseApi firebase;
-  CrashAnalyticsProvider _crashAnalyticsProvider;
+  CrashAnalyticsProvider _cap;
+  AuthenticationProvider _ap;
+
   late PreferenceService _api;
 
   Stream<UserPreference>? _stream;
@@ -23,6 +26,7 @@ class PreferenceProvider extends ChangeNotifier {
   StreamSubscription<UserPreference>? _streamSubscription;
   UserPreference _preference = PreferenceService.defaultPreference;
   UserPreference get preference => _preference;
+
   setTheme(ThemeMode t) {
     _preference.themeIndex = t.index;
     notifyListeners();
@@ -59,46 +63,40 @@ class PreferenceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  PreferenceProvider(this.firebase, this._crashAnalyticsProvider) {
+  PreferenceProvider(this.firebase, this._cap, this._ap) {
     this._api = ImplPreferenceService(this.firebase);
+  }
+
+  void init() {
     _api.tryFetchFromLocalStorage().then((p) {
       if (p != null) {
         _preference = p;
         notifyListeners();
       }
     });
+    _streamSubscription?.cancel();
+    if (_ap.user == null) return;
 
-    // Whenever auth state change, renew the snapshot sub, cuz uid might change when deleting acc for ex
-    firebase.auth!.authStateChanges().listen((u) async {
-      // Logged out or linked another social account, no uid change
-      // no need to update the stream with a new uid
-      // kinda hacky :)
-      if (u == null || u.providerData.length > 1) return;
-      if (_streamSubscription != null) {
-        await _streamSubscription!.cancel();
-        _streamSubscription = null;
-      }
-      _stream = _api.streamPreference(u);
-      _streamSubscription = _stream!.listen((p) {
-        _crashAnalyticsProvider.log('streamPreference ${p.writeToJson()}');
-        _preference = p;
-        notifyListeners();
-      });
+    _stream = _api.streamPreference(_ap.user!);
+    _streamSubscription = _stream!.listen((p) {
+      _cap.log('streamPreference ${p.writeToJson()}');
+      _preference = p;
+      notifyListeners();
     });
   }
 
   Future<LangameResponse> save() async {
     try {
-      await _api.savePreference(firebase.auth!.currentUser?.uid, _preference);
+      await _api.savePreference(_ap.user!.uid, _preference);
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
         'shakeToFeedback': preference.shakeToFeedback,
         'hasDoneOnBoarding': preference.hasDoneOnBoarding,
         'unknownPeopleRecommendations': preference.unknownPeopleRecommendations,
         'themeIndex': preference.themeIndex,
       });
-      _crashAnalyticsProvider.log('save ${_preference.writeToJson()}');
+      _cap.log('save ${_preference.writeToJson()}');
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to notifyPresence');
+      _cap.log('failed to save');
       firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -113,7 +111,7 @@ class PreferenceProvider extends ChangeNotifier {
             .remove(_preference.searchHistory.elementAt(i));
       }
     }
-    _crashAnalyticsProvider.log('addSearchHistory');
+    _cap.log('addSearchHistory');
 
     notifyListeners();
     firebase.analytics
@@ -121,14 +119,14 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   void placeFirstSearchHistory(String tag) {
-    _crashAnalyticsProvider.log('placeFirstSearchHistory');
+    _cap.log('placeFirstSearchHistory');
 
     _preference.searchHistory.removeWhere((e) => e == tag);
     _preference.searchHistory.add(tag);
   }
 
   void deleteSearchHistory(String tag) {
-    _crashAnalyticsProvider.log('deleteSearchHistory');
+    _cap.log('deleteSearchHistory');
 
     _preference.searchHistory.removeWhere((e) => e == tag);
     _filteredTagSearchHistory.removeWhere((e) => e == tag);
@@ -138,7 +136,7 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   void resetFilteredSearchTagHistory() {
-    _crashAnalyticsProvider.log('resetFilteredSearchTagHistory');
+    _cap.log('resetFilteredSearchTagHistory');
 
     _filteredTagSearchHistory = _preference.searchHistory;
     notifyListeners();

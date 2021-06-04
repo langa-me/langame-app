@@ -22,9 +22,9 @@ Future<bool> basicOnWillPopScope(BuildContext context) async =>
             label: Text('CANCEL',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: isLightThenBlack(context, reverse: false))),
+                    color: isLightThenDark(context, reverse: false))),
             style: ElevatedButton.styleFrom(
-              primary: isLightThenBlack(context, reverse: true),
+              primary: isLightThenDark(context, reverse: true),
               side: BorderSide(
                   width: 2.0, color: Theme.of(context).colorScheme.secondary),
               shape: RoundedRectangleBorder(
@@ -36,7 +36,7 @@ Future<bool> basicOnWillPopScope(BuildContext context) async =>
           OutlinedButton.icon(
             onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(
-              primary: isLightThenBlack(context, reverse: true),
+              primary: isLightThenDark(context, reverse: true),
               side: BorderSide(
                   width: 2.0, color: Theme.of(context).colorScheme.secondary),
               shape: RoundedRectangleBorder(
@@ -48,7 +48,7 @@ Future<bool> basicOnWillPopScope(BuildContext context) async =>
             label: Text('YES',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: isLightThenBlack(context, reverse: false))),
+                    color: isLightThenDark(context, reverse: false))),
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
@@ -13,10 +14,12 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/views/buttons/button.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
-import 'friends.dart';
+import 'main_view.dart';
 
 /// Setup the app for the user (topics, friends...)
 class OnBoarding extends StatefulWidget {
@@ -80,7 +83,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                 return 'Please enter some text';
               }
               var cp = Provider.of<ContextProvider>(context, listen: false);
-              cp.showLoadingDialog('Validating...');
+              cp.showLoadingDialog(text: 'Validating...');
               var ap =
                   Provider.of<AuthenticationProvider>(context, listen: false);
               ap // Sometimes the user has no displayName (apple hidden mail), using the tag then
@@ -90,9 +93,12 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   .then((res) {
                 cp.handleLangameResponse(
                   res,
-                  succeedMessage: 'This tag is available',
+                  succeedMessage: 'Welcome to Langame $value',
                   failedMessage: 'Tag is not available',
-                  onSucceed: () => setState(() => hasFinishedOnBoarding = true),
+                  onSucceed: () {
+                    setState(() => hasFinishedOnBoarding = true);
+                    _onDone();
+                  },
                 );
               }).whenComplete(() {
                 cp.dialogComplete();
@@ -113,7 +119,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   //     .showSnackBar(SnackBar(content: Text('Processing Data')));
                 }
               },
-              child: Text('Submit'),
+              child: Text('Choose this tag'),
             ),
           ),
         ],
@@ -122,18 +128,18 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   }
 
   void _onDone() async {
-    Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
-      'favourite topics ${favouriteTopics.map((e) => e.content).join(',')}',
-      analyticsMessage: 'favourite_topics',
-      analyticsParameters: {'topics': favouriteTopics.join(',')},
-    );
+    // Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
+    //   'favourite topics ${favouriteTopics.map((e) => e.content).join(',')}',
+    //   analyticsMessage: 'favourite_topics',
+    //   analyticsParameters: {'topics': favouriteTopics.join(',')},
+    // );
 
     LangameResponse res =
         await Provider.of<MessageProvider>(context, listen: false)
             .initializeMessageApi();
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var fp = Provider.of<FunnyProvider>(context, listen: false);
-    cp.showLoadingDialog(fp.getLoadingRandom());
+    cp.showLoadingDialog();
     var showFailure = () async {
       cp.dialogComplete();
       cp.showFailureDialog(fp.getFailingRandom());
@@ -146,7 +152,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
       var r = await pp.save();
       cp.handleLangameResponse(r, onFailure: showFailure, onSucceed: () {
         cp.dialogComplete();
-        cp.pushReplacement(FriendsView());
+        cp.pushReplacement(MainView());
       });
     }, onFailure: showFailure);
   }
@@ -205,6 +211,24 @@ class _OnBoardingState extends State with AfterLayoutMixin {
               ],
             ),
           ),
+        ),
+        PageViewModel(
+          title: 'Your friends don\'t have Langame?',
+          bodyWidget: Column(children: [
+            Lottie.asset(
+              'animations/share.json',
+              height: AppSize.safeBlockVertical * 70,
+              width: AppSize.safeBlockHorizontal * 70,
+              alignment: Alignment.center,
+            ),
+            LangameButton(
+                () => Share.share(
+                    'I\'m using Langame to have more interesting conversations, you should try:\n${AppConst.mainUrl}',
+                    subject:
+                        'Join me on Langame app for incredible conversations!'),
+                'Invite your friends',
+                FontAwesomeIcons.shareAlt)
+          ]),
         ),
         PageViewModel(
           title: 'Choose a tag',

@@ -44,6 +44,7 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https://help.langa.me</string>
+		<string>https://langa.me</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -95,5 +96,9 @@
     <string>We need some of your contact information to help others recognize you</string>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>We need some of your contact information to help others recognize you</string>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://play.langa.me</string>
+	</array>
 </dict>
 </plist>

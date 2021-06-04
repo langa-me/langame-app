@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -47,13 +49,17 @@ class AuthenticationProvider extends ChangeNotifier {
         await firebase.crashlytics?.setUserIdentifier(data.uid);
         await firebase.analytics?.setUserId(data.uid);
         _user = await _authenticationApi.getLangameUser(data.uid);
+      } catch (e) {
+        _crashAnalyticsProvider.log('failed to get user uid: ${data.uid}, $e');
+      }
+      try {
         if (_user == null) {
           _user = await _authenticationApi.addLangameUser(data);
         }
       } catch (e, s) {
-        _crashAnalyticsProvider.log(
-            'failed to setup user on firebase stream change uid: ${data.uid}');
+        _crashAnalyticsProvider.log('failed to add user uid: ${data.uid}');
         _crashAnalyticsProvider.recordError(e, s);
+        // _authenticationApi.logout();
       }
       _userStream.add(_user);
       notifyListeners();
@@ -70,6 +76,13 @@ class AuthenticationProvider extends ChangeNotifier {
         firebase.analytics?.logLogin();
         return LangameResponse(LangameStatus.succeed);
       }
+      // TODO: Temporary hack because above if doesn't work
+      if (!(await firebase.firestore!
+              .collection(AppConst.firestoreUsersCollection)
+              .doc(uc.user!.uid)
+              .get())
+          .exists) return LangameResponse(LangameStatus.succeed);
+
       // If it's an existing user and it has some new data from auth
       // i.e. updated social profile maybe? Or simply
       // authenticated with another social provider which has more data
@@ -92,10 +105,8 @@ class AuthenticationProvider extends ChangeNotifier {
           ? uc.user!.photoURL
           : null;
 
-      var isGoogle =
-          uc.user!.providerData.any((e) => e.providerId == 'google.com');
-      var isApple =
-          uc.user!.providerData.any((e) => e.providerId == 'apple.com');
+      var isGoogle = uc.credential!.providerId == 'google.com';
+      var isApple = uc.credential!.providerId == 'apple.com';
       _crashAnalyticsProvider.log(
           'updateProfile newDisplayName $newDisplayName newPhotoUrl $newPhotoUrl isGoogle $isGoogle isApple $isApple');
       await _authenticationApi.updateProfile(
@@ -149,6 +160,12 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LangameResponse> logout() async {
     try {
+      _crashAnalyticsProvider.log('purging local storage');
+      var i = await SharedPreferences.getInstance();
+      await i.clear();
+      // TODO: permission denied somehow (firestore)
+      // _crashAnalyticsProvider.log('purging local firestore');
+      // await firebase.firestore!.clearPersistence();
       await _authenticationApi.logout();
       _crashAnalyticsProvider.log('logout');
       return LangameResponse<lg.User>(LangameStatus.succeed);
@@ -217,17 +234,31 @@ class AuthenticationProvider extends ChangeNotifier {
     return LangameResponse(LangameStatus.succeed);
   }
 
-  Future<LangameResponse> delete() async {
+  Future<LangameResponse<void>> delete() async {
     try {
       _crashAnalyticsProvider.log('deleting all data');
+      // [firebase_auth/requires-recent-login] This operation is sensitive
+      //  and requires recent authentication. Log in again before
+      //retrying this request.
+      var cred = await (user!.google
+          ? _authenticationApi.loginWithGoogle()
+          : user!.apple
+              ? _authenticationApi.loginWithApple()
+              : user!.facebook
+                  ? _authenticationApi.loginWithFacebook()
+                  : null);
+      if (cred == null)
+        throw LangameException(
+            'the user is authenticated without any social providers');
+      await _authenticationApi.reAuthenticate(cred);
       await _authenticationApi.delete();
-      _crashAnalyticsProvider.log('logging out');
-      await logout();
       _crashAnalyticsProvider.log('purging local storage');
       var i = await SharedPreferences.getInstance();
       await i.clear();
-      _crashAnalyticsProvider.log('purging local firestore');
-      await firebase.firestore!.clearPersistence();
+      // _crashAnalyticsProvider.log('purging local firestore');
+      // await firebase.firestore!.clearPersistence();
+      _crashAnalyticsProvider.log('logging out');
+      await logout();
     } catch (e, s) {
       _crashAnalyticsProvider.log('failed to delete');
       _crashAnalyticsProvider.recordError(e, s);

@@ -1,6 +1,12 @@
 # Langame
 
+[![codecov](https://codecov.io/gh/langa-me/langame-app/branch/main/graph/badge.svg?token=4LVXERDQ5U)](https://codecov.io/gh/langa-me/langame-app)
+
+![graph-codecov](https://codecov.io/gh/langa-me/langame-app/branch/main/graphs/sunburst.svg?token=4LVXERDQ5U)
+
 ## Development
+
+### Running
 
 You should use **Idea IntelliJ** and create at least these configurations:
 - Flutter with flavor "dev"
@@ -8,17 +14,57 @@ You should use **Idea IntelliJ** and create at least these configurations:
 
 Using CLI:
 ```bash
-flutter run --flavor dev
-flutter run --flavor prod
+flutter devices
+```
+```bash
+flutter run --flavor dev -d [MY_DEVICE]
+flutter run --flavor prod -d [MY_DEVICE]
 ```
 
-### Json
-
-For using models Dart models:
+### Stripe
 
 ```bash
-flutter pub run build_runner build --delete-conflicting-outputs
-flutter pub run build_runner watch --delete-conflicting-outputs
+brew install stripe/stripe-cli/stripe
+```
+
+```bash
+# Premium product
+stripe products create \
+  --name="Billing Guide: Premium Service" \
+  --description="Premium service with extra features"
+
+# Basic product
+stripe products create \
+  --name="Billing Guide: Basic Service" \
+  --description="Basic service with minimum features"
+
+# Premium price
+stripe prices create \
+-d product=prod_JV1FPZFW99R0Ol \
+-d unit_amount=1000 \
+-d currency=usd \
+-d "recurring[interval]"=month
+
+# Basic price
+stripe prices create \
+-d product=prod_HGd6W1VUqqXGvr \
+-d unit_amount=500 \
+-d currency=usd \
+-d "recurring[interval]"=month
+```
+
+#### Proto gen
+
+```bash
+cd ..
+git clone org-856813@github.com:stripe/openapi.git
+go get -u github.com/NYTimes/openapi2proto/cmd/openapi2proto
+cd langame-app
+mkdir -p protos/stripe/protobuf
+openapi2proto -spec ../openapi/openapi/spec3.json -out protos/stripe.proto
+wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto -P protos/google/protobuf
+wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/timestamp.proto -P protos/google/protobuf
+make proto
 ```
 
 ### How to release

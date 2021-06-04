@@ -71,26 +71,54 @@ class StretchableButton extends StatelessWidget {
   }
 }
 
-Widget buildBasicButton(
-    BuildContext context, String text, Function()? onPressed) {
-  return OutlinedButton.icon(
-    style: Theme.of(context).textButtonTheme.style,
-    onPressed: onPressed,
-    icon: Icon(Icons.autorenew_outlined),
-    label: Text(text),
-  );
-}
+class BaseLangameButton extends StatelessWidget {
+  final void Function()? _onPressed;
+  final String _text;
+  final IconData _icon;
+  final bool? variant;
+  final bool? border;
+  final EdgeInsetsGeometry? padding;
+  BaseLangameButton(this._onPressed, this._text, this._icon,
+      {this.variant = true, this.border = true, this.padding});
 
-class BasicLangameButton extends StatefulWidget {
-  @override
-  _BasicLangameButtonState createState() => _BasicLangameButtonState();
-}
-
-class _BasicLangameButtonState extends State<BasicLangameButton> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     throw UnimplementedError();
+  }
+}
+
+class LangameButton extends BaseLangameButton {
+  LangameButton(void Function() onPressed, String text, IconData icon,
+      {bool? variant = true, bool? border = true, EdgeInsetsGeometry? padding})
+      : super(onPressed, text, icon,
+            variant: variant, border: border, padding: padding);
+  @override
+  Widget build(BuildContext context) {
+    var bg = variant != null && variant!
+        ? variantIsLightThenDark(context, reverse: true)
+        : isLightThenDark(context, reverse: true);
+    var fg = variant != null && variant!
+        ? variantIsLightThenDark(context, reverse: false)
+        : isLightThenDark(context, reverse: false);
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        primary: bg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(64.0),
+        ),
+        side: border != null && border!
+            ? BorderSide(width: 0.5, color: averageGrey())
+            : null,
+        padding: padding ?? padding,
+      ),
+      onPressed: _onPressed,
+      icon: Icon(_icon, color: fg),
+      label: Text(
+        _text,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: fg),
+      ),
+    );
   }
 }
 
@@ -114,72 +142,61 @@ class ToggleButton extends StatefulWidget {
 
   @override
   _ToggleButtonState createState() => _ToggleButtonState(
-      selected: selected,
-      onChange: onChange,
-      textSelected: textSelected,
-      textUnselected: textUnselected,
-      width: width,
-      onLongPress: onLongPress);
+      selected: selected);
 }
 
 class _ToggleButtonState extends State<ToggleButton> {
   bool selected;
-  void Function(bool)? onChange;
-  String textSelected;
-  String textUnselected;
-  final double? width;
-  final bool onLongPress;
 
-  _ToggleButtonState(
-      {this.textSelected = '',
-      this.textUnselected = '',
-      this.selected = false,
-      this.onChange,
-      this.width = 150,
-      this.onLongPress = false});
+  _ToggleButtonState({this.selected = false});
 
   @override
   Widget build(BuildContext context) {
+    var bg = isLightThenDark(context, reverse: true);
+    var bgSelected = variantBisIsLightThenDark(context, reverse: true);
+    var fg = isLightThenDark(context, reverse: false);
+    // var fg = isLightThenDark(context, reverse: false);
     var s = ElevatedButton.styleFrom(
-      primary: isLightThenBlack(context, reverse: true),
+      primary: bg,
       side: BorderSide(
           width: 1.0, color: Theme.of(context).colorScheme.secondary),
       padding: EdgeInsets.all(5),
-      // shape: RoundedRectangleBorder(
-      //   borderRadius: BorderRadius.circular(64.0),
-      // ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(64.0),
+      ),
     );
     return AnimatedCrossFade(
-      duration: Duration(milliseconds: 200),
+      duration: Duration(milliseconds: 500),
       crossFadeState:
           selected ? CrossFadeState.showFirst : CrossFadeState.showSecond,
       firstChild: Container(
-        width: width,
+        width: widget.width,
+        padding: EdgeInsets.all(2),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).colorScheme.primary)
+                  primary: bgSelected)
               .merge(s),
-          child: Text(textSelected,
+          child: Text(widget.textSelected,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 18,
-                  color: isLightThenBlack(context, reverse: true))),
-          onPressed: onLongPress ? null : _onFirstChildChange,
-          onLongPress: onLongPress ? _onFirstChildChange : null,
+                  color: fg)),
+          onPressed: widget.onLongPress ? null : _onFirstChildChange,
+          onLongPress: widget.onLongPress ? _onFirstChildChange : null,
         ),
       ),
       secondChild: Container(
-        width: width,
+        width: widget.width,
         padding: EdgeInsets.all(2),
         child: ElevatedButton(
           style: s,
-          child: Text(textUnselected,
+          child: Text(widget.textUnselected,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 18,
-                  color: isLightThenBlack(context, reverse: false))),
-          onPressed: onLongPress ? null : _onSecondChildChange,
-          onLongPress: onLongPress ? _onSecondChildChange : null,
+                  color: fg)),
+          onPressed: widget.onLongPress ? null : _onSecondChildChange,
+          onLongPress: widget.onLongPress ? _onSecondChildChange : null,
         ),
       ),
     );
@@ -189,13 +206,13 @@ class _ToggleButtonState extends State<ToggleButton> {
     setState(() {
       selected = !selected;
     });
-    if (onChange != null) onChange!(false);
+    if (widget.onChange != null) widget.onChange!(false);
   }
 
   _onSecondChildChange() {
     setState(() {
       selected = !selected;
     });
-    if (onChange != null) onChange!(true);
+    if (widget.onChange != null) widget.onChange!(true);
   }
 }
