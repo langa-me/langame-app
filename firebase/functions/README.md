@@ -7,6 +7,7 @@ For further information, see Firebase [documentation](https://firebase.google.co
 ```bash
 npm install -g firebase-tools
 firebase login
+firebase remoteconfig:get > remoteconfig.template.json
 ```
 
 ### Secrets

@@ -1,6 +1,6 @@
 name: langame
 description: AI Augmented human conversations
-version: 1.1.6+23
+version: 1.1.6+24
 authors:
   - Langame <mail@langa.me>
 
@@ -89,8 +89,8 @@ dependencies:
     sdk: flutter
 
 flutter_icons:
-  image_path_android: "images/logo.jpg"
-  image_path_ios: "images/logo.jpg"
+  image_path_android: "images/logo-android.png"
+  image_path_ios: "images/logo-ios.png"
   android: true # can specify file name here e.g. "ic_launcher"
   ios: true # can specify file name here e.g. "My-Launcher-Icon"
 
