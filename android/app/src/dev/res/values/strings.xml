@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Langame-dev</string>
+    <string name="app_name">Langame</string>
     <string name="facebook_app_id">3351161798318077</string>
     <string name="fb_login_protocol_scheme">fb3351161798318077</string>
 </resources>
