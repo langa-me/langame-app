@@ -1,10 +1,11 @@
-name: Flutter dev CI
+name: CI
 
 on:
   push:
     branches:
       - dev
       - main
+  pull_request:
 
 jobs:
   analyze_test:
