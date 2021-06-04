@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
+import 'package:langame/models/errors.dart';
 import 'package:langame/models/google/protobuf/timestamp.pb.dart' as gg;
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:protobuf/protobuf.dart';
 
 extension interactionExtensions on lg.InteractionLevel {
@@ -92,36 +94,52 @@ class LangameExt {
     var m = o as Map<String, dynamic>;
     return lg.Langame(
       channelName: m['channelName'],
-      players: (m['players'] as List<dynamic>?)
-          ?.map((e) => LangamePlayerExt.fromObject(e)),
+      players: (m['players'] as List<dynamic>?)?.map((e) => e as String),
       topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
       questions: (m['questions'] as List<dynamic>?)
           ?.map((e) => QuestionExt.fromObject(e)),
       initiator: m['initiator'],
-      done: m['done'],
+      done: dynamicToProtobufTimestamp(m['done']),
       currentQuestion: m['currentQuestion'],
-      date: m['date'] != null ? gg.Timestamp(nanos: DateTime.parse(m['date']).microsecond*1000) : null,
+      date: dynamicToProtobufTimestamp(m['date']),
+      started: dynamicToProtobufTimestamp(m['started']),
+      errors: (m['errors'] as List<dynamic>?)?.map((e) => e as String),
     );
   }
 }
 
-class LangamePlayerExt {
-  static lg.Langame_Player fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Langame_Player(
-      userId: m['userId'],
-      timeIn: m['timeIn'],
-      timeOut: m['timeOut'],
-      notes: (m['notes'] as List<dynamic>?)
-          ?.map((e) => LangameNoteExt.fromObject(e))
-    );
+gg.Timestamp? dynamicToProtobufTimestamp(dynamic something) {
+  if (something == null) return null;
+  // Firestore Timestamp (i.e. when using thing.serverTimestamp()...)
+  if (something is Timestamp)
+    return gg.Timestamp.fromDateTime(something.toDate());
+  // DateTime string (saved from date time field or whatever)
+  try {
+    var t = gg.Timestamp.fromDateTime(DateTime.parse(something));
+    return t;
+  } catch (e) {
+    throw LangameException('failed_to_parse_to_timestamp');
   }
 }
 
-class LangameNoteExt {
-  static lg.Langame_Note fromObject(Object o) {
+class PlayerExt {
+  static lg.Player fromObject(Object o) {
     var m = o as Map<String, dynamic>;
-    return lg.Langame_Note(
+    return lg.Player(
+        userId: m['userId'],
+        timeIn: dynamicToProtobufTimestamp(m['timeIn']),
+        timeOut: dynamicToProtobufTimestamp(m['timeOut']),
+        audioId: m['audioId'],
+        audioToken: m['audioToken'],
+        notes:
+            (m['notes'] as List<dynamic>?)?.map((e) => NoteExt.fromObject(e)));
+  }
+}
+
+class NoteExt {
+  static lg.Note fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Note(
       content: m['content'],
       createdAt: m['createdAt'],
     );

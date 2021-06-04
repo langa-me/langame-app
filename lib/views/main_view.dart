@@ -5,17 +5,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
-import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/relation_provider.dart';
 import 'package:langame/views/new_langame_page_view.dart';
-import 'package:langame/views/old_langame_page_view.dart';
 import 'package:langame/views/settings.dart';
 import 'package:provider/provider.dart';
 
 import 'colors/colors.dart';
 import 'dialogs/dialogs.dart';
-import 'interactions_page_view.dart';
 import 'running_langames_view.dart';
 import 'search_page_view.dart';
 
@@ -35,7 +32,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .setCurrentScreen('send_langame');
-    var mp = Provider.of<MessageProvider>(context, listen: false);
     var rp = Provider.of<RelationProvider>(context, listen: false);
     rp.getUserRecommendations();
     rp.getRecentInteractions();
@@ -103,15 +99,17 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       controller: _pageController,
       children: [
         NewLangamePageView(goToPage),
-        OldLangamePageView(goToPage),
-        InteractionsPageView(goToPage),
+        // OldLangamePageView(goToPage),
+        // InteractionsPageView(goToPage),
         SearchPageView(goToPage),
       ],
     );
   }
 
+  void _onBottomBarItemTapped(int i) =>
+    goToPage(i);
+  
 
-  void _onBottomBarItemTapped(int i) => goToPage(i);
   void goToPage(int i, {Curve? curve}) => setState(() {
         _selectedIndex = i;
         curve != null
@@ -150,26 +148,26 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
           activeIcon: _buildStartIcon(Theme.of(context).colorScheme.secondary),
           label: 'Start',
         ),
-        BottomNavigationBarItem(
-          backgroundColor: Colors.transparent,
-          icon: Icon(FontAwesomeIcons.brain,
-              color: _selectedIndex == 1
-                  ? Theme.of(context).colorScheme.secondary
-                  : isLightThenDark(context)),
-          label: 'Langames',
-        ),
-        BottomNavigationBarItem(
-          backgroundColor: Colors.transparent,
-          icon: Icon(FontAwesomeIcons.peopleCarry,
-              color: _selectedIndex == 2
-                  ? Theme.of(context).colorScheme.secondary
-                  : isLightThenDark(context)),
-          label: 'Interactions',
-        ),
+        // BottomNavigationBarItem(
+        //   backgroundColor: Colors.transparent,
+        //   icon: Icon(FontAwesomeIcons.brain,
+        //       color: _selectedIndex == 1
+        //           ? Theme.of(context).colorScheme.secondary
+        //           : isLightThenDark(context)),
+        //   label: 'Langames',
+        // ),
+        // BottomNavigationBarItem(
+        //   backgroundColor: Colors.transparent,
+        //   icon: Icon(FontAwesomeIcons.peopleCarry,
+        //       color: _selectedIndex == 2
+        //           ? Theme.of(context).colorScheme.secondary
+        //           : isLightThenDark(context)),
+        //   label: 'Interactions',
+        // ),
         BottomNavigationBarItem(
           backgroundColor: Colors.transparent,
           icon: Icon(Icons.search_outlined,
-              color: _selectedIndex == 3
+              color: _selectedIndex == 1
                   ? Theme.of(context).colorScheme.secondary
                   : isLightThenDark(context)),
           label: 'Search',

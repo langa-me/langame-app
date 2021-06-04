@@ -70,7 +70,7 @@ class _PaymentState extends State<PaymentView> {
                         _handleFailure();
                         return;
                       }
-                      var r = await pp.completeSubscription(pm.result!);
+                      await pp.completeSubscription(pm.result!);
                       if (pm.status == LangameStatus.failed) {
                         _handleFailure();
                         return;
@@ -88,7 +88,7 @@ class _PaymentState extends State<PaymentView> {
                       var onSelectCard = (PaymentMethodError pm) async {
                         if (pm.error != null) return;
                         cp.dialogComplete();
-                        cp.showLoadingDialog('processing your request...');
+                        cp.showLoadingDialog(text: 'processing your request...');
                         var r = await pp.completeSubscription(pm.paymentMethod);
                         if (r.status == LangameStatus.failed) {
                           _handleFailure();

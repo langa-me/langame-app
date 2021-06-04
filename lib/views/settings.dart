@@ -5,7 +5,6 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/payment.dart';
@@ -73,7 +72,8 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               padding: const EdgeInsets.all(12),
               child: Consumer<PreferenceProvider>(builder: (context, s, child) {
                 return FlexThemeModeSwitch(
-                  title: Text('Theme', style: Theme.of(context).textTheme.headline6),
+                  title: Text('Theme',
+                      style: Theme.of(context).textTheme.headline6),
                   padding: EdgeInsets.all(5),
                   themeMode: ThemeMode.values[s.preference.themeIndex],
                   onThemeModeChanged: s.setTheme,
@@ -92,32 +92,40 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 }
                 cp.push(PaymentView());
               },
-              leading: Icon(Icons.subscriptions_rounded, color: isLightThenDark(context)),
-              title: Text('Subscription', style: Theme.of(context).textTheme.headline6),
+              leading: Icon(Icons.subscriptions_rounded,
+                  color: isLightThenDark(context)),
+              title: Text('Subscription',
+                  style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
                 cp.showSnackBar('Coming soon!');
                 cap.logNewFeatureClick('settings_profile');
               },
-              leading: Icon(Icons.account_circle_outlined, color: isLightThenDark(context)),
-              title: Text('Profile', style: Theme.of(context).textTheme.headline6),
+              leading: Icon(Icons.account_circle_outlined,
+                  color: isLightThenDark(context)),
+              title:
+                  Text('Profile', style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
                 cp.showSnackBar('Coming soon!');
                 cap.logNewFeatureClick('settings_notifications');
               },
-              leading: Icon(Icons.notifications_outlined, color: isLightThenDark(context)),
-              title: Text('Notifications', style: Theme.of(context).textTheme.headline6),
+              leading: Icon(Icons.notifications_outlined,
+                  color: isLightThenDark(context)),
+              title: Text('Notifications',
+                  style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
                 cp.showSnackBar('Coming soon!');
                 cap.logNewFeatureClick('settings_digital_wellbeing');
               },
-              leading: Icon(Icons.self_improvement_outlined, color: isLightThenDark(context)),
-              title: Text('Digital Wellbeing', style: Theme.of(context).textTheme.headline6),
+              leading: Icon(Icons.self_improvement_outlined,
+                  color: isLightThenDark(context)),
+              title: Text('Digital Wellbeing',
+                  style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
@@ -144,15 +152,17 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                         style: Theme.of(context).textTheme.headline6,
                       ),
                       LangameButton(() {
-                            cp.dialogComplete();
-                            _delete();
-                          }, 'Delete my account', Icons.delete_forever_outlined)
+                        cp.dialogComplete();
+                        _delete();
+                      }, 'Delete my account', Icons.delete_forever_outlined)
                     ]),
                   )
                 ], canBack: true);
               },
-              leading: Icon(Icons.whatshot_outlined, color: isLightThenDark(context)),
-              title: Text('Delete my account and all my data', style: Theme.of(context).textTheme.headline6),
+              leading: Icon(Icons.whatshot_outlined,
+                  color: isLightThenDark(context)),
+              title: Text('Delete my account and all my data',
+                  style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () async {
@@ -162,9 +172,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   cap.logNewFeatureClick('settings_log_out');
                   return;
                 }
-                cp.showLoadingDialog(
-                    Provider.of<FunnyProvider>(context, listen: false)
-                        .getLoadingRandom());
+                cp.showLoadingDialog();
                 await writeOnlyPreferenceProvider?.save();
                 await Provider.of<AuthenticationProvider>(context,
                         listen: false)
@@ -173,16 +181,20 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 cp.dialogComplete();
                 cp.pushReplacement(Login());
               },
-              leading: Icon(Icons.login_outlined, color: isLightThenDark(context)),
-              title: Text('Log out', style: Theme.of(context).textTheme.headline6),
+              leading:
+                  Icon(Icons.login_outlined, color: isLightThenDark(context)),
+              title:
+                  Text('Log out', style: Theme.of(context).textTheme.headline6),
             ),
             TextDivider('Experimental features'),
             Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
                 onTap: () =>
                     p.setShakeToFeedback(!p.preference.shakeToFeedback),
-                leading: Icon(Icons.feedback_outlined, color: isLightThenDark(context)),
-                title: Text('Shake-to-feedback', style: Theme.of(context).textTheme.headline6),
+                leading: Icon(Icons.feedback_outlined,
+                    color: isLightThenDark(context)),
+                title: Text('Shake-to-feedback',
+                    style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
                     value: p.preference.shakeToFeedback,
                     onChanged: (v) =>
@@ -191,14 +203,29 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             ),
             Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
-                onTap: () => p.setRecommendations(
-                    !p.preference.unknownPeopleRecommendations),
+                onTap: () {
+                  if (kReleaseMode) {
+                    cp.showSnackBar('Coming soon!');
+                    cap.logNewFeatureClick('settings_subscription');
+                    return;
+                  }
+                  p.setRecommendations(
+                      !p.preference.unknownPeopleRecommendations);
+                },
                 leading: Icon(Icons.recommend, color: isLightThenDark(context)),
-                title: Text('User recommendations', style: Theme.of(context).textTheme.headline6),
+                title: Text('User recommendations',
+                    style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
                     value: p.preference.unknownPeopleRecommendations,
-                    onChanged: (v) => p.setRecommendations(
-                        !p.preference.unknownPeopleRecommendations)),
+                    onChanged: (v) {
+                      if (kReleaseMode) {
+                        cp.showSnackBar('Coming soon!');
+                        cap.logNewFeatureClick('settings_subscription');
+                        return;
+                      }
+                      p.setRecommendations(
+                          !p.preference.unknownPeopleRecommendations);
+                    }),
               ),
             ),
           ],
@@ -207,11 +234,9 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
     );
   }
 
-
   void _delete() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    cp.showLoadingDialog(
-        Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom());
+    cp.showLoadingDialog();
     var r = await Provider.of<AuthenticationProvider>(context, listen: false)
         .delete();
     cp.handleLangameResponse(r, onSucceed: () async {

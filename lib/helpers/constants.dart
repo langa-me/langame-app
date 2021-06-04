@@ -23,7 +23,6 @@ class AppConst {
   static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
 
   static const String notifyPresenceFunction = 'notifyPresence';
-  static const String getChannelTokenFunction = 'getChannelToken';
   static const String createStripeSubscriptionFunction =
       'createStripeSubscription';
 

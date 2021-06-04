@@ -103,5 +103,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://play.langa.me</string>
+	</array>
 </dict>
 </plist>

@@ -17,8 +17,8 @@ class DynamicLinksProvider extends ChangeNotifier {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final DynamicLinkParameters parameters = DynamicLinkParameters(
-        uriPrefix: 'https://langa.page.link',
-        link: Uri.parse('https://langa.me/$path'),
+        uriPrefix: 'https://play.langa.me',
+        link: Uri.parse('$path'),
         androidParameters: AndroidParameters(
           packageName: packageInfo.packageName,
           minimumVersion: int.parse(packageInfo.buildNumber), // TODO
@@ -47,35 +47,22 @@ class DynamicLinksProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<String>> setupAndCheckDynamicLinks() async {
+  Future<LangameResponse<void>> setupAndCheckDynamicLinks(
+      Future<dynamic> Function(PendingDynamicLinkData?) onDynamicLink) async {
     try {
       _dynamicLinks.onLink(
-          onSuccess: (PendingDynamicLinkData? dynamicLink) async {
-        final Uri? deepLink = dynamicLink?.link;
+          onSuccess: onDynamicLink,
+          onError: (OnLinkErrorException e) async {
+            _cap.log('onLinkError $e');
+            _cap.recordError(e, null);
+          });
 
-        if (deepLink != null) {
-          // ignore: unawaited_futures
-          // TODO: handle link for each view?
-          // i.e. "bob in langame, backgrounding app and clicking a link"?
-        }
-      }, onError: (OnLinkErrorException e) async {
-        _cap.log('onLinkError $e');
-        _cap.recordError(e, null);
-      });
-
-      final PendingDynamicLinkData? data =
-          await FirebaseDynamicLinks.instance.getInitialLink();
-      final Uri? deepLink = data?.link;
-
-      if (deepLink != null) {
-        // ignore: unawaited_futures
-        return LangameResponse(LangameStatus.succeed, result: deepLink.path);
-      }
+      onDynamicLink(await _dynamicLinks.getInitialLink());
+      return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
       _cap.log('failed to setupAndCheckDynamicLinks');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
-    return LangameResponse(LangameStatus.succeed);
   }
 }

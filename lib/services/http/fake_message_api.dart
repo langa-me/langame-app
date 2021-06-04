@@ -1,9 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/message_api.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 class FakeMessageApi extends MessageApi {
   FakeMessageApi(FirebaseApi firebase,

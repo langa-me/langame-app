@@ -364,6 +364,9 @@ export namespace langame {
 
             /** User latestInteractions */
             latestInteractions?: (string[]|null);
+
+            /** User errors */
+            errors?: (string[]|null);
         }
 
         /** Represents a User. */
@@ -413,6 +416,9 @@ export namespace langame {
 
             /** User latestInteractions. */
             public latestInteractions: string[];
+
+            /** User errors. */
+            public errors: string[];
 
             /**
              * Creates a new User instance using the specified properties.
@@ -620,7 +626,7 @@ export namespace langame {
             channelName?: (string|null);
 
             /** Langame players */
-            players?: (langame.protobuf.Langame.IPlayer[]|null);
+            players?: (string[]|null);
 
             /** Langame topics */
             topics?: (string[]|null);
@@ -632,13 +638,22 @@ export namespace langame {
             initiator?: (string|null);
 
             /** Langame done */
-            done?: (boolean|null);
+            done?: (google.protobuf.ITimestamp|null);
 
             /** Langame currentQuestion */
             currentQuestion?: (number|null);
 
             /** Langame date */
             date?: (google.protobuf.ITimestamp|null);
+
+            /** Langame errors */
+            errors?: (string[]|null);
+
+            /** Langame started */
+            started?: (google.protobuf.ITimestamp|null);
+
+            /** Langame currentAudioId */
+            currentAudioId?: (number|null);
         }
 
         /** Represents a Langame. */
@@ -654,7 +669,7 @@ export namespace langame {
             public channelName: string;
 
             /** Langame players. */
-            public players: langame.protobuf.Langame.IPlayer[];
+            public players: string[];
 
             /** Langame topics. */
             public topics: string[];
@@ -666,13 +681,22 @@ export namespace langame {
             public initiator: string;
 
             /** Langame done. */
-            public done: boolean;
+            public done?: (google.protobuf.ITimestamp|null);
 
             /** Langame currentQuestion. */
             public currentQuestion: number;
 
             /** Langame date. */
             public date?: (google.protobuf.ITimestamp|null);
+
+            /** Langame errors. */
+            public errors: string[];
+
+            /** Langame started. */
+            public started?: (google.protobuf.ITimestamp|null);
+
+            /** Langame currentAudioId. */
+            public currentAudioId: number;
 
             /**
              * Creates a new Langame instance using the specified properties.
@@ -745,211 +769,220 @@ export namespace langame {
             public toJSON(): { [k: string]: any };
         }
 
-        namespace Langame {
+        /** Properties of a Player. */
+        interface IPlayer {
 
-            /** Properties of a Player. */
-            interface IPlayer {
+            /** Player userId */
+            userId?: (string|null);
 
-                /** Player userId */
-                userId?: (string|null);
+            /** Player timeIn */
+            timeIn?: (google.protobuf.ITimestamp|null);
 
-                /** Player timeIn */
-                timeIn?: (google.protobuf.ITimestamp|null);
+            /** Player timeOut */
+            timeOut?: (google.protobuf.ITimestamp|null);
 
-                /** Player timeOut */
-                timeOut?: (google.protobuf.ITimestamp|null);
+            /** Player notes */
+            notes?: (langame.protobuf.INote[]|null);
 
-                /** Player notes */
-                notes?: (langame.protobuf.Langame.INote[]|null);
-            }
+            /** Player audioId */
+            audioId?: (number|null);
 
-            /** Represents a Player. */
-            class Player implements IPlayer {
+            /** Player audioToken */
+            audioToken?: (string|null);
+        }
 
-                /**
-                 * Constructs a new Player.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: langame.protobuf.Langame.IPlayer);
+        /** Represents a Player. */
+        class Player implements IPlayer {
 
-                /** Player userId. */
-                public userId: string;
+            /**
+             * Constructs a new Player.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: langame.protobuf.IPlayer);
 
-                /** Player timeIn. */
-                public timeIn?: (google.protobuf.ITimestamp|null);
+            /** Player userId. */
+            public userId: string;
 
-                /** Player timeOut. */
-                public timeOut?: (google.protobuf.ITimestamp|null);
+            /** Player timeIn. */
+            public timeIn?: (google.protobuf.ITimestamp|null);
 
-                /** Player notes. */
-                public notes: langame.protobuf.Langame.INote[];
+            /** Player timeOut. */
+            public timeOut?: (google.protobuf.ITimestamp|null);
 
-                /**
-                 * Creates a new Player instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns Player instance
-                 */
-                public static create(properties?: langame.protobuf.Langame.IPlayer): langame.protobuf.Langame.Player;
+            /** Player notes. */
+            public notes: langame.protobuf.INote[];
 
-                /**
-                 * Encodes the specified Player message. Does not implicitly {@link langame.protobuf.Langame.Player.verify|verify} messages.
-                 * @param message Player message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: langame.protobuf.Langame.IPlayer, writer?: $protobuf.Writer): $protobuf.Writer;
+            /** Player audioId. */
+            public audioId: number;
 
-                /**
-                 * Encodes the specified Player message, length delimited. Does not implicitly {@link langame.protobuf.Langame.Player.verify|verify} messages.
-                 * @param message Player message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: langame.protobuf.Langame.IPlayer, writer?: $protobuf.Writer): $protobuf.Writer;
+            /** Player audioToken. */
+            public audioToken: string;
 
-                /**
-                 * Decodes a Player message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns Player
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Langame.Player;
+            /**
+             * Creates a new Player instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Player instance
+             */
+            public static create(properties?: langame.protobuf.IPlayer): langame.protobuf.Player;
 
-                /**
-                 * Decodes a Player message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns Player
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Langame.Player;
+            /**
+             * Encodes the specified Player message. Does not implicitly {@link langame.protobuf.Player.verify|verify} messages.
+             * @param message Player message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: langame.protobuf.IPlayer, writer?: $protobuf.Writer): $protobuf.Writer;
 
-                /**
-                 * Verifies a Player message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
+            /**
+             * Encodes the specified Player message, length delimited. Does not implicitly {@link langame.protobuf.Player.verify|verify} messages.
+             * @param message Player message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: langame.protobuf.IPlayer, writer?: $protobuf.Writer): $protobuf.Writer;
 
-                /**
-                 * Creates a Player message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns Player
-                 */
-                public static fromObject(object: { [k: string]: any }): langame.protobuf.Langame.Player;
+            /**
+             * Decodes a Player message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Player
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Player;
 
-                /**
-                 * Creates a plain object from a Player message. Also converts values to other types if specified.
-                 * @param message Player
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: langame.protobuf.Langame.Player, options?: $protobuf.IConversionOptions): { [k: string]: any };
+            /**
+             * Decodes a Player message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Player
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Player;
 
-                /**
-                 * Converts this Player to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-            }
+            /**
+             * Verifies a Player message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
 
-            /** Properties of a Note. */
-            interface INote {
+            /**
+             * Creates a Player message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Player
+             */
+            public static fromObject(object: { [k: string]: any }): langame.protobuf.Player;
 
-                /** Note content */
-                content?: (string|null);
+            /**
+             * Creates a plain object from a Player message. Also converts values to other types if specified.
+             * @param message Player
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: langame.protobuf.Player, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
-                /** Note createdAt */
-                createdAt?: (google.protobuf.ITimestamp|null);
-            }
+            /**
+             * Converts this Player to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
 
-            /** Represents a Note. */
-            class Note implements INote {
+        /** Properties of a Note. */
+        interface INote {
 
-                /**
-                 * Constructs a new Note.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: langame.protobuf.Langame.INote);
+            /** Note content */
+            content?: (string|null);
 
-                /** Note content. */
-                public content: string;
+            /** Note createdAt */
+            createdAt?: (google.protobuf.ITimestamp|null);
+        }
 
-                /** Note createdAt. */
-                public createdAt?: (google.protobuf.ITimestamp|null);
+        /** Represents a Note. */
+        class Note implements INote {
 
-                /**
-                 * Creates a new Note instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns Note instance
-                 */
-                public static create(properties?: langame.protobuf.Langame.INote): langame.protobuf.Langame.Note;
+            /**
+             * Constructs a new Note.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: langame.protobuf.INote);
 
-                /**
-                 * Encodes the specified Note message. Does not implicitly {@link langame.protobuf.Langame.Note.verify|verify} messages.
-                 * @param message Note message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: langame.protobuf.Langame.INote, writer?: $protobuf.Writer): $protobuf.Writer;
+            /** Note content. */
+            public content: string;
 
-                /**
-                 * Encodes the specified Note message, length delimited. Does not implicitly {@link langame.protobuf.Langame.Note.verify|verify} messages.
-                 * @param message Note message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: langame.protobuf.Langame.INote, writer?: $protobuf.Writer): $protobuf.Writer;
+            /** Note createdAt. */
+            public createdAt?: (google.protobuf.ITimestamp|null);
 
-                /**
-                 * Decodes a Note message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns Note
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Langame.Note;
+            /**
+             * Creates a new Note instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Note instance
+             */
+            public static create(properties?: langame.protobuf.INote): langame.protobuf.Note;
 
-                /**
-                 * Decodes a Note message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns Note
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Langame.Note;
+            /**
+             * Encodes the specified Note message. Does not implicitly {@link langame.protobuf.Note.verify|verify} messages.
+             * @param message Note message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: langame.protobuf.INote, writer?: $protobuf.Writer): $protobuf.Writer;
 
-                /**
-                 * Verifies a Note message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
+            /**
+             * Encodes the specified Note message, length delimited. Does not implicitly {@link langame.protobuf.Note.verify|verify} messages.
+             * @param message Note message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: langame.protobuf.INote, writer?: $protobuf.Writer): $protobuf.Writer;
 
-                /**
-                 * Creates a Note message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns Note
-                 */
-                public static fromObject(object: { [k: string]: any }): langame.protobuf.Langame.Note;
+            /**
+             * Decodes a Note message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Note
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Note;
 
-                /**
-                 * Creates a plain object from a Note message. Also converts values to other types if specified.
-                 * @param message Note
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: langame.protobuf.Langame.Note, options?: $protobuf.IConversionOptions): { [k: string]: any };
+            /**
+             * Decodes a Note message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Note
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Note;
 
-                /**
-                 * Converts this Note to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-            }
+            /**
+             * Verifies a Note message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Note message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Note
+             */
+            public static fromObject(object: { [k: string]: any }): langame.protobuf.Note;
+
+            /**
+             * Creates a plain object from a Note message. Also converts values to other types if specified.
+             * @param message Note
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: langame.protobuf.Note, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Note to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
         }
 
         /** Properties of a Paint. */

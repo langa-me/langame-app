@@ -55,8 +55,6 @@ abstract class AuthenticationApi {
     bool apple = false,
   });
 
-  Future<String> getChannelToken(String channelName);
-
   Future<List<lg.User>> getUserRecommendations(lg.User user);
 
   Future<int?> getInteraction(String uid, String otherUid);

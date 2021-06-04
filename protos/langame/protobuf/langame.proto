@@ -59,6 +59,7 @@ message User {
   repeated string tokens = 12;
 
   repeated string latest_interactions = 13;
+  repeated string errors = 14;
 }
 
 /// Evaluated relationship between users using AI + heuristics
@@ -90,28 +91,36 @@ message UserPreference {
 
 message Langame {
   string channel_name = 1;
-  repeated Player players = 2;
+  // Players is a (Firestore) collection of Player
+  repeated string players = 2;
   repeated string topics = 3;
   repeated Question questions = 4;
   // Who started this
   string initiator = 5;
   // Over, finished, nobody, can join anymore
-  bool done = 7;
+  google.protobuf.Timestamp done = 7;
   int32 current_question = 8;
+  // Initial date planned
   google.protobuf.Timestamp date = 9;
+  repeated string errors = 10;
+  google.protobuf.Timestamp started = 11;
+  int32 current_audio_id = 12;
+}
 
-  message Player {
-    string user_id = 1;
-    // Timestamp of the arrival in the Langame
-    google.protobuf.Timestamp time_in = 2;
-    // Timestamp of the departure in the Langame
-    google.protobuf.Timestamp time_out = 3;
-    repeated Note notes = 4;
-  }
-  message Note {
-    string content = 1;
-    google.protobuf.Timestamp created_at = 2;
-  }
+message Player {
+  string user_id = 1;
+  // Timestamp of the arrival in the Langame
+  google.protobuf.Timestamp time_in = 2;
+  // Timestamp of the departure in the Langame
+  google.protobuf.Timestamp time_out = 3;
+  repeated Note notes = 4;
+  // Necessary for Agora...
+  int32 audio_id = 5;
+  string audio_token = 6;
+}
+message Note {
+  string content = 1;
+  google.protobuf.Timestamp created_at = 2;
 }
 
 message Paint {

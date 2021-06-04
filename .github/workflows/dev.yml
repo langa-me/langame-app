@@ -26,8 +26,8 @@ jobs:
           RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
       - name: Install Flutter dependencies
         run: flutter pub get
-      - name: Analyze files
-        run: flutter analyze .
+      # - name: Analyze files
+        # run: flutter analyze .
       - name: Run the tests
         run: flutter test --coverage
       - name: Upload coverage to codecov
@@ -36,20 +36,19 @@ jobs:
       - name: Print outdated packages
         run: flutter pub outdated
       # Backend checks
-      - name: Move to Firebase directory
-        run: cd firebase/functions
       - name: Decrypt service account key
-        run: |
-          gpg --quiet --batch --yes --decrypt --passphrase="$RELEASE_SECRET_PASSPHRASE" \
-          --output service-account.zip service-account.zip.gpg && unzip service-account.zip
         env:
           RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
+        run: |
+          cd firebase/functions
+          gpg --quiet --batch --yes --decrypt --passphrase="$RELEASE_SECRET_PASSPHRASE" \
+          --output service-account.zip service-account.zip.gpg && unzip service-account.zip
+      - uses: actions/setup-node@v2
         with:
-          node-version: [12.x]
+          node-version: '12'
       - name: npm install, build and test
         run: | 
+          cd firebase/functions
           npm i
           npm run build
           npm run lint

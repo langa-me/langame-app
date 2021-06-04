@@ -6,12 +6,12 @@ import {
 
 import * as admin from "firebase-admin";
 import {
-  getLangame,
-  getUserData,
   handleSendToDevice,
   kInvalidRequest,
   kUserDoesNotExist,
 } from "./helpers";
+import {getLangame, getUserData} from "./utils/firestore";
+import {langame} from "./langame/protobuf/langame.gen";
 
 export const notifyPresence = async (data: any,
     context: functions.https.CallableContext) => {
@@ -43,8 +43,8 @@ export const notifyPresence = async (data: any,
   if ("statusCode" in langame) return langame;
   // We need to filter players with self,
   // do not want to send self notification
-  const playersExceptSelf = langame.players.filter((p: any) =>
-    p.langameUid != context.auth!.uid);
+  const playersExceptSelf = langame.data()!.players.filter((p: string) =>
+    p != context.auth!.uid);
   if (playersExceptSelf.length === 0) {
     return new FirebaseFunctionsResponse(
         FirebaseFunctionsResponseStatusCode.INTERNAL,
@@ -53,17 +53,22 @@ export const notifyPresence = async (data: any,
     );
   }
   // Get players data from firestore (need their messaging tokens)
-  const recipientsData: Array<FirebaseFunctionsResponse | any> = [];
+  const recipientsData: Array<
+  admin.firestore.DocumentSnapshot<langame.protobuf.User>> = [];
   for (const r of playersExceptSelf) {
-    const user = await getUserData(r.langameUid);
-    if ("statusCode" in user) return user;
-    if (!user.tokens) {
+    const user = await getUserData(r);
+    if ("statusCode" in user) {
+      // TODO: better handle this use case error
+      functions.logger.error("invalid user");
+      continue;
+    }
+    if (!user.data()!.tokens) {
       functions.logger
-          .error(kUserDoesNotExist(r.langameUid), "has no devices");
+          .error(kUserDoesNotExist(r), "has no devices");
       return new FirebaseFunctionsResponse(
           FirebaseFunctionsResponseStatusCode.INTERNAL,
           undefined,
-          `user ${r.langameUid} has no devices (tokens)`,
+          `user ${r} has no devices (tokens)`,
       );
     }
     recipientsData.push(user);
@@ -78,14 +83,14 @@ export const notifyPresence = async (data: any,
       .map(async (e) => {
         return handleSendToDevice(e,
             admin.messaging().sendToDevice(
-          e.tokens!,
+          e.data()!.tokens!,
           {
             notification: {
-              tag: langame.channelName,
+              tag: langame.data()!.channelName,
               // eslint-disable-next-line max-len
-              body: `${senderData.displayName} is waiting you to play ${langame.topics.join(",")}`,
+              body: `${senderData.displayName} is waiting you to play ${langame.data()!.topics.join(",")}`,
               // eslint-disable-next-line max-len
-              title: `Join ${senderData.displayName} to play ${langame.topics.join(",")} now?`,
+              title: `Join ${senderData.displayName} to play ${langame.data()!.topics.join(",")} now?`,
             },
           },
           {

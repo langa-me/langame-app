@@ -29,6 +29,7 @@ export const cleanupUser = async (user: UserRecord,
       .doc(user.uid);
 
   const batch = db.batch();
+  // TODO: shouldn't we use transaction for read too?
   try {
     if (!customer) {
       await reportError(new Error("could not retrieve Stripe customer"),
@@ -67,6 +68,15 @@ export const cleanupUser = async (user: UserRecord,
     for (const preferenceToDelete of preferencesToDelete.docs) {
       batch.delete(preferenceToDelete.ref);
     }
+
+    const presenceInLangames = await db
+        .collectionGroup("players")
+        .where("userId", "==", user.uid).get();
+
+    for (const p of presenceInLangames.docs) {
+      batch.delete(p.ref);
+    }
+
     functions.logger.info("preparing interactions, preferences, user deletion");
 
     return batch.delete(userDocToDelete).commit();

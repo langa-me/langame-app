@@ -3,14 +3,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/extension.dart';
-import 'package:langame/models/firebase_functions_protocol.dart';
 import 'package:langame/services/http/message_api.dart';
 
 import 'firebase.dart';

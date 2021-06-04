@@ -1,17 +1,21 @@
+import * as admin from "firebase-admin";
+// Initialize admin firebase
+admin.initializeApp();
+admin.firestore().settings({ignoreUndefinedProperties: true});
+
 import * as functions from "firebase-functions";
 import {newFeedback} from "./feedback";
-import {interactionsDecrement} from "./scheduledFunctions";
+import {interactionsDecrement, setLangamesDone} from "./scheduledFunctions";
 import {cleanupUser} from "./deleteData";
 import {subscribe} from "./subscribe";
 import {notifyPresence} from "./notifyPresence";
-import {getChannelToken} from "./getChannelToken";
 import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
 import {confirmStripePayment} from "./stripe/confirmStripePayment";
 import {createStripeCustomer} from "./stripe/createStripeCustomer";
 import {kLangamesCollection, kStripeCustomersCollection} from "./helpers";
 import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
-import {onUpdateLangame} from "./onUpdateLangame";
+import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
 
 /*
  admin.auth() // TODO: should kick everyone
@@ -39,15 +43,12 @@ exports.interactionsDecrement = functions
     .schedule("1 * * * *")
     .onRun(interactionsDecrement);
 
+exports.setLangamesDone = functions
+    .pubsub
+    .schedule("1 * * * *")
+    .onRun(setLangamesDone);
 
 exports.cleanupUser = functions.auth.user().onDelete(cleanupUser);
-
-exports.getChannelToken = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(getChannelToken);
-
 
 exports.notifyPresence = functions
     .region(region)
@@ -99,6 +100,6 @@ exports.onCreateLangame = functions.firestore
     .document(`${kLangamesCollection}/{pushId}`)
     .onCreate(onCreateLangame);
 
-exports.onUpdateLangame = functions.firestore
-    .document(`${kLangamesCollection}/{langameId}`)
-    .onUpdate(onUpdateLangame);
+exports.onUpdateLangamePlayers = functions.firestore
+    .document(`${kLangamesCollection}/{langameId}/players/{playerId}`)
+    .onUpdate(onUpdateLangamePlayers);

@@ -1,3 +1,4 @@
+void main() {}
 // import 'package:langame/helpers/constants.dart';
 // import 'package:langame/models/errors.dart';
 // import 'package:langame/services/http/firebase.dart';

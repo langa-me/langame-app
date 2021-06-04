@@ -1,7 +1,7 @@
-import 'dart:collection';
 import 'dart:ui';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -17,9 +17,7 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
-import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/paint_provider.dart';
-import 'package:langame/views/painters/mutliplayer_painting.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
@@ -48,18 +46,19 @@ class LocalPlayer {
 
 class _LangameViewState extends State<LangameView> {
   bool permissionRequested = false;
-  String? channelToken;
-  lg.Langame? langame;
+  Stream<DocumentSnapshot<lg.Langame>>? langameStream;
   Map<int, LocalPlayer> _localPlayers = {};
   bool engineInitialized = false;
   bool audioChannelJoined = false;
   int errors = 0;
+  bool done = false;
   static const int maxErrors = 3;
 
+  int _selfUid = 0;
   String _loadingMessage = '';
   String _failingMessage = '';
 
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
   final PageController controller = PageController(initialPage: 0);
   final TextEditingController notesController = new TextEditingController();
 
@@ -74,21 +73,60 @@ class _LangameViewState extends State<LangameView> {
     Provider.of<PaintingProvider>(context, listen: false)
         .init(widget.channelName);
     var lp = Provider.of<LangameProvider>(context, listen: false);
-    // Add self presence to the Langame
-    lp.joinLangame(widget.channelName);
+
     if (!widget.notifyOthers) return;
     lp.notifyPresence(widget.channelName);
   }
 
   @override
   Widget build(BuildContext context) {
-    var auth = Provider.of<AuthenticationProvider>(context, listen: false);
     var crash = Provider.of<CrashAnalyticsProvider>(context, listen: false);
-    var message = Provider.of<MessageProvider>(context, listen: false);
     var lp = Provider.of<LangameProvider>(context, listen: false);
     var audio = Provider.of<AudioProvider>(context, listen: false);
+    var cp = Provider.of<ContextProvider>(context, listen: false);
 
-    if (langame != null && langame!.done) {
+    // TODO: might do that on other pages too
+    var network = Provider.of<ConnectivityResult>(context, listen: false);
+    if (network != ConnectivityResult.wifi &&
+        network != ConnectivityResult.mobile) {
+      crash.analytics.logEvent(name: 'offline', parameters: {
+        'view': 'langame_view',
+      });
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: cp.buildLoadingWidget(text: 'You are offline!'),
+      );
+    }
+
+    if (langameStream == null) {
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: FutureBuilder<
+                LangameResponse<Stream<DocumentSnapshot<lg.Langame>>>>(
+            future: lp.joinLangame(widget.channelName),
+            builder: (c, s) {
+              if (s.hasError) _handleError();
+              if (s.hasData &&
+                  s.data != null &&
+                  s.data!.status == LangameStatus.succeed &&
+                  s.data!.result != null) {
+                _postFrameCallback((_) => setState(() {
+                      langameStream = s.data!.result!;
+                    }));
+              } else if (s.hasData &&
+                  s.data != null &&
+                  s.data!.status == LangameStatus.failed) {
+                _handleError();
+                _postFrameCallback((_) => setState(() {
+                      langameStream = null;
+                    }));
+              }
+              return cp.buildLoadingWidget(text: _loadingMessage);
+            }),
+      );
+    }
+
+    if (done) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -114,19 +152,6 @@ class _LangameViewState extends State<LangameView> {
       );
     }
 
-    // TODO: might do that on other pages too
-    var network = Provider.of<ConnectivityResult>(context, listen: false);
-    if (network != ConnectivityResult.wifi &&
-        network != ConnectivityResult.mobile) {
-      crash.analytics.logEvent(name: 'offline', parameters: {
-        'view': 'langame_view',
-      });
-      return WillPopScope(
-        onWillPop: _onBackPressed,
-        child: _buildLoading(text: 'You are offline!'),
-      );
-    }
-
     if (!permissionRequested) {
       audio.checkPermission().then((r) {
         // No result or no permission granted
@@ -137,38 +162,6 @@ class _LangameViewState extends State<LangameView> {
       });
     }
     crash.log('permissionRequested $permissionRequested');
-
-    // Second-step, ask for a token generation
-    if (channelToken == null) {
-      return WillPopScope(
-        onWillPop: _onBackPressed,
-        child: FutureBuilder<LangameResponse<String>>(
-            future: message.getChannelToken(widget.channelName),
-            builder: (c, s) {
-              if (s.hasError) _handleError();
-              if (s.hasData &&
-                  s.data != null &&
-                  s.data!.status == LangameStatus.succeed) {
-                _postFrameCallback(
-                    (_) => setState(() => channelToken = s.data!.result));
-              } else if (s.hasData &&
-                  s.data != null &&
-                  s.data!.status == LangameStatus.failed) {
-                _handleError();
-                _postFrameCallback((_) => setState(() => channelToken = null));
-              }
-              return _buildLoading(text: _loadingMessage);
-            }),
-      );
-    }
-    crash.log('channelToken $channelToken');
-
-    if (langame == null) {
-      setState(() {
-        langame = lp.runningLangames.values
-            .firstWhere((l) => l.channelName == widget.channelName);
-      });
-    }
 
     // Fifth-step, initialize audio engine
     if (!engineInitialized) {
@@ -190,127 +183,109 @@ class _LangameViewState extends State<LangameView> {
               _postFrameCallback(
                   (_) => setState(() => engineInitialized = false));
             }
-            return _buildLoading(text: _loadingMessage);
+            return cp.buildLoadingWidget(text: _loadingMessage);
           },
         ),
       );
     }
     crash.log('engineInitialized $engineInitialized');
 
-    // Sixth-step, join audio channel
-    if (!audioChannelJoined) {
-      return WillPopScope(
-        onWillPop: _onBackPressed,
-        child: FutureBuilder<LangameResponse<void>>(
-            future: audio.joinChannel(
-                channelToken!, widget.channelName, auth.user!.uid),
-            builder: (c, s) {
-              if (s.hasError) _handleError();
-              if (s.hasData &&
-                  s.data != null &&
-                  s.data!.status == LangameStatus.succeed) {
-                _postFrameCallback(
-                    (_) => setState(() => audioChannelJoined = true));
-              } else if (s.hasData &&
-                  s.data != null &&
-                  s.data!.status == LangameStatus.failed) {
-                _handleError();
-                _postFrameCallback(
-                    (_) => setState(() => audioChannelJoined = false));
-              }
-              return _buildLoading(text: _loadingMessage);
-            }),
-      );
-    }
-    crash.log('channelJoined $audioChannelJoined');
-
-    if (channelToken == null ||
-        langame == null ||
-        !engineInitialized ||
-        !audioChannelJoined) {
-      return WillPopScope(
-        onWillPop: _onBackPressed,
-        child: _buildLoading(text: _loadingMessage),
-      );
-    }
-
     return WillPopScope(
-      onWillPop: _onBackPressed,
-      // Start once two players joined
-      child: langame!.players.where((p) => p.timeIn.isInitialized()).length < 2
-          ? _buildWaitingScreen()
-          : _buildRunningLangame(),
-    );
+        onWillPop: _onBackPressed,
+        // Start once two players joined
+        child: StreamBuilder<DocumentSnapshot<lg.Langame>>(
+            builder: (context, langameSnap) {
+              if (langameSnap.hasData && langameSnap.data!.exists) {
+                // If it has started...
+                return langameSnap.data!.data()!.hasStarted()
+                    ? _buildRunningLangame(langameSnap.data!)
+                    : _buildWaitingScreen(langameSnap.data!.data()!);
+              }
+              return cp.buildLoadingWidget(text: _loadingMessage);
+            },
+            stream: langameStream));
   }
 
-  Widget _buildRunningLangame() {
+  Widget _buildRunningLangame(DocumentSnapshot<lg.Langame> l) {
     Provider.of<LangameProvider>(context, listen: false)
         .addNote(widget.channelName, notesController.text);
+    Provider.of<AudioProvider>(context, listen: false) // TODO
+        // ignore: invalid_return_type_for_catch_error
+        .joinChannel(l)
+        .then((e) {
+      if (e.error != null) _handleError(failNow: true);
+    });
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-      ),
-      body: Row(
-        children: [
-          NavigationRail(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() => _selectedIndex = index);
-              controller.animateToPage(
-                _selectedIndex,
-                duration: Duration(seconds: 1),
-                curve: Curves.easeIn,
-              );
-            },
-            labelType: NavigationRailLabelType.selected,
-            destinations: const [
-              NavigationRailDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home_outlined),
-                label: Text('Home'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.format_paint_outlined),
-                selectedIcon: Icon(Icons.format_paint_outlined),
-                label: Text('Paint'),
-              ),
-            ],
-          ),
-          const VerticalDivider(thickness: 1, width: 1),
-          Expanded(
-            child: PageView(
-              scrollDirection: Axis.vertical,
-              controller: controller,
-              // Prevent swiping on draw view
-              physics:
-                  _selectedIndex == 1 ? NeverScrollableScrollPhysics() : null,
-              onPageChanged: (v) {
-                setState(() => _selectedIndex = v);
-              },
-              children: [
-                _buildHome(),
-                MultiplayerPainting(),
-              ],
-            ),
-          ),
-        ],
-      ),
+      resizeToAvoidBottomInset: false,
+      body: _buildHome(l.data()!),
+
+      // body: Row(
+      //   children: [
+      //     NavigationRail(
+      //       selectedIndex: _selectedIndex,
+      //       onDestinationSelected: (int index) {
+      //         setState(() => _selectedIndex = index);
+      //         controller.animateToPage(
+      //           _selectedIndex,
+      //           duration: Duration(seconds: 1),
+      //           curve: Curves.easeIn,
+      //         );
+      //       },
+      //       labelType: NavigationRailLabelType.selected,
+      //       destinations: const [
+      //         NavigationRailDestination(
+      //           icon: Icon(Icons.home_outlined),
+      //           selectedIcon: Icon(Icons.home_outlined),
+      //           label: Text('Home'),
+      //         ),
+      //         // NavigationRailDestination(
+      //         //   icon: Icon(Icons.format_paint_outlined),
+      //         //   selectedIcon: Icon(Icons.format_paint_outlined),
+      //         //   label: Text('Paint'),
+      //         // ),
+      //       ],
+      //     ),
+      //     const VerticalDivider(thickness: 1, width: 1),
+      //     Expanded(
+      //       child: PageView(
+      //         scrollDirection: Axis.vertical,
+      //         controller: controller,
+      //         // Prevent swiping on draw view
+      //         physics:
+      //             _selectedIndex == 1 ? NeverScrollableScrollPhysics() : null,
+      //         onPageChanged: (v) {
+      //           setState(() => _selectedIndex = v);
+      //         },
+      //         children: [
+      //           _buildHome(l.data()!),
+      //           // MultiplayerPainting(),
+      //         ],
+      //       ),
+      //     ),
+      //   ],
+      // ),
     );
   }
 
-  Widget _buildHome() => Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _buildTimerText(),
-          _buildQuestion(),
-          _buildBottomHalf(),
-        ],
-      );
+  Widget _buildHome(lg.Langame l) => Stack(children: [
+        Positioned(
+            top: AppSize.safeBlockVertical * 1,
+            right: AppSize.safeBlockHorizontal * 1,
+            child: IconButton(
+                onPressed: _onBackPressed, icon: Icon(FontAwesomeIcons.times))),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _buildTimerText(),
+            _buildQuestion(l),
+            _buildBottomHalf(),
+          ],
+        )
+      ]);
 
-  Future<bool> _onBackPressed() async {
+  Future<bool> _onBackPressed() {
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    return await cp.showCustomDialog(
+    return cp.showCustomDialog<bool>(
       [
         Padding(
             padding: EdgeInsets.all(10),
@@ -431,8 +406,10 @@ class _LangameViewState extends State<LangameView> {
     ]);
   }
 
-  void _handleError() {
-    if (errors > maxErrors) {
+  void _handleError({bool failNow = false}) {
+    if (errors > maxErrors || failNow) {
+      Provider.of<AudioProvider>(context, listen: false).leaveChannel();
+
       showToast(
         _failingMessage,
         color: Colors.red,
@@ -452,30 +429,28 @@ class _LangameViewState extends State<LangameView> {
     WidgetsBinding.instance!.addPostFrameCallback(callback);
   }
 
-  Widget _buildLoading({String? text}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          text ?? '',
-          style: Theme.of(context).textTheme.headline6,
-        ),
-        SpinKitDualRing(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black,
-        ),
-      ],
-    );
-  }
-
   RtcEngineEventHandler _buildEventHandler() => RtcEngineEventHandler(
-        activeSpeaker: (int uid) {
+        activeSpeaker: (int audioId) async {
+          LangameResponse<lg.User>? joiner;
+          if (!_localPlayers.containsKey(audioId)) {
+            joiner = await Provider.of<AudioProvider>(context, listen: false)
+                .getLangameUserFromAudioId(audioId);
+            if (joiner.error != null || joiner.result == null) {
+              return;
+            }
+          }
+
           setState(() {
-            _localPlayers[uid]?.isSpeaking = true;
+            if (joiner != null)
+              _localPlayers[audioId] = LocalPlayer(joiner.result!, false);
+            _localPlayers.keys.forEach((e) {
+              _localPlayers[e]?.isSpeaking = false;
+            });
+            // hack because seems to use uid 0
+            _localPlayers[audioId == 0 ? _selfUid : audioId]?.isSpeaking = true;
           });
           Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
-              '${_localPlayers[uid]?.langameUser.displayName} speaking: ${_localPlayers[uid]?.isSpeaking}');
+              '${_localPlayers[audioId]?.langameUser.displayName} speaking: ${_localPlayers[audioId]?.isSpeaking}');
         },
         microphoneEnabled: (bool a) {
           Provider.of<CrashAnalyticsProvider>(context, listen: false)
@@ -489,43 +464,45 @@ class _LangameViewState extends State<LangameView> {
           Provider.of<CrashAnalyticsProvider>(context, listen: false)
               .log('localUserRegistered a $a b$b');
         },
-        userJoined: (int uid, int _) async {
+        userJoined: (int audioId, int _) async {
           var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
           var joiner = await Provider.of<AudioProvider>(context, listen: false)
-              .rtcUidToFirebaseUid(uid);
+              .getLangameUserFromAudioId(audioId);
           if (joiner.error != null || joiner.result == null) {
             return;
           }
-          Provider.of<AuthenticationProvider>(context, listen: false)
-              .getLangameUser(joiner.result!)
-              .then((u) {
-            setState(() {
-              _localPlayers[uid] = LocalPlayer(u.result!, false);
-            });
-            cap.log('userJoined $uid',
-                analyticsMessage: 'langame_user_join',
-                analyticsParameters: {
-                  'uid': _localPlayers[uid]?.langameUser.uid
-                });
+
+          setState(() {
+            _localPlayers[audioId] = LocalPlayer(joiner.result!, false);
           });
+          cap.log('userJoined $audioId',
+              analyticsMessage: 'langame_user_join',
+              analyticsParameters: {
+                'uid': _localPlayers[audioId]?.langameUser.uid
+              });
         },
         userOffline: (int uid, UserOfflineReason reason) {
+          if (!_localPlayers.containsKey(uid)) return; // TODO
           Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
               'userOffline $uid $reason',
               analyticsMessage: 'langame_user_leave',
               analyticsParameters: {
-                'uid': _localPlayers[uid]?.langameUser.uid,
+                'uid': _localPlayers[uid]!.langameUser.uid,
                 'reason': reason.index,
               });
           final String? tag = _localPlayers[uid]!.langameUser.tag;
+
           Provider.of<ContextProvider>(context, listen: false)
               .showSnackBar('$tag left');
-          _localPlayers.remove(uid);
+          setState(() {
+            _localPlayers.remove(uid);
+          });
         },
         joinChannelSuccess: (channelName, uid, elapsed) {
           var ap = Provider.of<AuthenticationProvider>(context, listen: false);
           setState(() {
             _localPlayers[uid] = LocalPlayer(ap.user!, false);
+            _selfUid = uid;
           });
 
           Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
@@ -546,7 +523,6 @@ class _LangameViewState extends State<LangameView> {
     try {
       Provider.of<CrashAnalyticsProvider>(context, listen: false)
           .log('langame end', analyticsMessage: 'langame_end');
-      var mp = Provider.of<MessageProvider>(context, listen: false);
       Provider.of<AudioProvider>(context, listen: false).stopTimer();
       await Future.wait([
         // mp.sendLangameEnd(langame!.channelName),
@@ -563,8 +539,9 @@ class _LangameViewState extends State<LangameView> {
       Future.delayed(Duration.zero, () => _showEndDialog(left: left));
   }
 
-  Widget _buildWaitingScreen() {
+  Widget _buildWaitingScreen(lg.Langame l) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         SpinKitPouringHourglass(
           color: Theme.of(context).colorScheme.primary,
@@ -572,10 +549,11 @@ class _LangameViewState extends State<LangameView> {
         ),
         SizedBox(height: AppSize.blockSizeVertical * 5),
         Container(
-          width: AppSize.blockSizeHorizontal * 70,
-          height: AppSize.blockSizeVertical * 40,
+          padding: EdgeInsets.all(12),
+          width: AppSize.blockSizeHorizontal * 85,
+          height: AppSize.blockSizeVertical * 60,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
+            color: variantIsLightThenDark(context, reverse: true),
             border: Border.all(
               color: Theme.of(context).colorScheme.primaryVariant,
               width: 5,
@@ -590,10 +568,7 @@ class _LangameViewState extends State<LangameView> {
                 Text(
                   _buildWaitingText(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
+                  style: Theme.of(context).textTheme.headline6,
                 ),
                 TextField(
                   controller: notesController,
@@ -610,11 +585,7 @@ class _LangameViewState extends State<LangameView> {
 
   String _buildWaitingText() {
     var texts = [];
-    if (langame != null) {
-      texts.add(
-          'Your friends are coming, in the meantime, any thoughts about "${langame!.topics.join(',')}"?');
-      texts.add('How do you think they will react to this topic?');
-    }
+    texts.add('How do you think they will react to this topic?');
 
     return texts.pickAny();
   }
@@ -627,7 +598,8 @@ class _LangameViewState extends State<LangameView> {
       // hack to force rebuild (notifyListeners() in provider cause
       // setState() or markNeedsBuild() called during build)
       _postFrameCallback((_) => setState(() {}));
-      return _buildLoading();
+      return Provider.of<ContextProvider>(context, listen: false)
+          .buildLoadingWidget(text: _loadingMessage);
     }
 
     return Consumer<AudioProvider>(
@@ -670,7 +642,7 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  Widget _buildQuestion() {
+  Widget _buildQuestion(lg.Langame l) {
     var theme = Theme.of(context);
     return Center(
       child: Container(
@@ -689,7 +661,7 @@ class _LangameViewState extends State<LangameView> {
             Container(
               child: Center(
                 child: Text(
-                  langame!.questions[langame!.currentQuestion].content,
+                  l.questions[l.currentQuestion].content,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headline6!.merge(TextStyle(
                       color: isLightThenDark(context, reverse: false))),
@@ -702,8 +674,8 @@ class _LangameViewState extends State<LangameView> {
                 icon: FaIcon(FontAwesomeIcons.brain,
                     color: isLightThenDark(context, reverse: false)),
                 onPressed: () => _showContexts(
-                    langame!.questions[langame!.currentQuestion].content,
-                    langame!.questions[langame!.currentQuestion].contexts),
+                    l.questions[l.currentQuestion].content,
+                    l.questions[l.currentQuestion].contexts),
               ),
               IconButton(
                 icon: Icon(Icons.warning_amber_rounded, color: Colors.orange),
@@ -846,25 +818,31 @@ class _LangameViewState extends State<LangameView> {
   Future<void> _showEndDialog({String? left}) async =>
       Provider.of<ContextProvider>(context, listen: false).showCustomDialog(
         [
-          Text(
-            'Langame is over',
-            style: TextStyle(color: Colors.white),
-          ),
-          LottieBuilder.asset('animations/congratulations.json'),
-          Text(
-            left != null
-                ? '$left left the Langame, it terminated it'
-                : 'Time elapsed',
-            style: TextStyle(color: Colors.white),
-          ),
-          IconsButton(
-            onPressed: _goBackToMainMenu,
-            text: 'Leave',
-            iconData: FontAwesomeIcons.doorOpen,
-            color: Colors.white,
-            textStyle: TextStyle(color: Colors.white),
-            iconColor: Colors.white,
-          ),
+          Padding(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Langame is over',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    LottieBuilder.asset('animations/congratulations.json'),
+                    Text(
+                      left != null
+                          ? '$left left the Langame, it terminated it'
+                          : 'Time elapsed',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    IconsButton(
+                      onPressed: _goBackToMainMenu,
+                      text: 'Leave',
+                      iconData: FontAwesomeIcons.doorOpen,
+                      color: Colors.white,
+                      textStyle: TextStyle(color: Colors.white),
+                      iconColor: Colors.white,
+                    ),
+                  ])),
         ],
         canBack: false,
         backgroundColor: Theme.of(context).colorScheme.primary,

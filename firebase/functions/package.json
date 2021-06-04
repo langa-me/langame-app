@@ -10,6 +10,8 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy",
+    "deploy-rules": "firebase deploy --only firestore:rules",
+    "deploy-indexes": "firebase deploy --only firestore:indexes",
     "logs": "firebase functions:log",
     "set-dev": "firebase use langame-dev",
     "set-prod": "firebase use langame-86ac4",

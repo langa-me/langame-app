@@ -21,8 +21,6 @@ class MessageProvider extends ChangeNotifier {
 
   MessageApi _messageApi;
 
-
-
   /// Create an authentication provider, and
   MessageProvider(this.firebase, this._messageApi, this._authenticationApi,
       this._crashAnalyticsProvider, this._authenticationProvider);
@@ -43,17 +41,7 @@ class MessageProvider extends ChangeNotifier {
     return LangameResponse(LangameStatus.succeed);
   }
 
-  Future<LangameResponse<String>> getChannelToken(String channelName) async {
-    try {
-      var r = await _authenticationApi.getChannelToken(channelName);
-      _crashAnalyticsProvider.log('getChannelToken $r');
-      return LangameResponse<String>(LangameStatus.succeed, result: r);
-    } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to get channel $channelName token');
-      _crashAnalyticsProvider.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
+
 
 
 

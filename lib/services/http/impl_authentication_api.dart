@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/string.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
-import 'package:langame/models/firebase_functions_protocol.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -234,38 +232,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
     });
   }
 
-  @override
-  Future<String> getChannelToken(String channelName) async {
-    HttpsCallable callable = firebase.functions!.httpsCallable(
-        AppConst.getChannelTokenFunction,
-        options: HttpsCallableOptions(timeout: Duration(seconds: 10)));
-
-    try {
-      final HttpsCallableResult result = await callable.call(
-        <String, dynamic>{
-          'channelName': channelName,
-        },
-      );
-      FirebaseFunctionsResponse response = FirebaseFunctionsResponse.fromJson(
-        Map<String, dynamic>.from(result.data),
-      );
-      switch (response.statusCode) {
-        case FirebaseFunctionsResponseStatusCode.OK:
-          return response.result!['channelToken'];
-        case FirebaseFunctionsResponseStatusCode.BAD_REQUEST:
-          throw LangameGetAudioTokenException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.BAD_REQUEST.toString());
-        case FirebaseFunctionsResponseStatusCode.UNAUTHORIZED:
-          throw LangameGetAudioTokenException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.UNAUTHORIZED.toString());
-        case FirebaseFunctionsResponseStatusCode.INTERNAL:
-          throw LangameGetAudioTokenException(response.errorMessage ??
-              FirebaseFunctionsResponseStatusCode.INTERNAL.toString());
-      }
-    } catch (e) {
-      throw LangameGetAudioTokenException(e.toString());
-    }
-  }
 
   @override
   Future<List<lg.User>> getUserRecommendations(lg.User user) async {

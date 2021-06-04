@@ -11,7 +11,7 @@ void Function() onAddToShoppingList(
       lp.addPlayer(u);
       msg = '${u.displayName} has been added to current Langame';
     }
-    cp.showSnackBar(msg, action: SnackBarAction(label: 'return to Langame creation?', onPressed: () => goToPage(0)));
+    cp.showSnackBar(msg);
   };
 }
 
@@ -19,6 +19,6 @@ void Function() onRemoveFromShoppingList(
     User u, NewLangameProvider lp, ContextProvider cp, void Function(int, {Curve? curve}) goToPage) {
   return () {
     lp.removePlayer(u);
-    cp.showSnackBar('${u.displayName} has been removed from current Langame', action: SnackBarAction(label: 'return to Langame creation?', onPressed: () => goToPage(0)));
+    cp.showSnackBar('${u.displayName} has been removed from current Langame');
   };
 }

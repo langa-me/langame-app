@@ -85,7 +85,9 @@ void main() async {
   var navigationKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
   var scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>(debugLabel: 'scaffoldKey');
-  var contextProvider = ContextProvider(navigationKey, scaffoldMessengerKey);
+  var funnyProvider = FunnyProvider();
+  var contextProvider =
+      ContextProvider(navigationKey, scaffoldMessengerKey, funnyProvider);
   var crashAnalyticsProvider =
       CrashAnalyticsProvider(firebase.crashlytics!, firebase.analytics!);
   var authenticationApi = ImplAuthenticationApi(firebase);
@@ -97,11 +99,10 @@ void main() async {
   var messageApi = useEmulator
       ? FakeMessageApi(firebase, (_) {})
       : ImplMessageApi(firebase, (n) {
-          if (n?.channelName != null) {
-            navigationKey.currentState?.pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => LangameView(n!.channelName, n.ready),
-              ),
+          debugPrint('opening $n');
+          if (n?['channelName'] != null) {
+            contextProvider.pushReplacement(
+              LangameView(n!['channelName'], false),
             );
           }
         });
@@ -126,7 +127,6 @@ void main() async {
             ///////////////////////////////////////////
 
             ChangeNotifierProvider(create: (_) => crashAnalyticsProvider),
-            ChangeNotifierProvider(create: (_) => preferenceProvider),
             StreamProvider<ConnectivityResult>.value(
                 value: Connectivity().onConnectivityChanged,
                 initialData: ConnectivityResult.wifi),
@@ -134,7 +134,7 @@ void main() async {
               create: (_) => contextProvider,
             ),
             ChangeNotifierProvider(create: (_) => TopicProvider(firebase)),
-            ChangeNotifierProvider(create: (_) => FunnyProvider()),
+            ChangeNotifierProvider(create: (_) => funnyProvider),
             ChangeNotifierProvider(create: (_) => NewLangameProvider()),
 
             ///////////////////////////////////////////
@@ -153,7 +153,10 @@ void main() async {
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, PreferenceProvider>(
-              update: (_, cap, ap, pp) => pp!,
+              update: (_, cap, ap, pp) {
+                pp!.init();
+                return pp;
+              },
               create: (_) => preferenceProvider,
             ),
             ChangeNotifierProxyProvider<CrashAnalyticsProvider, AudioProvider>(
@@ -173,7 +176,14 @@ void main() async {
             ),
             ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
                 ContextProvider, PreferenceProvider, FeedbackProvider>(
-              update: (_, cap, cp, pp, fp) => fp!,
+              update: (ctx, cap, cp, pp, fp) {
+                fp?.disable();
+                return FeedbackProvider(
+                    firebase,
+                    crashAnalyticsProvider,
+                    contextProvider,
+                    Provider.of<PreferenceProvider>(ctx, listen: false));
+              },
               create: (_) => FeedbackProvider(firebase, crashAnalyticsProvider,
                   contextProvider, preferenceProvider),
             ),

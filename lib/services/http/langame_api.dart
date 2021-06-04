@@ -16,10 +16,11 @@ abstract class LangameApi {
   Future<void> addNoteToLangame(String channelName, String note);
 
   /// Get [Langame] which current user is part of
-  Stream<QuerySnapshot<lg.Langame>> getLangames({bool unDoneOnly = false});
+  Future<Iterable<Stream<DocumentSnapshot<lg.Langame>>>> getLangames(
+      {bool unDoneOnly = false});
 
   /// Add self to [Langame] ins
-  Future<void> joinLangame(String channelName);
+  Future<Stream<DocumentSnapshot<lg.Langame>>> joinLangame(String channelName);
 
   /// Response to a Langame message to say "I am ready and waiting"
   Future<void> notifyPresence(String channelName);

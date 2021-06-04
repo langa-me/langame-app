@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import '../firebase.dart';

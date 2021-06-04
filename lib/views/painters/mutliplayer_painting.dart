@@ -71,7 +71,7 @@ class _MultiplayerPaintingState extends State<MultiplayerPainting> {
         ),
         floatingActionButton: FabCircularMenu(
             key: fabKey,
-            ringDiameter: AppSize.safeBlockVertical * 50,
+            ringDiameter: AppSize.safeBlockVertical * 70,
             ringWidth: AppSize.safeBlockVertical * 10,
             fabColor: Theme.of(context).colorScheme.primary,
             ringColor: Theme.of(context).colorScheme.primary,

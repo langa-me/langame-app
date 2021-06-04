@@ -3,6 +3,8 @@ import * as admin from "firebase-admin";
 import {kQuestionsCollection, kTagsCollection} from "./helpers";
 import {firestore} from "firebase-admin/lib/firestore";
 import QuerySnapshot = firestore.QuerySnapshot;
+import {converter} from "./utils/firestore";
+import {langame} from "./langame/protobuf/langame.gen";
 
 export const openAiKey = functions.config().openai.key;
 
@@ -19,38 +21,41 @@ export const offlineQuestionSearch =
         limit: number,
         minimumThreshold: number,
         generated: boolean):
-        Promise<any[]> => {
+        Promise<langame.protobuf.Question[]> => {
       tags = tags.map((t) => t.toLowerCase());
       // Filter questions with highest scores for these tags
-      let documents: QuerySnapshot;
+      let tagDocs: QuerySnapshot<langame.protobuf.Tag>;
       if (generated) {
-        documents = await admin
+        tagDocs = await admin
             .firestore()
             .collection(kTagsCollection)
             .where("generated", "==", true)
             .where("content", "in", tags)
+            .withConverter(converter<langame.protobuf.Tag>())
             .limit(limit)
             .get();
       } else {
         // TODO should aggregate/whatever u call it score in topic
-        documents = await admin
+        tagDocs = await admin
             .firestore()
             .collection(kTagsCollection)
             .orderBy("score", "desc")
             .where("score", ">", minimumThreshold)
             .where("content", "in", tags)
+            .withConverter(converter<langame.protobuf.Tag>())
             .limit(limit)
             .get();
       }
 
-      const questions = [];
-      for (const d of documents.docs) {
+      const questions: langame.protobuf.Question[] = [];
+      for (const t of tagDocs.docs) {
         const q = await admin
             .firestore()
             .collection(kQuestionsCollection)
-            .doc(d.data().question)
+            .doc(t.data().question)
+            .withConverter(converter<langame.protobuf.Question>())
             .get();
-        questions.push(q.data());
+        if (t.data()) questions.push(q.data()!);
       }
       return questions;
     };

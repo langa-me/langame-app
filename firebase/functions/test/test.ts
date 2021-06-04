@@ -5,15 +5,9 @@ import * as admin from "firebase-admin";
 import "mocha";
 import {expect} from "chai";
 
-before(() => {
-  const serviceAccount = require("../langame-dev-8ac76897c7bc.json");
-  // eslint-disable-next-line max-len
-  // const serviceAccount = require("../langame-86ac4-firebase-adminsdk-iojlf-2d6861b97d.json");
 
-  // Initialize the app with a service account, granting admin privileges
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+before(() => {
+
 });
 
 it.skip("check that we can find some questions", async () => {
@@ -57,3 +51,5 @@ it.skip("", async () => {
   console.log(t.parameters.offline_use_generated
       .defaultValue["value"] === "true");
 });
+
+

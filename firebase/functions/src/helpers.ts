@@ -11,8 +11,6 @@ import {
 export const appID = functions.config().agora.id;
 export const appCertificate = functions.config().agora.certificate;
 
-// token expire time, hardcode to 3600 seconds = 1 hour
-export const expirationTimeInSeconds = 3600;
 export const role = RtcRole.PUBLISHER;
 
 
@@ -66,52 +64,6 @@ export const filterOutSendLangameCalls =
       return 0;
     };
 
-export const getUserData = async (id: string) => {
-  const recipient = await admin
-      .firestore()
-      .collection(kUsersCollection)
-      .doc(id)
-      .get();
-  if (!recipient.exists) {
-    functions.logger.error(kUserDoesNotExist(id), "not present in db");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        kUserDoesNotExist(id),
-    );
-  }
-
-
-  const data = recipient.data();
-
-  if (!data) {
-    functions.logger.error(kUserDoesNotExist(id), "has no data");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        kUserDoesNotExist(id),
-    );
-  }
-
-  if (!data.uid) {
-    functions.logger.error(kUserDoesNotExist(id), "has no uid");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        `user ${id} has no uid`,
-    );
-  }
-
-  if (!data.displayName) {
-    functions.logger.error(kUserDoesNotExist(id), "has not display name");
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        `user ${id} has no displayName`,
-    );
-  }
-  return data;
-};
 
 export const handleSendToDevice = (recipientData: any,
     promise: Promise<admin.messaging.MessagingDevicesResponse>)
@@ -147,7 +99,7 @@ export const handleSendToDevice = (recipientData: any,
 };
 
 export const generateAgoraRtcToken = (channelName: string,
-    uid: number): string => {
+    uid: number, expirationTimeInSeconds: number = 3600): string => {
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
@@ -191,33 +143,6 @@ export const hashFnv32a = (str: string, asString: boolean, seed: number):
   return hVal >>> 0;
 };
 
-export const getLangame = async (channelName: string):
-    Promise<FirebaseFunctionsResponse | any> => {
-  const queryResult = await admin.firestore()
-      .collection(kLangamesCollection)
-      .where("channelName", "==", channelName)
-      .get();
-  if (queryResult.empty) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        "could not find this channel",
-    );
-  }
-  try {
-    const data = queryResult.docs[0].data();
-    return {
-      id: queryResult.docs[0].id,
-      data,
-    };
-  } catch (e) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.INTERNAL,
-        undefined,
-        "failed to build langame object",
-    );
-  }
-};
 
 /**
  *

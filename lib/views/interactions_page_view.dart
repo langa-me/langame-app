@@ -94,7 +94,7 @@ class _State extends State<InteractionsPageView>
                                     LangameResponse<InteractionLevel?>>(
                                 future: r.getInteraction(
                                     r.userRecommendations[index].uid),
-                                builder: (ctx, s) => BuildUserTile(
+                                builder: (ctx, s) => buildUserTile(
                                     context,
                                     lp,
                                     r.userRecommendations[index],
@@ -152,7 +152,7 @@ class _State extends State<InteractionsPageView>
                         )
                       : ListView.builder(
                           itemCount: r.recentInteractions.length,
-                          itemBuilder: (context, index) => BuildUserTile(
+                          itemBuilder: (context, index) => buildUserTile(
                               context,
                               lp,
                               r.recentInteractions.elementAt(index).item1,

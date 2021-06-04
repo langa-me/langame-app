@@ -10,7 +10,7 @@
 	</array>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:langa</string>
+		<string>applinks:play.langa.me</string>
 	</array>
 	<key>com.apple.developer.in-app-payments</key>
 	<array/>

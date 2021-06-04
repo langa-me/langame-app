@@ -18,7 +18,6 @@ import 'package:langame/views/buttons/button.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'main_view.dart';
 
@@ -84,7 +83,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                 return 'Please enter some text';
               }
               var cp = Provider.of<ContextProvider>(context, listen: false);
-              cp.showLoadingDialog('Validating...');
+              cp.showLoadingDialog(text: 'Validating...');
               var ap =
                   Provider.of<AuthenticationProvider>(context, listen: false);
               ap // Sometimes the user has no displayName (apple hidden mail), using the tag then
@@ -140,7 +139,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
             .initializeMessageApi();
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var fp = Provider.of<FunnyProvider>(context, listen: false);
-    cp.showLoadingDialog(fp.getLoadingRandom());
+    cp.showLoadingDialog();
     var showFailure = () async {
       cp.dialogComplete();
       cp.showFailureDialog(fp.getFailingRandom());

@@ -1,91 +1,138 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/firebase_functions_protocol.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:langame/models/google/protobuf/timestamp.pbserver.dart' as gg;
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/langame_api.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 class ImplLangameApi extends LangameApi {
   ImplLangameApi(FirebaseApi firebase) : super(firebase);
 
-
-  
-    @override
-  Stream<QuerySnapshot<lg.Langame>> getLangames({bool unDoneOnly = false}) {
-    return firebase.firestore!
-        .collection(AppConst.firestoreLangamesCollection)
-        .where('initiator', isEqualTo: firebase.auth!.currentUser!.uid)
-        .where('players', arrayContains: firebase.auth!.currentUser!.uid)
-        // i.e. hack to filter or not only running Langame
-        .where('done', whereIn: [unDoneOnly ? false : true, false])
+  @override
+  Future<Iterable<Stream<DocumentSnapshot<lg.Langame>>>> getLangames(
+      {bool unDoneOnly = false}) async {
+    var players = await firebase.firestore!
+        .collectionGroup('players')
+        .where('userId', isEqualTo: firebase.auth!.currentUser!.uid)
+        .get();
+    return players.docs.map((e) => e.reference.parent.parent!
         .withConverter<lg.Langame>(
           fromFirestore: (snapshot, _) =>
               LangameExt.fromObject(snapshot.data()!),
           toFirestore: (user, _) => user.toMapStringDynamic(),
         )
-        .snapshots();
+        .snapshots());
   }
 
   @override
-  Future<void> joinLangame(String channelName) async {
+  Future<Stream<DocumentSnapshot<lg.Langame>>> joinLangame(
+      String channelName) async {
     var snap = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)
         .where('channelName', isEqualTo: channelName)
+        .withConverter<lg.Langame>(
+          fromFirestore: (snapshot, _) =>
+              LangameExt.fromObject(snapshot.data()!),
+          toFirestore: (user, _) => user.toMapStringDynamic(),
+        )
         .get();
     if (snap.docs.isEmpty || !snap.docs.first.exists)
       throw LangameMessageException('invalid_channel_name');
-    return snap.docs.first.reference.update({
-      'players': FieldValue.arrayUnion([
-        {
-          'userId': firebase.auth!.currentUser!.uid,
-          'timeIn': FieldValue.serverTimestamp()
-        }
-      ])
-    });
+    // Set time in (whether was in initially invited players or not)
+    var snapP = await snap.docs.first.reference
+        .collection('players')
+        .doc(firebase.auth!.currentUser!.uid)
+        .withConverter<lg.Player>(
+          fromFirestore: (snapshot, _) =>
+              PlayerExt.fromObject(snapshot.data()!),
+          toFirestore: (user, _) => user.toMapStringDynamic(),
+        )
+        .get();
+    // No audio id, ask an audio id to server
+    if (snapP.data() != null && !snapP.data()!.hasAudioId() ||
+        snapP.data()!.audioId == -1) {
+      await snapP.reference.set(
+        lg.Player(
+          audioId: -1,
+        ),
+        SetOptions(merge: true),
+      );
+      // Wait that server assign a audio id
+      await snapP.reference
+          .snapshots()
+          .firstWhere((e) => e.data()!.audioId != -1)
+          .timeout(Duration(seconds: 10));
+    }
+
+    return snap.docs.first.reference.snapshots();
   }
 
   @override
   Future<void> addNoteToLangame(String channelName, String note) async {
+    if (note.isEmpty) return;
     var snap = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)
         .where('channelName', isEqualTo: channelName)
         .get();
     if (!snap.docs.first.exists)
       throw LangameMessageException('invalid_channel_name');
-    return snap.docs.first.reference.set({
-      'players.notes': FieldValue.arrayUnion([note])
-    });
+    final noteRef = snap.docs.first.reference
+        .collection("players")
+        .doc(firebase.auth!.currentUser!.uid)
+        .collection('notes')
+        .withConverter<lg.Note>(
+          fromFirestore: (snapshot, _) => NoteExt.fromObject(snapshot.data()!),
+          toFirestore: (user, _) => user.toMapStringDynamic(),
+        );
+    final exist = await noteRef.where('content', isEqualTo: note).get();
+    if (exist.docs.length == 0) {
+      noteRef.add(lg.Note(
+        content: note,
+        createdAt: gg.Timestamp.fromDateTime(DateTime.now()),
+      ));
+    }
   }
-
 
   @override
   Future<Stream<DocumentSnapshot<lg.Langame>>> createLangame(
-      List<String> players, List<String> topics, DateTime date) {
-    return firebase.firestore!
+      List<String> players, List<String> topics, DateTime date) async {
+    var p = players.map((e) => lg.Player(userId: e)).toList() +
+        [lg.Player(userId: firebase.auth!.currentUser!.uid)];
+    var dateAsProtobuf = gg.Timestamp.fromDateTime(
+      date,
+    );
+    var a = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)
         .withConverter<lg.Langame>(
-          fromFirestore: (snapshot, _) =>
-              LangameExt.fromObject(snapshot.data()!),
-          toFirestore: (user, _) => user.toMapStringDynamic(),
+          fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
         )
         .add(lg.Langame(
-          players: players.map((e) => lg.Langame_Player(userId: e)).toList() +
-              [lg.Langame_Player(userId: firebase.auth!.currentUser!.uid)],
+          channelName: '',
           topics: topics,
           initiator: firebase.auth!.currentUser!.uid, // TODO: risky
-          date: gg.Timestamp(nanos: date.microsecond * 1000),
-        ))
-        .then((ref) => ref
-            .withConverter<lg.Langame>(
-              fromFirestore: (snapshot, _) =>
-                  LangameExt.fromObject(snapshot.data()!),
-              toFirestore: (user, _) => user.toMapStringDynamic(),
-            )
-            .snapshots());
+          date: dateAsProtobuf,
+        ));
+
+    p.forEach((e) => a
+        .collection("players")
+        .withConverter<lg.Player>(
+          fromFirestore: (s, _) => PlayerExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
+        )
+        .doc(e.userId)
+        .set(e, SetOptions(merge: true)));
+    return a
+        .withConverter<lg.Langame>(
+          fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
+        )
+        .snapshots()
+        .timeout(Duration(seconds: 20));
   }
 
   @override

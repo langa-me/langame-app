@@ -24,7 +24,7 @@ admin.initializeApp({
 });
 
 describe("Cloud Functions", () => {
-  describe("stripe", () => {
+  describe.skip("stripe", () => {
     const useStripeMocked = false;
 
     const stripeConfig = {

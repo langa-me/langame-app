@@ -27,8 +27,8 @@ jobs:
           flutter-version: 2.2.0
       - name: Install Flutter dependencies
         run: flutter pub get
-      - name: Analyze files
-        run: flutter analyze .
+      # - name: Analyze files
+        # run: flutter analyze .
       - name: Run the tests
         run: flutter test --coverage
       - name: Upload coverage to codecov
@@ -40,15 +40,14 @@ jobs:
       - name: Move to Firebase directory
         run: cd firebase/functions
       - name: Decrypt service account key
+        env:
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
         run: |
           gpg --quiet --batch --yes --decrypt --passphrase="$RELEASE_SECRET_PASSPHRASE" \
           --output service-account.zip service-account.zip.gpg && unzip service-account.zip
-        env:
-          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: [12.x]
+          node-version: '12'
       - name: npm install, build and test
         run: | 
           npm i

@@ -16,8 +16,8 @@ class PreferenceProvider extends ChangeNotifier {
   static const _historyLength = 5;
 
   FirebaseApi firebase;
-  CrashAnalyticsProvider _crashAnalyticsProvider;
-  AuthenticationProvider _authenticationProvider;
+  CrashAnalyticsProvider _cap;
+  AuthenticationProvider _ap;
 
   late PreferenceService _api;
 
@@ -26,8 +26,6 @@ class PreferenceProvider extends ChangeNotifier {
   StreamSubscription<UserPreference>? _streamSubscription;
   UserPreference _preference = PreferenceService.defaultPreference;
   UserPreference get preference => _preference;
-
-  String? _originalUserId;
 
   setTheme(ThemeMode t) {
     _preference.themeIndex = t.index;
@@ -65,48 +63,40 @@ class PreferenceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  PreferenceProvider(this.firebase, this._crashAnalyticsProvider,
-      this._authenticationProvider) {
+  PreferenceProvider(this.firebase, this._cap, this._ap) {
     this._api = ImplPreferenceService(this.firebase);
+  }
+
+  void init() {
     _api.tryFetchFromLocalStorage().then((p) {
       if (p != null) {
         _preference = p;
         notifyListeners();
       }
     });
+    _streamSubscription?.cancel();
+    if (_ap.user == null) return;
 
-    // Whenever auth state change, renew the snapshot sub, cuz uid might change when deleting acc for ex
-    _authenticationProvider.userStream.listen((u) async {
-      // Logged out or linked another social account, no uid change
-      // no need to update the stream with a new uid
-      // kinda hacky :)
-      if (u == null || u.uid == _originalUserId) return;
-      _originalUserId = u.uid;
-      if (_streamSubscription != null) {
-        await _streamSubscription!.cancel();
-        _streamSubscription = null;
-      }
-      _stream = _api.streamPreference(u);
-      _streamSubscription = _stream!.listen((p) {
-        _crashAnalyticsProvider.log('streamPreference ${p.writeToJson()}');
-        _preference = p;
-        notifyListeners();
-      });
+    _stream = _api.streamPreference(_ap.user!);
+    _streamSubscription = _stream!.listen((p) {
+      _cap.log('streamPreference ${p.writeToJson()}');
+      _preference = p;
+      notifyListeners();
     });
   }
 
   Future<LangameResponse> save() async {
     try {
-      await _api.savePreference(firebase.auth!.currentUser?.uid, _preference);
+      await _api.savePreference(_ap.user!.uid, _preference);
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
         'shakeToFeedback': preference.shakeToFeedback,
         'hasDoneOnBoarding': preference.hasDoneOnBoarding,
         'unknownPeopleRecommendations': preference.unknownPeopleRecommendations,
         'themeIndex': preference.themeIndex,
       });
-      _crashAnalyticsProvider.log('save ${_preference.writeToJson()}');
+      _cap.log('save ${_preference.writeToJson()}');
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to save');
+      _cap.log('failed to save');
       firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -121,7 +111,7 @@ class PreferenceProvider extends ChangeNotifier {
             .remove(_preference.searchHistory.elementAt(i));
       }
     }
-    _crashAnalyticsProvider.log('addSearchHistory');
+    _cap.log('addSearchHistory');
 
     notifyListeners();
     firebase.analytics
@@ -129,14 +119,14 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   void placeFirstSearchHistory(String tag) {
-    _crashAnalyticsProvider.log('placeFirstSearchHistory');
+    _cap.log('placeFirstSearchHistory');
 
     _preference.searchHistory.removeWhere((e) => e == tag);
     _preference.searchHistory.add(tag);
   }
 
   void deleteSearchHistory(String tag) {
-    _crashAnalyticsProvider.log('deleteSearchHistory');
+    _cap.log('deleteSearchHistory');
 
     _preference.searchHistory.removeWhere((e) => e == tag);
     _filteredTagSearchHistory.removeWhere((e) => e == tag);
@@ -146,7 +136,7 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   void resetFilteredSearchTagHistory() {
-    _crashAnalyticsProvider.log('resetFilteredSearchTagHistory');
+    _cap.log('resetFilteredSearchTagHistory');
 
     _filteredTagSearchHistory = _preference.searchHistory;
     notifyListeners();

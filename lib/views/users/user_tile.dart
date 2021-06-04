@@ -8,7 +8,7 @@ import 'package:langame/views/images/image.dart';
 import 'package:langame/views/users/shopping_list.dart';
 import 'package:provider/provider.dart';
 
-Widget BuildUserTile(BuildContext context, NewLangameProvider lp, lg.User u,
+Widget buildUserTile(BuildContext context, NewLangameProvider lp, lg.User u,
         lg.InteractionLevel? l, void Function(int, {Curve? curve}) goToPage) =>
     ListTile(
       subtitle:
