@@ -6,26 +6,75 @@ import "google/protobuf/timestamp.proto";
 // Note: models ids are usually not stored in Firestore since it already use id to index them
 // it is mostly used within the logic of the front-end / services
 
-message Topic {
-  string id = 1;
+
+message Meme {
+  google.protobuf.Timestamp created_at = 1;
   string content = 2;
+  repeated Tag tags = 4;
 }
 
-message Question {
-  string id = 1;
-  string content = 2;
-  repeated string contexts = 3;
-}
-
+// Tag associated to a question, for example, representing a meaning, "philosophy"
+// could also be a tag like "human generated", "machine generated", "classification"
 message Tag {
-  string id = 1;
-  string content = 2;
-  double score = 3;
-  // Whether tagged by a human (i.e. ignore then score?)
-  bool human = 4;
-  string question = 5;
-  bool generated = 6;
-  // TODO: metadata about model used, version etc.
+  google.protobuf.Timestamp created_at = 1;
+
+  oneof type {
+    Topic topic = 2;
+    Classification classification = 3;
+    Origin origin = 4;
+    // User feedback on a question, note, score etc.. (See Airbnb style XD)
+    Feedback feedback = 5;
+    Context context = 6;
+  }
+
+  message Topic {
+    string content = 2;
+    repeated string emojis = 3;
+  }
+
+  message Classification {
+    string content = 1;
+    double score = 2;
+    // If human classified, the score does not really matter?
+    bool human = 3;
+    // Model, version ...
+  }
+
+  message Origin {
+    oneof type {
+      OpenAI openai = 2;
+    }
+
+    message OpenAI {
+      uint32 version = 1;
+    }
+  }
+
+  message Feedback {
+    string user_id = 1;
+    oneof type {
+      GeneralScore score = 2;
+      Relevance relevance = 3;
+    }
+
+    message GeneralScore {
+      uint32 score = 1;
+    }
+
+    message Relevance {
+      uint32 score = 1;
+    }
+  }
+
+  message Context {
+    string content = 1;
+    Type type = 2;
+    enum Type {
+      WIKIPEDIA = 0;
+      OPENAI = 1;
+      // TODO: similar, synonym etc.
+    }
+  }
 }
 
 message User {
@@ -94,12 +143,13 @@ message Langame {
   // Players is a (Firestore) collection of Player
   repeated string players = 2;
   repeated string topics = 3;
-  repeated Question questions = 4;
+  // Memes id
+  repeated string memes = 4;
   // Who started this
   string initiator = 5;
   // Over, finished, nobody, can join anymore
   google.protobuf.Timestamp done = 7;
-  int32 current_question = 8;
+  int32 current_meme = 8;
   // Initial date planned
   google.protobuf.Timestamp date = 9;
   repeated string errors = 10;
@@ -119,8 +169,22 @@ message Player {
   string audio_token = 6;
 }
 message Note {
-  string content = 1;
-  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp created_at = 1;
+  oneof type {
+    Generic generic = 2;
+    Goal goal = 3;
+    Definition definition = 4;
+  }
+
+  message Generic {
+    string content = 1;
+  }
+  message Goal {
+    string content = 1;
+  }
+  message Definition {
+    string content = 1;
+  }
 }
 
 message Paint {

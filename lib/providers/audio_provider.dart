@@ -172,24 +172,32 @@ class AudioProvider extends ChangeNotifier {
 
       final r = RetryOptions(maxAttempts: 8);
 
-      await runZonedGuarded(
-          () async => await r.retry(
+      var lr = await runZonedGuarded<Future<LangameResponse<void>>>(
+          () async {
+             var response = await r.retry<LangameResponse<void>>(
                 () => _engine!
                     .joinChannel(self.data()!.audioToken,
                         langame.data()!.channelName, null, self.data()!.audioId)
-                    .timeout(Duration(seconds: 20)),
+                    .timeout(Duration(seconds: 20))
+                    .then((_) => LangameResponse(LangameStatus.succeed))
+                    .catchError((_) => LangameResponse(LangameStatus.failed)),
                 retryIf: (e) => e is PlatformException || e is TimeoutException,
-                onRetry: (e) => _cap.log(
+                onRetry: (e) {
+                   _cap.log(
                     'failed to join channel with token ${self.data()!.audioToken}, retrying $e',
                     analyticsMessage: 'audio_failed_join',
                     analyticsParameters: {
                       'error': e,
                       'token': self.data()!.audioToken,
-                    }),
-              ), (e, s) {
+                    });
+                }
+              );
+              return response;
+              }, (e, s) {
         _cap.log('failed to join channel ${langame.data()!.channelName}');
         _cap.recordError(e, s);
-      });
+      })!;
+      if (lr.status == LangameStatus.failed) LangameResponse(LangameStatus.failed);
     } catch (e, s) {
       _cap.log('failed to join channel ${langame.data()!.channelName}');
       _cap.recordError(e, s);

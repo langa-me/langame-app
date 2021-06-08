@@ -119,12 +119,14 @@ class _LoginState extends State<Login> {
             await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
           },
           splashColor: Theme.of(context).colorScheme.primary),
-      Platform.isIOS ? AppleSignInButton(
-          onPressed: () async {
-            if (isAuthenticating) return;
-            await _handleOnPressedLogin(ap.loginWithApple, 'Apple');
-          },
-          splashColor: Theme.of(context).colorScheme.primary) : SizedBox.shrink()
+      Platform.isIOS
+          ? AppleSignInButton(
+              onPressed: () async {
+                if (isAuthenticating) return;
+                await _handleOnPressedLogin(ap.loginWithApple, 'Apple');
+              },
+              splashColor: Theme.of(context).colorScheme.primary)
+          : SizedBox.shrink()
     ];
     return Scaffold(
       body: Column(
@@ -175,13 +177,7 @@ class _LoginState extends State<Login> {
               var messages = await mp.getInitialMessage();
               cp.handleLangameResponse(messages, onSucceed: () async {
                 await Provider.of<DynamicLinksProvider>(context, listen: false)
-                    .setupAndCheckDynamicLinks((dl) async {
-                  if (dl != null) {
-                    // Opened a Langame link that opened the app
-                    // i.e. https://langa.page.link/play/CHANNEL_NAME
-                      cp.pushReplacement(LangameView(dl.link.pathSegments[0], false));
-                  }
-                });
+                    .setupAndCheckDynamicLinks();
                 // Note that we ignore failures in dynamic link initialization
                 if (messages.result != null) {
                   cp.pushReplacement(

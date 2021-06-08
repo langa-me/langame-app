@@ -28,6 +28,21 @@ class InteractionLevel extends $pb.ProtobufEnum {
   const InteractionLevel._($core.int v, $core.String n) : super(v, n);
 }
 
+class Tag_Context_Type extends $pb.ProtobufEnum {
+  static const Tag_Context_Type WIKIPEDIA = Tag_Context_Type._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'WIKIPEDIA');
+  static const Tag_Context_Type OPENAI = Tag_Context_Type._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OPENAI');
+
+  static const $core.List<Tag_Context_Type> values = <Tag_Context_Type> [
+    WIKIPEDIA,
+    OPENAI,
+  ];
+
+  static final $core.Map<$core.int, Tag_Context_Type> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static Tag_Context_Type? valueOf($core.int value) => _byValue[value];
+
+  const Tag_Context_Type._($core.int v, $core.String n) : super(v, n);
+}
+
 class Paint_Shape extends $pb.ProtobufEnum {
   static const Paint_Shape Rectangle = Paint_Shape._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Rectangle');
   static const Paint_Shape Circle = Paint_Shape._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Circle');

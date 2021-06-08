@@ -3,7 +3,7 @@ import {QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
 import {kUsersCollection, hashFnv32a} from "./helpers";
 import * as admin from "firebase-admin";
-import {offlineQuestionSearch} from "./questions";
+import {offlineMemeSearch} from "./questions";
 import * as functions from "firebase-functions";
 import {converter, db, handleError} from "./utils/firestore";
 import {langame} from "./langame/protobuf/langame.gen";
@@ -76,25 +76,25 @@ export const onCreateLangame = async (
       );
       return;
     }
-    let questions: any[] | undefined;
+    let memes: admin.firestore.DocumentSnapshot<langame.protobuf.Meme>[]
+    | undefined;
     if (t.parameters.question_engine.defaultValue.value === "offline") {
-      questions = await offlineQuestionSearch(lg.data()!.topics,
+      memes = await offlineMemeSearch(lg.data()!.topics,
           // @ts-ignore
           // eslint-disable-next-line max-len
           t.parameters.question_count.defaultValue.value * 1, // Casting to number
-          0.1,
-          t.parameters.offline_use_generated.defaultValue.value === "true");
+      );
     } else if (t.parameters.question_engine.defaultValue.value === "online") {
       throw Error("unimplemented");
       // questions =
       //         await onlineOpenAiCompletion(data.topics, t.parameters);
     }
 
-    if (!questions || questions.length === 0) {
+    if (!memes || memes.length === 0) {
       await Promise.all(
           handleError(
               snap,
-              `failed to find question for topics, ${lg.data()!.topics}`,
+              `failed to find meme for topics, ${lg.data()!.topics}`,
           lg.data()!.initiator,
           )
       );
@@ -103,12 +103,13 @@ export const onCreateLangame = async (
 
     functions
         .logger
-        .info("found questions for topics", lg.data()!.topics, questions);
+        .info("found memes for topics", lg.data()!.topics, memes);
     const playersSnap = await snap.ref.collection("players")
         .withConverter(converter<langame.protobuf.Player>()).get();
     await snap.ref.set({
-      questions: questions,
+      memes: memes.map((e) => e.id),
       channelName: channelName,
+      currentMeme: 0,
     }, {merge: true});
 
     const toNotify = playersSnap

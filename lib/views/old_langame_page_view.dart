@@ -110,10 +110,17 @@ class _State extends State<OldLangamePageView>
           children: s.data!.result!
               .map((e) => ListTile(
                     trailing: Text(format.format(e.createdAt.toDateTime())),
-                    title: Text(e.content),
+                    title: Text(e.hasDefinition()
+                        ? e.definition.content
+                        : e.hasGeneric()
+                            ? e.generic.content
+                            : e.hasGoal()
+                                ? e.goal.content
+                                : ''),
                   ))
               .toList());
     }
-    return Provider.of<ContextProvider>(context, listen: false).buildLoadingWidget();
+    return Provider.of<ContextProvider>(context, listen: false)
+        .buildLoadingWidget();
   }
 }

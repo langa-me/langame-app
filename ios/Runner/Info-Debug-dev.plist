@@ -105,7 +105,8 @@
 	<false/>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
-		<string>https://play.langa.me</string>
+		<string>https://join.langa.me</string>
+		<string>https://langamedev.page.link</string>
 	</array>
 </dict>
 </plist>

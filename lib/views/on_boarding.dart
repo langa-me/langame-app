@@ -28,8 +28,6 @@ class OnBoarding extends StatefulWidget {
 }
 
 class _OnBoardingState extends State with AfterLayoutMixin {
-  List<Topic> favouriteTopics = [];
-
   final _formKey = GlobalKey<FormState>(debugLabel: '_formKey');
   bool hasFinishedOnBoarding = false;
 
@@ -43,8 +41,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IntroductionScreen(
-        done: Text('Done'),
-        next: Text('Next'),
+        done: Text('Done', style: Theme.of(context).textTheme.headline6),
+        next: Text('Next', style: Theme.of(context).textTheme.headline6),
         pages: _buildPageModels(),
         isBottomSafeArea: true,
         showDoneButton: hasFinishedOnBoarding,
@@ -60,15 +58,18 @@ class _OnBoardingState extends State with AfterLayoutMixin {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           TextFormField(
+            style: Theme.of(context).textTheme.headline6,
             decoration: new InputDecoration(
               focusColor: Theme.of(context).colorScheme.secondary,
               // fillColor: Theme.of(context).colorScheme.primary,
               contentPadding:
                   EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
               hintText: 'How will people find you?',
-              // hintStyle: Theme.of(context).textTheme.button,
-              prefixIcon: Icon(Icons.alternate_email_outlined,
-                  color: Theme.of(context).colorScheme.secondary),
+              hintStyle: Theme.of(context).textTheme.headline6,
+              prefixIcon: Icon(
+                Icons.alternate_email_outlined,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
             ),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp('^[a-zA-Z]*\$')),
@@ -109,18 +110,15 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Validate returns true if the form is valid, or false otherwise.
-                if (_formKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                  // ScaffoldMessenger.of(context)
-                  //     .showSnackBar(SnackBar(content: Text('Processing Data')));
-                }
-              },
-              child: Text('Choose this tag'),
-            ),
+            child: LangameButton(() {
+              // Validate returns true if the form is valid, or false otherwise.
+              if (_formKey.currentState!.validate()) {
+                // If the form is valid, display a snackbar. In the real world,
+                // you'd often call a server or save the information in a database.
+                // ScaffoldMessenger.of(context)
+                //     .showSnackBar(SnackBar(content: Text('Processing Data')));
+              }
+            }, 'Choose this tag', FontAwesomeIcons.tag),
           ),
         ],
       ),
@@ -159,7 +157,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
 
   List<PageViewModel> _buildPageModels() => [
         PageViewModel(
-          title: 'Send us a feedback anytime?',
+          titleWidget: Text('Send us a feedback anytime?',
+              style: Theme.of(context).textTheme.headline5),
           bodyWidget: Consumer<PreferenceProvider>(
             builder: (context, p, child) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -168,7 +167,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   onTap: () =>
                       p.setShakeToFeedback(!p.preference.shakeToFeedback),
                   leading: Icon(Icons.feedback_outlined),
-                  title: Text('Shake-to-feedback'),
+                  title: Text('Shake-to-feedback',
+                      style: Theme.of(context).textTheme.headline6),
                   trailing: Switch(
                     value: p.preference.shakeToFeedback,
                     onChanged: (v) =>
@@ -186,7 +186,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           ),
         ),
         PageViewModel(
-          title: 'Get user recommendations?',
+          titleWidget: Text('Get user recommendations?',
+              style: Theme.of(context).textTheme.headline5),
           bodyWidget: Consumer<PreferenceProvider>(
             builder: (context, p, child) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -195,7 +196,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   onTap: () => p.setRecommendations(
                       !p.preference.unknownPeopleRecommendations),
                   leading: Icon(Icons.recommend),
-                  title: Text('Unknown user recommendations'),
+                  title: Text('Unknown user recommendations',
+                      style: Theme.of(context).textTheme.headline6),
                   trailing: Switch(
                     value: p.preference.unknownPeopleRecommendations,
                     onChanged: (v) => p.setRecommendations(
@@ -213,7 +215,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           ),
         ),
         PageViewModel(
-          title: 'Your friends don\'t have Langame?',
+          titleWidget: Text('Your friends don\'t have Langame?',
+              style: Theme.of(context).textTheme.headline5),
           bodyWidget: Column(children: [
             Lottie.asset(
               'animations/share.json',
@@ -231,7 +234,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           ]),
         ),
         PageViewModel(
-          title: 'Choose a tag',
+          titleWidget: Text('Choose a tag',
+              style: Theme.of(context).textTheme.headline5),
           bodyWidget: _buildTagForm(),
         ),
       ];

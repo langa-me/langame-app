@@ -10,6 +10,15 @@ service cloud.firestore {
             allow read: if request.auth != null && request.auth.uid in resource.data.recipientsUid;
             allow delete: if request.auth != null && request.auth.uid in resource.data.recipientsUid;
         }
+        match /memes/{memeId} {
+            allow read: if request.auth != null;
+            match /tags/{tagId} {
+                allow read: if request.auth != null;
+            }
+        }
+        match /{path=**}/tags/{tagId} {
+            allow read: if request.auth != null;
+        }
         match /langames/{langameId} {
             // Only allow access to invited Langames
             // TODO

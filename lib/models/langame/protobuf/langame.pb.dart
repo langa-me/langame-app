@@ -11,58 +11,67 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 import '../../google/protobuf/timestamp.pb.dart' as $0;
 
+import 'langame.pbenum.dart';
+
 export 'langame.pbenum.dart';
 
-class Topic extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Topic', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+class Meme extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Meme', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOM<$0.Timestamp>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..pc<Tag>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tags', $pb.PbFieldType.PM, subBuilder: Tag.create)
     ..hasRequiredFields = false
   ;
 
-  Topic._() : super();
-  factory Topic({
-    $core.String? id,
+  Meme._() : super();
+  factory Meme({
+    $0.Timestamp? createdAt,
     $core.String? content,
+    $core.Iterable<Tag>? tags,
   }) {
     final _result = create();
-    if (id != null) {
-      _result.id = id;
+    if (createdAt != null) {
+      _result.createdAt = createdAt;
     }
     if (content != null) {
       _result.content = content;
     }
+    if (tags != null) {
+      _result.tags.addAll(tags);
+    }
     return _result;
   }
-  factory Topic.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Topic.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory Meme.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Meme.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  Topic clone() => Topic()..mergeFromMessage(this);
+  Meme clone() => Meme()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  Topic copyWith(void Function(Topic) updates) => super.copyWith((message) => updates(message as Topic)) as Topic; // ignore: deprecated_member_use
+  Meme copyWith(void Function(Meme) updates) => super.copyWith((message) => updates(message as Meme)) as Meme; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static Topic create() => Topic._();
-  Topic createEmptyInstance() => create();
-  static $pb.PbList<Topic> createRepeated() => $pb.PbList<Topic>();
+  static Meme create() => Meme._();
+  Meme createEmptyInstance() => create();
+  static $pb.PbList<Meme> createRepeated() => $pb.PbList<Meme>();
   @$core.pragma('dart2js:noInline')
-  static Topic getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Topic>(create);
-  static Topic? _defaultInstance;
+  static Meme getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Meme>(create);
+  static Meme? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get id => $_getSZ(0);
+  $0.Timestamp get createdAt => $_getN(0);
   @$pb.TagNumber(1)
-  set id($core.String v) { $_setString(0, v); }
+  set createdAt($0.Timestamp v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasId() => $_has(0);
+  $core.bool hasCreatedAt() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearCreatedAt() => clearField(1);
+  @$pb.TagNumber(1)
+  $0.Timestamp ensureCreatedAt() => $_ensure(0);
 
   @$pb.TagNumber(2)
   $core.String get content => $_getSZ(1);
@@ -72,101 +81,81 @@ class Topic extends $pb.GeneratedMessage {
   $core.bool hasContent() => $_has(1);
   @$pb.TagNumber(2)
   void clearContent() => clearField(2);
+
+  @$pb.TagNumber(4)
+  $core.List<Tag> get tags => $_getList(2);
 }
 
-class Question extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Question', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+class Tag_Topic extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Topic', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
-    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'contexts')
+    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'emojis')
     ..hasRequiredFields = false
   ;
 
-  Question._() : super();
-  factory Question({
-    $core.String? id,
+  Tag_Topic._() : super();
+  factory Tag_Topic({
     $core.String? content,
-    $core.Iterable<$core.String>? contexts,
+    $core.Iterable<$core.String>? emojis,
   }) {
     final _result = create();
-    if (id != null) {
-      _result.id = id;
-    }
     if (content != null) {
       _result.content = content;
     }
-    if (contexts != null) {
-      _result.contexts.addAll(contexts);
+    if (emojis != null) {
+      _result.emojis.addAll(emojis);
     }
     return _result;
   }
-  factory Question.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Question.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory Tag_Topic.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Topic.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  Question clone() => Question()..mergeFromMessage(this);
+  Tag_Topic clone() => Tag_Topic()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  Question copyWith(void Function(Question) updates) => super.copyWith((message) => updates(message as Question)) as Question; // ignore: deprecated_member_use
+  Tag_Topic copyWith(void Function(Tag_Topic) updates) => super.copyWith((message) => updates(message as Tag_Topic)) as Tag_Topic; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static Question create() => Question._();
-  Question createEmptyInstance() => create();
-  static $pb.PbList<Question> createRepeated() => $pb.PbList<Question>();
+  static Tag_Topic create() => Tag_Topic._();
+  Tag_Topic createEmptyInstance() => create();
+  static $pb.PbList<Tag_Topic> createRepeated() => $pb.PbList<Tag_Topic>();
   @$core.pragma('dart2js:noInline')
-  static Question getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Question>(create);
-  static Question? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get id => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set id($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  static Tag_Topic getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Topic>(create);
+  static Tag_Topic? _defaultInstance;
 
   @$pb.TagNumber(2)
-  $core.String get content => $_getSZ(1);
+  $core.String get content => $_getSZ(0);
   @$pb.TagNumber(2)
-  set content($core.String v) { $_setString(1, v); }
+  set content($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(2)
-  $core.bool hasContent() => $_has(1);
+  $core.bool hasContent() => $_has(0);
   @$pb.TagNumber(2)
   void clearContent() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.List<$core.String> get contexts => $_getList(2);
+  $core.List<$core.String> get emojis => $_getList(1);
 }
 
-class Tag extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
-    ..a<$core.double>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', $pb.PbFieldType.OD)
-    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'human')
-    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'question')
-    ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'generated')
+class Tag_Classification extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Classification', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..a<$core.double>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', $pb.PbFieldType.OD)
+    ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'human')
     ..hasRequiredFields = false
   ;
 
-  Tag._() : super();
-  factory Tag({
-    $core.String? id,
+  Tag_Classification._() : super();
+  factory Tag_Classification({
     $core.String? content,
     $core.double? score,
     $core.bool? human,
-    $core.String? question,
-    $core.bool? generated,
   }) {
     final _result = create();
-    if (id != null) {
-      _result.id = id;
-    }
     if (content != null) {
       _result.content = content;
     }
@@ -176,11 +165,471 @@ class Tag extends $pb.GeneratedMessage {
     if (human != null) {
       _result.human = human;
     }
-    if (question != null) {
-      _result.question = question;
+    return _result;
+  }
+  factory Tag_Classification.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Classification.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Tag_Classification clone() => Tag_Classification()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Tag_Classification copyWith(void Function(Tag_Classification) updates) => super.copyWith((message) => updates(message as Tag_Classification)) as Tag_Classification; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Tag_Classification create() => Tag_Classification._();
+  Tag_Classification createEmptyInstance() => create();
+  static $pb.PbList<Tag_Classification> createRepeated() => $pb.PbList<Tag_Classification>();
+  @$core.pragma('dart2js:noInline')
+  static Tag_Classification getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Classification>(create);
+  static Tag_Classification? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get content => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set content($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.double get score => $_getN(1);
+  @$pb.TagNumber(2)
+  set score($core.double v) { $_setDouble(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasScore() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearScore() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get human => $_getBF(2);
+  @$pb.TagNumber(3)
+  set human($core.bool v) { $_setBool(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasHuman() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearHuman() => clearField(3);
+}
+
+class Tag_Origin_OpenAI extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Origin.OpenAI', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'version', $pb.PbFieldType.OU3)
+    ..hasRequiredFields = false
+  ;
+
+  Tag_Origin_OpenAI._() : super();
+  factory Tag_Origin_OpenAI({
+    $core.int? version,
+  }) {
+    final _result = create();
+    if (version != null) {
+      _result.version = version;
     }
-    if (generated != null) {
-      _result.generated = generated;
+    return _result;
+  }
+  factory Tag_Origin_OpenAI.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Origin_OpenAI.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Tag_Origin_OpenAI clone() => Tag_Origin_OpenAI()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Tag_Origin_OpenAI copyWith(void Function(Tag_Origin_OpenAI) updates) => super.copyWith((message) => updates(message as Tag_Origin_OpenAI)) as Tag_Origin_OpenAI; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Tag_Origin_OpenAI create() => Tag_Origin_OpenAI._();
+  Tag_Origin_OpenAI createEmptyInstance() => create();
+  static $pb.PbList<Tag_Origin_OpenAI> createRepeated() => $pb.PbList<Tag_Origin_OpenAI>();
+  @$core.pragma('dart2js:noInline')
+  static Tag_Origin_OpenAI getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Origin_OpenAI>(create);
+  static Tag_Origin_OpenAI? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get version => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set version($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearVersion() => clearField(1);
+}
+
+enum Tag_Origin_Type {
+  openai, 
+  notSet
+}
+
+class Tag_Origin extends $pb.GeneratedMessage {
+  static const $core.Map<$core.int, Tag_Origin_Type> _Tag_Origin_TypeByTag = {
+    2 : Tag_Origin_Type.openai,
+    0 : Tag_Origin_Type.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Origin', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..oo(0, [2])
+    ..aOM<Tag_Origin_OpenAI>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'openai', subBuilder: Tag_Origin_OpenAI.create)
+    ..hasRequiredFields = false
+  ;
+
+  Tag_Origin._() : super();
+  factory Tag_Origin({
+    Tag_Origin_OpenAI? openai,
+  }) {
+    final _result = create();
+    if (openai != null) {
+      _result.openai = openai;
+    }
+    return _result;
+  }
+  factory Tag_Origin.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Origin.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Tag_Origin clone() => Tag_Origin()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Tag_Origin copyWith(void Function(Tag_Origin) updates) => super.copyWith((message) => updates(message as Tag_Origin)) as Tag_Origin; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Tag_Origin create() => Tag_Origin._();
+  Tag_Origin createEmptyInstance() => create();
+  static $pb.PbList<Tag_Origin> createRepeated() => $pb.PbList<Tag_Origin>();
+  @$core.pragma('dart2js:noInline')
+  static Tag_Origin getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Origin>(create);
+  static Tag_Origin? _defaultInstance;
+
+  Tag_Origin_Type whichType() => _Tag_Origin_TypeByTag[$_whichOneof(0)]!;
+  void clearType() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(2)
+  Tag_Origin_OpenAI get openai => $_getN(0);
+  @$pb.TagNumber(2)
+  set openai(Tag_Origin_OpenAI v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasOpenai() => $_has(0);
+  @$pb.TagNumber(2)
+  void clearOpenai() => clearField(2);
+  @$pb.TagNumber(2)
+  Tag_Origin_OpenAI ensureOpenai() => $_ensure(0);
+}
+
+class Tag_Feedback_GeneralScore extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Feedback.GeneralScore', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', $pb.PbFieldType.OU3)
+    ..hasRequiredFields = false
+  ;
+
+  Tag_Feedback_GeneralScore._() : super();
+  factory Tag_Feedback_GeneralScore({
+    $core.int? score,
+  }) {
+    final _result = create();
+    if (score != null) {
+      _result.score = score;
+    }
+    return _result;
+  }
+  factory Tag_Feedback_GeneralScore.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Feedback_GeneralScore.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Tag_Feedback_GeneralScore clone() => Tag_Feedback_GeneralScore()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Tag_Feedback_GeneralScore copyWith(void Function(Tag_Feedback_GeneralScore) updates) => super.copyWith((message) => updates(message as Tag_Feedback_GeneralScore)) as Tag_Feedback_GeneralScore; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Tag_Feedback_GeneralScore create() => Tag_Feedback_GeneralScore._();
+  Tag_Feedback_GeneralScore createEmptyInstance() => create();
+  static $pb.PbList<Tag_Feedback_GeneralScore> createRepeated() => $pb.PbList<Tag_Feedback_GeneralScore>();
+  @$core.pragma('dart2js:noInline')
+  static Tag_Feedback_GeneralScore getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Feedback_GeneralScore>(create);
+  static Tag_Feedback_GeneralScore? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get score => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set score($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasScore() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearScore() => clearField(1);
+}
+
+class Tag_Feedback_Relevance extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Feedback.Relevance', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', $pb.PbFieldType.OU3)
+    ..hasRequiredFields = false
+  ;
+
+  Tag_Feedback_Relevance._() : super();
+  factory Tag_Feedback_Relevance({
+    $core.int? score,
+  }) {
+    final _result = create();
+    if (score != null) {
+      _result.score = score;
+    }
+    return _result;
+  }
+  factory Tag_Feedback_Relevance.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Feedback_Relevance.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Tag_Feedback_Relevance clone() => Tag_Feedback_Relevance()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Tag_Feedback_Relevance copyWith(void Function(Tag_Feedback_Relevance) updates) => super.copyWith((message) => updates(message as Tag_Feedback_Relevance)) as Tag_Feedback_Relevance; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Tag_Feedback_Relevance create() => Tag_Feedback_Relevance._();
+  Tag_Feedback_Relevance createEmptyInstance() => create();
+  static $pb.PbList<Tag_Feedback_Relevance> createRepeated() => $pb.PbList<Tag_Feedback_Relevance>();
+  @$core.pragma('dart2js:noInline')
+  static Tag_Feedback_Relevance getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Feedback_Relevance>(create);
+  static Tag_Feedback_Relevance? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get score => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set score($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasScore() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearScore() => clearField(1);
+}
+
+enum Tag_Feedback_Type {
+  score, 
+  relevance, 
+  notSet
+}
+
+class Tag_Feedback extends $pb.GeneratedMessage {
+  static const $core.Map<$core.int, Tag_Feedback_Type> _Tag_Feedback_TypeByTag = {
+    2 : Tag_Feedback_Type.score,
+    3 : Tag_Feedback_Type.relevance,
+    0 : Tag_Feedback_Type.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Feedback', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..oo(0, [2, 3])
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userId')
+    ..aOM<Tag_Feedback_GeneralScore>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', subBuilder: Tag_Feedback_GeneralScore.create)
+    ..aOM<Tag_Feedback_Relevance>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'relevance', subBuilder: Tag_Feedback_Relevance.create)
+    ..hasRequiredFields = false
+  ;
+
+  Tag_Feedback._() : super();
+  factory Tag_Feedback({
+    $core.String? userId,
+    Tag_Feedback_GeneralScore? score,
+    Tag_Feedback_Relevance? relevance,
+  }) {
+    final _result = create();
+    if (userId != null) {
+      _result.userId = userId;
+    }
+    if (score != null) {
+      _result.score = score;
+    }
+    if (relevance != null) {
+      _result.relevance = relevance;
+    }
+    return _result;
+  }
+  factory Tag_Feedback.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Feedback.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Tag_Feedback clone() => Tag_Feedback()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Tag_Feedback copyWith(void Function(Tag_Feedback) updates) => super.copyWith((message) => updates(message as Tag_Feedback)) as Tag_Feedback; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Tag_Feedback create() => Tag_Feedback._();
+  Tag_Feedback createEmptyInstance() => create();
+  static $pb.PbList<Tag_Feedback> createRepeated() => $pb.PbList<Tag_Feedback>();
+  @$core.pragma('dart2js:noInline')
+  static Tag_Feedback getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Feedback>(create);
+  static Tag_Feedback? _defaultInstance;
+
+  Tag_Feedback_Type whichType() => _Tag_Feedback_TypeByTag[$_whichOneof(0)]!;
+  void clearType() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  $core.String get userId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set userId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUserId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUserId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  Tag_Feedback_GeneralScore get score => $_getN(1);
+  @$pb.TagNumber(2)
+  set score(Tag_Feedback_GeneralScore v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasScore() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearScore() => clearField(2);
+  @$pb.TagNumber(2)
+  Tag_Feedback_GeneralScore ensureScore() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  Tag_Feedback_Relevance get relevance => $_getN(2);
+  @$pb.TagNumber(3)
+  set relevance(Tag_Feedback_Relevance v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasRelevance() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRelevance() => clearField(3);
+  @$pb.TagNumber(3)
+  Tag_Feedback_Relevance ensureRelevance() => $_ensure(2);
+}
+
+class Tag_Context extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Context', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..e<Tag_Context_Type>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: Tag_Context_Type.WIKIPEDIA, valueOf: Tag_Context_Type.valueOf, enumValues: Tag_Context_Type.values)
+    ..hasRequiredFields = false
+  ;
+
+  Tag_Context._() : super();
+  factory Tag_Context({
+    $core.String? content,
+    Tag_Context_Type? type,
+  }) {
+    final _result = create();
+    if (content != null) {
+      _result.content = content;
+    }
+    if (type != null) {
+      _result.type = type;
+    }
+    return _result;
+  }
+  factory Tag_Context.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Context.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Tag_Context clone() => Tag_Context()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Tag_Context copyWith(void Function(Tag_Context) updates) => super.copyWith((message) => updates(message as Tag_Context)) as Tag_Context; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Tag_Context create() => Tag_Context._();
+  Tag_Context createEmptyInstance() => create();
+  static $pb.PbList<Tag_Context> createRepeated() => $pb.PbList<Tag_Context>();
+  @$core.pragma('dart2js:noInline')
+  static Tag_Context getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Context>(create);
+  static Tag_Context? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get content => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set content($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => clearField(1);
+
+  @$pb.TagNumber(2)
+  Tag_Context_Type get type => $_getN(1);
+  @$pb.TagNumber(2)
+  set type(Tag_Context_Type v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasType() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearType() => clearField(2);
+}
+
+enum Tag_Type {
+  topic, 
+  classification, 
+  origin, 
+  feedback, 
+  context, 
+  notSet
+}
+
+class Tag extends $pb.GeneratedMessage {
+  static const $core.Map<$core.int, Tag_Type> _Tag_TypeByTag = {
+    2 : Tag_Type.topic,
+    3 : Tag_Type.classification,
+    4 : Tag_Type.origin,
+    5 : Tag_Type.feedback,
+    6 : Tag_Type.context,
+    0 : Tag_Type.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..oo(0, [2, 3, 4, 5, 6])
+    ..aOM<$0.Timestamp>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
+    ..aOM<Tag_Topic>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topic', subBuilder: Tag_Topic.create)
+    ..aOM<Tag_Classification>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'classification', subBuilder: Tag_Classification.create)
+    ..aOM<Tag_Origin>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'origin', subBuilder: Tag_Origin.create)
+    ..aOM<Tag_Feedback>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'feedback', subBuilder: Tag_Feedback.create)
+    ..aOM<Tag_Context>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'context', subBuilder: Tag_Context.create)
+    ..hasRequiredFields = false
+  ;
+
+  Tag._() : super();
+  factory Tag({
+    $0.Timestamp? createdAt,
+    Tag_Topic? topic,
+    Tag_Classification? classification,
+    Tag_Origin? origin,
+    Tag_Feedback? feedback,
+    Tag_Context? context,
+  }) {
+    final _result = create();
+    if (createdAt != null) {
+      _result.createdAt = createdAt;
+    }
+    if (topic != null) {
+      _result.topic = topic;
+    }
+    if (classification != null) {
+      _result.classification = classification;
+    }
+    if (origin != null) {
+      _result.origin = origin;
+    }
+    if (feedback != null) {
+      _result.feedback = feedback;
+    }
+    if (context != null) {
+      _result.context = context;
     }
     return _result;
   }
@@ -205,59 +654,74 @@ class Tag extends $pb.GeneratedMessage {
   static Tag getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag>(create);
   static Tag? _defaultInstance;
 
+  Tag_Type whichType() => _Tag_TypeByTag[$_whichOneof(0)]!;
+  void clearType() => clearField($_whichOneof(0));
+
   @$pb.TagNumber(1)
-  $core.String get id => $_getSZ(0);
+  $0.Timestamp get createdAt => $_getN(0);
   @$pb.TagNumber(1)
-  set id($core.String v) { $_setString(0, v); }
+  set createdAt($0.Timestamp v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasId() => $_has(0);
+  $core.bool hasCreatedAt() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearCreatedAt() => clearField(1);
+  @$pb.TagNumber(1)
+  $0.Timestamp ensureCreatedAt() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.String get content => $_getSZ(1);
+  Tag_Topic get topic => $_getN(1);
   @$pb.TagNumber(2)
-  set content($core.String v) { $_setString(1, v); }
+  set topic(Tag_Topic v) { setField(2, v); }
   @$pb.TagNumber(2)
-  $core.bool hasContent() => $_has(1);
+  $core.bool hasTopic() => $_has(1);
   @$pb.TagNumber(2)
-  void clearContent() => clearField(2);
+  void clearTopic() => clearField(2);
+  @$pb.TagNumber(2)
+  Tag_Topic ensureTopic() => $_ensure(1);
 
   @$pb.TagNumber(3)
-  $core.double get score => $_getN(2);
+  Tag_Classification get classification => $_getN(2);
   @$pb.TagNumber(3)
-  set score($core.double v) { $_setDouble(2, v); }
+  set classification(Tag_Classification v) { setField(3, v); }
   @$pb.TagNumber(3)
-  $core.bool hasScore() => $_has(2);
+  $core.bool hasClassification() => $_has(2);
   @$pb.TagNumber(3)
-  void clearScore() => clearField(3);
+  void clearClassification() => clearField(3);
+  @$pb.TagNumber(3)
+  Tag_Classification ensureClassification() => $_ensure(2);
 
   @$pb.TagNumber(4)
-  $core.bool get human => $_getBF(3);
+  Tag_Origin get origin => $_getN(3);
   @$pb.TagNumber(4)
-  set human($core.bool v) { $_setBool(3, v); }
+  set origin(Tag_Origin v) { setField(4, v); }
   @$pb.TagNumber(4)
-  $core.bool hasHuman() => $_has(3);
+  $core.bool hasOrigin() => $_has(3);
   @$pb.TagNumber(4)
-  void clearHuman() => clearField(4);
+  void clearOrigin() => clearField(4);
+  @$pb.TagNumber(4)
+  Tag_Origin ensureOrigin() => $_ensure(3);
 
   @$pb.TagNumber(5)
-  $core.String get question => $_getSZ(4);
+  Tag_Feedback get feedback => $_getN(4);
   @$pb.TagNumber(5)
-  set question($core.String v) { $_setString(4, v); }
+  set feedback(Tag_Feedback v) { setField(5, v); }
   @$pb.TagNumber(5)
-  $core.bool hasQuestion() => $_has(4);
+  $core.bool hasFeedback() => $_has(4);
   @$pb.TagNumber(5)
-  void clearQuestion() => clearField(5);
+  void clearFeedback() => clearField(5);
+  @$pb.TagNumber(5)
+  Tag_Feedback ensureFeedback() => $_ensure(4);
 
   @$pb.TagNumber(6)
-  $core.bool get generated => $_getBF(5);
+  Tag_Context get context => $_getN(5);
   @$pb.TagNumber(6)
-  set generated($core.bool v) { $_setBool(5, v); }
+  set context(Tag_Context v) { setField(6, v); }
   @$pb.TagNumber(6)
-  $core.bool hasGenerated() => $_has(5);
+  $core.bool hasContext() => $_has(5);
   @$pb.TagNumber(6)
-  void clearGenerated() => clearField(6);
+  void clearContext() => clearField(6);
+  @$pb.TagNumber(6)
+  Tag_Context ensureContext() => $_ensure(5);
 }
 
 class User extends $pb.GeneratedMessage {
@@ -581,10 +1045,10 @@ class Langame extends $pb.GeneratedMessage {
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'channelName')
     ..pPS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'players')
     ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topics')
-    ..pc<Question>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'questions', $pb.PbFieldType.PM, subBuilder: Question.create)
+    ..pPS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memes')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'initiator')
     ..aOM<$0.Timestamp>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'done', subBuilder: $0.Timestamp.create)
-    ..a<$core.int>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentQuestion', $pb.PbFieldType.O3)
+    ..a<$core.int>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentMeme', $pb.PbFieldType.O3)
     ..aOM<$0.Timestamp>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'date', subBuilder: $0.Timestamp.create)
     ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors')
     ..aOM<$0.Timestamp>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'started', subBuilder: $0.Timestamp.create)
@@ -597,10 +1061,10 @@ class Langame extends $pb.GeneratedMessage {
     $core.String? channelName,
     $core.Iterable<$core.String>? players,
     $core.Iterable<$core.String>? topics,
-    $core.Iterable<Question>? questions,
+    $core.Iterable<$core.String>? memes,
     $core.String? initiator,
     $0.Timestamp? done,
-    $core.int? currentQuestion,
+    $core.int? currentMeme,
     $0.Timestamp? date,
     $core.Iterable<$core.String>? errors,
     $0.Timestamp? started,
@@ -616,8 +1080,8 @@ class Langame extends $pb.GeneratedMessage {
     if (topics != null) {
       _result.topics.addAll(topics);
     }
-    if (questions != null) {
-      _result.questions.addAll(questions);
+    if (memes != null) {
+      _result.memes.addAll(memes);
     }
     if (initiator != null) {
       _result.initiator = initiator;
@@ -625,8 +1089,8 @@ class Langame extends $pb.GeneratedMessage {
     if (done != null) {
       _result.done = done;
     }
-    if (currentQuestion != null) {
-      _result.currentQuestion = currentQuestion;
+    if (currentMeme != null) {
+      _result.currentMeme = currentMeme;
     }
     if (date != null) {
       _result.date = date;
@@ -679,7 +1143,7 @@ class Langame extends $pb.GeneratedMessage {
   $core.List<$core.String> get topics => $_getList(2);
 
   @$pb.TagNumber(4)
-  $core.List<Question> get questions => $_getList(3);
+  $core.List<$core.String> get memes => $_getList(3);
 
   @$pb.TagNumber(5)
   $core.String get initiator => $_getSZ(4);
@@ -702,13 +1166,13 @@ class Langame extends $pb.GeneratedMessage {
   $0.Timestamp ensureDone() => $_ensure(5);
 
   @$pb.TagNumber(8)
-  $core.int get currentQuestion => $_getIZ(6);
+  $core.int get currentMeme => $_getIZ(6);
   @$pb.TagNumber(8)
-  set currentQuestion($core.int v) { $_setSignedInt32(6, v); }
+  set currentMeme($core.int v) { $_setSignedInt32(6, v); }
   @$pb.TagNumber(8)
-  $core.bool hasCurrentQuestion() => $_has(6);
+  $core.bool hasCurrentMeme() => $_has(6);
   @$pb.TagNumber(8)
-  void clearCurrentQuestion() => clearField(8);
+  void clearCurrentMeme() => clearField(8);
 
   @$pb.TagNumber(9)
   $0.Timestamp get date => $_getN(7);
@@ -860,24 +1324,189 @@ class Player extends $pb.GeneratedMessage {
   void clearAudioToken() => clearField(6);
 }
 
-class Note extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Note', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+class Note_Generic extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Note.Generic', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
-    ..aOM<$0.Timestamp>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
     ..hasRequiredFields = false
   ;
 
-  Note._() : super();
-  factory Note({
+  Note_Generic._() : super();
+  factory Note_Generic({
     $core.String? content,
-    $0.Timestamp? createdAt,
   }) {
     final _result = create();
     if (content != null) {
       _result.content = content;
     }
+    return _result;
+  }
+  factory Note_Generic.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Note_Generic.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Note_Generic clone() => Note_Generic()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Note_Generic copyWith(void Function(Note_Generic) updates) => super.copyWith((message) => updates(message as Note_Generic)) as Note_Generic; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Note_Generic create() => Note_Generic._();
+  Note_Generic createEmptyInstance() => create();
+  static $pb.PbList<Note_Generic> createRepeated() => $pb.PbList<Note_Generic>();
+  @$core.pragma('dart2js:noInline')
+  static Note_Generic getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Note_Generic>(create);
+  static Note_Generic? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get content => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set content($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => clearField(1);
+}
+
+class Note_Goal extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Note.Goal', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..hasRequiredFields = false
+  ;
+
+  Note_Goal._() : super();
+  factory Note_Goal({
+    $core.String? content,
+  }) {
+    final _result = create();
+    if (content != null) {
+      _result.content = content;
+    }
+    return _result;
+  }
+  factory Note_Goal.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Note_Goal.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Note_Goal clone() => Note_Goal()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Note_Goal copyWith(void Function(Note_Goal) updates) => super.copyWith((message) => updates(message as Note_Goal)) as Note_Goal; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Note_Goal create() => Note_Goal._();
+  Note_Goal createEmptyInstance() => create();
+  static $pb.PbList<Note_Goal> createRepeated() => $pb.PbList<Note_Goal>();
+  @$core.pragma('dart2js:noInline')
+  static Note_Goal getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Note_Goal>(create);
+  static Note_Goal? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get content => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set content($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => clearField(1);
+}
+
+class Note_Definition extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Note.Definition', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..hasRequiredFields = false
+  ;
+
+  Note_Definition._() : super();
+  factory Note_Definition({
+    $core.String? content,
+  }) {
+    final _result = create();
+    if (content != null) {
+      _result.content = content;
+    }
+    return _result;
+  }
+  factory Note_Definition.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Note_Definition.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Note_Definition clone() => Note_Definition()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Note_Definition copyWith(void Function(Note_Definition) updates) => super.copyWith((message) => updates(message as Note_Definition)) as Note_Definition; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Note_Definition create() => Note_Definition._();
+  Note_Definition createEmptyInstance() => create();
+  static $pb.PbList<Note_Definition> createRepeated() => $pb.PbList<Note_Definition>();
+  @$core.pragma('dart2js:noInline')
+  static Note_Definition getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Note_Definition>(create);
+  static Note_Definition? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get content => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set content($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearContent() => clearField(1);
+}
+
+enum Note_Type {
+  generic, 
+  goal, 
+  definition, 
+  notSet
+}
+
+class Note extends $pb.GeneratedMessage {
+  static const $core.Map<$core.int, Note_Type> _Note_TypeByTag = {
+    2 : Note_Type.generic,
+    3 : Note_Type.goal,
+    4 : Note_Type.definition,
+    0 : Note_Type.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Note', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..oo(0, [2, 3, 4])
+    ..aOM<$0.Timestamp>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
+    ..aOM<Note_Generic>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'generic', subBuilder: Note_Generic.create)
+    ..aOM<Note_Goal>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'goal', subBuilder: Note_Goal.create)
+    ..aOM<Note_Definition>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'definition', subBuilder: Note_Definition.create)
+    ..hasRequiredFields = false
+  ;
+
+  Note._() : super();
+  factory Note({
+    $0.Timestamp? createdAt,
+    Note_Generic? generic,
+    Note_Goal? goal,
+    Note_Definition? definition,
+  }) {
+    final _result = create();
     if (createdAt != null) {
       _result.createdAt = createdAt;
+    }
+    if (generic != null) {
+      _result.generic = generic;
+    }
+    if (goal != null) {
+      _result.goal = goal;
+    }
+    if (definition != null) {
+      _result.definition = definition;
     }
     return _result;
   }
@@ -902,25 +1531,52 @@ class Note extends $pb.GeneratedMessage {
   static Note getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Note>(create);
   static Note? _defaultInstance;
 
+  Note_Type whichType() => _Note_TypeByTag[$_whichOneof(0)]!;
+  void clearType() => clearField($_whichOneof(0));
+
   @$pb.TagNumber(1)
-  $core.String get content => $_getSZ(0);
+  $0.Timestamp get createdAt => $_getN(0);
   @$pb.TagNumber(1)
-  set content($core.String v) { $_setString(0, v); }
+  set createdAt($0.Timestamp v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasContent() => $_has(0);
+  $core.bool hasCreatedAt() => $_has(0);
   @$pb.TagNumber(1)
-  void clearContent() => clearField(1);
+  void clearCreatedAt() => clearField(1);
+  @$pb.TagNumber(1)
+  $0.Timestamp ensureCreatedAt() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $0.Timestamp get createdAt => $_getN(1);
+  Note_Generic get generic => $_getN(1);
   @$pb.TagNumber(2)
-  set createdAt($0.Timestamp v) { setField(2, v); }
+  set generic(Note_Generic v) { setField(2, v); }
   @$pb.TagNumber(2)
-  $core.bool hasCreatedAt() => $_has(1);
+  $core.bool hasGeneric() => $_has(1);
   @$pb.TagNumber(2)
-  void clearCreatedAt() => clearField(2);
+  void clearGeneric() => clearField(2);
   @$pb.TagNumber(2)
-  $0.Timestamp ensureCreatedAt() => $_ensure(1);
+  Note_Generic ensureGeneric() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  Note_Goal get goal => $_getN(2);
+  @$pb.TagNumber(3)
+  set goal(Note_Goal v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasGoal() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearGoal() => clearField(3);
+  @$pb.TagNumber(3)
+  Note_Goal ensureGoal() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  Note_Definition get definition => $_getN(3);
+  @$pb.TagNumber(4)
+  set definition(Note_Definition v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasDefinition() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearDefinition() => clearField(4);
+  @$pb.TagNumber(4)
+  Note_Definition ensureDefinition() => $_ensure(3);
 }
 
 class Paint_SelectionRectangle extends $pb.GeneratedMessage {

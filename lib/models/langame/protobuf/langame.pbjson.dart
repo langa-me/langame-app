@@ -21,44 +21,125 @@ const InteractionLevel$json = const {
 
 /// Descriptor for `InteractionLevel`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List interactionLevelDescriptor = $convert.base64Decode('ChBJbnRlcmFjdGlvbkxldmVsEgcKA0JBRBAAEgsKB0FWRVJBR0UQARIJCgVHUkVBVBACEggKBExPVkUQAw==');
-@$core.Deprecated('Use topicDescriptor instead')
-const Topic$json = const {
-  '1': 'Topic',
+@$core.Deprecated('Use memeDescriptor instead')
+const Meme$json = const {
+  '1': 'Meme',
   '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    const {'1': 'created_at', '3': 1, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'createdAt'},
     const {'1': 'content', '3': 2, '4': 1, '5': 9, '10': 'content'},
+    const {'1': 'tags', '3': 4, '4': 3, '5': 11, '6': '.langame.protobuf.Tag', '10': 'tags'},
   ],
 };
 
-/// Descriptor for `Topic`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List topicDescriptor = $convert.base64Decode('CgVUb3BpYxIOCgJpZBgBIAEoCVICaWQSGAoHY29udGVudBgCIAEoCVIHY29udGVudA==');
-@$core.Deprecated('Use questionDescriptor instead')
-const Question$json = const {
-  '1': 'Question',
-  '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
-    const {'1': 'content', '3': 2, '4': 1, '5': 9, '10': 'content'},
-    const {'1': 'contexts', '3': 3, '4': 3, '5': 9, '10': 'contexts'},
-  ],
-};
-
-/// Descriptor for `Question`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List questionDescriptor = $convert.base64Decode('CghRdWVzdGlvbhIOCgJpZBgBIAEoCVICaWQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIaCghjb250ZXh0cxgDIAMoCVIIY29udGV4dHM=');
+/// Descriptor for `Meme`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List memeDescriptor = $convert.base64Decode('CgRNZW1lEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIpCgR0YWdzGAQgAygLMhUubGFuZ2FtZS5wcm90b2J1Zi5UYWdSBHRhZ3M=');
 @$core.Deprecated('Use tagDescriptor instead')
 const Tag$json = const {
   '1': 'Tag',
   '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    const {'1': 'created_at', '3': 1, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'createdAt'},
+    const {'1': 'topic', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Topic', '9': 0, '10': 'topic'},
+    const {'1': 'classification', '3': 3, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Classification', '9': 0, '10': 'classification'},
+    const {'1': 'origin', '3': 4, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Origin', '9': 0, '10': 'origin'},
+    const {'1': 'feedback', '3': 5, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback', '9': 0, '10': 'feedback'},
+    const {'1': 'context', '3': 6, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Context', '9': 0, '10': 'context'},
+  ],
+  '3': const [Tag_Topic$json, Tag_Classification$json, Tag_Origin$json, Tag_Feedback$json, Tag_Context$json],
+  '8': const [
+    const {'1': 'type'},
+  ],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Topic$json = const {
+  '1': 'Topic',
+  '2': const [
     const {'1': 'content', '3': 2, '4': 1, '5': 9, '10': 'content'},
-    const {'1': 'score', '3': 3, '4': 1, '5': 1, '10': 'score'},
-    const {'1': 'human', '3': 4, '4': 1, '5': 8, '10': 'human'},
-    const {'1': 'question', '3': 5, '4': 1, '5': 9, '10': 'question'},
-    const {'1': 'generated', '3': 6, '4': 1, '5': 8, '10': 'generated'},
+    const {'1': 'emojis', '3': 3, '4': 3, '5': 9, '10': 'emojis'},
+  ],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Classification$json = const {
+  '1': 'Classification',
+  '2': const [
+    const {'1': 'content', '3': 1, '4': 1, '5': 9, '10': 'content'},
+    const {'1': 'score', '3': 2, '4': 1, '5': 1, '10': 'score'},
+    const {'1': 'human', '3': 3, '4': 1, '5': 8, '10': 'human'},
+  ],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Origin$json = const {
+  '1': 'Origin',
+  '2': const [
+    const {'1': 'openai', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Origin.OpenAI', '9': 0, '10': 'openai'},
+  ],
+  '3': const [Tag_Origin_OpenAI$json],
+  '8': const [
+    const {'1': 'type'},
+  ],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Origin_OpenAI$json = const {
+  '1': 'OpenAI',
+  '2': const [
+    const {'1': 'version', '3': 1, '4': 1, '5': 13, '10': 'version'},
+  ],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Feedback$json = const {
+  '1': 'Feedback',
+  '2': const [
+    const {'1': 'user_id', '3': 1, '4': 1, '5': 9, '10': 'userId'},
+    const {'1': 'score', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback.GeneralScore', '9': 0, '10': 'score'},
+    const {'1': 'relevance', '3': 3, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback.Relevance', '9': 0, '10': 'relevance'},
+  ],
+  '3': const [Tag_Feedback_GeneralScore$json, Tag_Feedback_Relevance$json],
+  '8': const [
+    const {'1': 'type'},
+  ],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Feedback_GeneralScore$json = const {
+  '1': 'GeneralScore',
+  '2': const [
+    const {'1': 'score', '3': 1, '4': 1, '5': 13, '10': 'score'},
+  ],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Feedback_Relevance$json = const {
+  '1': 'Relevance',
+  '2': const [
+    const {'1': 'score', '3': 1, '4': 1, '5': 13, '10': 'score'},
+  ],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Context$json = const {
+  '1': 'Context',
+  '2': const [
+    const {'1': 'content', '3': 1, '4': 1, '5': 9, '10': 'content'},
+    const {'1': 'type', '3': 2, '4': 1, '5': 14, '6': '.langame.protobuf.Tag.Context.Type', '10': 'type'},
+  ],
+  '4': const [Tag_Context_Type$json],
+};
+
+@$core.Deprecated('Use tagDescriptor instead')
+const Tag_Context_Type$json = const {
+  '1': 'Type',
+  '2': const [
+    const {'1': 'WIKIPEDIA', '2': 0},
+    const {'1': 'OPENAI', '2': 1},
   ],
 };
 
 /// Descriptor for `Tag`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSDgoCaWQYASABKAlSAmlkEhgKB2NvbnRlbnQYAiABKAlSB2NvbnRlbnQSFAoFc2NvcmUYAyABKAFSBXNjb3JlEhQKBWh1bWFuGAQgASgIUgVodW1hbhIaCghxdWVzdGlvbhgFIAEoCVIIcXVlc3Rpb24SHAoJZ2VuZXJhdGVkGAYgASgIUglnZW5lcmF0ZWQ=');
+final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSOQoKY3JlYXRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdBIzCgV0b3BpYxgCIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuVGFnLlRvcGljSABSBXRvcGljEk4KDmNsYXNzaWZpY2F0aW9uGAMgASgLMiQubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ2xhc3NpZmljYXRpb25IAFIOY2xhc3NpZmljYXRpb24SNgoGb3JpZ2luGAQgASgLMhwubGFuZ2FtZS5wcm90b2J1Zi5UYWcuT3JpZ2luSABSBm9yaWdpbhI8CghmZWVkYmFjaxgFIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrSABSCGZlZWRiYWNrEjkKB2NvbnRleHQYBiABKAsyHS5sYW5nYW1lLnByb3RvYnVmLlRhZy5Db250ZXh0SABSB2NvbnRleHQaOQoFVG9waWMSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZlbW9qaXMYAyADKAlSBmVtb2ppcxpWCg5DbGFzc2lmaWNhdGlvbhIYCgdjb250ZW50GAEgASgJUgdjb250ZW50EhQKBXNjb3JlGAIgASgBUgVzY29yZRIUCgVodW1hbhgDIAEoCFIFaHVtYW4acwoGT3JpZ2luEj0KBm9wZW5haRgCIAEoCzIjLmxhbmdhbWUucHJvdG9idWYuVGFnLk9yaWdpbi5PcGVuQUlIAFIGb3BlbmFpGiIKBk9wZW5BSRIYCgd2ZXJzaW9uGAEgASgNUgd2ZXJzaW9uQgYKBHR5cGUagwIKCEZlZWRiYWNrEhcKB3VzZXJfaWQYASABKAlSBnVzZXJJZBJDCgVzY29yZRgCIAEoCzIrLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrLkdlbmVyYWxTY29yZUgAUgVzY29yZRJICglyZWxldmFuY2UYAyABKAsyKC5sYW5nYW1lLnByb3RvYnVmLlRhZy5GZWVkYmFjay5SZWxldmFuY2VIAFIJcmVsZXZhbmNlGiQKDEdlbmVyYWxTY29yZRIUCgVzY29yZRgBIAEoDVIFc2NvcmUaIQoJUmVsZXZhbmNlEhQKBXNjb3JlGAEgASgNUgVzY29yZUIGCgR0eXBlGn4KB0NvbnRleHQSGAoHY29udGVudBgBIAEoCVIHY29udGVudBI2CgR0eXBlGAIgASgOMiIubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ29udGV4dC5UeXBlUgR0eXBlIiEKBFR5cGUSDQoJV0lLSVBFRElBEAASCgoGT1BFTkFJEAFCBgoEdHlwZQ==');
 @$core.Deprecated('Use userDescriptor instead')
 const User$json = const {
   '1': 'User',
@@ -104,10 +185,10 @@ const Langame$json = const {
     const {'1': 'channel_name', '3': 1, '4': 1, '5': 9, '10': 'channelName'},
     const {'1': 'players', '3': 2, '4': 3, '5': 9, '10': 'players'},
     const {'1': 'topics', '3': 3, '4': 3, '5': 9, '10': 'topics'},
-    const {'1': 'questions', '3': 4, '4': 3, '5': 11, '6': '.langame.protobuf.Question', '10': 'questions'},
+    const {'1': 'memes', '3': 4, '4': 3, '5': 9, '10': 'memes'},
     const {'1': 'initiator', '3': 5, '4': 1, '5': 9, '10': 'initiator'},
     const {'1': 'done', '3': 7, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'done'},
-    const {'1': 'current_question', '3': 8, '4': 1, '5': 5, '10': 'currentQuestion'},
+    const {'1': 'current_meme', '3': 8, '4': 1, '5': 5, '10': 'currentMeme'},
     const {'1': 'date', '3': 9, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'date'},
     const {'1': 'errors', '3': 10, '4': 3, '5': 9, '10': 'errors'},
     const {'1': 'started', '3': 11, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'started'},
@@ -116,7 +197,7 @@ const Langame$json = const {
 };
 
 /// Descriptor for `Langame`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSGAoHcGxheWVycxgCIAMoCVIHcGxheWVycxIWCgZ0b3BpY3MYAyADKAlSBnRvcGljcxI4CglxdWVzdGlvbnMYBCADKAsyGi5sYW5nYW1lLnByb3RvYnVmLlF1ZXN0aW9uUglxdWVzdGlvbnMSHAoJaW5pdGlhdG9yGAUgASgJUglpbml0aWF0b3ISLgoEZG9uZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBGRvbmUSKQoQY3VycmVudF9xdWVzdGlvbhgIIAEoBVIPY3VycmVudFF1ZXN0aW9uEi4KBGRhdGUYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgRkYXRlEhYKBmVycm9ycxgKIAMoCVIGZXJyb3JzEjQKB3N0YXJ0ZWQYCyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgdzdGFydGVkEigKEGN1cnJlbnRfYXVkaW9faWQYDCABKAVSDmN1cnJlbnRBdWRpb0lk');
+final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSGAoHcGxheWVycxgCIAMoCVIHcGxheWVycxIWCgZ0b3BpY3MYAyADKAlSBnRvcGljcxIUCgVtZW1lcxgEIAMoCVIFbWVtZXMSHAoJaW5pdGlhdG9yGAUgASgJUglpbml0aWF0b3ISLgoEZG9uZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBGRvbmUSIQoMY3VycmVudF9tZW1lGAggASgFUgtjdXJyZW50TWVtZRIuCgRkYXRlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIEZGF0ZRIWCgZlcnJvcnMYCiADKAlSBmVycm9ycxI0CgdzdGFydGVkGAsgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIHc3RhcnRlZBIoChBjdXJyZW50X2F1ZGlvX2lkGAwgASgFUg5jdXJyZW50QXVkaW9JZA==');
 @$core.Deprecated('Use playerDescriptor instead')
 const Player$json = const {
   '1': 'Player',
@@ -136,13 +217,43 @@ final $typed_data.Uint8List playerDescriptor = $convert.base64Decode('CgZQbGF5ZX
 const Note$json = const {
   '1': 'Note',
   '2': const [
+    const {'1': 'created_at', '3': 1, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'createdAt'},
+    const {'1': 'generic', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Note.Generic', '9': 0, '10': 'generic'},
+    const {'1': 'goal', '3': 3, '4': 1, '5': 11, '6': '.langame.protobuf.Note.Goal', '9': 0, '10': 'goal'},
+    const {'1': 'definition', '3': 4, '4': 1, '5': 11, '6': '.langame.protobuf.Note.Definition', '9': 0, '10': 'definition'},
+  ],
+  '3': const [Note_Generic$json, Note_Goal$json, Note_Definition$json],
+  '8': const [
+    const {'1': 'type'},
+  ],
+};
+
+@$core.Deprecated('Use noteDescriptor instead')
+const Note_Generic$json = const {
+  '1': 'Generic',
+  '2': const [
     const {'1': 'content', '3': 1, '4': 1, '5': 9, '10': 'content'},
-    const {'1': 'created_at', '3': 2, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'createdAt'},
+  ],
+};
+
+@$core.Deprecated('Use noteDescriptor instead')
+const Note_Goal$json = const {
+  '1': 'Goal',
+  '2': const [
+    const {'1': 'content', '3': 1, '4': 1, '5': 9, '10': 'content'},
+  ],
+};
+
+@$core.Deprecated('Use noteDescriptor instead')
+const Note_Definition$json = const {
+  '1': 'Definition',
+  '2': const [
+    const {'1': 'content', '3': 1, '4': 1, '5': 9, '10': 'content'},
   ],
 };
 
 /// Descriptor for `Note`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List noteDescriptor = $convert.base64Decode('CgROb3RlEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnQSOQoKY3JlYXRlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdA==');
+final $typed_data.Uint8List noteDescriptor = $convert.base64Decode('CgROb3RlEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSOgoHZ2VuZXJpYxgCIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuTm90ZS5HZW5lcmljSABSB2dlbmVyaWMSMQoEZ29hbBgDIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuTm90ZS5Hb2FsSABSBGdvYWwSQwoKZGVmaW5pdGlvbhgEIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuTm90ZS5EZWZpbml0aW9uSABSCmRlZmluaXRpb24aIwoHR2VuZXJpYxIYCgdjb250ZW50GAEgASgJUgdjb250ZW50GiAKBEdvYWwSGAoHY29udGVudBgBIAEoCVIHY29udGVudBomCgpEZWZpbml0aW9uEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnRCBgoEdHlwZQ==');
 @$core.Deprecated('Use paintDescriptor instead')
 const Paint$json = const {
   '1': 'Paint',

@@ -1,62 +1,37 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {kQuestionsCollection, kTagsCollection} from "./helpers";
-import {firestore} from "firebase-admin/lib/firestore";
-import QuerySnapshot = firestore.QuerySnapshot;
+import {kTagsCollection} from "./helpers";
 import {converter} from "./utils/firestore";
 import {langame} from "./langame/protobuf/langame.gen";
+import {shuffle} from "./utils/array";
 
 export const openAiKey = functions.config().openai.key;
 
 /**
- * findQuestionsInTopics Find questions in topic ordered by score, filtering
+ * offlineMemeSearch Find memes in topic ordered by score, filtering
  * low scores
- * @param{Array<string>} tags
+ * @param{Array<string>} topics
  * @param{number} limit number of questions
  * @param{number} minimumThreshold minimum score for non-generated questions
- * @param{boolean} generated whether to use only generated questions
  */
-export const offlineQuestionSearch =
-    async (tags: Array<string>,
-        limit: number,
-        minimumThreshold: number,
-        generated: boolean):
-        Promise<langame.protobuf.Question[]> => {
-      tags = tags.map((t) => t.toLowerCase());
-      // Filter questions with highest scores for these tags
-      let tagDocs: QuerySnapshot<langame.protobuf.Tag>;
-      if (generated) {
-        tagDocs = await admin
-            .firestore()
-            .collection(kTagsCollection)
-            .where("generated", "==", true)
-            .where("content", "in", tags)
-            .withConverter(converter<langame.protobuf.Tag>())
-            .limit(limit)
-            .get();
-      } else {
-        // TODO should aggregate/whatever u call it score in topic
-        tagDocs = await admin
-            .firestore()
-            .collection(kTagsCollection)
-            .orderBy("score", "desc")
-            .where("score", ">", minimumThreshold)
-            .where("content", "in", tags)
-            .withConverter(converter<langame.protobuf.Tag>())
-            .limit(limit)
-            .get();
-      }
+export const offlineMemeSearch =
+  async (topics: Array<string>,
+      limit: number):
+    Promise<admin.firestore.DocumentSnapshot<langame.protobuf.Meme>[]> => {
+    topics = topics.map((t) => t.toLowerCase());
+    // Filter memes with highest scores for these topics
+    const tagDocs = await admin
+        .firestore()
+        .collectionGroup(kTagsCollection)
+        .where("topic.content", "in", topics)
+        .withConverter(converter<langame.protobuf.Tag>())
+        .limit(limit)
+        .get();
 
-      const questions: langame.protobuf.Question[] = [];
-      for (const t of tagDocs.docs) {
-        const q = await admin
-            .firestore()
-            .collection(kQuestionsCollection)
-            .doc(t.data().question)
-            .withConverter(converter<langame.protobuf.Question>())
-            .get();
-        if (t.data()) questions.push(q.data()!);
-      }
-      return questions;
-    };
+
+    const r = await Promise.all(tagDocs.docs.map((e) => e.ref.parent
+        .parent!.withConverter(converter<langame.protobuf.Meme>())
+        .get()));
+    return shuffle(r);
+  };
 

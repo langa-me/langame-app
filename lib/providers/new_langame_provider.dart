@@ -6,8 +6,8 @@ class NewLangameProvider extends ChangeNotifier {
   /// Players to be invited
   List<lg.User> _shoppingList = [];
   List<lg.User> get shoppingList => _shoppingList;
-  List<lg.Topic> _selectedTopics = [];
-  List<lg.Topic> get selectedTopics => _selectedTopics;
+  List<lg.Tag> _selectedTopics = [];
+  List<lg.Tag> get selectedTopics => _selectedTopics;
   DateTime? _selectedDate;
   DateTime? get selectedDate => _selectedDate;
 
@@ -21,13 +21,13 @@ class NewLangameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addTopic(lg.Topic topic) {
+  void addTopic(lg.Tag topic) {
     _selectedTopics.add(topic);
     notifyListeners();
   }
 
-  void removeTopic(lg.Topic topic) {
-    _selectedTopics.removeWhere((e) => e.id == topic.id);
+  void removeTopic(lg.Tag topic) {
+    _selectedTopics.removeWhere((e) => e.topic.content == topic.topic.content);
     notifyListeners();
   }
 

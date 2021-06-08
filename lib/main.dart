@@ -34,7 +34,7 @@ import 'package:langame/providers/paint_provider.dart';
 import 'package:langame/providers/payment_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/providers/remote_config_providert.dart';
-import 'package:langame/providers/topic_provider.dart';
+import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
@@ -133,7 +133,7 @@ void main() async {
             ChangeNotifierProvider(
               create: (_) => contextProvider,
             ),
-            ChangeNotifierProvider(create: (_) => TopicProvider(firebase)),
+            ChangeNotifierProvider(create: (_) => TagProvider(firebase, crashAnalyticsProvider)),
             ChangeNotifierProvider(create: (_) => funnyProvider),
             ChangeNotifierProvider(create: (_) => NewLangameProvider()),
 
@@ -209,11 +209,12 @@ void main() async {
                   authenticationProvider,
                   ImplPaymentApi(firebase)),
             ),
-            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider, ContextProvider,
                     DynamicLinksProvider>(
-                update: (_, cap, dlp) => dlp!,
+                update: (_, cap, cp, dlp) => dlp!,
                 create: (_) => DynamicLinksProvider(
                       crashAnalyticsProvider,
+                      contextProvider,
                       dynamicLinks,
                     )),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,

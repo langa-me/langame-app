@@ -61,10 +61,7 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Internal rework
-      - Interface changes
-      - Removal of painting feature as too expensive to maintain and not interesting enough for Langame
-      - Rework process of Langames, can start and enter anytime, leave and re-enter."
+      changelog: "- Improved starter generation"
     )
 
     delete_temp_keychain(keychain_name)

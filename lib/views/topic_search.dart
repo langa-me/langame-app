@@ -5,7 +5,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
-import 'package:langame/providers/topic_provider.dart';
+import 'package:langame/providers/tag_provider.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -49,10 +49,10 @@ class _TopicSearchViewState extends State<TopicSearchView>
             _buildSearchBar(),
             Container(
               height: AppSize.safeBlockVertical * 70,
-              child: Consumer2<NewLangameProvider, TopicProvider>(
+              child: Consumer2<NewLangameProvider, TagProvider>(
                   builder: (context, nlp, tp, child) {
-                var topicsSorted = tp.topics
-                    .where((e) => e.content
+                var topicsSorted = tp.topics.values
+                    .where((tag) => tag.topic.content
                         .toLowerCase()
                         .startsWith(filter.toLowerCase()))
                     .toList();
@@ -77,16 +77,17 @@ class _TopicSearchViewState extends State<TopicSearchView>
                                     else
                                       nlp.removeTopic(e);
                                   });
-                                  if (nlp.selectedTopics.length > 1) {
-                                    var cp = Provider.of<ContextProvider>(
-                                        context,
-                                        listen: false);
-                                    cp.showSnackBar(
-                                        'Only one topic at a time is supported for now');
-                                  }
+                                  // if (nlp.selectedTopics.length > 1) {
+                                  //   var cp = Provider.of<ContextProvider>(
+                                  //       context,
+                                  //       listen: false);
+                                  //   cp.showSnackBar(
+                                  //       'Only one topic at a time is supported for now');
+                                  // }
                                 },
-                                textUnselected: e.content,
-                                textSelected: e.content),
+                                textUnselected:
+                                    '${e.topic.emojis.join('')}${e.topic.content}',
+                                textSelected: '${e.topic.emojis.join('')}${e.topic.content}'),
                           ))
                       .toList(),
                 );

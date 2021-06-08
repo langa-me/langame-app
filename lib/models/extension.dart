@@ -96,11 +96,11 @@ class LangameExt {
       channelName: m['channelName'],
       players: (m['players'] as List<dynamic>?)?.map((e) => e as String),
       topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
-      questions: (m['questions'] as List<dynamic>?)
-          ?.map((e) => QuestionExt.fromObject(e)),
+      memes:
+          (m['memes'] as List<dynamic>?)?.map((e) => e as String),
       initiator: m['initiator'],
       done: dynamicToProtobufTimestamp(m['done']),
-      currentQuestion: m['currentQuestion'],
+      currentMeme: m['currentMeme'],
       date: dynamicToProtobufTimestamp(m['date']),
       started: dynamicToProtobufTimestamp(m['started']),
       errors: (m['errors'] as List<dynamic>?)?.map((e) => e as String),
@@ -140,19 +140,86 @@ class NoteExt {
   static lg.Note fromObject(Object o) {
     var m = o as Map<String, dynamic>;
     return lg.Note(
-      content: m['content'],
-      createdAt: m['createdAt'],
+      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
+      generic: m['generic'] != null ? lg.Note_Generic(content: m['generic']!['content']) : null,
+      goal: m['goal'] != null ? lg.Note_Goal(content: m['goal']!['content']) : null,
+      definition: m['definition'] != null ? lg.Note_Definition(content: m['definition']!['content']) : null,
     );
   }
 }
 
-class QuestionExt {
-  static lg.Question fromObject(Object o) {
+class MemeExt {
+  static lg.Meme fromObject(Object o) {
     var m = o as Map<String, dynamic>;
-    return lg.Question(
-      id: m['id'],
+    return lg.Meme(
+      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
       content: m['content'],
-      contexts: (m['contexts'] as List<dynamic>?)?.map((e) => e as String),
+      tags: (m['tags'] as List<dynamic>?)?.map((e) => TagExt.fromObject(e)),
+    );
+  }
+}
+
+class TagExt {
+  static lg.Tag fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Tag(
+      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
+      topic: m['topic'] != null ? TagTopicExt.fromObject(m['topic']) : null,
+      classification: m['classification'] != null ? TagClassificationExt.fromObject(m['classification']) : null,
+      origin: m['origin'] != null ? TagOriginExt.fromObject(m['origin']) : null,
+      feedback: m['feedback'] != null ? TagFeedbackExt.fromObject(m['feedback']) : null,
+      context: m['context'] != null ? TagContextExt.fromObject(m['context']) : null,
+    );
+  }
+}
+
+class TagTopicExt {
+  static lg.Tag_Topic fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Tag_Topic(
+      content: m['content'],
+      emojis: (m['emojis'] as List<dynamic>?)?.map((e) => e as String),
+    );
+  }
+}
+
+class TagClassificationExt {
+  static lg.Tag_Classification fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Tag_Classification(
+      content: m['content'],
+      score: m['score'],
+      human: m['human'],
+    );
+  }
+}
+
+class TagOriginExt {
+  static lg.Tag_Origin fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Tag_Origin(
+      openai: m['openai'] != null ? lg.Tag_Origin_OpenAI(version: m['openai']!['version']) : null
+    );
+  }
+}
+
+class TagFeedbackExt {
+  static lg.Tag_Feedback fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Tag_Feedback(
+      userId: m['userId'],
+      score: m['score'] != null ? lg.Tag_Feedback_GeneralScore(score: m['score']!['score']) : null,
+      relevance: m['relevance'] != null ? lg.Tag_Feedback_Relevance(score: m['relevance']!['score']) : null,
+    );
+  }
+}
+
+class TagContextExt {
+  static lg.Tag_Context fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Tag_Context(
+      content: m['content'],
+      type: lg.Tag_Context_Type.values.firstWhere((e) => e.toString() == m['type'], orElse: () => lg.Tag_Context_Type.OPENAI),
     );
   }
 }

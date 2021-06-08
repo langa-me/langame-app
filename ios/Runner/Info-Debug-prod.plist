@@ -55,7 +55,8 @@
 	<string>$(APP_DISPLAY_NAME)</string>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
-		<string>https://play.langa.me</string>
+		<string>https://join.langa.me</string>
+		<string>https://langamedev.page.link</string>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>

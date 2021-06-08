@@ -29,7 +29,8 @@ class AppConst {
   static const String firestoreUsersCollection = 'users';
   static const String firestoreNotificationsCollection = 'notifications';
   static const String firestoreLangamesCollection = 'langames';
-  static const String firestoreTopicsCollection = 'topics';
+  static const String firestoreMemesCollection = 'memes';
+  static const String firestoreTagsSubCollection = 'tags';
   static const String firestoreInteractionsCollection = 'interactions';
   static const String firestorePreferencesCollection = 'preferences';
   static const String firestoreStripeCustomersCollection = 'stripe_customers';

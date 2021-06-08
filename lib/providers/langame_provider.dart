@@ -67,17 +67,17 @@ class LangameProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse<DocumentSnapshot<lg.Langame>>> createLangame(
-      List<lg.User> players, List<lg.Topic> topics, DateTime date,
+      List<lg.User> players, List<lg.Tag> topics, DateTime date,
       {bool instant = false}) async {
     try {
       final String msg =
-          'create Langame about ${topics.map((e) => e.content).join(',')} with ${players.map((e) => e.uid).join(',')} on ${date.toIso8601String()}';
+          'create Langame about ${topics.map((e) => e.topic.content).join(',')} with ${players.map((e) => e.uid).join(',')} on ${date.toIso8601String()}';
       _cap.log(msg);
 
       // TODO: we'd likely send the whole  topic in the future (with classifications)
       var stream = await _langameApi.createLangame(
         players.map((e) => e.uid).toList(),
-        topics.map((e) => e.content).toList(),
+        topics.map((e) => e.topic.content).toList(),
         date,
       );
       var snap = await stream.firstWhere((e) =>
@@ -121,9 +121,9 @@ class LangameProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<void>> addNote(String channelName, String note) async {
+  Future<LangameResponse<void>> addNote(String channelName, String note, lg.Note_Type type) async {
     try {
-      await _langameApi.addNoteToLangame(channelName, note);
+      await _langameApi.addNoteToLangame(channelName, note, type);
       _cap.log('addNote $note');
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {

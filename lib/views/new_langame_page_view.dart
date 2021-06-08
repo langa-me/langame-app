@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:after_layout/after_layout.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,6 +10,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
@@ -18,6 +20,7 @@ import 'package:langame/views/langame.dart';
 import 'package:langame/views/running_langames_view.dart';
 import 'package:langame/views/topic_search.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
 import 'colors/colors.dart';
 import 'users/user_tile.dart';
@@ -50,7 +53,7 @@ class _SendLangameState extends State<NewLangamePageView>
           () => cp.push(TopicSearchView()),
           nlp.selectedTopics.isEmpty
               ? 'Select a topic'
-              : nlp.selectedTopics.first.content,
+              : nlp.selectedTopics.first.topic.content,
           FontAwesomeIcons.graduationCap,
           padding: EdgeInsets.symmetric(
               vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20)),
@@ -124,12 +127,12 @@ class _SendLangameState extends State<NewLangamePageView>
       cp.showSnackBar('You must select at least one topics');
       return;
     }
-    var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
-    if (nlp.selectedTopics.length > 1) {
-      cp.showSnackBar('For now, only 1 topic at once is supported');
-      cap.logNewFeatureClick('new_langame_multiple_topics');
-      return;
-    }
+    // var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
+    // if (nlp.selectedTopics.length > 1) {
+    //   cp.showSnackBar('For now, only 1 topic at once is supported');
+    //   cap.logNewFeatureClick('new_langame_multiple_topics');
+    //   return;
+    // }
 
     var lp = Provider.of<LangameProvider>(context, listen: false);
     var fp = Provider.of<FunnyProvider>(context, listen: false);
@@ -179,16 +182,16 @@ class _SendLangameState extends State<NewLangamePageView>
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Text('Here is the link for your Langame',
-              //     style: Theme.of(context).textTheme.headline4!.merge(TextStyle(
-              //         color: isLightThenDark(context, reverse: false)))),
-              // Divider(),
-              // Text(
-              //     'Copy this link and send it to people you want to meet with. '
-              //     'Be sure to save it so you can use it later, too.',
-              //     style: Theme.of(context).textTheme.caption!.merge(TextStyle(
-              //         color: isLightThenDark(context, reverse: false)))),
+              Text('Here is the link for your Langame',
+                  style: Theme.of(context).textTheme.headline4!.merge(TextStyle(
+                      color: isLightThenDark(context, reverse: false)))),
               Divider(),
+              Text(
+                  'Copy this link and send it to people you want to meet with. '
+                  'Be sure to save it so you can use it later, too.',
+                  style: Theme.of(context).textTheme.caption!.merge(TextStyle(
+                      color: isLightThenDark(context, reverse: false)))),
+              // Divider(),
               // ListTile(
               //   onTap: () => FlutterClipboard.copy(createDynamicLink.result!)
               //       .then((v) => cp.showSnackBar(
@@ -215,17 +218,17 @@ class _SendLangameState extends State<NewLangamePageView>
               //   trailing: Icon(FontAwesomeIcons.copy,
               //       color: isLightThenDark(context, reverse: false)),
               // ),
-              LangameButton(
-                () {
-                  cp.showSnackBar('Coming soon');
-                  var cap = Provider.of<CrashAnalyticsProvider>(context,
-                      listen: false);
-                  cap.logNewFeatureClick('new_langame_add_to_calendar');
-                },
-                'Add to calendar',
-                FontAwesomeIcons.calendarCheck,
-                // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 100),
-              ),
+              // LangameButton(
+              //   () {
+              //     cp.showSnackBar('Coming soon');
+              //     var cap = Provider.of<CrashAnalyticsProvider>(context,
+              //         listen: false);
+              //     cap.logNewFeatureClick('new_langame_add_to_calendar');
+              //   },
+              //   'Add to calendar',
+              //   FontAwesomeIcons.calendarCheck,
+              //   // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 100),
+              // ),
               Divider(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,

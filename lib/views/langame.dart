@@ -18,11 +18,13 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/paint_provider.dart';
+import 'package:langame/providers/tag_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:provider/provider.dart';
 
+import 'buttons/button.dart';
 import 'colors/colors.dart';
 import 'images/image.dart';
 import 'main_view.dart';
@@ -105,20 +107,21 @@ class _LangameViewState extends State<LangameView> {
                 LangameResponse<Stream<DocumentSnapshot<lg.Langame>>>>(
             future: lp.joinLangame(widget.channelName),
             builder: (c, s) {
-              if (s.hasError) _handleError();
+              if (s.hasError ||
+                  (s.hasData &&
+                      s.data != null &&
+                      s.data!.status == LangameStatus.failed)) {
+                _handleError();
+                _postFrameCallback((_) => setState(() {
+                      langameStream = null;
+                    }));
+              }
               if (s.hasData &&
                   s.data != null &&
                   s.data!.status == LangameStatus.succeed &&
                   s.data!.result != null) {
                 _postFrameCallback((_) => setState(() {
                       langameStream = s.data!.result!;
-                    }));
-              } else if (s.hasData &&
-                  s.data != null &&
-                  s.data!.status == LangameStatus.failed) {
-                _handleError();
-                _postFrameCallback((_) => setState(() {
-                      langameStream = null;
                     }));
               }
               return cp.buildLoadingWidget(text: _loadingMessage);
@@ -208,7 +211,7 @@ class _LangameViewState extends State<LangameView> {
 
   Widget _buildRunningLangame(DocumentSnapshot<lg.Langame> l) {
     Provider.of<LangameProvider>(context, listen: false)
-        .addNote(widget.channelName, notesController.text);
+        .addNote(widget.channelName, notesController.text, lg.Note_Type.goal);
     Provider.of<AudioProvider>(context, listen: false) // TODO
         // ignore: invalid_return_type_for_catch_error
         .joinChannel(l)
@@ -277,7 +280,7 @@ class _LangameViewState extends State<LangameView> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             _buildTimerText(),
-            _buildQuestion(l),
+            _buildMeme(l),
             _buildBottomHalf(),
           ],
         )
@@ -288,55 +291,23 @@ class _LangameViewState extends State<LangameView> {
     return cp.showCustomDialog<bool>(
       [
         Padding(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(20),
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text(
                 'Exit the langame?',
                 textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .headline4!
-                    .merge(TextStyle(color: Colors.white)),
+                style: Theme.of(context).textTheme.headline4,
               ),
-              OutlinedButton.icon(
-                onPressed: cp.dialogComplete,
-                icon: Icon(Icons.cancel_outlined,
-                    color: Theme.of(context).colorScheme.secondary),
-                label: Text('CANCEL',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  side: BorderSide(
-                      width: 2.0,
-                      color: Theme.of(context).colorScheme.secondary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32.0),
-                  ),
-                ),
-              ),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  await _onEnd();
-                  cp.dialogComplete();
-                  _goBackToMainMenu();
-                },
-                style: ElevatedButton.styleFrom(
-                  side: BorderSide(
-                      width: 2.0,
-                      color: Theme.of(context).colorScheme.secondary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32.0),
-                  ),
-                ),
-                icon: Icon(Icons.exit_to_app_rounded,
-                    color: Theme.of(context).colorScheme.secondary),
-                label: Text('YES',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white)),
-              ),
+              LangameButton(cp.dialogComplete, 'Cancel', Icons.cancel_outlined),
+              LangameButton(() async {
+                await _onEnd();
+                cp.dialogComplete();
+                _goBackToMainMenu();
+              }, 'Yes', Icons.exit_to_app_rounded),
             ])),
       ],
+      canBack: true,
     );
   }
 
@@ -350,59 +321,42 @@ class _LangameViewState extends State<LangameView> {
   Future<void> showPermissionDialog() {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     return cp.showCustomDialog([
-      Center(
+      Container(
+          padding: EdgeInsets.all(12),
           child: Column(children: [
-        Text('We need your permission to use your microphone',
-            style: Theme.of(context)
-                .textTheme
-                .headline6!
-                .merge(TextStyle(color: Colors.white))),
-        Lottie.asset('animations/microphone.json'),
-        IconsButton(
-          onPressed: () {
-            cp.dialogComplete();
-            _goBackToMainMenu();
-          },
-          text: 'Leave',
-          iconData: FontAwesomeIcons.doorOpen,
-          color: isLightThenDark(context, reverse: true),
-          textStyle: TextStyle(color: isLightThenDark(context, reverse: false)),
-          iconColor: isLightThenDark(context, reverse: false),
-        ),
-        IconsButton(
-          onPressed: () async {
-            var p = Provider.of<AudioProvider>(context, listen: false);
-            var res = await p.requestPermission();
+            Text('We need your permission to use your microphone',
+                style: Theme.of(context).textTheme.headline6),
+            Lottie.asset('animations/microphone.json'),
+            LangameButton(() {
+              cp.dialogComplete();
+              _goBackToMainMenu();
+            }, 'Leave', FontAwesomeIcons.doorOpen),
+            LangameButton(() async {
+              var p = Provider.of<AudioProvider>(context, listen: false);
+              var res = await p.requestPermission();
 
-            cp.handleLangameResponse(
-              res,
-              succeedMessage: 'Great!',
-              failedMessage: _failingMessage,
-              onSucceed: () {
-                // Permission granted!
-                if (res.result != null && res.result!) {
-                  _postFrameCallback((duration) {
-                    setState(() => permissionRequested = true);
-                  });
-                  cp.dialogComplete();
-                  return;
-                }
-                showToast(
-                    'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
-                    color: isLightThenDark(context, reverse: true),
-                    textColor: isLightThenDark(context, reverse: false));
-                _goBackToMainMenu();
-              },
-              onFailure: _goBackToMainMenu,
-            );
-          },
-          text: 'Accept',
-          iconData: FontAwesomeIcons.checkCircle,
-          color: isLightThenDark(context, reverse: true),
-          textStyle: TextStyle(color: isLightThenDark(context, reverse: false)),
-          iconColor: isLightThenDark(context, reverse: false),
-        ),
-      ]))
+              cp.handleLangameResponse(
+                res,
+                failedMessage: _failingMessage,
+                onSucceed: () {
+                  // Permission granted!
+                  if (res.result != null && res.result!) {
+                    _postFrameCallback((duration) {
+                      setState(() => permissionRequested = true);
+                    });
+                    cp.dialogComplete();
+                    return;
+                  }
+                  showToast(
+                      'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
+                      color: isLightThenDark(context, reverse: true),
+                      textColor: isLightThenDark(context, reverse: false));
+                  _goBackToMainMenu();
+                },
+                onFailure: _goBackToMainMenu,
+              );
+            }, 'Accept', FontAwesomeIcons.checkCircle),
+          ]))
     ]);
   }
 
@@ -642,8 +596,73 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  Widget _buildQuestion(lg.Langame l) {
+  Widget _buildMeme(lg.Langame l) {
     var theme = Theme.of(context);
+    var tp = Provider.of<TagProvider>(context, listen: false);
+    var ctxFutureBuilder = () => FutureBuilder(
+        future: tp.getMemeTags(l.memes[l.currentMeme]),
+        builder: (ctx, AsyncSnapshot<LangameResponse<List<lg.Tag>>> tags) {
+          if (tags.hasData &&
+              tags.data!.result != null &&
+              tags.data!.result!.length > 0) {
+            return IconButton(
+              icon: FaIcon(FontAwesomeIcons.brain,
+                  color: isLightThenDark(context, reverse: false)),
+              onPressed: () => _showContexts(tags.data!.result!
+                  .where((e) => e.hasContext())
+                  .map((e) => e.context)
+                  .toList()),
+            );
+          }
+          return CircularProgressIndicator();
+        });
+    var memeFutureBuilder = () => FutureBuilder(
+        future: tp.getMeme(l.memes[l.currentMeme]),
+        builder: (ctx, AsyncSnapshot<LangameResponse<lg.Meme>> s) {
+          if (s.hasData && s.data!.result != null) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Text(
+                      s.data!.result!.content,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headline6!.merge(TextStyle(
+                          color: isLightThenDark(context, reverse: false))),
+                    ),
+                  ),
+                ),
+                Row(children: [
+                  ctxFutureBuilder(),
+                  IconButton(
+                    icon:
+                        Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                    onPressed: () => Dialogs.materialDialog(
+                        color: variantIsLightThenDark(context, reverse: true),
+                        msg:
+                            'The meme and context features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
+                        title: 'Warning!',
+                        titleStyle: Theme.of(context)
+                            .textTheme
+                            .headline3!
+                            .merge(TextStyle(color: Colors.white)),
+                        msgStyle: TextStyle(
+                            fontSize: AppSize.safeBlockVertical * 2,
+                            color: Colors.white),
+                        animation: 'animations/warning.json',
+                        context: context,
+                        actions: []),
+                  ),
+                ]),
+              ],
+            );
+          }
+          return Provider.of<ContextProvider>(context, listen: false)
+              .buildLoadingWidget(text: '');
+        });
+
     return Center(
       child: Container(
         padding: EdgeInsets.all(12),
@@ -655,49 +674,8 @@ class _LangameViewState extends State<LangameView> {
             color: isLightThenDark(context, reverse: true),
             borderRadius: BorderRadius.all(Radius.circular(10.0))),
         height: AppSize.blockSizeVertical * 40,
-        width: AppSize.safeBlockHorizontal * 70,
-        child: Column(
-          children: [
-            Container(
-              child: Center(
-                child: Text(
-                  l.questions[l.currentQuestion].content,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headline6!.merge(TextStyle(
-                      color: isLightThenDark(context, reverse: false))),
-                ),
-              ),
-            ),
-            Spacer(),
-            Row(children: [
-              IconButton(
-                icon: FaIcon(FontAwesomeIcons.brain,
-                    color: isLightThenDark(context, reverse: false)),
-                onPressed: () => _showContexts(
-                    l.questions[l.currentQuestion].content,
-                    l.questions[l.currentQuestion].contexts),
-              ),
-              IconButton(
-                icon: Icon(Icons.warning_amber_rounded, color: Colors.orange),
-                onPressed: () => Dialogs.materialDialog(
-                    color: Theme.of(context).colorScheme.primary,
-                    msg:
-                        'The question and context features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
-                    title: 'Warning!',
-                    titleStyle: Theme.of(context)
-                        .textTheme
-                        .headline3!
-                        .merge(TextStyle(color: Colors.white)),
-                    msgStyle: TextStyle(
-                        fontSize: AppSize.safeBlockVertical * 2,
-                        color: Colors.white),
-                    animation: 'animations/warning.json',
-                    context: context,
-                    actions: []),
-              ),
-            ]),
-          ],
-        ),
+        width: AppSize.safeBlockHorizontal * 80,
+        child: memeFutureBuilder(),
       ),
     );
   }
@@ -773,7 +751,7 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  Future _showContexts(String title, List<String> contexts) => showDialog(
+  Future _showContexts(List<lg.Tag_Context> contexts) => showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: Text(
@@ -801,7 +779,7 @@ class _LangameViewState extends State<LangameView> {
                     (c) => SingleChildScrollView(
                       scrollDirection: Axis.vertical, //.horizontal
                       child: Text(
-                        c,
+                        c.content,
                         style: TextStyle(
                           color: isLightThenDark(context),
                           fontSize: AppSize.blockSizeVertical * 2,

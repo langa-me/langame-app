@@ -13,7 +13,7 @@ abstract class LangameApi {
       List<String> recipients, List<String> topics, DateTime date);
 
   /// Add a note to a [Langame]
-  Future<void> addNoteToLangame(String channelName, String note);
+  Future<void> addNoteToLangame(String channelName, String note, lg.Note_Type type);
 
   /// Get [Langame] which current user is part of
   Future<Iterable<Stream<DocumentSnapshot<lg.Langame>>>> getLangames(
