@@ -49,7 +49,7 @@ class AudioProvider extends ChangeNotifier {
       // Ignore
       if (_sub != null) return LangameResponse(LangameStatus.succeed);
       CountdownTimer countDownTimer = CountdownTimer(
-        Duration(minutes: 15),
+        Duration(minutes: 60),
         Duration(seconds: 1),
       );
 

@@ -740,6 +740,10 @@ class User extends $pb.GeneratedMessage {
     ..pPS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tokens')
     ..pPS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'latestInteractions')
     ..pPS(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors')
+    ..aOM<$0.Timestamp>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'lastLogin', subBuilder: $0.Timestamp.create)
+    ..aOM<$0.Timestamp>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'lastLogout', subBuilder: $0.Timestamp.create)
+    ..aOM<$0.Timestamp>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'creationTime', subBuilder: $0.Timestamp.create)
+    ..aOB(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disabled')
     ..hasRequiredFields = false
   ;
 
@@ -759,6 +763,10 @@ class User extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? tokens,
     $core.Iterable<$core.String>? latestInteractions,
     $core.Iterable<$core.String>? errors,
+    $0.Timestamp? lastLogin,
+    $0.Timestamp? lastLogout,
+    $0.Timestamp? creationTime,
+    $core.bool? disabled,
   }) {
     final _result = create();
     if (uid != null) {
@@ -802,6 +810,18 @@ class User extends $pb.GeneratedMessage {
     }
     if (errors != null) {
       _result.errors.addAll(errors);
+    }
+    if (lastLogin != null) {
+      _result.lastLogin = lastLogin;
+    }
+    if (lastLogout != null) {
+      _result.lastLogout = lastLogout;
+    }
+    if (creationTime != null) {
+      _result.creationTime = creationTime;
+    }
+    if (disabled != null) {
+      _result.disabled = disabled;
     }
     return _result;
   }
@@ -927,6 +947,48 @@ class User extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(14)
   $core.List<$core.String> get errors => $_getList(13);
+
+  @$pb.TagNumber(15)
+  $0.Timestamp get lastLogin => $_getN(14);
+  @$pb.TagNumber(15)
+  set lastLogin($0.Timestamp v) { setField(15, v); }
+  @$pb.TagNumber(15)
+  $core.bool hasLastLogin() => $_has(14);
+  @$pb.TagNumber(15)
+  void clearLastLogin() => clearField(15);
+  @$pb.TagNumber(15)
+  $0.Timestamp ensureLastLogin() => $_ensure(14);
+
+  @$pb.TagNumber(16)
+  $0.Timestamp get lastLogout => $_getN(15);
+  @$pb.TagNumber(16)
+  set lastLogout($0.Timestamp v) { setField(16, v); }
+  @$pb.TagNumber(16)
+  $core.bool hasLastLogout() => $_has(15);
+  @$pb.TagNumber(16)
+  void clearLastLogout() => clearField(16);
+  @$pb.TagNumber(16)
+  $0.Timestamp ensureLastLogout() => $_ensure(15);
+
+  @$pb.TagNumber(17)
+  $0.Timestamp get creationTime => $_getN(16);
+  @$pb.TagNumber(17)
+  set creationTime($0.Timestamp v) { setField(17, v); }
+  @$pb.TagNumber(17)
+  $core.bool hasCreationTime() => $_has(16);
+  @$pb.TagNumber(17)
+  void clearCreationTime() => clearField(17);
+  @$pb.TagNumber(17)
+  $0.Timestamp ensureCreationTime() => $_ensure(16);
+
+  @$pb.TagNumber(18)
+  $core.bool get disabled => $_getBF(17);
+  @$pb.TagNumber(18)
+  set disabled($core.bool v) { $_setBool(17, v); }
+  @$pb.TagNumber(18)
+  $core.bool hasDisabled() => $_has(17);
+  @$pb.TagNumber(18)
+  void clearDisabled() => clearField(18);
 }
 
 class UserPreference extends $pb.GeneratedMessage {

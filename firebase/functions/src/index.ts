@@ -6,7 +6,7 @@ admin.firestore().settings({ignoreUndefinedProperties: true});
 import * as functions from "firebase-functions";
 import {newFeedback} from "./feedback";
 import {interactionsDecrement, setLangamesDone} from "./scheduledFunctions";
-import {cleanupUser} from "./deleteData";
+import {onDeleteAuthentication} from "./onDeleteAuthentication";
 import {subscribe} from "./subscribe";
 import {notifyPresence} from "./notifyPresence";
 import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
@@ -48,7 +48,6 @@ exports.setLangamesDone = functions
     .schedule("1 * * * *")
     .onRun(setLangamesDone);
 
-exports.cleanupUser = functions.auth.user().onDelete(cleanupUser);
 
 exports.notifyPresence = functions
     .region(region)
@@ -103,3 +102,8 @@ exports.onCreateLangame = functions.firestore
 exports.onUpdateLangamePlayers = functions.firestore
     .document(`${kLangamesCollection}/{langameId}/players/{playerId}`)
     .onUpdate(onUpdateLangamePlayers);
+
+// Authentication //
+
+exports.onDeleteAuthentication =
+    functions.auth.user().onDelete(onDeleteAuthentication);

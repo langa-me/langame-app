@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/authentication_api.dart';
@@ -14,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   FirebaseApi firebase;
-  CrashAnalyticsProvider _crashAnalyticsProvider;
+  CrashAnalyticsProvider _cap;
 
   /// Authentication, relations, users ///
 
@@ -36,31 +38,41 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   /// Create an authentication provider, and
-  AuthenticationProvider(
-      this.firebase, this._authenticationApi, this._crashAnalyticsProvider) {
+  AuthenticationProvider(this.firebase, this._authenticationApi, this._cap) {
     _firebaseUserStream = _authenticationApi.userChanges;
     _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
-      _crashAnalyticsProvider
-          .log('_firebaseUserStream.listen ${data.toString()}');
+      _cap.log('_firebaseUserStream.listen ${data.toString()}');
       // data.refreshToken being null means need to re-auth basically
-      if (data == null) return null;
-      try {
-        await firebase.crashlytics?.setUserIdentifier(data.uid);
-        await firebase.analytics?.setUserId(data.uid);
-        _user = await _authenticationApi.getLangameUser(data.uid);
-      } catch (e) {
-        _crashAnalyticsProvider.log('failed to get user uid: ${data.uid}, $e');
-      }
-      try {
-        if (_user == null) {
-          _user = await _authenticationApi.addLangameUser(data);
+      if (data == null) {
+        // If logged out, set logout time
+        if (user != null) {
+          firebase.firestore!
+              .collection(AppConst.firestoreUsersCollection)
+              .doc(user!.uid)
+              .update({
+            'lastLogout': FieldValue.serverTimestamp(),
+          });
         }
-      } catch (e, s) {
-        _crashAnalyticsProvider.log('failed to add user uid: ${data.uid}');
-        _crashAnalyticsProvider.recordError(e, s);
-        // _authenticationApi.logout();
+        return null;
       }
+      var r = await firebase.firestore!.runTransaction((t) async {
+        final langameUser = UserExt.fromFirebase(data);
+        final ref = firebase.firestore!
+            .collection(AppConst.firestoreUsersCollection)
+            .withConverter<lg.User>(
+              fromFirestore: (snapshot, _) =>
+                  UserExt.fromObject(snapshot.data()!),
+              toFirestore: (user, _) => user.toMapStringDynamic(),
+            )
+            .doc(langameUser.uid);
+        t.set(ref, langameUser, SetOptions(merge: true));
+        return ref;
+      });
+
+      _user = (await r.get()).data();
+      await firebase.crashlytics?.setUserIdentifier(data.uid);
+      await firebase.analytics?.setUserId(data.uid);
       _userStream.add(_user);
       notifyListeners();
     });
@@ -68,7 +80,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LangameResponse> _loginWith(OAuthCredential credential) async {
     try {
-      _crashAnalyticsProvider.log('_crashAnalyticsProvider.loginWith');
+      _cap.log('_crashAnalyticsProvider.loginWith');
       var uc = await _authenticationApi.loginWithFirebase(credential);
       if (uc.user == null) throw LangameAuthException('null_user');
       // Shouldn't update profile on new user at login
@@ -107,7 +119,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
       var isGoogle = uc.credential!.providerId == 'google.com';
       var isApple = uc.credential!.providerId == 'apple.com';
-      _crashAnalyticsProvider.log(
+      _cap.log(
           'updateProfile newDisplayName $newDisplayName newPhotoUrl $newPhotoUrl isGoogle $isGoogle isApple $isApple');
       await _authenticationApi.updateProfile(
         displayName: newDisplayName,
@@ -116,9 +128,8 @@ class AuthenticationProvider extends ChangeNotifier {
         apple: isApple,
       );
     } catch (e, s) {
-      _crashAnalyticsProvider
-          .log('failed to _crashAnalyticsProvider.loginWith');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to _crashAnalyticsProvider.loginWith');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     firebase.analytics?.logLogin();
@@ -130,8 +141,8 @@ class AuthenticationProvider extends ChangeNotifier {
       var res = await _authenticationApi.loginWithApple();
       return _loginWith(res);
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to loginWithApple');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to loginWithApple');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
   }
@@ -141,8 +152,8 @@ class AuthenticationProvider extends ChangeNotifier {
       var res = await _authenticationApi.loginWithFacebook();
       return _loginWith(res);
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to loginWithFacebook');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to loginWithFacebook');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
   }
@@ -152,45 +163,48 @@ class AuthenticationProvider extends ChangeNotifier {
       var res = await _authenticationApi.loginWithGoogle();
       return _loginWith(res);
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to loginWithGoogle');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to loginWithGoogle');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
   }
 
   Future<LangameResponse> logout() async {
     try {
-      _crashAnalyticsProvider.log('purging local storage');
+      _cap.log('purging local storage');
       var i = await SharedPreferences.getInstance();
       await i.clear();
       // TODO: permission denied somehow (firestore)
       // _crashAnalyticsProvider.log('purging local firestore');
       // await firebase.firestore!.clearPersistence();
       await _authenticationApi.logout();
-      _crashAnalyticsProvider.log('logout');
+      _cap.log('logout');
       return LangameResponse<lg.User>(LangameStatus.succeed);
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to logout');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to logout');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
 
   // TODO langame response
   Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
-    _crashAnalyticsProvider.log('getLangameUsersStartingWithTag $tag');
+    _cap.log('getLangameUsersStartingWithTag $tag');
     return await _authenticationApi.getLangameUsersStartingWithTag(
         _user!.tag, tag);
   }
 
   Future<LangameResponse<lg.User>> getLangameUser(String uid) async {
     try {
-      var r = await _authenticationApi.getLangameUser(uid);
-      _crashAnalyticsProvider.log('getLangameUser $uid');
-      return LangameResponse<lg.User>(LangameStatus.succeed, result: r);
+      var r = await _authenticationApi
+          .getLangameUser(uid)
+          .firstWhere((e) => e.data() != null)
+          .timeout(Duration(seconds: 20));
+      _cap.log('getLangameUser $uid');
+      return LangameResponse<lg.User>(LangameStatus.succeed, result: r.data()!);
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to getLangameUser $uid');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to getLangameUser $uid');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -198,16 +212,18 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse<List<lg.User>>> getLangameUsers(
       List<String> userIds) async {
     try {
-      List<lg.User> r = [];
-      for (var i = 0; i < userIds.length; i++) {
-        var user = await _authenticationApi.getLangameUser(userIds[i]);
-        if (user != null) r.add(user);
-      }
-      _crashAnalyticsProvider.log('getLangameUsers ${userIds.join(",")}');
-      return LangameResponse<List<lg.User>>(LangameStatus.succeed, result: r);
+      List<DocumentSnapshot<lg.User>> r = await Future.wait(userIds.map((u) =>
+          _authenticationApi
+              .getLangameUser(u)
+              .firstWhere((e) => e.data() != null)
+              .timeout(Duration(seconds: 20))));
+
+      _cap.log('getLangameUsers ${userIds.join(",")}');
+      return LangameResponse<List<lg.User>>(LangameStatus.succeed,
+          result: r.map((e) => e.data()!).toList());
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to get users ${userIds.join(",")}');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to get users ${userIds.join(",")}');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
@@ -225,10 +241,10 @@ class AuthenticationProvider extends ChangeNotifier {
           newEmail: newEmail,
           tag: tag,
           topics: topics);
-      _crashAnalyticsProvider.log('updateProfile');
+      _cap.log('updateProfile');
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to updateProfile');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to updateProfile');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -236,7 +252,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LangameResponse<void>> delete() async {
     try {
-      _crashAnalyticsProvider.log('deleting all data');
+      _cap.log('deleting all data');
       // [firebase_auth/requires-recent-login] This operation is sensitive
       //  and requires recent authentication. Log in again before
       //retrying this request.
@@ -252,16 +268,16 @@ class AuthenticationProvider extends ChangeNotifier {
             'the user is authenticated without any social providers');
       await _authenticationApi.reAuthenticate(cred);
       await _authenticationApi.delete();
-      _crashAnalyticsProvider.log('purging local storage');
+      _cap.log('purging local storage');
       var i = await SharedPreferences.getInstance();
       await i.clear();
       // _crashAnalyticsProvider.log('purging local firestore');
       // await firebase.firestore!.clearPersistence();
-      _crashAnalyticsProvider.log('logging out');
+      _cap.log('logging out');
       await logout();
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to delete');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to delete');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);

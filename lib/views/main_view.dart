@@ -31,10 +31,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .setCurrentScreen('send_langame');
-    var rp = Provider.of<RelationProvider>(context, listen: false);
-    rp.getUserRecommendations();
-    rp.getRecentInteractions();
+        .setCurrentScreen('main_view');
   }
 
   @override

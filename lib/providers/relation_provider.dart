@@ -53,14 +53,14 @@ class RelationProvider extends ChangeNotifier {
       var interactions = await _authenticationApi
           .getInteractions(_authenticationProvider.user!.uid);
       var users = await Future.wait(
-          interactions.map((i) => _authenticationApi.getLangameUser(i.item1)));
+          interactions.map((i) => _authenticationApi.getLangameUser(i.item1)
+          .firstWhere((e) => e.data() != null)
+          .timeout(Duration(seconds: 20))));
       _recentInteractions = OrderedSet<Tuple2<lg.User, lg.InteractionLevel>>(
           Comparing.on((e) => e.item2.value));
       users.asMap().forEach((i, u) {
-        if (u != null) {
           _recentInteractions
-              .add(Tuple2(u, interactions[i].item2.toInteractionLevel()));
-        }
+              .add(Tuple2(u.data()!, interactions[i].item2.toInteractionLevel()));
       });
       notifyListeners();
 

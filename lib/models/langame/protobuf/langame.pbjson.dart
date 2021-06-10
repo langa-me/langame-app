@@ -158,11 +158,15 @@ const User$json = const {
     const {'1': 'tokens', '3': 12, '4': 3, '5': 9, '10': 'tokens'},
     const {'1': 'latest_interactions', '3': 13, '4': 3, '5': 9, '10': 'latestInteractions'},
     const {'1': 'errors', '3': 14, '4': 3, '5': 9, '10': 'errors'},
+    const {'1': 'last_login', '3': 15, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'lastLogin'},
+    const {'1': 'last_logout', '3': 16, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'lastLogout'},
+    const {'1': 'creation_time', '3': 17, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'creationTime'},
+    const {'1': 'disabled', '3': 18, '4': 1, '5': 8, '10': 'disabled'},
   ],
 };
 
 /// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIaCghmYWNlYm9vaxgIIAEoCFIIZmFjZWJvb2sSFAoFYXBwbGUYCSABKAhSBWFwcGxlEikKEGZhdm91cml0ZV90b3BpY3MYCiADKAlSD2Zhdm91cml0ZVRvcGljcxIQCgN0YWcYCyABKAlSA3RhZxIWCgZ0b2tlbnMYDCADKAlSBnRva2VucxIvChNsYXRlc3RfaW50ZXJhY3Rpb25zGA0gAygJUhJsYXRlc3RJbnRlcmFjdGlvbnMSFgoGZXJyb3JzGA4gAygJUgZlcnJvcnM=');
+final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIaCghmYWNlYm9vaxgIIAEoCFIIZmFjZWJvb2sSFAoFYXBwbGUYCSABKAhSBWFwcGxlEikKEGZhdm91cml0ZV90b3BpY3MYCiADKAlSD2Zhdm91cml0ZVRvcGljcxIQCgN0YWcYCyABKAlSA3RhZxIWCgZ0b2tlbnMYDCADKAlSBnRva2VucxIvChNsYXRlc3RfaW50ZXJhY3Rpb25zGA0gAygJUhJsYXRlc3RJbnRlcmFjdGlvbnMSFgoGZXJyb3JzGA4gAygJUgZlcnJvcnMSOQoKbGFzdF9sb2dpbhgPIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWxhc3RMb2dpbhI7CgtsYXN0X2xvZ291dBgQIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCmxhc3RMb2dvdXQSPwoNY3JlYXRpb25fdGltZRgRIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSDGNyZWF0aW9uVGltZRIaCghkaXNhYmxlZBgSIAEoCFIIZGlzYWJsZWQ=');
 @$core.Deprecated('Use userPreferenceDescriptor instead')
 const UserPreference$json = const {
   '1': 'UserPreference',

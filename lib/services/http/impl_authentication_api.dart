@@ -92,9 +92,9 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<UserCredential> loginWithFirebase(OAuthCredential credential) async {
+  Future<UserCredential> loginWithFirebase(OAuthCredential credential) {
     try {
-      return await firebase.auth!.signInWithCredential(credential);
+      return firebase.auth!.signInWithCredential(credential);
     } on FirebaseAuthException catch (e) {
       throw LangameFirebaseSignInException(
           cause: 'failed to signInWithCredential ${e.code}');
@@ -108,42 +108,16 @@ class ImplAuthenticationApi extends AuthenticationApi {
   /// Throw GetUserException if it does not exist
   /// TODO: might use a transaction?
   @override
-  Future<lg.User?> getLangameUser(String uid) async {
+  Stream<DocumentSnapshot<lg.User>> getLangameUser(String uid) {
     CollectionReference users =
         firebase.firestore!.collection(AppConst.firestoreUsersCollection);
-    var doc = await users
+    return users
         .doc(uid)
         .withConverter<lg.User>(
           fromFirestore: (snapshot, _) => UserExt.fromObject(snapshot.data()!),
           toFirestore: (user, _) => user.toMapStringDynamic(),
         )
-        .get();
-    if (!doc.exists) return null;
-    var data = doc.data();
-    if (data == null) return null;
-    firebase.crashlytics?.setUserIdentifier(data.uid);
-    firebase.analytics?.setUserId(data.uid);
-    return data;
-  }
-
-  @override
-  Future<lg.User> addLangameUser(User user) async {
-    CollectionReference users =
-        firebase.firestore!.collection(AppConst.firestoreUsersCollection);
-    lg.User langameUser = UserExt.fromFirebase(user);
-    if (user.providerData.any((e) => e.providerId == 'google.com')) {
-      langameUser.google = true;
-    }
-    if (user.providerData.any((e) => e.providerId == 'apple.com')) {
-      langameUser.apple = true;
-    }
-    // TODO: facebook
-
-    return users
-        .doc(langameUser.uid)
-        .set(langameUser.toMapStringDynamic())
-        .then((value) => langameUser)
-        .catchError((err) => throw LangameAddUserException(err.toString()));
+        .snapshots();
   }
 
   @override
@@ -231,7 +205,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
       // firebase.auth.currentUser.updatePhoneNumber()
     });
   }
-
 
   @override
   Future<List<lg.User>> getUserRecommendations(lg.User user) async {

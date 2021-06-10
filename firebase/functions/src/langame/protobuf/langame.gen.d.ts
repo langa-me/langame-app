@@ -1054,6 +1054,18 @@ export namespace langame {
 
             /** User errors */
             errors?: (string[]|null);
+
+            /** User lastLogin */
+            lastLogin?: (google.protobuf.ITimestamp|null);
+
+            /** User lastLogout */
+            lastLogout?: (google.protobuf.ITimestamp|null);
+
+            /** User creationTime */
+            creationTime?: (google.protobuf.ITimestamp|null);
+
+            /** User disabled */
+            disabled?: (boolean|null);
         }
 
         /** Represents a User. */
@@ -1106,6 +1118,18 @@ export namespace langame {
 
             /** User errors. */
             public errors: string[];
+
+            /** User lastLogin. */
+            public lastLogin?: (google.protobuf.ITimestamp|null);
+
+            /** User lastLogout. */
+            public lastLogout?: (google.protobuf.ITimestamp|null);
+
+            /** User creationTime. */
+            public creationTime?: (google.protobuf.ITimestamp|null);
+
+            /** User disabled. */
+            public disabled: boolean;
 
             /**
              * Creates a new User instance using the specified properties.

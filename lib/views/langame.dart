@@ -112,9 +112,6 @@ class _LangameViewState extends State<LangameView> {
                       s.data != null &&
                       s.data!.status == LangameStatus.failed)) {
                 _handleError();
-                _postFrameCallback((_) => setState(() {
-                      langameStream = null;
-                    }));
               }
               if (s.hasData &&
                   s.data != null &&
@@ -599,6 +596,7 @@ class _LangameViewState extends State<LangameView> {
   Widget _buildMeme(lg.Langame l) {
     var theme = Theme.of(context);
     var tp = Provider.of<TagProvider>(context, listen: false);
+    var cp = Provider.of<ContextProvider>(context, listen: false);
     var ctxFutureBuilder = () => FutureBuilder(
         future: tp.getMemeTags(l.memes[l.currentMeme]),
         builder: (ctx, AsyncSnapshot<LangameResponse<List<lg.Tag>>> tags) {
@@ -639,21 +637,23 @@ class _LangameViewState extends State<LangameView> {
                   IconButton(
                     icon:
                         Icon(Icons.warning_amber_rounded, color: Colors.orange),
-                    onPressed: () => Dialogs.materialDialog(
-                        color: variantIsLightThenDark(context, reverse: true),
-                        msg:
-                            'The meme and context features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
-                        title: 'Warning!',
-                        titleStyle: Theme.of(context)
-                            .textTheme
-                            .headline3!
-                            .merge(TextStyle(color: Colors.white)),
-                        msgStyle: TextStyle(
-                            fontSize: AppSize.safeBlockVertical * 2,
-                            color: Colors.white),
-                        animation: 'animations/warning.json',
-                        context: context,
-                        actions: []),
+                    onPressed: () => cp.showCustomDialog([
+                      Text(
+                        'Warning',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.headline6,
+                      ),
+                      Lottie.asset('animations/warning.json', 
+                      width: AppSize.safeBlockHorizontal * 50,
+                      height: AppSize.safeBlockVertical * 50,
+                      
+                      ),
+                      Text(
+                        'Some features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.headline6,
+                      ),
+                    ], canBack: true),
                   ),
                 ]),
               ],

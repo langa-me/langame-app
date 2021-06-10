@@ -40,48 +40,59 @@ class _LoginState extends State<Login> {
     final provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
     Provider.of<FeedbackProvider>(context, listen: false).init();
+    var cp = Provider.of<ContextProvider>(context, listen: false);
 
-    var networkState = Provider.of<ConnectivityResult>(context, listen: false);
-    if (networkState == ConnectivityResult.none) {
-      // If no internet, skip auth stuff
-      return;
-    }
-
-    // Bunch of spaghetti code to check if it is a new user or already authenticated
-    provider.userStream.first.then((user) async {
-      cap.log('login - userStream - ${user?.writeToJson()}');
-      if (user == null || successDialogFuture != null) return null;
-      // TODO: what happen if no internet?
-      Provider.of<LangameProvider>(context, listen: false).initialize();
-      var cp = Provider.of<ContextProvider>(context, listen: false);
-      // Once arriving on login page, if coming from a notification tap coming
-      // from a terminated state (app closed, have notification in bar)
-      // and the user is properly authenticated, will open directly langame view
-      // otherwise it will go to setup or friends according to auth state
-      var displayName =
-          user.displayName.isNotEmpty ? ' as ${user.displayName}' : '';
-      cp.showSuccessDialog('Connected$displayName!');
-      // Kind of hack to wait for preference update // TODO shouldn't need
-      await Future.delayed(Duration(seconds: 1));
-      var hasDoneOnBoarding =
-          Provider.of<PreferenceProvider>(context, listen: false)
-              .preference
-              .hasDoneOnBoarding;
-      if (hasDoneOnBoarding) {
-        // Probably logged-out, skip message api init
-        initMessageApi(
-            Provider.of<MessageProvider>(context, listen: false), cp);
-      } else {
-        // User previously authenticated but didn't do setup
-        Future.delayed(Duration(seconds: 1), () {
-          cp.pop();
-          // User is not opening the app from a notification
-          cp.pushReplacement(OnBoarding());
-        });
+    Connectivity().checkConnectivity().then((network) async {
+      if (network == ConnectivityResult.none) {
+        cp.showFailureDialog('You have no access to the internet!');
+        await Future.delayed(Duration(seconds: 2));
+        cp.dialogComplete();
+        return;
       }
+      // Bunch of spaghetti code to check if it is a new user or already authenticated
+      provider.userStream.first.then((user) async {
+        cap.log('login - userStream - ${user?.writeToJson()}');
+        if (user == null || successDialogFuture != null) {
+          setState(() => isAuthenticating = false);
+          return null;
+        }
+        if (user.disabled) {
+          cp.showFailureDialog(
+              'Unfortunately, your account has been disabled, please contact customer support');
+          await Future.delayed(Duration(seconds: 2));
+          cp.dialogComplete();
+          return;
+        }
+        // TODO: what happen if no internet?
+        Provider.of<LangameProvider>(context, listen: false).initialize();
+        // Once arriving on login page, if coming from a notification tap coming
+        // from a terminated state (app closed, have notification in bar)
+        // and the user is properly authenticated, will open directly langame view
+        // otherwise it will go to setup or friends according to auth state
+        var displayName =
+            user.displayName.isNotEmpty ? ' as ${user.displayName}' : '';
+        cp.showSuccessDialog('Connected$displayName!');
+        // Kind of hack to wait for preference update // TODO shouldn't need
+        await Future.delayed(Duration(seconds: 1));
+        var hasDoneOnBoarding =
+            Provider.of<PreferenceProvider>(context, listen: false)
+                .preference
+                .hasDoneOnBoarding;
+        if (hasDoneOnBoarding) {
+          // Probably logged-out, skip message api init
+          initMessageApi(
+              Provider.of<MessageProvider>(context, listen: false), cp);
+        } else {
+          // User previously authenticated but didn't do setup
+          Future.delayed(Duration(seconds: 1), () {
+            cp.pop();
+            // User is not opening the app from a notification
+            cp.pushReplacement(OnBoarding());
+          });
+        }
+      });
+      // TODO: fix button on/off according to state
     });
-    // TODO: fix button on/off according to state
-    setState(() => isAuthenticating = false);
   }
 
   @override

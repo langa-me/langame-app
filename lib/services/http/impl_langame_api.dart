@@ -64,7 +64,7 @@ class ImplLangameApi extends LangameApi {
       await snapP.reference
           .snapshots()
           .firstWhere((e) => e.data()!.audioId != -1)
-          .timeout(Duration(seconds: 10));
+          .timeout(Duration(seconds: 20));
     }
 
     return snap.docs.first.reference.snapshots();

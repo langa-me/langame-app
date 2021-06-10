@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:tuple/tuple.dart';
@@ -32,15 +33,12 @@ abstract class AuthenticationApi {
   Future<void> delete();
 
   /// Get [LangameUser] from Firestore using Firebase uid
-  Future<lg.User?> getLangameUser(String uid);
+  Stream<DocumentSnapshot<lg.User>>  getLangameUser(String uid);
 
   /// Get [LangameUser] from Firestore using Langame [tag]
   Future<List<lg.User>> getLangameUsersStartingWithTag(
       String ignoreTag, String tag,
       {int limit = 5});
-
-  /// Add [LangameUser] to Firestore using Firebase [User]
-  Future<lg.User> addLangameUser(User user);
 
   /// Update current authenticated user, at the firebase level
   /// and firestore [LangameUser], throw if not authenticated

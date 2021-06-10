@@ -18,7 +18,7 @@ const stripe = new Stripe(functions.config().stripe.key, {
  * @param{UserRecord} user
  * @param{functions.EventContext} context
  */
-export const cleanupUser = async (user: UserRecord,
+export const onDeleteAuthentication = async (user: UserRecord,
     context: functions.EventContext) => {
   const db = admin.firestore();
   const customerCollection = db.collection("stripe_customers");

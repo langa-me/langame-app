@@ -40,7 +40,7 @@ class _SendLangameState extends State<NewLangamePageView>
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .setCurrentScreen('send_langame');
+        .setCurrentScreen('new_langame_page_view');
   }
 
   @override

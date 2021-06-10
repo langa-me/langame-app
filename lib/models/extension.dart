@@ -66,15 +66,26 @@ class UserExt {
         favouriteTopics:
             (m['favouriteTopics'] as List<dynamic>?)?.map((e) => e as String),
         tag: m['tag'],
-        tokens: (m['tokens'] as List<dynamic>?)?.map((e) => e as String));
+        tokens: (m['tokens'] as List<dynamic>?)?.map((e) => e as String),
+        latestInteractions: (m['latestInteractions'] as List<dynamic>?)
+            ?.map((e) => e as String),
+        errors: (m['errors'] as List<dynamic>?)?.map((e) => e as String),
+        lastLogin: dynamicToProtobufTimestamp(m['lastLogin']),
+        lastLogout: dynamicToProtobufTimestamp(m['lastLogout']),
+        creationTime: dynamicToProtobufTimestamp(m['creationTime']),
+        disabled: m['disabled']);
   }
 
   static lg.User fromFirebase(fb.User user) => lg.User(
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      phoneNumber: user.phoneNumber,
-      photoUrl: user.photoURL);
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        phoneNumber: user.phoneNumber,
+        photoUrl: user.photoURL,
+        google: user.providerData.any((e) => e.providerId == "google.com"),
+        apple: user.providerData.any((e) => e.providerId == "apple.com"),
+        creationTime: dynamicToProtobufTimestamp(user.metadata.creationTime),
+      );
 }
 
 class NotificationExt {
@@ -96,8 +107,7 @@ class LangameExt {
       channelName: m['channelName'],
       players: (m['players'] as List<dynamic>?)?.map((e) => e as String),
       topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
-      memes:
-          (m['memes'] as List<dynamic>?)?.map((e) => e as String),
+      memes: (m['memes'] as List<dynamic>?)?.map((e) => e as String),
       initiator: m['initiator'],
       done: dynamicToProtobufTimestamp(m['done']),
       currentMeme: m['currentMeme'],
@@ -113,6 +123,7 @@ gg.Timestamp? dynamicToProtobufTimestamp(dynamic something) {
   // Firestore Timestamp (i.e. when using thing.serverTimestamp()...)
   if (something is Timestamp)
     return gg.Timestamp.fromDateTime(something.toDate());
+  if (something is DateTime) return gg.Timestamp.fromDateTime(something);
   // DateTime string (saved from date time field or whatever)
   try {
     var t = gg.Timestamp.fromDateTime(DateTime.parse(something));
@@ -141,9 +152,15 @@ class NoteExt {
     var m = o as Map<String, dynamic>;
     return lg.Note(
       createdAt: dynamicToProtobufTimestamp(m['createdAt']),
-      generic: m['generic'] != null ? lg.Note_Generic(content: m['generic']!['content']) : null,
-      goal: m['goal'] != null ? lg.Note_Goal(content: m['goal']!['content']) : null,
-      definition: m['definition'] != null ? lg.Note_Definition(content: m['definition']!['content']) : null,
+      generic: m['generic'] != null
+          ? lg.Note_Generic(content: m['generic']!['content'])
+          : null,
+      goal: m['goal'] != null
+          ? lg.Note_Goal(content: m['goal']!['content'])
+          : null,
+      definition: m['definition'] != null
+          ? lg.Note_Definition(content: m['definition']!['content'])
+          : null,
     );
   }
 }
@@ -165,10 +182,15 @@ class TagExt {
     return lg.Tag(
       createdAt: dynamicToProtobufTimestamp(m['createdAt']),
       topic: m['topic'] != null ? TagTopicExt.fromObject(m['topic']) : null,
-      classification: m['classification'] != null ? TagClassificationExt.fromObject(m['classification']) : null,
+      classification: m['classification'] != null
+          ? TagClassificationExt.fromObject(m['classification'])
+          : null,
       origin: m['origin'] != null ? TagOriginExt.fromObject(m['origin']) : null,
-      feedback: m['feedback'] != null ? TagFeedbackExt.fromObject(m['feedback']) : null,
-      context: m['context'] != null ? TagContextExt.fromObject(m['context']) : null,
+      feedback: m['feedback'] != null
+          ? TagFeedbackExt.fromObject(m['feedback'])
+          : null,
+      context:
+          m['context'] != null ? TagContextExt.fromObject(m['context']) : null,
     );
   }
 }
@@ -198,8 +220,9 @@ class TagOriginExt {
   static lg.Tag_Origin fromObject(Object o) {
     var m = o as Map<String, dynamic>;
     return lg.Tag_Origin(
-      openai: m['openai'] != null ? lg.Tag_Origin_OpenAI(version: m['openai']!['version']) : null
-    );
+        openai: m['openai'] != null
+            ? lg.Tag_Origin_OpenAI(version: m['openai']!['version'])
+            : null);
   }
 }
 
@@ -208,8 +231,12 @@ class TagFeedbackExt {
     var m = o as Map<String, dynamic>;
     return lg.Tag_Feedback(
       userId: m['userId'],
-      score: m['score'] != null ? lg.Tag_Feedback_GeneralScore(score: m['score']!['score']) : null,
-      relevance: m['relevance'] != null ? lg.Tag_Feedback_Relevance(score: m['relevance']!['score']) : null,
+      score: m['score'] != null
+          ? lg.Tag_Feedback_GeneralScore(score: m['score']!['score'])
+          : null,
+      relevance: m['relevance'] != null
+          ? lg.Tag_Feedback_Relevance(score: m['relevance']!['score'])
+          : null,
     );
   }
 }
@@ -219,7 +246,9 @@ class TagContextExt {
     var m = o as Map<String, dynamic>;
     return lg.Tag_Context(
       content: m['content'],
-      type: lg.Tag_Context_Type.values.firstWhere((e) => e.toString() == m['type'], orElse: () => lg.Tag_Context_Type.OPENAI),
+      type: lg.Tag_Context_Type.values.firstWhere(
+          (e) => e.toString() == m['type'],
+          orElse: () => lg.Tag_Context_Type.OPENAI),
     );
   }
 }

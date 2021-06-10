@@ -1,0 +1,1 @@
+- Corrected an authentication bug

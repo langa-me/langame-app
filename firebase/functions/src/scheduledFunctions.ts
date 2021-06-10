@@ -31,7 +31,7 @@ export const interactionsDecrement =
 export const setLangamesDone =
     async (_: functions.EventContext) => {
       const db = admin.firestore();
-      const HOUR = 1000 * 60 * 60;
+      const HOUR = 4 * 1000 * 60 * 60;
       const anHourAgo = new Date(Date.now() - HOUR);
 
       try {
@@ -44,13 +44,15 @@ export const setLangamesDone =
               .withConverter(converter<langame.protobuf.Langame>()));
 
           for (const doc of langamesThatStartedMoreThanOneHourAgo.docs) {
-            const players = await t.get(doc.ref.collection("players")
-                .withConverter(converter<langame.protobuf.Player>()));
-            const isEmpty =
-            players.docs
-                .filter((e) => e.data().timeOut !== undefined).length ===
-            players.docs.length;
-            if (!isEmpty) continue;
+            // const players = await t.get(doc.ref.collection("players")
+            //     .withConverter(converter<langame.protobuf.Player>()));
+            // // TODO: does not work if player does not signal
+            // // time out properly obviously
+            // const isEmpty =
+            // players.docs
+            //     .filter((e) => e.data().timeOut !== undefined).length ===
+            // players.docs.length;
+            // if (!isEmpty) continue;
             t.update(doc.ref, {
               done: admin.firestore.FieldValue.serverTimestamp(),
             });

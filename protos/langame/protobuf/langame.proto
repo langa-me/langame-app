@@ -109,6 +109,10 @@ message User {
 
   repeated string latest_interactions = 13;
   repeated string errors = 14;
+  google.protobuf.Timestamp last_login = 15;
+  google.protobuf.Timestamp last_logout = 16;
+  google.protobuf.Timestamp creation_time = 17;
+  bool disabled = 18;
 }
 
 /// Evaluated relationship between users using AI + heuristics
