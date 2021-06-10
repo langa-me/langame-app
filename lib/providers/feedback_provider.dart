@@ -1,10 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:feedback/feedback.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/errors.dart';
+import 'package:langame/models/extension.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
@@ -16,13 +21,26 @@ import 'crash_analytics_provider.dart';
 
 class FeedbackProvider extends ChangeNotifier {
   FirebaseApi firebase;
-  final CrashAnalyticsProvider _crashAnalyticsProvider;
+  final CrashAnalyticsProvider _cap;
   final ContextProvider _contextProvider;
   final PreferenceProvider _preferenceProvider;
   ShakeDetector? _detector;
 
-  FeedbackProvider(this.firebase, this._crashAnalyticsProvider,
-      this._contextProvider, this._preferenceProvider) {
+  int? _feedbackMemeRelevanceScore;
+  int? _feedbackMemeGeneralScore;
+
+  int? get feedbackMemeRelevanceScore => _feedbackMemeRelevanceScore;
+  int? get feedbackMemeGeneralScore => feedbackMemeGeneralScore;
+  set feedbackMemeRelevanceScore(v) {
+    _feedbackMemeRelevanceScore = v;
+  }
+
+  set feedbackMemeGeneralScore(v) {
+    _feedbackMemeGeneralScore = v;
+  }
+
+  FeedbackProvider(this.firebase, this._cap, this._contextProvider,
+      this._preferenceProvider) {
     // init();
   }
 
@@ -87,8 +105,7 @@ class FeedbackProvider extends ChangeNotifier {
             },
           ),
         );
-        uploadTask
-            .catchError((e, s) => _crashAnalyticsProvider.recordError(e, s));
+        uploadTask.catchError((e, s) => _cap.recordError(e, s));
       };
       if (Platform.isAndroid) {
         // TODO: maybe wrap this device info stuff into helper
@@ -141,5 +158,62 @@ class FeedbackProvider extends ChangeNotifier {
       ScaffoldMessenger.of(_contextProvider.navigationKey.currentContext!)
           .showSnackBar(snackBar);
     });
+  }
+
+  Future<LangameResponse<void>> sendMemeFeedback(String memeId) async {
+    try {
+      final tags = firebase.firestore!
+          .collection(AppConst.firestoreMemesCollection)
+          .doc(memeId)
+          .withConverter<lg.Meme>(
+            fromFirestore: (snapshot, _) =>
+                MemeExt.fromObject(snapshot.data()!),
+            toFirestore: (e, _) => e.toMapStringDynamic(),
+          )
+          .collection(AppConst.firestoreTagsSubCollection);
+      final selfTagsSnap = await tags
+          .where('userId', isEqualTo: firebase.auth!.currentUser!.uid)
+          .get();
+      if (selfTagsSnap.docs.isEmpty) {
+        await tags
+            .withConverter<lg.Tag>(
+              fromFirestore: (snapshot, _) =>
+                  TagExt.fromObject(snapshot.data()!),
+              toFirestore: (e, _) => e.toMapStringDynamic(),
+            )
+            .add(
+              lg.Tag(
+                feedback: lg.Tag_Feedback(
+                    relevance: lg.Tag_Feedback_Relevance(
+                        score: _feedbackMemeRelevanceScore!),
+                    score: lg.Tag_Feedback_GeneralScore(
+                        score: _feedbackMemeGeneralScore!),
+                    userId: firebase.auth!.currentUser!.uid),
+              ),
+            );
+      } else {
+        await selfTagsSnap.docs.first.reference
+            .withConverter<lg.Tag>(
+              fromFirestore: (snapshot, _) =>
+                  TagExt.fromObject(snapshot.data()!),
+              toFirestore: (e, _) => e.toMapStringDynamic(),
+            )
+            .set(
+                lg.Tag(
+                  feedback: lg.Tag_Feedback(
+                      relevance: lg.Tag_Feedback_Relevance(
+                          score: _feedbackMemeRelevanceScore!),
+                      score: lg.Tag_Feedback_GeneralScore(
+                          score: _feedbackMemeGeneralScore!)),
+                ),
+                SetOptions(merge: true));
+      }
+      _cap.log('sendMemeFeedback $memeId');
+    } catch (e, s) {
+      _cap.log('failed to sendMemeFeedback $memeId');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+    return LangameResponse(LangameStatus.succeed);
   }
 }

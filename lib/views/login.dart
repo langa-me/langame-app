@@ -30,7 +30,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   Future<void>? successDialogFuture;
-  bool isAuthenticating = true;
+  bool isAuthenticating = false;
 
   @override
   void initState() {
@@ -49,13 +49,15 @@ class _LoginState extends State<Login> {
         cp.dialogComplete();
         return;
       }
+
       // Bunch of spaghetti code to check if it is a new user or already authenticated
       provider.userStream.first.then((user) async {
         cap.log('login - userStream - ${user?.writeToJson()}');
         if (user == null || successDialogFuture != null) {
-          setState(() => isAuthenticating = false);
           return null;
         }
+        setState(() => isAuthenticating = true);
+
         if (user.disabled) {
           cp.showFailureDialog(
               'Unfortunately, your account has been disabled, please contact customer support');
@@ -209,7 +211,10 @@ class _LoginState extends State<Login> {
     var f = fn().timeout(const Duration(seconds: 10));
     var cp = Provider.of<ContextProvider>(context, listen: false);
     cp.showLoadingDialog();
-    f.whenComplete(() => cp.dialogComplete());
+    f.whenComplete(() {
+      cp.dialogComplete();
+      setState(() => isAuthenticating = false);
+    });
     f.then((res) {
       if (res.status == LangameStatus.succeed) {
         Provider.of<CrashAnalyticsProvider>(context, listen: false)

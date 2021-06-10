@@ -15,6 +15,7 @@ import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/paint_provider.dart';
@@ -298,7 +299,7 @@ class _LangameViewState extends State<LangameView> {
               ),
               LangameButton(cp.dialogComplete, 'Cancel', Icons.cancel_outlined),
               LangameButton(() async {
-                await _onEnd();
+                await _onEnd(showDialog: true);
                 cp.dialogComplete();
                 _goBackToMainMenu();
               }, 'Yes', Icons.exit_to_app_rounded),
@@ -470,7 +471,7 @@ class _LangameViewState extends State<LangameView> {
         },
       );
 
-  Future<void> _onEnd({String? left, bool showDialog = false}) async {
+  Future<void> _onEnd({bool showDialog = false}) async {
     try {
       Provider.of<CrashAnalyticsProvider>(context, listen: false)
           .log('langame end', analyticsMessage: 'langame_end');
@@ -486,8 +487,7 @@ class _LangameViewState extends State<LangameView> {
           .crashlytics
           .recordError(e, s);
     }
-    if (showDialog)
-      Future.delayed(Duration.zero, () => _showEndDialog(left: left));
+    if (showDialog) Future.delayed(Duration.zero, () => _showEndDialog());
   }
 
   Widget _buildWaitingScreen(lg.Langame l) {
@@ -643,10 +643,10 @@ class _LangameViewState extends State<LangameView> {
                         textAlign: TextAlign.center,
                         style: theme.textTheme.headline6,
                       ),
-                      Lottie.asset('animations/warning.json', 
-                      width: AppSize.safeBlockHorizontal * 50,
-                      height: AppSize.safeBlockVertical * 50,
-                      
+                      Lottie.asset(
+                        'animations/warning.json',
+                        width: AppSize.safeBlockHorizontal * 50,
+                        height: AppSize.safeBlockVertical * 50,
                       ),
                       Text(
                         'Some features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
@@ -754,11 +754,8 @@ class _LangameViewState extends State<LangameView> {
   Future _showContexts(List<lg.Tag_Context> contexts) => showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: Text(
-            'CONTEXTS',
-            style: Theme.of(context).textTheme.headline4,
-            textAlign: TextAlign.center,
-          ),
+          title: Align(child: FaIcon(FontAwesomeIcons.brain,
+                  color: isLightThenDark(context, reverse: false))),
           content: Container(
             width: AppSize.safeBlockHorizontal * 70,
             height: AppSize.safeBlockVertical * 50,
@@ -774,7 +771,22 @@ class _LangameViewState extends State<LangameView> {
               ),
             ),
             child: PageView(
-              children: contexts
+              children: contexts.length == 0 ?
+                  [
+                    Column(children: [
+                  Image(
+                    width: AppSize.safeBlockHorizontal * 30,
+                    height: AppSize.safeBlockVertical * 30,
+                    image: AssetImage('images/logo-colourless.png'),
+                  ),
+                  Spacer(),
+                  Text('No contexts for this!',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headline4),
+                    ]),
+                  ]
+             :
+              contexts
                   .map(
                     (c) => SingleChildScrollView(
                       scrollDirection: Axis.vertical, //.horizontal
@@ -793,36 +805,65 @@ class _LangameViewState extends State<LangameView> {
         ),
       );
 
-  Future<void> _showEndDialog({String? left}) async =>
-      Provider.of<ContextProvider>(context, listen: false).showCustomDialog(
-        [
-          Padding(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Langame is over',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    LottieBuilder.asset('animations/congratulations.json'),
-                    Text(
-                      left != null
-                          ? '$left left the Langame, it terminated it'
-                          : 'Time elapsed',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    IconsButton(
-                      onPressed: _goBackToMainMenu,
-                      text: 'Leave',
-                      iconData: FontAwesomeIcons.doorOpen,
-                      color: Colors.white,
-                      textStyle: TextStyle(color: Colors.white),
-                      iconColor: Colors.white,
-                    ),
-                  ])),
-        ],
-        canBack: false,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      );
+  Future<void> _showEndDialog() async {
+    Provider.of<ContextProvider>(context, listen: false).showCustomDialog(
+      [
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: Consumer<FeedbackProvider>(builder: (ctx, s, c) => Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(
+              'Langame is over, how was it?',
+              style: TextStyle(color: Colors.white),
+            ),
+            LottieBuilder.asset('animations/congratulations.json'),
+            Text(
+              'How relevant to the topic the conversation starter was?',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            ToggleButtons(
+              children: <Widget>[
+                Icon(FontAwesomeIcons.frown, color: isLightThenDark(context)),
+                Icon(FontAwesomeIcons.meh, color: isLightThenDark(context)),
+                Icon(FontAwesomeIcons.grinTongue,
+                    color: isLightThenDark(context)),
+              ],
+              onPressed: (int i) => s.feedbackMemeRelevanceScore = i,
+              isSelected: List.generate(3, (i) => i == (s.feedbackMemeRelevanceScore ?? 1)),
+            ),
+            Text(
+              'How would you rate the conversation starter?',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            ToggleButtons(
+              children: <Widget>[
+                Icon(FontAwesomeIcons.frown, color: isLightThenDark(context)),
+                Icon(FontAwesomeIcons.meh, color: isLightThenDark(context)),
+                Icon(FontAwesomeIcons.grinTongue,
+                    color: isLightThenDark(context)),
+              ],
+              onPressed: (int i) => s.feedbackMemeGeneralScore = i,
+              isSelected: List.generate(3, (i) => i == (s.feedbackMemeGeneralScore ?? 1)),
+            ),
+            IconsButton(
+              onPressed: () {
+                var currentLg = Provider.of<LangameProvider>(context, listen: false).runningLangames.values.firstWhere((e) => e.channelName == widget.channelName);
+                // TODO: handle multiple memes
+                // We don't wait, should not block user
+                s.sendMemeFeedback(currentLg.memes[0]);
+                _goBackToMainMenu();
+              },
+              text: 'Leave',
+              iconData: FontAwesomeIcons.doorOpen,
+              color: Colors.white,
+              textStyle: TextStyle(color: Colors.white),
+              iconColor: Colors.white,
+            ),
+          ]),
+        ),
+        ),
+      ],
+      canBack: false,
+      backgroundColor: Theme.of(context).colorScheme.primary,
+    );
+  }
 }

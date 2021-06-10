@@ -189,8 +189,14 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             TextDivider('Experimental features'),
             Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
-                onTap: () =>
-                    p.setShakeToFeedback(!p.preference.shakeToFeedback),
+                onTap: () {
+                  if (kReleaseMode) {
+                    cp.showSnackBar('Coming soon!');
+                    cap.logNewFeatureClick('settings_shake_to_feedback');
+                    return;
+                  }
+                  p.setShakeToFeedback(!p.preference.shakeToFeedback);
+                },
                 leading: Icon(Icons.feedback_outlined,
                     color: isLightThenDark(context)),
                 title: Text('Shake-to-feedback',
@@ -206,7 +212,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 onTap: () {
                   if (kReleaseMode) {
                     cp.showSnackBar('Coming soon!');
-                    cap.logNewFeatureClick('settings_subscription');
+                    cap.logNewFeatureClick('settings_user_recommendations');
                     return;
                   }
                   p.setRecommendations(
