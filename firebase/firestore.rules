@@ -18,6 +18,8 @@ service cloud.firestore {
         }
         match /{path=**}/tags/{tagId} {
             allow read: if request.auth != null;
+            // Only allows writing feedback tags
+            allow write: if request.resource.data.feedback.userId == request.auth.uid
         }
         match /langames/{langameId} {
             // Only allow access to invited Langames

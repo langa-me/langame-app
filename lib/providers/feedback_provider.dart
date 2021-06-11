@@ -26,17 +26,29 @@ class FeedbackProvider extends ChangeNotifier {
   final PreferenceProvider _preferenceProvider;
   ShakeDetector? _detector;
 
-  int? _feedbackMemeRelevanceScore;
-  int? _feedbackMemeGeneralScore;
+  int _feedbackMemeRelevanceScore = 1;
+  int _feedbackMemeGeneralScore = 1;
+  List<bool> _feedbackMemeRelevanceSelected = [false, true, false];
+  List<bool> _feedbackMemeGeneralScoreSelected = [false, true, false];
 
-  int? get feedbackMemeRelevanceScore => _feedbackMemeRelevanceScore;
-  int? get feedbackMemeGeneralScore => feedbackMemeGeneralScore;
+  int get feedbackMemeRelevanceScore => _feedbackMemeRelevanceScore;
+  int get feedbackMemeGeneralScore => feedbackMemeGeneralScore;
+  List<bool> get feedbackMemeRelevanceSelected =>
+      _feedbackMemeRelevanceSelected;
+  List<bool> get feedbackMemeGeneralScoreSelected =>
+      _feedbackMemeGeneralScoreSelected;
   set feedbackMemeRelevanceScore(v) {
     _feedbackMemeRelevanceScore = v;
+    _feedbackMemeRelevanceSelected = [false, false, false];
+    _feedbackMemeRelevanceSelected[v] = true;
+    notifyListeners();
   }
 
   set feedbackMemeGeneralScore(v) {
     _feedbackMemeGeneralScore = v;
+    _feedbackMemeGeneralScoreSelected = [false, false, false];
+    _feedbackMemeGeneralScoreSelected[v] = true;
+    notifyListeners();
   }
 
   FeedbackProvider(this.firebase, this._cap, this._contextProvider,
@@ -165,48 +177,56 @@ class FeedbackProvider extends ChangeNotifier {
       final tags = firebase.firestore!
           .collection(AppConst.firestoreMemesCollection)
           .doc(memeId)
-          .withConverter<lg.Meme>(
-            fromFirestore: (snapshot, _) =>
-                MemeExt.fromObject(snapshot.data()!),
+          .collection(AppConst.firestoreTagsSubCollection)
+          .withConverter<lg.Tag>(
+            fromFirestore: (s, _) => TagExt.fromObject(s.data()!),
             toFirestore: (e, _) => e.toMapStringDynamic(),
-          )
-          .collection(AppConst.firestoreTagsSubCollection);
+          );
       final selfTagsSnap = await tags
-          .where('userId', isEqualTo: firebase.auth!.currentUser!.uid)
+          .where('feedback.userId', isEqualTo: firebase.auth!.currentUser!.uid)
           .get();
       if (selfTagsSnap.docs.isEmpty) {
-        await tags
-            .withConverter<lg.Tag>(
-              fromFirestore: (snapshot, _) =>
-                  TagExt.fromObject(snapshot.data()!),
-              toFirestore: (e, _) => e.toMapStringDynamic(),
-            )
-            .add(
-              lg.Tag(
-                feedback: lg.Tag_Feedback(
-                    relevance: lg.Tag_Feedback_Relevance(
-                        score: _feedbackMemeRelevanceScore!),
-                    score: lg.Tag_Feedback_GeneralScore(
-                        score: _feedbackMemeGeneralScore!),
-                    userId: firebase.auth!.currentUser!.uid),
-              ),
-            );
+        await Future.wait([
+          tags.add(
+            lg.Tag(
+              feedback: lg.Tag_Feedback(
+                  relevance: lg.Tag_Feedback_Relevance(
+                      score: _feedbackMemeRelevanceScore),
+                  userId: firebase.auth!.currentUser!.uid),
+            ),
+          ),
+          tags.add(
+            lg.Tag(
+              feedback: lg.Tag_Feedback(
+                  general:
+                      lg.Tag_Feedback_General(score: _feedbackMemeGeneralScore),
+                  userId: firebase.auth!.currentUser!.uid),
+            ),
+          ),
+        ]);
       } else {
-        await selfTagsSnap.docs.first.reference
-            .withConverter<lg.Tag>(
-              fromFirestore: (snapshot, _) =>
-                  TagExt.fromObject(snapshot.data()!),
-              toFirestore: (e, _) => e.toMapStringDynamic(),
-            )
-            .set(
+        await Future.wait(selfTagsSnap.docs.map((e) {
+          if (e.data().feedback.hasRelevance()) {
+            return e.reference.set(
                 lg.Tag(
                   feedback: lg.Tag_Feedback(
-                      relevance: lg.Tag_Feedback_Relevance(
-                          score: _feedbackMemeRelevanceScore!),
-                      score: lg.Tag_Feedback_GeneralScore(
-                          score: _feedbackMemeGeneralScore!)),
+                    relevance: lg.Tag_Feedback_Relevance(
+                        score: _feedbackMemeRelevanceScore),
+                  ),
                 ),
                 SetOptions(merge: true));
+          } else if (e.data().feedback.hasGeneral()) {
+            return e.reference.set(
+                lg.Tag(
+                  feedback: lg.Tag_Feedback(
+                    general: lg.Tag_Feedback_General(
+                        score: _feedbackMemeGeneralScore),
+                  ),
+                ),
+                SetOptions(merge: true));
+          }
+          return Future.delayed(Duration.zero);
+        }));
       }
       _cap.log('sendMemeFeedback $memeId');
     } catch (e, s) {

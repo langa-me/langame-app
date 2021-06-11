@@ -53,11 +53,11 @@ message Tag {
   message Feedback {
     string user_id = 1;
     oneof type {
-      GeneralScore score = 2;
+      General general = 2;
       Relevance relevance = 3;
     }
 
-    message GeneralScore {
+    message General {
       uint32 score = 1;
     }
 

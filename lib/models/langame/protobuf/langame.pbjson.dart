@@ -94,18 +94,18 @@ const Tag_Feedback$json = const {
   '1': 'Feedback',
   '2': const [
     const {'1': 'user_id', '3': 1, '4': 1, '5': 9, '10': 'userId'},
-    const {'1': 'score', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback.GeneralScore', '9': 0, '10': 'score'},
+    const {'1': 'general', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback.General', '9': 0, '10': 'general'},
     const {'1': 'relevance', '3': 3, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback.Relevance', '9': 0, '10': 'relevance'},
   ],
-  '3': const [Tag_Feedback_GeneralScore$json, Tag_Feedback_Relevance$json],
+  '3': const [Tag_Feedback_General$json, Tag_Feedback_Relevance$json],
   '8': const [
     const {'1': 'type'},
   ],
 };
 
 @$core.Deprecated('Use tagDescriptor instead')
-const Tag_Feedback_GeneralScore$json = const {
-  '1': 'GeneralScore',
+const Tag_Feedback_General$json = const {
+  '1': 'General',
   '2': const [
     const {'1': 'score', '3': 1, '4': 1, '5': 13, '10': 'score'},
   ],
@@ -139,7 +139,7 @@ const Tag_Context_Type$json = const {
 };
 
 /// Descriptor for `Tag`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSOQoKY3JlYXRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdBIzCgV0b3BpYxgCIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuVGFnLlRvcGljSABSBXRvcGljEk4KDmNsYXNzaWZpY2F0aW9uGAMgASgLMiQubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ2xhc3NpZmljYXRpb25IAFIOY2xhc3NpZmljYXRpb24SNgoGb3JpZ2luGAQgASgLMhwubGFuZ2FtZS5wcm90b2J1Zi5UYWcuT3JpZ2luSABSBm9yaWdpbhI8CghmZWVkYmFjaxgFIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrSABSCGZlZWRiYWNrEjkKB2NvbnRleHQYBiABKAsyHS5sYW5nYW1lLnByb3RvYnVmLlRhZy5Db250ZXh0SABSB2NvbnRleHQaOQoFVG9waWMSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZlbW9qaXMYAyADKAlSBmVtb2ppcxpWCg5DbGFzc2lmaWNhdGlvbhIYCgdjb250ZW50GAEgASgJUgdjb250ZW50EhQKBXNjb3JlGAIgASgBUgVzY29yZRIUCgVodW1hbhgDIAEoCFIFaHVtYW4acwoGT3JpZ2luEj0KBm9wZW5haRgCIAEoCzIjLmxhbmdhbWUucHJvdG9idWYuVGFnLk9yaWdpbi5PcGVuQUlIAFIGb3BlbmFpGiIKBk9wZW5BSRIYCgd2ZXJzaW9uGAEgASgNUgd2ZXJzaW9uQgYKBHR5cGUagwIKCEZlZWRiYWNrEhcKB3VzZXJfaWQYASABKAlSBnVzZXJJZBJDCgVzY29yZRgCIAEoCzIrLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrLkdlbmVyYWxTY29yZUgAUgVzY29yZRJICglyZWxldmFuY2UYAyABKAsyKC5sYW5nYW1lLnByb3RvYnVmLlRhZy5GZWVkYmFjay5SZWxldmFuY2VIAFIJcmVsZXZhbmNlGiQKDEdlbmVyYWxTY29yZRIUCgVzY29yZRgBIAEoDVIFc2NvcmUaIQoJUmVsZXZhbmNlEhQKBXNjb3JlGAEgASgNUgVzY29yZUIGCgR0eXBlGn4KB0NvbnRleHQSGAoHY29udGVudBgBIAEoCVIHY29udGVudBI2CgR0eXBlGAIgASgOMiIubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ29udGV4dC5UeXBlUgR0eXBlIiEKBFR5cGUSDQoJV0lLSVBFRElBEAASCgoGT1BFTkFJEAFCBgoEdHlwZQ==');
+final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSOQoKY3JlYXRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdBIzCgV0b3BpYxgCIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuVGFnLlRvcGljSABSBXRvcGljEk4KDmNsYXNzaWZpY2F0aW9uGAMgASgLMiQubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ2xhc3NpZmljYXRpb25IAFIOY2xhc3NpZmljYXRpb24SNgoGb3JpZ2luGAQgASgLMhwubGFuZ2FtZS5wcm90b2J1Zi5UYWcuT3JpZ2luSABSBm9yaWdpbhI8CghmZWVkYmFjaxgFIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrSABSCGZlZWRiYWNrEjkKB2NvbnRleHQYBiABKAsyHS5sYW5nYW1lLnByb3RvYnVmLlRhZy5Db250ZXh0SABSB2NvbnRleHQaOQoFVG9waWMSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZlbW9qaXMYAyADKAlSBmVtb2ppcxpWCg5DbGFzc2lmaWNhdGlvbhIYCgdjb250ZW50GAEgASgJUgdjb250ZW50EhQKBXNjb3JlGAIgASgBUgVzY29yZRIUCgVodW1hbhgDIAEoCFIFaHVtYW4acwoGT3JpZ2luEj0KBm9wZW5haRgCIAEoCzIjLmxhbmdhbWUucHJvdG9idWYuVGFnLk9yaWdpbi5PcGVuQUlIAFIGb3BlbmFpGiIKBk9wZW5BSRIYCgd2ZXJzaW9uGAEgASgNUgd2ZXJzaW9uQgYKBHR5cGUa/QEKCEZlZWRiYWNrEhcKB3VzZXJfaWQYASABKAlSBnVzZXJJZBJCCgdnZW5lcmFsGAIgASgLMiYubGFuZ2FtZS5wcm90b2J1Zi5UYWcuRmVlZGJhY2suR2VuZXJhbEgAUgdnZW5lcmFsEkgKCXJlbGV2YW5jZRgDIAEoCzIoLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrLlJlbGV2YW5jZUgAUglyZWxldmFuY2UaHwoHR2VuZXJhbBIUCgVzY29yZRgBIAEoDVIFc2NvcmUaIQoJUmVsZXZhbmNlEhQKBXNjb3JlGAEgASgNUgVzY29yZUIGCgR0eXBlGn4KB0NvbnRleHQSGAoHY29udGVudBgBIAEoCVIHY29udGVudBI2CgR0eXBlGAIgASgOMiIubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ29udGV4dC5UeXBlUgR0eXBlIiEKBFR5cGUSDQoJV0lLSVBFRElBEAASCgoGT1BFTkFJEAFCBgoEdHlwZQ==');
 @$core.Deprecated('Use userDescriptor instead')
 const User$json = const {
   '1': 'User',

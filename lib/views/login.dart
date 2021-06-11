@@ -30,7 +30,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   Future<void>? successDialogFuture;
-  bool isAuthenticating = false;
+  bool isAuthenticating = true;
 
   @override
   void initState() {
@@ -47,8 +47,14 @@ class _LoginState extends State<Login> {
         cp.showFailureDialog('You have no access to the internet!');
         await Future.delayed(Duration(seconds: 2));
         cp.dialogComplete();
+        cap.log('I am offline',
+            analyticsMessage: 'offline',
+            analyticsParameters: {
+              'view': 'langame_view',
+            });
         return;
       }
+      setState(() => isAuthenticating = false);
 
       // Bunch of spaghetti code to check if it is a new user or already authenticated
       provider.userStream.first.then((user) async {
@@ -106,15 +112,17 @@ class _LoginState extends State<Login> {
 
     var network = Provider.of<ConnectivityResult>(context);
 
-    if (network != ConnectivityResult.wifi &&
-        network != ConnectivityResult.mobile) {
+    if (network == ConnectivityResult.none) {
       crash.log('I am offline',
           analyticsMessage: 'offline',
           analyticsParameters: {
             'view': 'langame_view',
           });
+      setState(() => isAuthenticating = true);
+
       return cp.buildLoadingWidget(text: 'You are offline!');
     }
+    setState(() => isAuthenticating = false);
 
     final ap = Provider.of<AuthenticationProvider>(context, listen: false);
     var logins = <Widget>[

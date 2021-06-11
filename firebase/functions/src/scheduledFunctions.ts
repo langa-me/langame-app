@@ -38,6 +38,7 @@ export const setLangamesDone =
         db.runTransaction(async (t) => {
           const langamesThatStartedMoreThanOneHourAgo = await t.get(db
               .collection(kLangamesCollection)
+              .where("done", "!=", null)
               .where("started",
                   "<",
                   admin.firestore.Timestamp.fromDate(anHourAgo))

@@ -231,8 +231,8 @@ class TagFeedbackExt {
     var m = o as Map<String, dynamic>;
     return lg.Tag_Feedback(
       userId: m['userId'],
-      score: m['score'] != null
-          ? lg.Tag_Feedback_GeneralScore(score: m['score']!['score'])
+      general: m['general'] != null
+          ? lg.Tag_Feedback_General(score: m['general']!['score'])
           : null,
       relevance: m['relevance'] != null
           ? lg.Tag_Feedback_Relevance(score: m['relevance']!['score'])

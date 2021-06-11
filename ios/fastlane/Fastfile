@@ -61,7 +61,7 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Corrected an authentication bug"
+      changelog: "- Ask some feedbacks from time to time to improve user experience"
     )
 
     delete_temp_keychain(keychain_name)

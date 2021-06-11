@@ -325,14 +325,14 @@ class Tag_Origin extends $pb.GeneratedMessage {
   Tag_Origin_OpenAI ensureOpenai() => $_ensure(0);
 }
 
-class Tag_Feedback_GeneralScore extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Feedback.GeneralScore', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+class Tag_Feedback_General extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Feedback.General', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', $pb.PbFieldType.OU3)
     ..hasRequiredFields = false
   ;
 
-  Tag_Feedback_GeneralScore._() : super();
-  factory Tag_Feedback_GeneralScore({
+  Tag_Feedback_General._() : super();
+  factory Tag_Feedback_General({
     $core.int? score,
   }) {
     final _result = create();
@@ -341,26 +341,26 @@ class Tag_Feedback_GeneralScore extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory Tag_Feedback_GeneralScore.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Tag_Feedback_GeneralScore.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory Tag_Feedback_General.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Tag_Feedback_General.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  Tag_Feedback_GeneralScore clone() => Tag_Feedback_GeneralScore()..mergeFromMessage(this);
+  Tag_Feedback_General clone() => Tag_Feedback_General()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  Tag_Feedback_GeneralScore copyWith(void Function(Tag_Feedback_GeneralScore) updates) => super.copyWith((message) => updates(message as Tag_Feedback_GeneralScore)) as Tag_Feedback_GeneralScore; // ignore: deprecated_member_use
+  Tag_Feedback_General copyWith(void Function(Tag_Feedback_General) updates) => super.copyWith((message) => updates(message as Tag_Feedback_General)) as Tag_Feedback_General; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static Tag_Feedback_GeneralScore create() => Tag_Feedback_GeneralScore._();
-  Tag_Feedback_GeneralScore createEmptyInstance() => create();
-  static $pb.PbList<Tag_Feedback_GeneralScore> createRepeated() => $pb.PbList<Tag_Feedback_GeneralScore>();
+  static Tag_Feedback_General create() => Tag_Feedback_General._();
+  Tag_Feedback_General createEmptyInstance() => create();
+  static $pb.PbList<Tag_Feedback_General> createRepeated() => $pb.PbList<Tag_Feedback_General>();
   @$core.pragma('dart2js:noInline')
-  static Tag_Feedback_GeneralScore getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Feedback_GeneralScore>(create);
-  static Tag_Feedback_GeneralScore? _defaultInstance;
+  static Tag_Feedback_General getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tag_Feedback_General>(create);
+  static Tag_Feedback_General? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.int get score => $_getIZ(0);
@@ -420,21 +420,21 @@ class Tag_Feedback_Relevance extends $pb.GeneratedMessage {
 }
 
 enum Tag_Feedback_Type {
-  score, 
+  general, 
   relevance, 
   notSet
 }
 
 class Tag_Feedback extends $pb.GeneratedMessage {
   static const $core.Map<$core.int, Tag_Feedback_Type> _Tag_Feedback_TypeByTag = {
-    2 : Tag_Feedback_Type.score,
+    2 : Tag_Feedback_Type.general,
     3 : Tag_Feedback_Type.relevance,
     0 : Tag_Feedback_Type.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Tag.Feedback', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..oo(0, [2, 3])
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userId')
-    ..aOM<Tag_Feedback_GeneralScore>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', subBuilder: Tag_Feedback_GeneralScore.create)
+    ..aOM<Tag_Feedback_General>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'general', subBuilder: Tag_Feedback_General.create)
     ..aOM<Tag_Feedback_Relevance>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'relevance', subBuilder: Tag_Feedback_Relevance.create)
     ..hasRequiredFields = false
   ;
@@ -442,15 +442,15 @@ class Tag_Feedback extends $pb.GeneratedMessage {
   Tag_Feedback._() : super();
   factory Tag_Feedback({
     $core.String? userId,
-    Tag_Feedback_GeneralScore? score,
+    Tag_Feedback_General? general,
     Tag_Feedback_Relevance? relevance,
   }) {
     final _result = create();
     if (userId != null) {
       _result.userId = userId;
     }
-    if (score != null) {
-      _result.score = score;
+    if (general != null) {
+      _result.general = general;
     }
     if (relevance != null) {
       _result.relevance = relevance;
@@ -491,15 +491,15 @@ class Tag_Feedback extends $pb.GeneratedMessage {
   void clearUserId() => clearField(1);
 
   @$pb.TagNumber(2)
-  Tag_Feedback_GeneralScore get score => $_getN(1);
+  Tag_Feedback_General get general => $_getN(1);
   @$pb.TagNumber(2)
-  set score(Tag_Feedback_GeneralScore v) { setField(2, v); }
+  set general(Tag_Feedback_General v) { setField(2, v); }
   @$pb.TagNumber(2)
-  $core.bool hasScore() => $_has(1);
+  $core.bool hasGeneral() => $_has(1);
   @$pb.TagNumber(2)
-  void clearScore() => clearField(2);
+  void clearGeneral() => clearField(2);
   @$pb.TagNumber(2)
-  Tag_Feedback_GeneralScore ensureScore() => $_ensure(1);
+  Tag_Feedback_General ensureGeneral() => $_ensure(1);
 
   @$pb.TagNumber(3)
   Tag_Feedback_Relevance get relevance => $_getN(2);

@@ -78,8 +78,7 @@ class ImplLangameApi extends LangameApi {
         .collection(AppConst.firestoreLangamesCollection)
         .where('channelName', isEqualTo: channelName)
         .get();
-    if (!snap.docs.first.exists)
-      throw LangameMessageException('invalid_channel_name');
+    if (!snap.docs.first.exists) throw LangameException('invalid_channel_name');
     final noteRef = snap.docs.first.reference
         .collection("players")
         .doc(firebase.auth!.currentUser!.uid)
@@ -88,46 +87,41 @@ class ImplLangameApi extends LangameApi {
           fromFirestore: (snapshot, _) => NoteExt.fromObject(snapshot.data()!),
           toFirestore: (user, _) => user.toMapStringDynamic(),
         );
-    final genericDoesNotExist =
-        (await noteRef.where('generic.content', isEqualTo: note).get())
-                .docs
-                .length ==
-            0;
-    final goalDoesNotExist =
-        (await noteRef.where('goal.content', isEqualTo: note).get())
-                .docs
-                .length ==
-            0;
-    final definitionDoesNotExist =
-        (await noteRef.where('definition.content', isEqualTo: note).get())
-                .docs
-                .length ==
-            0;
-    if (genericDoesNotExist && goalDoesNotExist && definitionDoesNotExist) {
-      lg.Note n;
-      switch (type) {
-        case lg.Note_Type.generic:
-          n = lg.Note(
+    // TODO: currently notes are unique by type, #to-digest
+    switch (type) {
+      case lg.Note_Type.generic:
+        final genericDoesNotExist =
+            (await noteRef.where('generic', isNull: true).get()).docs.length ==
+                0;
+        if (genericDoesNotExist)
+          noteRef.add(lg.Note(
             generic: lg.Note_Generic(content: note),
             createdAt: gg.Timestamp.fromDateTime(DateTime.now()),
-          );
-          break;
-        case lg.Note_Type.goal:
-          n = lg.Note(
+          ));
+        break;
+      case lg.Note_Type.goal:
+        final goalDoesNotExist =
+            (await noteRef.where('goal', isNull: true).get()).docs.length == 0;
+        if (goalDoesNotExist)
+          noteRef.add(lg.Note(
             goal: lg.Note_Goal(content: note),
             createdAt: gg.Timestamp.fromDateTime(DateTime.now()),
-          );
-          break;
-        case lg.Note_Type.definition:
-          n = lg.Note(
+          ));
+        break;
+      case lg.Note_Type.definition:
+        final definitionDoesNotExist =
+            (await noteRef.where('definition', isNull: true).get())
+                    .docs
+                    .length ==
+                0;
+        if (definitionDoesNotExist)
+          noteRef.add(lg.Note(
             definition: lg.Note_Definition(content: note),
             createdAt: gg.Timestamp.fromDateTime(DateTime.now()),
-          );
-          break;
-        case lg.Note_Type.notSet:
-          throw LangameMessageException('invalid_channel_name');
-      }
-      noteRef.add(n);
+          ));
+        break;
+      case lg.Note_Type.notSet:
+        throw LangameException('invalid_note_type');
     }
   }
 

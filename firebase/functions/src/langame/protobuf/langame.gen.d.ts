@@ -622,8 +622,8 @@ export namespace langame {
                 /** Feedback userId */
                 userId?: (string|null);
 
-                /** Feedback score */
-                score?: (langame.protobuf.Tag.Feedback.IGeneralScore|null);
+                /** Feedback general */
+                general?: (langame.protobuf.Tag.Feedback.IGeneral|null);
 
                 /** Feedback relevance */
                 relevance?: (langame.protobuf.Tag.Feedback.IRelevance|null);
@@ -641,14 +641,14 @@ export namespace langame {
                 /** Feedback userId. */
                 public userId: string;
 
-                /** Feedback score. */
-                public score?: (langame.protobuf.Tag.Feedback.IGeneralScore|null);
+                /** Feedback general. */
+                public general?: (langame.protobuf.Tag.Feedback.IGeneral|null);
 
                 /** Feedback relevance. */
                 public relevance?: (langame.protobuf.Tag.Feedback.IRelevance|null);
 
                 /** Feedback type. */
-                public type?: ("score"|"relevance");
+                public type?: ("general"|"relevance");
 
                 /**
                  * Creates a new Feedback instance using the specified properties.
@@ -723,91 +723,91 @@ export namespace langame {
 
             namespace Feedback {
 
-                /** Properties of a GeneralScore. */
-                interface IGeneralScore {
+                /** Properties of a General. */
+                interface IGeneral {
 
-                    /** GeneralScore score */
+                    /** General score */
                     score?: (number|null);
                 }
 
-                /** Represents a GeneralScore. */
-                class GeneralScore implements IGeneralScore {
+                /** Represents a General. */
+                class General implements IGeneral {
 
                     /**
-                     * Constructs a new GeneralScore.
+                     * Constructs a new General.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: langame.protobuf.Tag.Feedback.IGeneralScore);
+                    constructor(properties?: langame.protobuf.Tag.Feedback.IGeneral);
 
-                    /** GeneralScore score. */
+                    /** General score. */
                     public score: number;
 
                     /**
-                     * Creates a new GeneralScore instance using the specified properties.
+                     * Creates a new General instance using the specified properties.
                      * @param [properties] Properties to set
-                     * @returns GeneralScore instance
+                     * @returns General instance
                      */
-                    public static create(properties?: langame.protobuf.Tag.Feedback.IGeneralScore): langame.protobuf.Tag.Feedback.GeneralScore;
+                    public static create(properties?: langame.protobuf.Tag.Feedback.IGeneral): langame.protobuf.Tag.Feedback.General;
 
                     /**
-                     * Encodes the specified GeneralScore message. Does not implicitly {@link langame.protobuf.Tag.Feedback.GeneralScore.verify|verify} messages.
-                     * @param message GeneralScore message or plain object to encode
+                     * Encodes the specified General message. Does not implicitly {@link langame.protobuf.Tag.Feedback.General.verify|verify} messages.
+                     * @param message General message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: langame.protobuf.Tag.Feedback.IGeneralScore, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: langame.protobuf.Tag.Feedback.IGeneral, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified GeneralScore message, length delimited. Does not implicitly {@link langame.protobuf.Tag.Feedback.GeneralScore.verify|verify} messages.
-                     * @param message GeneralScore message or plain object to encode
+                     * Encodes the specified General message, length delimited. Does not implicitly {@link langame.protobuf.Tag.Feedback.General.verify|verify} messages.
+                     * @param message General message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: langame.protobuf.Tag.Feedback.IGeneralScore, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: langame.protobuf.Tag.Feedback.IGeneral, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Decodes a GeneralScore message from the specified reader or buffer.
+                     * Decodes a General message from the specified reader or buffer.
                      * @param reader Reader or buffer to decode from
                      * @param [length] Message length if known beforehand
-                     * @returns GeneralScore
+                     * @returns General
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Tag.Feedback.GeneralScore;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Tag.Feedback.General;
 
                     /**
-                     * Decodes a GeneralScore message from the specified reader or buffer, length delimited.
+                     * Decodes a General message from the specified reader or buffer, length delimited.
                      * @param reader Reader or buffer to decode from
-                     * @returns GeneralScore
+                     * @returns General
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Tag.Feedback.GeneralScore;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Tag.Feedback.General;
 
                     /**
-                     * Verifies a GeneralScore message.
+                     * Verifies a General message.
                      * @param message Plain object to verify
                      * @returns `null` if valid, otherwise the reason why it is not
                      */
                     public static verify(message: { [k: string]: any }): (string|null);
 
                     /**
-                     * Creates a GeneralScore message from a plain object. Also converts values to their respective internal types.
+                     * Creates a General message from a plain object. Also converts values to their respective internal types.
                      * @param object Plain object
-                     * @returns GeneralScore
+                     * @returns General
                      */
-                    public static fromObject(object: { [k: string]: any }): langame.protobuf.Tag.Feedback.GeneralScore;
+                    public static fromObject(object: { [k: string]: any }): langame.protobuf.Tag.Feedback.General;
 
                     /**
-                     * Creates a plain object from a GeneralScore message. Also converts values to other types if specified.
-                     * @param message GeneralScore
+                     * Creates a plain object from a General message. Also converts values to other types if specified.
+                     * @param message General
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: langame.protobuf.Tag.Feedback.GeneralScore, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: langame.protobuf.Tag.Feedback.General, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
-                     * Converts this GeneralScore to JSON.
+                     * Converts this General to JSON.
                      * @returns JSON object
                      */
                     public toJSON(): { [k: string]: any };
