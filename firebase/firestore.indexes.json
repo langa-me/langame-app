@@ -15,6 +15,14 @@
         { "fieldPath": "date", "order": "ASCENDING" },
         { "fieldPath": "channelName", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "langames",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "done", "order": "ASCENDING" },
+        { "fieldPath": "started", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": [

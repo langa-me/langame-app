@@ -196,12 +196,12 @@ const Langame$json = const {
     const {'1': 'date', '3': 9, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'date'},
     const {'1': 'errors', '3': 10, '4': 3, '5': 9, '10': 'errors'},
     const {'1': 'started', '3': 11, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'started'},
-    const {'1': 'current_audio_id', '3': 12, '4': 1, '5': 5, '10': 'currentAudioId'},
+    const {'1': 'next_meme', '3': 13, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'nextMeme'},
   ],
 };
 
 /// Descriptor for `Langame`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSGAoHcGxheWVycxgCIAMoCVIHcGxheWVycxIWCgZ0b3BpY3MYAyADKAlSBnRvcGljcxIUCgVtZW1lcxgEIAMoCVIFbWVtZXMSHAoJaW5pdGlhdG9yGAUgASgJUglpbml0aWF0b3ISLgoEZG9uZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBGRvbmUSIQoMY3VycmVudF9tZW1lGAggASgFUgtjdXJyZW50TWVtZRIuCgRkYXRlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIEZGF0ZRIWCgZlcnJvcnMYCiADKAlSBmVycm9ycxI0CgdzdGFydGVkGAsgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIHc3RhcnRlZBIoChBjdXJyZW50X2F1ZGlvX2lkGAwgASgFUg5jdXJyZW50QXVkaW9JZA==');
+final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSGAoHcGxheWVycxgCIAMoCVIHcGxheWVycxIWCgZ0b3BpY3MYAyADKAlSBnRvcGljcxIUCgVtZW1lcxgEIAMoCVIFbWVtZXMSHAoJaW5pdGlhdG9yGAUgASgJUglpbml0aWF0b3ISLgoEZG9uZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBGRvbmUSIQoMY3VycmVudF9tZW1lGAggASgFUgtjdXJyZW50TWVtZRIuCgRkYXRlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIEZGF0ZRIWCgZlcnJvcnMYCiADKAlSBmVycm9ycxI0CgdzdGFydGVkGAsgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIHc3RhcnRlZBI3CgluZXh0X21lbWUYDSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUghuZXh0TWVtZQ==');
 @$core.Deprecated('Use playerDescriptor instead')
 const Player$json = const {
   '1': 'Player',

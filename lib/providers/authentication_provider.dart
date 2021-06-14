@@ -42,7 +42,6 @@ class AuthenticationProvider extends ChangeNotifier {
     _firebaseUserStream = _authenticationApi.userChanges;
     _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
-      _cap.log('_firebaseUserStream.listen ${data.toString()}');
       // data.refreshToken being null means need to re-auth basically
       if (data == null) {
         // If logged out, set logout time
@@ -119,8 +118,6 @@ class AuthenticationProvider extends ChangeNotifier {
 
       var isGoogle = uc.credential!.providerId == 'google.com';
       var isApple = uc.credential!.providerId == 'apple.com';
-      _cap.log(
-          'updateProfile newDisplayName $newDisplayName newPhotoUrl $newPhotoUrl isGoogle $isGoogle isApple $isApple');
       await _authenticationApi.updateProfile(
         displayName: newDisplayName,
         photoURL: newPhotoUrl,
@@ -188,10 +185,17 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   // TODO langame response
-  Future<List<lg.User>> getLangameUsersStartingWithTag(String tag) async {
-    _cap.log('getLangameUsersStartingWithTag $tag');
-    return await _authenticationApi.getLangameUsersStartingWithTag(
-        _user!.tag, tag);
+  Future<LangameResponse<List<lg.User>>> getLangameUsersStartingWithTag(String tag) async {
+    try {
+      _cap.log('getLangameUsersStartingWithTag $tag');
+      var u = await _authenticationApi.getLangameUsersStartingWithTag(
+          _user!.tag, tag);
+      return LangameResponse(LangameStatus.succeed, result: u);
+    } catch (e, s) {
+      _cap.log('failed to getLangameUsersStartingWithTag $tag');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
   }
 
   Future<LangameResponse<lg.User>> getLangameUser(String uid) async {
@@ -200,10 +204,10 @@ class AuthenticationProvider extends ChangeNotifier {
           .getLangameUser(uid)
           .firstWhere((e) => e.data() != null)
           .timeout(Duration(seconds: 20));
-      _cap.log('getLangameUser $uid');
+      _cap.log('getLangameUser');
       return LangameResponse<lg.User>(LangameStatus.succeed, result: r.data()!);
     } catch (e, s) {
-      _cap.log('failed to getLangameUser $uid');
+      _cap.log('failed to getLangameUser');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -218,11 +222,11 @@ class AuthenticationProvider extends ChangeNotifier {
               .firstWhere((e) => e.data() != null)
               .timeout(Duration(seconds: 20))));
 
-      _cap.log('getLangameUsers ${userIds.join(",")}');
+      _cap.log('getLangameUsers');
       return LangameResponse<List<lg.User>>(LangameStatus.succeed,
           result: r.map((e) => e.data()!).toList());
     } catch (e, s) {
-      _cap.log('failed to get users ${userIds.join(",")}');
+      _cap.log('failed to get users');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

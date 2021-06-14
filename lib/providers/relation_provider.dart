@@ -37,12 +37,12 @@ class RelationProvider extends ChangeNotifier {
       _userRecommendations = await _authenticationApi
           .getUserRecommendations(_authenticationProvider.user!);
       _crashAnalyticsProvider
-          .log('getUserRecommendations ${_authenticationProvider.user!.uid}');
+          .log('getUserRecommendations');
       notifyListeners();
       return LangameResponse<void>(LangameStatus.succeed);
     } catch (e, s) {
       _crashAnalyticsProvider.log(
-          'failed to getUserRecommendations ${_authenticationProvider.user?.uid}');
+          'failed to getUserRecommendations');
       _crashAnalyticsProvider.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -65,12 +65,12 @@ class RelationProvider extends ChangeNotifier {
       notifyListeners();
 
       _crashAnalyticsProvider
-          .log('getRecentInteractions ${_authenticationProvider.user!.uid}');
+          .log('getRecentInteractions');
       notifyListeners();
       return LangameResponse<void>(LangameStatus.succeed);
     } catch (e, s) {
       _crashAnalyticsProvider.log(
-          'failed to getRecentInteractions ${_authenticationProvider.user?.uid}');
+          'failed to getRecentInteractions');
       _crashAnalyticsProvider.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -81,13 +81,13 @@ class RelationProvider extends ChangeNotifier {
     try {
       var r = await _authenticationApi.getInteraction(
           _authenticationProvider.user!.uid, otherUid);
-      _crashAnalyticsProvider.log('getInteraction $otherUid');
+      _crashAnalyticsProvider.log('getInteraction');
       if (r == null)
         return LangameResponse(LangameStatus.failed, error: 'no interactions');
       return LangameResponse(LangameStatus.succeed,
           result: r.toInteractionLevel());
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to getInteraction $otherUid');
+      _crashAnalyticsProvider.log('failed to getInteraction');
       _crashAnalyticsProvider.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

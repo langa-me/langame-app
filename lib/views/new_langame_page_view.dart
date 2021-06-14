@@ -49,12 +49,11 @@ class _SendLangameState extends State<NewLangamePageView>
     var cp = Provider.of<ContextProvider>(context);
     return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       // TextDivider('Topic'),
-      LangameButton(
-          () => cp.push(TopicSearchView()),
-          nlp.selectedTopics.isEmpty
+      LangameButton(FontAwesomeIcons.graduationCap,
+          onPressed: () => cp.push(TopicSearchView()),
+          text: nlp.selectedTopics.isEmpty
               ? 'Select a topic'
               : nlp.selectedTopics.first.topic.content,
-          FontAwesomeIcons.graduationCap,
           padding: EdgeInsets.symmetric(
               vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20)),
       // TextDivider('Invite'),
@@ -66,10 +65,8 @@ class _SendLangameState extends State<NewLangamePageView>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: nlp.shoppingList.isEmpty
                 ? [
-                    LangameButton(
-                        () => widget._goToPage(1),
-                        'Add people',
-                        FontAwesomeIcons.userPlus,
+                    LangameButton(FontAwesomeIcons.userPlus, onPressed: () => widget._goToPage(1), text: 'Add people',
+                        
                         padding: EdgeInsets.symmetric(
                             vertical: 10,
                             horizontal: AppSize.safeBlockHorizontal * 20)),
@@ -113,10 +110,14 @@ class _SendLangameState extends State<NewLangamePageView>
         onSaved: (val) => val ?? nlp.setSelectedDate(DateTime.parse(val!)),
       ),
       // SizedBox(height: AppSize.safeBlockVertical * 6),
-      LangameButton(() => onPressedNewLangame(cp, nlp), 'New Langame',
-          FontAwesomeIcons.comments,
-          padding: EdgeInsets.symmetric(
-              vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20),),
+      LangameButton(
+        FontAwesomeIcons.comments,
+        onPressed: () => onPressedNewLangame(cp, nlp),
+        text: 'New Langame',
+        
+        padding: EdgeInsets.symmetric(
+            vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20),
+      ),
 
       SizedBox(height: AppSize.safeBlockVertical * 2),
     ]);
@@ -139,7 +140,9 @@ class _SendLangameState extends State<NewLangamePageView>
     cp.showLoadingDialog();
     var createLangame = await lp.createLangame(nlp.shoppingList,
         nlp.selectedTopics, nlp.selectedDate ?? DateTime.now());
-    if (createLangame.error != null || createLangame.result == null || createLangame.result!.data() == null) {
+    if (createLangame.error != null ||
+        createLangame.result == null ||
+        createLangame.result!.data() == null) {
       cp.dialogComplete();
       cp.showFailureDialog('${fp.getFailingRandom()}, please retry later');
       await Future.delayed(Duration(seconds: 2));
@@ -231,27 +234,26 @@ class _SendLangameState extends State<NewLangamePageView>
               // ),
               Divider(),
               Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                // Any case, when 2 player are in, start.
-                LangameButton(() {
-                  // USE CASE: didn't select anybody, any date
-                  // - a langame is created, anyone with the link can join anytime
-                  // USE CASE: selected X, date Y
-                  // - a langame is created, anyone with the link can join anytime,
-                  // X is notified of date Y
-                  cp.push(RunningLangamesView());
-                }, 'Join later', FontAwesomeIcons.bell),
-                LangameButton(() {
-                  // USE CASE: didn't select anybody, any date
-                  // - a langame is created, anyone with the link can join anytime
-                  // USE CASE: selected X, date Y
-                  // - a langame is created, anyone with the link can join anytime,
-                  // X is notified of date Y and of presence of self in lg
-                  cp.pushReplacement(
-                      LangameView(snap.channelName, false));
-                }, 'Join now', FontAwesomeIcons.hourglass),
-              ])
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    // Any case, when 2 player are in, start.
+                    LangameButton(FontAwesomeIcons.bell, onPressed: () {
+                      // USE CASE: didn't select anybody, any date
+                      // - a langame is created, anyone with the link can join anytime
+                      // USE CASE: selected X, date Y
+                      // - a langame is created, anyone with the link can join anytime,
+                      // X is notified of date Y
+                      cp.push(RunningLangamesView());
+                    }, text: 'Join later'),
+                    LangameButton(FontAwesomeIcons.hourglass, onPressed: () {
+                      // USE CASE: didn't select anybody, any date
+                      // - a langame is created, anyone with the link can join anytime
+                      // USE CASE: selected X, date Y
+                      // - a langame is created, anyone with the link can join anytime,
+                      // X is notified of date Y and of presence of self in lg
+                      cp.pushReplacement(LangameView(snap.channelName, false));
+                    }, text: 'Join now'),
+                  ])
             ],
           ),
         ),

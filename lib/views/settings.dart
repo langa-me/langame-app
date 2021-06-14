@@ -151,10 +151,12 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headline6,
                       ),
-                      LangameButton(() {
+                      LangameButton(
+                        Icons.delete_forever_outlined,
+                        onPressed: () {
                         cp.dialogComplete();
                         _delete();
-                      }, 'Delete my account', Icons.delete_forever_outlined)
+                      }, text: 'Delete my account')
                     ]),
                   )
                 ], canBack: true);

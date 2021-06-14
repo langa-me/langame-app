@@ -47,18 +47,14 @@ class _LoginState extends State<Login> {
         cp.showFailureDialog('You have no access to the internet!');
         await Future.delayed(Duration(seconds: 2));
         cp.dialogComplete();
-        cap.log('I am offline',
-            analyticsMessage: 'offline',
-            analyticsParameters: {
-              'view': 'langame_view',
-            });
+        cap.log('I am offline', analyticsMessage: 'offline');
         return;
       }
       setState(() => isAuthenticating = false);
 
       // Bunch of spaghetti code to check if it is a new user or already authenticated
       provider.userStream.first.then((user) async {
-        cap.log('login - userStream - ${user?.writeToJson()}');
+        cap.log('login - userStream');
         if (user == null || successDialogFuture != null) {
           return null;
         }
@@ -113,11 +109,7 @@ class _LoginState extends State<Login> {
     var network = Provider.of<ConnectivityResult>(context);
 
     if (network == ConnectivityResult.none) {
-      crash.log('I am offline',
-          analyticsMessage: 'offline',
-          analyticsParameters: {
-            'view': 'langame_view',
-          });
+      crash.log('I am offline', analyticsMessage: 'offline');
       setState(() => isAuthenticating = true);
 
       return cp.buildLoadingWidget(text: 'You are offline!');

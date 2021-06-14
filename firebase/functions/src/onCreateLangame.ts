@@ -3,10 +3,10 @@ import {QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
 import {kUsersCollection, hashFnv32a} from "./helpers";
 import * as admin from "firebase-admin";
-import {offlineMemeSearch} from "./questions";
+import {offlineMemeSearch} from "./memes";
 import * as functions from "firebase-functions";
 import {converter, db, handleError} from "./utils/firestore";
-import {langame} from "./langame/protobuf/langame.gen";
+import {langame} from "./langame/protobuf/langame";
 
 /**
  *
@@ -106,10 +106,15 @@ export const onCreateLangame = async (
         .info("found memes for topics", lg.data()!.topics, memes);
     const playersSnap = await snap.ref.collection("players")
         .withConverter(converter<langame.protobuf.Player>()).get();
+    const d = new Date();
+    d.setMinutes(d.getMinutes() +
+    // @ts-ignore
+    t.parameters.langame_delay_for_next.defaultValue.value*1);
     await snap.ref.set({
       memes: memes.map((e) => e.id),
       channelName: channelName,
       currentMeme: 0,
+      nextMeme: admin.firestore.Timestamp.fromDate(d),
     }, {merge: true});
 
     const toNotify = playersSnap

@@ -79,7 +79,7 @@ class PreferenceProvider extends ChangeNotifier {
 
     _stream = _api.streamPreference(_ap.user!);
     _streamSubscription = _stream!.listen((p) {
-      _cap.log('streamPreference ${p.writeToJson()}');
+      _cap.log('streamPreference');
       _preference = p;
       notifyListeners();
     });
@@ -94,7 +94,7 @@ class PreferenceProvider extends ChangeNotifier {
         'unknownPeopleRecommendations': preference.unknownPeopleRecommendations,
         'themeIndex': preference.themeIndex,
       });
-      _cap.log('save ${_preference.writeToJson()}');
+      _cap.log('save preference');
     } catch (e, s) {
       _cap.log('failed to save');
       firebase.crashlytics?.recordError(e, s);

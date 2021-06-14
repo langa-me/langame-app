@@ -11,6 +11,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quiver/async.dart';
@@ -23,8 +24,9 @@ class AudioProvider extends ChangeNotifier {
   RtcEngine? _engine;
   FirebaseApi firebase;
   CrashAnalyticsProvider _cap;
+  RemoteConfigProvider _rcp;
 
-  AudioProvider(this.firebase, this._cap);
+  AudioProvider(this.firebase, this._cap, this._rcp);
 
   bool _isMicrophoneEnabled = false;
 
@@ -36,48 +38,8 @@ class AudioProvider extends ChangeNotifier {
   bool _isJoining = false;
   String? _langameSnapId;
 
-  // ignore: close_sinks
-  StreamController<Duration> _remaining = StreamController.broadcast();
-
-  Stream<Duration> get remaining => _remaining.stream.asBroadcastStream();
-  StreamSubscription<CountdownTimer>? _sub;
-
-  bool get timerStarted => _sub != null;
-
-  LangameResponse<void> startTimer() {
-    try {
-      // Ignore
-      if (_sub != null) return LangameResponse(LangameStatus.succeed);
-      CountdownTimer countDownTimer = CountdownTimer(
-        Duration(minutes: 60),
-        Duration(seconds: 1),
-      );
-
-      _sub = countDownTimer.listen(null);
-      _sub?.onData((duration) {
-        _remaining.add(duration.remaining);
-      });
-
-      _sub?.onDone(_sub?.cancel);
-    } catch (e, s) {
-      _cap.log('failed to start timer');
-      _cap.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-    return LangameResponse(LangameStatus.succeed);
-  }
-
-  Future<LangameResponse<void>> stopTimer() async {
-    try {
-      await _sub?.cancel();
-      _sub = null;
-      return LangameResponse(LangameStatus.succeed);
-    } catch (e, s) {
-      _cap.log('failed to stop timer');
-      _cap.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
+  int _currentMeme = 0;
+  int get currentMeme => _currentMeme;
 
   Future<LangameResponse<bool>> checkPermission() async {
     try {
@@ -151,6 +113,7 @@ class AudioProvider extends ChangeNotifier {
         _cap.log('joinChannel already joining channel or has joined');
         return LangameResponse(LangameStatus.succeed);
       }
+
       var self = await firebase.firestore!
           .doc(
               'langames/${langame.id}/players/${firebase.auth!.currentUser!.uid}')
@@ -172,32 +135,31 @@ class AudioProvider extends ChangeNotifier {
 
       final r = RetryOptions(maxAttempts: 8);
 
-      var lr = await runZonedGuarded<Future<LangameResponse<void>>>(
-          () async {
-             var response = await r.retry<LangameResponse<void>>(
-                () => _engine!
-                    .joinChannel(self.data()!.audioToken,
-                        langame.data()!.channelName, null, self.data()!.audioId)
-                    .timeout(Duration(seconds: 20))
-                    .then((_) => LangameResponse(LangameStatus.succeed))
-                    .catchError((_) => LangameResponse(LangameStatus.failed)),
-                retryIf: (e) => e is PlatformException || e is TimeoutException,
-                onRetry: (e) {
-                   _cap.log(
-                    'failed to join channel with token ${self.data()!.audioToken}, retrying $e',
-                    analyticsMessage: 'audio_failed_join',
-                    analyticsParameters: {
-                      'error': e,
-                      'token': self.data()!.audioToken,
-                    });
-                }
-              );
-              return response;
-              }, (e, s) {
+      var lr = await runZonedGuarded<Future<LangameResponse<void>>>(() async {
+        var response = await r.retry<LangameResponse<void>>(
+            () => _engine!
+                .joinChannel(self.data()!.audioToken,
+                    langame.data()!.channelName, null, self.data()!.audioId)
+                .timeout(Duration(seconds: 20))
+                .then((_) => LangameResponse(LangameStatus.succeed))
+                .catchError((_) => LangameResponse(LangameStatus.failed)),
+            retryIf: (e) => e is PlatformException || e is TimeoutException,
+            onRetry: (e) {
+              _cap.log(
+                  'failed to join channel with token ${self.data()!.audioToken}, retrying $e',
+                  analyticsMessage: 'audio_failed_join',
+                  analyticsParameters: {
+                    'error': e,
+                    'token': self.data()!.audioToken,
+                  });
+            });
+        return response;
+      }, (e, s) {
         _cap.log('failed to join channel ${langame.data()!.channelName}');
         _cap.recordError(e, s);
       })!;
-      if (lr.status == LangameStatus.failed) LangameResponse(LangameStatus.failed);
+      if (lr.status == LangameStatus.failed)
+        LangameResponse(LangameStatus.failed);
     } catch (e, s) {
       _cap.log('failed to join channel ${langame.data()!.channelName}');
       _cap.recordError(e, s);
@@ -216,7 +178,6 @@ class AudioProvider extends ChangeNotifier {
         await _engine?.leaveChannel();
         await _engine?.destroy();
       }, (_, __) {});
-      stopTimer();
       if (_langameSnapId != null) {
         firebase.firestore!
             .collection('langames')
@@ -295,6 +256,30 @@ class AudioProvider extends ChangeNotifier {
       return LangameResponse(LangameStatus.succeed, result: user.data()!);
     } catch (e, s) {
       _cap.log('failed to getLangameUserFromAudioId');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
+
+  Future<LangameResponse<void>> incrementCurrentMeme(
+      Langame l, int value) async {
+    try {
+      if ((_currentMeme + value) < 0 || (_currentMeme + value) >= (l.memes.length - 1))
+      return LangameResponse(LangameStatus.succeed);
+      var ref = firebase.firestore!
+          .collection(AppConst.firestoreLangamesCollection)
+          .doc(_langameSnapId);
+      await ref.update({
+        'currentMeme': FieldValue.increment(value),
+      });
+      _cap.log('incrementCurrentMeme $_currentMeme + $value');
+
+      _currentMeme = _currentMeme + value;
+      notifyListeners();
+
+      return LangameResponse(LangameStatus.succeed);
+    } catch (e, s) {
+      _cap.log('failed to switchSpeakerphone');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

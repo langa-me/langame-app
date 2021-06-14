@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
-import 'package:langame/providers/remote_config_providert.dart';
+import 'package:langame/providers/remote_config_provider.dart';
 import 'package:pubnub/pubnub.dart';
 import 'package:touchable/touchable.dart';
 import 'package:uuid/uuid.dart';
@@ -223,8 +223,8 @@ class PaintingProvider extends ChangeNotifier {
         return LangameResponse(LangameStatus.failed, error: kNotAuthenticated);
       _pubNub = PubNub(
         defaultKeyset: Keyset(
-          subscribeKey: _rcp.pubNubSubscribeKey,
-          publishKey: _rcp.pubNubPublishKey,
+          subscribeKey: _rcp.remoteConfig.getString('pub_nub_subscribe_key'),
+          publishKey: _rcp.remoteConfig.getString('pub_nub_publish_key'),
           uuid: UUID(u.uid),
         ),
       );

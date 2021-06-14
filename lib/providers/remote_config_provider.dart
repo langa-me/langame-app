@@ -5,7 +5,7 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 class RemoteConfigProvider extends ChangeNotifier {
   RemoteConfigProvider(this._cap, this._remoteConfig) {
     // TODO: should fetch once network online
-    _remoteConfig.fetchAndActivate().then((updated) {
+    remoteConfig.fetchAndActivate().then((updated) {
       if (updated) {
         // the config has been updated, new parameter values are available.
         // notifyListeners();
@@ -17,8 +17,5 @@ class RemoteConfigProvider extends ChangeNotifier {
   // ignore: unused_field
   final CrashAnalyticsProvider _cap;
   final RemoteConfig _remoteConfig;
-
-  String get pubNubSubscribeKey =>
-      _remoteConfig.getString('pub_nub_subscribe_key');
-  String get pubNubPublishKey => _remoteConfig.getString('pub_nub_publish_key');
+  RemoteConfig get remoteConfig => _remoteConfig;
 }

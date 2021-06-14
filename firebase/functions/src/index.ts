@@ -2,7 +2,6 @@ import * as admin from "firebase-admin";
 // Initialize admin firebase
 admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
-
 import * as functions from "firebase-functions";
 import {newFeedback} from "./feedback";
 import {interactionsDecrement, setLangamesDone} from "./scheduledFunctions";
@@ -16,6 +15,7 @@ import {kLangamesCollection, kStripeCustomersCollection} from "./helpers";
 import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
+
 
 /*
  admin.auth() // TODO: should kick everyone
@@ -98,6 +98,10 @@ exports.confirmStripePayment = functions.firestore
 exports.onCreateLangame = functions.firestore
     .document(`${kLangamesCollection}/{pushId}`)
     .onCreate(onCreateLangame);
+
+// exports.onUpdateLangame = functions.firestore
+//     .document(`${kLangamesCollection}/{langameId}`)
+//     .onUpdate(onUpdateLangame);
 
 exports.onUpdateLangamePlayers = functions.firestore
     .document(`${kLangamesCollection}/{langameId}/players/{playerId}`)

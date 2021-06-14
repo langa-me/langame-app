@@ -19,6 +19,9 @@ List<Function(Color)> _loaders = [
   (Color c) => SpinKitPouringHourglass(color: c),
   (Color c) => SpinKitFoldingCube(color: c),
   (Color c) => SpinKitDoubleBounce(color: c),
+  (Color c) => SpinKitCubeGrid(color: c),
+  (Color c) => SpinKitFoldingCube(color: c),
+  (Color c) => SpinKitPumpingHeart(color: c),
 ];
 
 class ContextProvider extends ChangeNotifier {

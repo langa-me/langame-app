@@ -1,4 +1,4 @@
-import {offlineQuestionSearch} from "../src/questions";
+import {offlineMemeSearch} from "../src/memes";
 import {newFeedback} from "../src/feedback";
 import {CompletionType, onlineOpenAiCompletion} from "../src/openai";
 import * as admin from "firebase-admin";
@@ -12,18 +12,18 @@ before(() => {
 
 it.skip("check that we can find some questions", async () => {
   // Generated ones
-  let questions = await offlineQuestionSearch(["biology"], 5, -1, true);
+  let questions = await offlineMemeSearch(["biology"], 5);
   console.log(JSON.stringify(questions));
-  questions = await offlineQuestionSearch(["health"], 5, -1, true);
+  questions = await offlineMemeSearch(["health"], 5);
   console.log(JSON.stringify(questions));
-  questions = await offlineQuestionSearch(["philosophy"], 5, -1, true);
+  questions = await offlineMemeSearch(["philosophy"], 5);
   console.log(JSON.stringify(questions));
   after(() => setTimeout(()=>{}, 1000));
 });
 
 it.skip("check", async () => {
   // Generated ones
-  const questions = await offlineQuestionSearch(["death"], 1, -1, true);
+  const questions = await offlineMemeSearch(["death"], 1);
   console.log(JSON.stringify(questions));
   after(() => setTimeout(()=>{}, 1000));
 });

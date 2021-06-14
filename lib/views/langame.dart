@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
@@ -19,6 +20,7 @@ import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/paint_provider.dart';
+import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
@@ -215,72 +217,30 @@ class _LangameViewState extends State<LangameView> {
         .then((e) {
       if (e.error != null) _handleError(failNow: true);
     });
+
     return Scaffold(
+      backgroundColor: variantIsLightThenDark(context, reverse: true),
       resizeToAvoidBottomInset: false,
       body: _buildHome(l.data()!),
-
-      // body: Row(
-      //   children: [
-      //     NavigationRail(
-      //       selectedIndex: _selectedIndex,
-      //       onDestinationSelected: (int index) {
-      //         setState(() => _selectedIndex = index);
-      //         controller.animateToPage(
-      //           _selectedIndex,
-      //           duration: Duration(seconds: 1),
-      //           curve: Curves.easeIn,
-      //         );
-      //       },
-      //       labelType: NavigationRailLabelType.selected,
-      //       destinations: const [
-      //         NavigationRailDestination(
-      //           icon: Icon(Icons.home_outlined),
-      //           selectedIcon: Icon(Icons.home_outlined),
-      //           label: Text('Home'),
-      //         ),
-      //         // NavigationRailDestination(
-      //         //   icon: Icon(Icons.format_paint_outlined),
-      //         //   selectedIcon: Icon(Icons.format_paint_outlined),
-      //         //   label: Text('Paint'),
-      //         // ),
-      //       ],
-      //     ),
-      //     const VerticalDivider(thickness: 1, width: 1),
-      //     Expanded(
-      //       child: PageView(
-      //         scrollDirection: Axis.vertical,
-      //         controller: controller,
-      //         // Prevent swiping on draw view
-      //         physics:
-      //             _selectedIndex == 1 ? NeverScrollableScrollPhysics() : null,
-      //         onPageChanged: (v) {
-      //           setState(() => _selectedIndex = v);
-      //         },
-      //         children: [
-      //           _buildHome(l.data()!),
-      //           // MultiplayerPainting(),
-      //         ],
-      //       ),
-      //     ),
-      //   ],
-      // ),
     );
   }
 
-  Widget _buildHome(lg.Langame l) => Stack(children: [
-        Positioned(
-            top: AppSize.safeBlockVertical * 1,
-            right: AppSize.safeBlockHorizontal * 1,
+  Widget _buildHome(lg.Langame l) => Column(children: [
+        Align(
+            alignment: Alignment.topRight,
             child: IconButton(
-                onPressed: _onBackPressed, icon: Icon(FontAwesomeIcons.times))),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+                onPressed: _onBackPressed,
+                icon: Icon(FontAwesomeIcons.times,
+                    color: isLightThenDark(context)))),
+        Expanded(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            _buildTimerText(),
+            _buildTimerText(l),
             _buildMeme(l),
             _buildBottomHalf(),
           ],
-        )
+        ))
       ]);
 
   Future<bool> _onBackPressed() {
@@ -296,8 +256,10 @@ class _LangameViewState extends State<LangameView> {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headline4,
               ),
-              LangameButton(cp.dialogComplete, 'Cancel', Icons.cancel_outlined),
-              LangameButton(_onEnd, 'Yes', Icons.exit_to_app_rounded),
+              LangameButton(Icons.cancel_outlined,
+                  onPressed: cp.dialogComplete, text: 'Cancel'),
+              LangameButton(Icons.exit_to_app_rounded,
+                  onPressed: _onEnd, text: 'Yes'),
             ])),
       ],
       canBack: true,
@@ -320,11 +282,11 @@ class _LangameViewState extends State<LangameView> {
             Text('We need your permission to use your microphone',
                 style: Theme.of(context).textTheme.headline6),
             Lottie.asset('animations/microphone.json'),
-            LangameButton(() {
+            LangameButton(FontAwesomeIcons.doorOpen, onPressed: () {
               cp.dialogComplete();
               _goBackToMainMenu();
-            }, 'Leave', FontAwesomeIcons.doorOpen),
-            LangameButton(() async {
+            }, text: 'Leave'),
+            LangameButton(FontAwesomeIcons.checkCircle, onPressed: () async {
               var p = Provider.of<AudioProvider>(context, listen: false);
               var res = await p.requestPermission();
 
@@ -348,7 +310,7 @@ class _LangameViewState extends State<LangameView> {
                 },
                 onFailure: _goBackToMainMenu,
               );
-            }, 'Accept', FontAwesomeIcons.checkCircle),
+            }, text: 'Accept'),
           ]))
     ]);
   }
@@ -396,8 +358,8 @@ class _LangameViewState extends State<LangameView> {
             // hack because seems to use uid 0
             _localPlayers[audioId == 0 ? _selfUid : audioId]?.isSpeaking = true;
           });
-          Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
-              '${_localPlayers[audioId]?.langameUser.displayName} speaking: ${_localPlayers[audioId]?.isSpeaking}');
+          Provider.of<CrashAnalyticsProvider>(context, listen: false)
+              .log('$audioId speaking: ${_localPlayers[audioId]?.isSpeaking}');
         },
         microphoneEnabled: (bool a) {
           Provider.of<CrashAnalyticsProvider>(context, listen: false)
@@ -422,11 +384,7 @@ class _LangameViewState extends State<LangameView> {
           setState(() {
             _localPlayers[audioId] = LocalPlayer(joiner.result!, false);
           });
-          cap.log('userJoined $audioId',
-              analyticsMessage: 'langame_user_join',
-              analyticsParameters: {
-                'uid': _localPlayers[audioId]?.langameUser.uid
-              });
+          cap.log('userJoined $audioId', analyticsMessage: 'langame_user_join');
         },
         userOffline: (int uid, UserOfflineReason reason) {
           if (!_localPlayers.containsKey(uid)) return; // TODO
@@ -434,7 +392,6 @@ class _LangameViewState extends State<LangameView> {
               'userOffline $uid $reason',
               analyticsMessage: 'langame_user_leave',
               analyticsParameters: {
-                'uid': _localPlayers[uid]!.langameUser.uid,
                 'reason': reason.index,
               });
           final String? tag = _localPlayers[uid]!.langameUser.tag;
@@ -455,7 +412,6 @@ class _LangameViewState extends State<LangameView> {
           Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
             'joinChannelSuccess $channelName $uid $elapsed',
             analyticsMessage: 'langame_user_join_self',
-            analyticsParameters: {'uid': _localPlayers[uid]?.langameUser.uid},
           );
         },
         leaveChannel: (stats) {
@@ -471,7 +427,6 @@ class _LangameViewState extends State<LangameView> {
     try {
       Provider.of<CrashAnalyticsProvider>(context, listen: false)
           .log('langame end', analyticsMessage: 'langame_end');
-      Provider.of<AudioProvider>(context, listen: false).stopTimer();
       await Future.wait([
         // mp.sendLangameEnd(langame!.channelName),
         Provider.of<AudioProvider>(context, listen: false).leaveChannel(),
@@ -488,12 +443,12 @@ class _LangameViewState extends State<LangameView> {
 
   Widget _buildWaitingScreen(lg.Langame l) {
     return Scaffold(
+      backgroundColor: variantIsLightThenDark(context, reverse: true),
       resizeToAvoidBottomInset: false,
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        SpinKitPouringHourglass(
-          color: Theme.of(context).colorScheme.primary,
-          size: AppSize.blockSizeHorizontal * 15,
-        ),
+        Provider.of<ContextProvider>(context, listen: false).buildLoadingWidget(
+            text: '',
+            backgroundColor: variantIsLightThenDark(context, reverse: true)),
         SizedBox(height: AppSize.blockSizeVertical * 5),
         Container(
           padding: EdgeInsets.all(12),
@@ -502,7 +457,7 @@ class _LangameViewState extends State<LangameView> {
           decoration: BoxDecoration(
             color: variantIsLightThenDark(context, reverse: true),
             border: Border.all(
-              color: Theme.of(context).colorScheme.primaryVariant,
+              color: variantIsLightThenDark(context),
               width: 5,
             ),
             borderRadius: const BorderRadius.all(
@@ -513,7 +468,7 @@ class _LangameViewState extends State<LangameView> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Text(
-                  _buildWaitingText(),
+                  _buildWaitingText(l),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headline6,
                 ),
@@ -521,8 +476,7 @@ class _LangameViewState extends State<LangameView> {
                   controller: notesController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText:
-                          'You can compare with your actual experience later'),
+                      hintText: 'What do you think?'),
                 ),
               ]),
         ),
@@ -530,63 +484,26 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  String _buildWaitingText() {
+  String _buildWaitingText(lg.Langame l) {
     var texts = [];
     texts.add('How do you think they will react to this topic?');
+    texts.add('What are your expectations?');
+    texts.add('Do you have any goal in mind to achieve during this call?');
+    texts.add('What do you think they can reveal you?');
+    texts.add('Do you know them that much?');
 
     return texts.pickAny();
   }
 
-  Widget _buildTimerText() {
-    var theme = Theme.of(context);
-
-    Widget _loadIfNotStarted(AudioProvider p) {
-      p.startTimer(); // TODO: no error handling ^^
-      // hack to force rebuild (notifyListeners() in provider cause
-      // setState() or markNeedsBuild() called during build)
-      _postFrameCallback((_) => setState(() {}));
-      return Provider.of<ContextProvider>(context, listen: false)
-          .buildLoadingWidget(text: _loadingMessage);
-    }
-
-    return Consumer<AudioProvider>(
-      builder: (context, p, child) => !p.timerStarted
-          ? _loadIfNotStarted(p)
-          : StreamBuilder<Duration>(
-              stream: p.remaining,
-              builder: (c, s) {
-                if (s.hasData && s.data != null && s.data!.inSeconds == 1) {
-                  _onEnd();
-                }
-                return Center(
-                  child: Container(
-                    margin: EdgeInsets.only(
-                        top: AppSize.safeBlockVertical * 5,
-                        bottom: AppSize.blockSizeVertical * 5),
-                    height: AppSize.blockSizeVertical * 8,
-                    width: AppSize.blockSizeHorizontal * 30,
-                    color: Colors.transparent,
-                    child: Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: const BorderRadius.all(
-                              const Radius.circular(10.0))),
-                      child: new Center(
-                        child: new Text(
-                          !s.hasData
-                              ? ''
-                              : '${s.data!.inMinutes}:${s.data!.inSeconds.remainder(60).toString().length == 2 ? '' : '0'}${s.data!.inSeconds.remainder(60)}',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headline6!.merge(
-                              TextStyle(color: isLightThenDark(context))),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-    );
+  Widget _buildTimerText(lg.Langame l) {
+    return Consumer<AudioProvider>(builder: (ctx, s, c) =>  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      LangameButton(FontAwesomeIcons.arrowAltCircleLeft, onPressed: () {
+        s.incrementCurrentMeme(l, -1);
+      }, text: 'Previous'/*, disabled: s.currentMeme == 0*/),
+      LangameButton(FontAwesomeIcons.arrowAltCircleRight, onPressed: () {
+        s.incrementCurrentMeme(l, 1);
+      }, text: 'Next'/*, disabled: s.currentMeme >= l.memes.length - 1*/)
+    ]));
   }
 
   Widget _buildMeme(lg.Langame l) {
@@ -664,7 +581,7 @@ class _LangameViewState extends State<LangameView> {
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary,
+              color: variantBisIsLightThenDark(context),
               width: 5,
             ),
             color: isLightThenDark(context, reverse: true),
@@ -680,13 +597,12 @@ class _LangameViewState extends State<LangameView> {
     return Expanded(
       child: Column(
         children: [
-          Divider(),
           Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(40.0)),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary,
+                color: variantBisIsLightThenDark(context),
                 width: 5,
               ),
               color: isLightThenDark(context, reverse: true),
@@ -707,7 +623,7 @@ class _LangameViewState extends State<LangameView> {
                                 width: 1,
                                 color: p.isSpeaking
                                     ? Colors.red
-                                    : Theme.of(context).colorScheme.primary,
+                                    : variantIsLightThenDark(context),
                                 style: BorderStyle.solid,
                               ),
                             ),
@@ -759,7 +675,7 @@ class _LangameViewState extends State<LangameView> {
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary,
+                color: variantIsLightThenDark(context),
                 width: 5,
               ),
               color: isLightThenDark(context, reverse: true),
@@ -847,7 +763,7 @@ class _LangameViewState extends State<LangameView> {
                 onPressed: (int i) => s.feedbackMemeGeneralScore = i,
                 isSelected: s.feedbackMemeGeneralScoreSelected,
               ),
-              LangameButton(() {
+              LangameButton(FontAwesomeIcons.doorOpen, onPressed: () {
                 var currentLg =
                     Provider.of<LangameProvider>(context, listen: false)
                         .runningLangames
@@ -855,10 +771,10 @@ class _LangameViewState extends State<LangameView> {
                         .firstWhere((e) => e.channelName == widget.channelName);
                 // TODO: handle multiple memes
                 // We don't wait, should not block user
-                s.sendMemeFeedback(currentLg.memes[0]);
+                s.sendMemeFeedback(currentLg.memes[currentLg.currentMeme]);
                 cp.showSnackBar('Thank you a lot 🥰');
                 _goBackToMainMenu();
-              }, 'Leave', FontAwesomeIcons.doorOpen),
+              }, text: 'Leave'),
             ]),
           ),
         ),

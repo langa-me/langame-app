@@ -12,18 +12,18 @@ import 'authentication_provider.dart';
 
 class MessageProvider extends ChangeNotifier {
   FirebaseApi firebase;
-  CrashAnalyticsProvider _crashAnalyticsProvider;
+  CrashAnalyticsProvider _cap;
   // ignore: unused_field
-  AuthenticationProvider _authenticationProvider;
-  AuthenticationApi _authenticationApi;
+  AuthenticationProvider _ap;
+  AuthenticationApi _authApi;
 
   /// Messages, notifications ///
 
   MessageApi _messageApi;
 
   /// Create an authentication provider, and
-  MessageProvider(this.firebase, this._messageApi, this._authenticationApi,
-      this._crashAnalyticsProvider, this._authenticationProvider);
+  MessageProvider(this.firebase, this._messageApi, this._authApi,
+      this._cap, this._ap);
 
   Future<LangameResponse<void>> initializeMessageApi() async {
     try {
@@ -34,8 +34,8 @@ class MessageProvider extends ChangeNotifier {
       // i.e. no internet
       // TODO  Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to initializeMessageApi');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to initializeMessageApi');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
@@ -49,11 +49,11 @@ class MessageProvider extends ChangeNotifier {
   Future<LangameResponse<dynamic>> getInitialMessage() async {
     try {
       var r = await _messageApi.getInitialMessage();
-      _crashAnalyticsProvider.log('getInitialMessage');
+      _cap.log('getInitialMessage');
       return LangameResponse(LangameStatus.succeed, result: r);
     } catch (e, s) {
-      _crashAnalyticsProvider.log('failed to getInitialMessage');
-      _crashAnalyticsProvider.recordError(e, s);
+      _cap.log('failed to getInitialMessage');
+      _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }

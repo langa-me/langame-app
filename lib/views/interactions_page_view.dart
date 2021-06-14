@@ -141,9 +141,10 @@ class _State extends State<InteractionsPageView>
                                   style: Theme.of(context).textTheme.headline4),
                               SizedBox(height: AppSize.safeBlockVertical * 5),
                     LangameButton(
-                        () => widget._goToPage(0, curve: Curves.bounceIn),
-                        'Why not start\na new Langame with friends?',
-                        FontAwesomeIcons.plus,
+                      FontAwesomeIcons.plus,
+                        onPressed: () => widget._goToPage(0, curve: Curves.bounceIn),
+                        text: 'Why not start\na new Langame with friends?',
+                        
                         padding: EdgeInsets.symmetric(
                             vertical: 10,
                             horizontal: 5)),

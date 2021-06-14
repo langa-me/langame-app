@@ -61,7 +61,7 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Ask some feedbacks from time to time to improve user experience"
+      changelog: "- Can now navigate starters during Langame"
     )
 
     delete_temp_keychain(keychain_name)

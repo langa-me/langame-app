@@ -1363,8 +1363,8 @@ export namespace langame {
             /** Langame started */
             started?: (google.protobuf.ITimestamp|null);
 
-            /** Langame currentAudioId */
-            currentAudioId?: (number|null);
+            /** Langame nextMeme */
+            nextMeme?: (google.protobuf.ITimestamp|null);
         }
 
         /** Represents a Langame. */
@@ -1406,8 +1406,8 @@ export namespace langame {
             /** Langame started. */
             public started?: (google.protobuf.ITimestamp|null);
 
-            /** Langame currentAudioId. */
-            public currentAudioId: number;
+            /** Langame nextMeme. */
+            public nextMeme?: (google.protobuf.ITimestamp|null);
 
             /**
              * Creates a new Langame instance using the specified properties.

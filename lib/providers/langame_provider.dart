@@ -47,7 +47,6 @@ class LangameProvider extends ChangeNotifier {
       streams.forEach((stream) {
         _subs.add(stream.listen((snap) {
           if (snap.data() == null) return;
-          _cap.log('langame stream ${snap.id}');
           if (snap.data()!.hasDone()) {
             _finishedLangames[snap.id] = snap.data()!;
           } else {
@@ -70,10 +69,6 @@ class LangameProvider extends ChangeNotifier {
       List<lg.User> players, List<lg.Tag> topics, DateTime date,
       {bool instant = false}) async {
     try {
-      final String msg =
-          'create Langame about ${topics.map((e) => e.topic.content).join(',')} with ${players.map((e) => e.uid).join(',')} on ${date.toIso8601String()}';
-      _cap.log(msg);
-
       // TODO: we'd likely send the whole  topic in the future (with classifications)
       var stream = await _langameApi.createLangame(
         players.map((e) => e.uid).toList(),

@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {kInteractionsCollection, kLangamesCollection} from "./helpers";
 import {converter} from "./utils/firestore";
-import {langame} from "./langame/protobuf/langame.gen";
+import {langame} from "./langame/protobuf/langame";
 import {reportError} from "./errors";
 
 export const interactionsDecrement =
@@ -38,7 +38,7 @@ export const setLangamesDone =
         db.runTransaction(async (t) => {
           const langamesThatStartedMoreThanOneHourAgo = await t.get(db
               .collection(kLangamesCollection)
-              .where("done", "!=", null)
+              .where("done", "!=", "something")
               .where("started",
                   "<",
                   admin.firestore.Timestamp.fromDate(anHourAgo))

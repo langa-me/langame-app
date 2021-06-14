@@ -1,7 +1,7 @@
 import {Change, EventContext} from "firebase-functions";
 import {QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
-import {langame} from "./langame/protobuf/langame.gen";
+import {langame} from "./langame/protobuf/langame";
 import {converter, handleError} from "./utils/firestore";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";

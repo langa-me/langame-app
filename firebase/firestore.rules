@@ -28,6 +28,13 @@ service cloud.firestore {
             allow read: if request.auth != null;
             // TODO: security!!!!
             allow create: if request.auth != null;
+            // Client can only update "currentMeme"
+            allow update: if (request.resource.data.diff(resource.data)
+                .affectedKeys()
+                .hasOnly(['currentMeme'])) &&
+                request.resource.data.currentMeme >= 0 &&
+                request.resource.data.currentMeme < resource.data.memes.size();
+                // request.time > resource.data.nextMeme &&
             match /players/{uid} {
                 // TODO: temporarily allow everything, should only be able to read, create self, and update notes
                 allow read: if request.auth != null;

@@ -133,6 +133,7 @@ class ImplLangameApi extends LangameApi {
     var dateAsProtobuf = gg.Timestamp.fromDateTime(
       date,
     );
+
     var a = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)
         .withConverter<lg.Langame>(

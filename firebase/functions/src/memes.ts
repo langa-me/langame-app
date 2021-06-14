@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {kTagsCollection} from "./helpers";
 import {converter} from "./utils/firestore";
-import {langame} from "./langame/protobuf/langame.gen";
+import {langame} from "./langame/protobuf/langame";
 import {shuffle} from "./utils/array";
 
 export const openAiKey = functions.config().openai.key;
@@ -29,9 +29,9 @@ export const offlineMemeSearch =
         .get();
 
 
-    const r = await Promise.all(tagDocs.docs.map((e) => e.ref.parent
+    const r = shuffle(await Promise.all(tagDocs.docs.map((e) => e.ref.parent
         .parent!.withConverter(converter<langame.protobuf.Meme>())
-        .get()));
-    return shuffle(r);
+        .get())));
+    return r;
   };
 

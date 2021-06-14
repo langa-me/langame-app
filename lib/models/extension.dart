@@ -114,6 +114,7 @@ class LangameExt {
       date: dynamicToProtobufTimestamp(m['date']),
       started: dynamicToProtobufTimestamp(m['started']),
       errors: (m['errors'] as List<dynamic>?)?.map((e) => e as String),
+      nextMeme: dynamicToProtobufTimestamp(m['nextMeme']),
     );
   }
 }

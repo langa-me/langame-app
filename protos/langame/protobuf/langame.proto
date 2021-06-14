@@ -158,7 +158,8 @@ message Langame {
   google.protobuf.Timestamp date = 9;
   repeated string errors = 10;
   google.protobuf.Timestamp started = 11;
-  int32 current_audio_id = 12;
+  // When the players can go next meme
+  google.protobuf.Timestamp next_meme = 13;
 }
 
 message Player {

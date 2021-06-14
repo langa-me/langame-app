@@ -33,7 +33,7 @@ import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/paint_provider.dart';
 import 'package:langame/providers/payment_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
-import 'package:langame/providers/remote_config_providert.dart';
+import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
@@ -159,9 +159,9 @@ void main() async {
               },
               create: (_) => preferenceProvider,
             ),
-            ChangeNotifierProxyProvider<CrashAnalyticsProvider, AudioProvider>(
-              update: (_, cap, ap) => ap!,
-              create: (_) => AudioProvider(firebase, crashAnalyticsProvider),
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider, RemoteConfigProvider, AudioProvider>(
+              update: (_, cap, rcp, ap) => ap!,
+              create: (_) => AudioProvider(firebase, crashAnalyticsProvider, remoteConfigProvider),
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, MessageProvider>(

@@ -110,7 +110,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: LangameButton(() {
+            child: LangameButton(FontAwesomeIcons.tag, onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_formKey.currentState!.validate()) {
                 // If the form is valid, display a snackbar. In the real world,
@@ -118,7 +118,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                 // ScaffoldMessenger.of(context)
                 //     .showSnackBar(SnackBar(content: Text('Processing Data')));
               }
-            }, 'Choose this tag', FontAwesomeIcons.tag),
+            }, text: 'Choose this tag'),
           ),
         ],
       ),
@@ -225,12 +225,13 @@ class _OnBoardingState extends State with AfterLayoutMixin {
               alignment: Alignment.center,
             ),
             LangameButton(
-                () => Share.share(
+              FontAwesomeIcons.shareAlt,
+                onPressed: () => Share.share(
                     'I\'m using Langame to have more interesting conversations, you should try:\n${AppConst.mainUrl}',
                     subject:
                         'Join me on Langame app for incredible conversations!'),
-                'Invite your friends',
-                FontAwesomeIcons.shareAlt)
+                text: 'Invite your friends',
+                )
           ]),
         ),
         PageViewModel(

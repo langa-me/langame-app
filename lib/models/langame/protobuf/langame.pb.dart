@@ -1114,7 +1114,7 @@ class Langame extends $pb.GeneratedMessage {
     ..aOM<$0.Timestamp>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'date', subBuilder: $0.Timestamp.create)
     ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors')
     ..aOM<$0.Timestamp>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'started', subBuilder: $0.Timestamp.create)
-    ..a<$core.int>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentAudioId', $pb.PbFieldType.O3)
+    ..aOM<$0.Timestamp>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'nextMeme', subBuilder: $0.Timestamp.create)
     ..hasRequiredFields = false
   ;
 
@@ -1130,7 +1130,7 @@ class Langame extends $pb.GeneratedMessage {
     $0.Timestamp? date,
     $core.Iterable<$core.String>? errors,
     $0.Timestamp? started,
-    $core.int? currentAudioId,
+    $0.Timestamp? nextMeme,
   }) {
     final _result = create();
     if (channelName != null) {
@@ -1163,8 +1163,8 @@ class Langame extends $pb.GeneratedMessage {
     if (started != null) {
       _result.started = started;
     }
-    if (currentAudioId != null) {
-      _result.currentAudioId = currentAudioId;
+    if (nextMeme != null) {
+      _result.nextMeme = nextMeme;
     }
     return _result;
   }
@@ -1261,14 +1261,16 @@ class Langame extends $pb.GeneratedMessage {
   @$pb.TagNumber(11)
   $0.Timestamp ensureStarted() => $_ensure(9);
 
-  @$pb.TagNumber(12)
-  $core.int get currentAudioId => $_getIZ(10);
-  @$pb.TagNumber(12)
-  set currentAudioId($core.int v) { $_setSignedInt32(10, v); }
-  @$pb.TagNumber(12)
-  $core.bool hasCurrentAudioId() => $_has(10);
-  @$pb.TagNumber(12)
-  void clearCurrentAudioId() => clearField(12);
+  @$pb.TagNumber(13)
+  $0.Timestamp get nextMeme => $_getN(10);
+  @$pb.TagNumber(13)
+  set nextMeme($0.Timestamp v) { setField(13, v); }
+  @$pb.TagNumber(13)
+  $core.bool hasNextMeme() => $_has(10);
+  @$pb.TagNumber(13)
+  void clearNextMeme() => clearField(13);
+  @$pb.TagNumber(13)
+  $0.Timestamp ensureNextMeme() => $_ensure(10);
 }
 
 class Player extends $pb.GeneratedMessage {

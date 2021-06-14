@@ -36,12 +36,12 @@ class _TopicSearchViewState extends State<TopicSearchView>
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
           title: LangameButton(
-            () {
+            FontAwesomeIcons.checkCircle,
+            onPressed: () {
               var cp = Provider.of<ContextProvider>(context, listen: false);
               cp.pop();
             },
-            'Done',
-            FontAwesomeIcons.checkCircle,
+            text: 'Done',
           ),
         ),
         body: Column(
@@ -69,7 +69,7 @@ class _TopicSearchViewState extends State<TopicSearchView>
                   children: topicsSorted
                       .map((e) => Align(
                             child: ToggleButton(
-                              width: AppSize.safeBlockHorizontal * 80,
+                                width: AppSize.safeBlockHorizontal * 80,
                                 selected: nlp.selectedTopics.contains(e),
                                 onChange: (bool selected) {
                                   setState(() {
@@ -88,7 +88,8 @@ class _TopicSearchViewState extends State<TopicSearchView>
                                 },
                                 textUnselected:
                                     '${e.topic.emojis.join('')}\n${e.topic.content}',
-                                textSelected: '${e.topic.emojis.join('')}\n${e.topic.content}'),
+                                textSelected:
+                                    '${e.topic.emojis.join('')}\n${e.topic.content}'),
                           ))
                       .toList(),
                 );

@@ -2,7 +2,7 @@
   "name": "functions",
   "description": "Firebase & co",
   "scripts": {
-    "clean": "echo 'TODO'",
+    "clean": "rm -rf lib/ node_modules/ package-lock.json",
     "lint": "eslint --ext .ts .",
     "build": "tsc",
     "serve": "npm run build -- --watch | firebase emulators:start",
@@ -12,6 +12,7 @@
     "deploy": "firebase deploy",
     "deploy-rules": "firebase deploy --only firestore:rules",
     "deploy-indexes": "firebase deploy --only firestore:indexes",
+    "deploy-remoteconfig": "firebase deploy --only remoteconfig",
     "logs": "firebase functions:log",
     "set-dev": "firebase use langame-dev",
     "set-prod": "firebase use langame-86ac4",
@@ -26,8 +27,8 @@
     "@google-cloud/logging": "^9.2.3",
     "@octokit/rest": "^18.5.2",
     "agora-access-token": "^2.0.1",
-    "firebase-admin": "^9.2.0",
-    "firebase-functions": "^3.11.0",
+    "firebase-admin": "^9.9.0",
+    "firebase-functions": "^3.14.1",
     "mailchimp-api-v3": "^1.15.0",
     "node-fetch": "^2.6.1",
     "stripe": "^8.148.0"

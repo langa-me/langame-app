@@ -19,7 +19,7 @@ module.exports = {
   },
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.
-    "*gen.d.ts"
+    "**/protobuf/**/*"
   ],
   plugins: [
     "@typescript-eslint",

@@ -12,19 +12,19 @@ proto:
 	mkdir -p ${FUNCTIONS_PATH}/src/${GOOGLE_PROTO_SUBPATH}
 	pbjs -t static-module -w commonjs -o ${FUNCTIONS_PATH}/lib/${GOOGLE_PROTO_SUBPATH}/timestamp.js \
 	protos/${GOOGLE_PROTO_SUBPATH}/timestamp.proto && \
-	pbts -o ${FUNCTIONS_PATH}/src/${GOOGLE_PROTO_SUBPATH}/timestamp.gen.d.ts ${FUNCTIONS_PATH}/lib/${GOOGLE_PROTO_SUBPATH}/timestamp.js
+	pbts -o ${FUNCTIONS_PATH}/src/${GOOGLE_PROTO_SUBPATH}/timestamp.d.ts ${FUNCTIONS_PATH}/lib/${GOOGLE_PROTO_SUBPATH}/timestamp.js
 
 	mkdir -p ${FUNCTIONS_PATH}/lib/${STRIPE_PROTO_SUBPATH}
 	mkdir -p ${FUNCTIONS_PATH}/src/${STRIPE_PROTO_SUBPATH}
 	pbjs -t static-module -w commonjs -o ${FUNCTIONS_PATH}/lib/${STRIPE_PROTO_SUBPATH}/stripe.js \
 	protos/${STRIPE_PROTO_SUBPATH}/stripe.proto && \
-	pbts -o ${FUNCTIONS_PATH}/src/${STRIPE_PROTO_SUBPATH}/stripe.gen.d.ts ${FUNCTIONS_PATH}/lib/${STRIPE_PROTO_SUBPATH}/stripe.js
+	pbts -o ${FUNCTIONS_PATH}/src/${STRIPE_PROTO_SUBPATH}/stripe.d.ts ${FUNCTIONS_PATH}/lib/${STRIPE_PROTO_SUBPATH}/stripe.js
 
 	mkdir -p ${FUNCTIONS_PATH}/lib/${LANGAME_PROTO_SUBPATH}
 	mkdir -p ${FUNCTIONS_PATH}/src/${LANGAME_PROTO_SUBPATH}
 	pbjs -t static-module -w commonjs -o ${FUNCTIONS_PATH}/lib/${LANGAME_PROTO_SUBPATH}/langame.js \
 	protos/${LANGAME_PROTO_SUBPATH}/langame.proto && \
-	pbts -o ${FUNCTIONS_PATH}/src/${LANGAME_PROTO_SUBPATH}/langame.gen.d.ts ${FUNCTIONS_PATH}/lib/${LANGAME_PROTO_SUBPATH}/langame.js
+	pbts -o ${FUNCTIONS_PATH}/src/${LANGAME_PROTO_SUBPATH}/langame.d.ts ${FUNCTIONS_PATH}/lib/${LANGAME_PROTO_SUBPATH}/langame.js
 
 compile_models:
 	flutter pub run build_runner watch --delete-conflicting-outputs

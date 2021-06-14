@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import {openAiKey} from "./questions";
+import {openAiKey} from "./memes";
 const fetch = require("node-fetch");
 
 const callOpenAiCompletionBase = async (remoteConfig: any, prompt: string) => {

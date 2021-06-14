@@ -71,53 +71,67 @@ class StretchableButton extends StatelessWidget {
   }
 }
 
-class BaseLangameButton extends StatelessWidget {
-  final void Function()? _onPressed;
-  final String _text;
-  final IconData _icon;
+class LangameButton extends StatefulWidget {
+  final void Function()? onPressed;
+  final String? text;
+  final IconData icon;
   final bool? variant;
   final bool? border;
   final EdgeInsetsGeometry? padding;
-  BaseLangameButton(this._onPressed, this._text, this._icon,
-      {this.variant = true, this.border = true, this.padding});
+  final bool disabled;
 
+  const LangameButton(this.icon,
+      {Key? key,
+      this.text,
+      this.onPressed,
+      this.variant,
+      this.border,
+      this.padding,
+      this.disabled = false})
+      : super(key: key);
   @override
-  Widget build(BuildContext context) {
-    throw UnimplementedError();
-  }
+  State<StatefulWidget> createState() => _LangameButtonState(
+      disabled: this.disabled);
 }
 
-class LangameButton extends BaseLangameButton {
-  LangameButton(void Function() onPressed, String text, IconData icon,
-      {bool? variant = true, bool? border = true, EdgeInsetsGeometry? padding})
-      : super(onPressed, text, icon,
-            variant: variant, border: border, padding: padding);
+class _LangameButtonState extends State<LangameButton> {
+   bool disabled = false;
+  _LangameButtonState({
+      this.disabled = false});
   @override
   Widget build(BuildContext context) {
-    var bg = variant != null && variant!
-        ? variantIsLightThenDark(context, reverse: true)
-        : isLightThenDark(context, reverse: true);
-    var fg = variant != null && variant!
-        ? variantIsLightThenDark(context, reverse: false)
-        : isLightThenDark(context, reverse: false);
+    var bg = widget.variant != null && widget.variant!
+        ? disabled
+            ? variantBisIsLightThenDark(context, reverse: true)
+            : variantIsLightThenDark(context, reverse: true)
+        : disabled
+            ? variantIsLightThenDark(context, reverse: true)
+            : isLightThenDark(context, reverse: true);
+    var fg = widget.variant != null && widget.variant!
+        ? disabled
+            ? variantBisIsLightThenDark(context, reverse: false)
+            : variantIsLightThenDark(context, reverse: false)
+        : disabled
+            ? variantIsLightThenDark(context, reverse: false)
+            : isLightThenDark(context, reverse: false);
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         primary: bg,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(64.0),
         ),
-        side: border != null && border!
+        side: widget.border != null && widget.border!
             ? BorderSide(width: 0.5, color: averageGrey())
             : null,
-        padding: padding ?? padding,
+        padding: widget.padding ?? widget.padding,
       ),
-      onPressed: _onPressed,
-      icon: Icon(_icon, color: fg),
-      label: Text(
-        _text,
+      onPressed: disabled ? null : widget.onPressed,
+      icon: Icon(widget.icon, color: fg),
+      label: widget.text != null ? Text(
+        widget.text!,
         textAlign: TextAlign.center,
         style: TextStyle(color: fg),
-      ),
+      ) : SizedBox.shrink(),
     );
   }
 }
@@ -141,8 +155,7 @@ class ToggleButton extends StatefulWidget {
       this.onLongPress = false});
 
   @override
-  _ToggleButtonState createState() => _ToggleButtonState(
-      selected: selected);
+  _ToggleButtonState createState() => _ToggleButtonState(selected: selected);
 }
 
 class _ToggleButtonState extends State<ToggleButton> {
@@ -173,14 +186,10 @@ class _ToggleButtonState extends State<ToggleButton> {
         width: widget.width,
         padding: EdgeInsets.all(2),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-                  primary: bgSelected)
-              .merge(s),
+          style: ElevatedButton.styleFrom(primary: bgSelected).merge(s),
           child: Text(widget.textSelected,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 18,
-                  color: fg)),
+              style: TextStyle(fontSize: 18, color: fg)),
           onPressed: widget.onLongPress ? null : _onFirstChildChange,
           onLongPress: widget.onLongPress ? _onFirstChildChange : null,
         ),
@@ -192,9 +201,7 @@ class _ToggleButtonState extends State<ToggleButton> {
           style: s,
           child: Text(widget.textUnselected,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 18,
-                  color: fg)),
+              style: TextStyle(fontSize: 18, color: fg)),
           onPressed: widget.onLongPress ? null : _onSecondChildChange,
           onLongPress: widget.onLongPress ? _onSecondChildChange : null,
         ),

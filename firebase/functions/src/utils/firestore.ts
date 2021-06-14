@@ -4,7 +4,7 @@ import {QueryDocumentSnapshot}
 import {kLangamesCollection,
   kUserDoesNotExist,
   kUsersCollection} from "../helpers";
-import {langame} from "../langame/protobuf/langame.gen";
+import {langame} from "../langame/protobuf/langame";
 import {FirebaseFunctionsResponse, FirebaseFunctionsResponseStatusCode}
   from "../models";
 import * as functions from "firebase-functions";

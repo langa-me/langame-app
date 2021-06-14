@@ -77,15 +77,15 @@ class _State extends State<SearchPageView>
               return;
             }
             ap.getLangameUsersStartingWithTag(query).then((v) =>
-                lsp.filteredTagSearchHistory = v.map((e) => e.tag).toList());
+                lsp.filteredTagSearchHistory = v.result?.map((e) => e.tag).toList());
           },
           onSubmitted: (query) {
             lsp.addSearchHistory(query);
             _searchBarController.close();
             ap.getLangameUsersStartingWithTag(query).then((users) {
-              if (users.length == 1) {
+              if (users.result?.length == 1) {
                 lsp.selectedTag = query;
-                lsp.selectedUser = users.first;
+                lsp.selectedUser = users.result?.first;
               } else {
                 // TODO: should notify "no user found" or several found ...
                 lsp.selectedTag = null;
@@ -130,9 +130,9 @@ class _State extends State<SearchPageView>
                     .then((users) {
                   lsp.addSearchHistory(_searchBarController.query);
                   _searchBarController.close();
-                  if (users.length == 1) {
+                  if (users.result?.length == 1) {
                     lsp.selectedTag = _searchBarController.query;
-                    lsp.selectedUser = users.first;
+                    lsp.selectedUser = users.result?.first;
                     setState(() {});
                   } else {
                     // TODO: should notify "no user found" or several found ...
@@ -164,13 +164,13 @@ class _State extends State<SearchPageView>
                       onTap: () {
                         _searchBarController.close();
                         ap.getLangameUsersStartingWithTag(tag).then((users) {
-                          if (users.length == 1) {
-                            lsp.selectedTag = users.first.tag;
-                            lsp.selectedUser = users.first;
-                            lsp.addSearchHistory(users.first.tag);
+                          if (users.result != null && users.result!.length == 1) {
+                            lsp.selectedTag = users.result?.first.tag;
+                            lsp.selectedUser = users.result?.first;
+                            lsp.addSearchHistory(users.result!.first.tag);
 
                             /// Place first
-                            lsp.placeFirstSearchHistory(users.first.tag);
+                            lsp.placeFirstSearchHistory(users.result!.first.tag);
                           } else {
                             // TODO: should notify "no user found" or several found ...
                             lsp.selectedTag = null;

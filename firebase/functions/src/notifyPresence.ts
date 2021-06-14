@@ -11,7 +11,7 @@ import {
   kUserDoesNotExist,
 } from "./helpers";
 import {getLangame, getUserData} from "./utils/firestore";
-import {langame} from "./langame/protobuf/langame.gen";
+import {langame} from "./langame/protobuf/langame";
 
 export const notifyPresence = async (data: any,
     context: functions.https.CallableContext) => {
