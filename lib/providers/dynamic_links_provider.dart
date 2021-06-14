@@ -20,8 +20,8 @@ class DynamicLinksProvider extends ChangeNotifier {
   ) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      final basePath = kReleaseMode
-          ? 'https://join.langa.me'
+      final basePath = true //kReleaseMode
+          ? 'https://langa.me/join'
           : 'https://langamedev.page.link';
       final DynamicLinkParameters parameters = DynamicLinkParameters(
         uriPrefix: basePath,
@@ -77,12 +77,14 @@ class DynamicLinksProvider extends ChangeNotifier {
   }
 
   Future<dynamic> _onSuccess(dl) async {
-    _cap.log('opened link ${dl?.link.path}', analyticsMessage: 'dynamic_links_open');
-    if (dl != null) {
+    _cap.log('opened link ${dl?.link.path}',
+        analyticsMessage: 'dynamic_links_open');
+    if (dl != null && dl.link.path.split('/').length > 1) {
+      _cap.log('opening view ${dl.link.path.split('/')[2]}');
       // Opened a Langame link that opened the app
       // i.e. https://DOMAIN/CHANNEL_NAME
       // path starts with "/" thats why the substring
-      _cp.pushReplacement(LangameView(dl.link.path.substring(1), false));
+      _cp.pushReplacement(LangameView(dl.link.path.split('/')[2], false));
     }
   }
 }

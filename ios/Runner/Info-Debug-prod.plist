@@ -41,10 +41,6 @@
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
 			<string>dynamic.links</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>plya.langa.me</string>
-			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
@@ -55,7 +51,7 @@
 	<string>$(APP_DISPLAY_NAME)</string>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
-		<string>https://join.langa.me</string>
+		<string>https://langa.me/join</string>
 		<string>https://langamedev.page.link</string>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>

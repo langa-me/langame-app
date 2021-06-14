@@ -98,7 +98,7 @@
     <string>We need some of your contact information to help others recognize you</string>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
-		<string>https://join.langa.me</string>
+		<string>https://langa.me/join</string>
 		<string>https://langamedev.page.link</string>
 	</array>
 </dict>

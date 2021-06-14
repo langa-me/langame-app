@@ -68,7 +68,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/fb_login_protocol_scheme" />
-                <data android:scheme="https" android:host="join.langa.me" />
+                <data android:scheme="https" android:host="langa.me/join" />
                 <data android:scheme="https" android:host="langamedev.page.link" />
             </intent-filter>
         </activity>

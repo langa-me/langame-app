@@ -6,13 +6,12 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
-import 'package:langame/providers/relation_provider.dart';
 import 'package:langame/views/new_langame_page_view.dart';
 import 'package:langame/views/settings.dart';
 import 'package:provider/provider.dart';
 
+import 'buttons/button.dart';
 import 'colors/colors.dart';
-import 'dialogs/dialogs.dart';
 import 'running_langames_view.dart';
 import 'search_page_view.dart';
 
@@ -37,7 +36,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () => basicOnWillPopScope(context),
+      onWillPop: _onBackPressed,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: _buildAppBar(),
@@ -51,6 +50,29 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<bool> _onBackPressed() {
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    return cp.showCustomDialog<bool>(
+      [
+        Padding(
+            padding: EdgeInsets.all(20),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(
+                'Exit Langame?',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              LangameButton(Icons.cancel_outlined,
+                  onPressed: cp.dialogComplete, text: 'Cancel'),
+              LangameButton(Icons.exit_to_app_rounded,
+                  onPressed: cp.pop, text: 'Yes'),
+            ])),
+      ],
+      canBack: true,
+    );
   }
 
   PreferredSizeWidget? _buildAppBar() {
@@ -103,9 +125,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     );
   }
 
-  void _onBottomBarItemTapped(int i) =>
-    goToPage(i);
-  
+  void _onBottomBarItemTapped(int i) => goToPage(i);
 
   void goToPage(int i, {Curve? curve}) => setState(() {
         _selectedIndex = i;

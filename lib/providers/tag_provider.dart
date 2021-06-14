@@ -27,7 +27,6 @@ class TagProvider extends ChangeNotifier {
           (snap) => snap.docs.forEach(
             (t) {
               if (t.data().hasTopic()) {
-                _cap.log('got a new topic ${t.data().topic.content}');
                 topics[t.data().topic.content] = t.data();
                 notifyListeners();
               }

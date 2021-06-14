@@ -159,16 +159,16 @@ class _SendLangameState extends State<NewLangamePageView>
       cp.dialogComplete();
       return;
     }
-    // var dlp = Provider.of<DynamicLinksProvider>(context, listen: false);
-    // var createDynamicLink =
-    //     await dlp.createDynamicLink(snap.channelName, true);
+    var dlp = Provider.of<DynamicLinksProvider>(context, listen: false);
+    var createDynamicLink =
+        await dlp.createDynamicLink(snap.channelName, true);
     cp.dialogComplete();
-    // if (createDynamicLink.error != null) {
-    //   cp.showFailureDialog('${fp.getFailingRandom()}, please retry later');
-    //   await Future.delayed(Duration(seconds: 2));
-    //   cp.dialogComplete();
-    //   return;
-    // }
+    if (createDynamicLink.error != null) {
+      cp.showFailureDialog('${fp.getFailingRandom()}, please retry later');
+      await Future.delayed(Duration(seconds: 2));
+      cp.dialogComplete();
+      return;
+    }
     cp.showCustomDialog(
       [
         Container(
@@ -194,44 +194,44 @@ class _SendLangameState extends State<NewLangamePageView>
                   'Be sure to save it so you can use it later, too.',
                   style: Theme.of(context).textTheme.caption!.merge(TextStyle(
                       color: isLightThenDark(context, reverse: false)))),
-              // Divider(),
-              // ListTile(
-              //   onTap: () => FlutterClipboard.copy(createDynamicLink.result!)
-              //       .then((v) => cp.showSnackBar(
-              //           '${createDynamicLink.result!} copied to clipboard!')),
-              //   tileColor: Theme.of(context).colorScheme.primaryVariant,
-              //   title: Text(
-              //     createDynamicLink.result!,
-              //     style: TextStyle(
-              //         color: isLightThenDark(context, reverse: false)),
-              //   ),
-              //   leading: IconButton(
-              //     icon: Icon(FontAwesomeIcons.shareAlt,
-              //         color: isLightThenDark(context, reverse: false)),
-              //     onPressed: () => Share.share(
-              //         'Join my Langame to talk about ${nlp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
-              //         subject:
-              //             'Join my Langame to talk about ${nlp.selectedTopics.join(',')}',
-              //         sharePositionOrigin: Rect.fromCenter(
-              //             center: Offset(AppSize.screenWidth / 2,
-              //                 AppSize.screenHeight / 2),
-              //             height: 0,
-              //             width: 0)),
-              //   ),
-              //   trailing: Icon(FontAwesomeIcons.copy,
-              //       color: isLightThenDark(context, reverse: false)),
-              // ),
-              // LangameButton(
-              //   () {
-              //     cp.showSnackBar('Coming soon');
-              //     var cap = Provider.of<CrashAnalyticsProvider>(context,
-              //         listen: false);
-              //     cap.logNewFeatureClick('new_langame_add_to_calendar');
-              //   },
-              //   'Add to calendar',
-              //   FontAwesomeIcons.calendarCheck,
-              //   // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 100),
-              // ),
+              Divider(),
+              ListTile(
+                onTap: () => FlutterClipboard.copy(createDynamicLink.result!)
+                    .then((v) => cp.showSnackBar(
+                        '${createDynamicLink.result!} copied to clipboard!')),
+                tileColor: Theme.of(context).colorScheme.primaryVariant,
+                title: Text(
+                  createDynamicLink.result!,
+                  style: TextStyle(
+                      color: isLightThenDark(context, reverse: false)),
+                ),
+                leading: IconButton(
+                  icon: Icon(FontAwesomeIcons.shareAlt,
+                      color: isLightThenDark(context, reverse: false)),
+                  onPressed: () => Share.share(
+                      'Join my Langame to talk about ${nlp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
+                      subject:
+                          'Join my Langame to talk about ${nlp.selectedTopics.join(',')}',
+                      sharePositionOrigin: Rect.fromCenter(
+                          center: Offset(AppSize.screenWidth / 2,
+                              AppSize.screenHeight / 2),
+                          height: 0,
+                          width: 0)),
+                ),
+                trailing: Icon(FontAwesomeIcons.copy,
+                    color: isLightThenDark(context, reverse: false)),
+              ),
+              LangameButton(
+                FontAwesomeIcons.calendarCheck,
+                onPressed: () {
+                  cp.showSnackBar('Coming soon');
+                  var cap = Provider.of<CrashAnalyticsProvider>(context,
+                      listen: false);
+                  cap.logNewFeatureClick('new_langame_add_to_calendar');
+                },
+                text: 'Add to calendar',
+                // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 100),
+              ),
               Divider(),
               Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -1,6 +1,6 @@
 name: langame
 description: AI Augmented human conversations
-version: 1.2.1+32
+version: 1.2.2+33
 authors:
   - Langame <mail@langa.me>
 
@@ -37,7 +37,7 @@ dependencies:
   firebase_messaging: ^10.0.0
   firebase_crashlytics: ^2.0.4
   firebase_remote_config: ^0.10.0-dev.3
-  firebase_dynamic_links: ^2.0.4
+  firebase_dynamic_links: ^2.0.6
   google_sign_in: ^5.0.3
   flutter_facebook_auth: ^3.4.0
   sign_in_with_apple: ^3.0.0
