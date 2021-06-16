@@ -99,7 +99,7 @@
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
 		<string>https://langa.me/join</string>
-		<string>https://langamedev.page.link</string>
+		<string>https://langamedev.page.link/join</string>
 	</array>
 </dict>
 </plist>

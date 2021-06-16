@@ -20,15 +20,15 @@ class DynamicLinksProvider extends ChangeNotifier {
   ) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      final basePath = true //kReleaseMode
+      final basePath = !packageInfo.packageName.contains('dev')
           ? 'https://langa.me/join'
-          : 'https://langamedev.page.link';
+          : 'https://langamedev.page.link/join';
       final DynamicLinkParameters parameters = DynamicLinkParameters(
         uriPrefix: basePath,
         link: Uri.parse('$basePath/$path'),
         androidParameters: AndroidParameters(
           packageName: packageInfo.packageName,
-          minimumVersion: int.parse(packageInfo.buildNumber), // TODO
+          minimumVersion: int.parse(packageInfo.buildNumber),
         ),
         dynamicLinkParametersOptions: DynamicLinkParametersOptions(
           shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
@@ -50,7 +50,7 @@ class DynamicLinksProvider extends ChangeNotifier {
 
       return LangameResponse(LangameStatus.succeed, result: url.toString());
     } catch (e, s) {
-      _cap.log('failed to shareLangameDynamicLink');
+      _cap.log('failed to createDynamicLink');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

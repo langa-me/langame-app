@@ -9,6 +9,60 @@ Color isLightThenDark(BuildContext context, {bool reverse = false}) =>
             ? Colors.black
             : Colors.white;
 
+Color getBlackAndWhite(BuildContext context, int layer,
+    {bool reverse = false}) {
+  if (Theme.of(context).brightness == Brightness.light) {
+    if (reverse) {
+      switch (layer) {
+        case 0:
+          return Colors.white;
+        case 1:
+          return Colors.grey.shade100;
+        case 2:
+          return Colors.grey.shade300;
+        case 3:
+          return Colors.grey.shade500;
+      }
+    } else {
+      switch (layer) {
+        case 0:
+          return Colors.black;
+        case 1:
+          return Colors.grey.shade900;
+        case 2:
+          return Colors.grey.shade700;
+        case 3:
+          return Colors.grey.shade500;
+      }
+    }
+  } else {
+    if (reverse) {
+      switch (layer) {
+        case 0:
+          return Colors.black;
+        case 1:
+          return Colors.grey.shade900;
+        case 2:
+          return Colors.grey.shade700;
+        case 3:
+          return Colors.grey.shade500;
+      }
+    } else {
+      switch (layer) {
+        case 0:
+          return Colors.white;
+        case 1:
+          return Colors.grey.shade100;
+        case 2:
+          return Colors.grey.shade300;
+        case 3:
+          return Colors.grey.shade500;
+      }
+    }
+  }
+  throw Exception('invalid arguments');
+}
+
 Color variantIsLightThenDark(BuildContext context, {bool reverse = false}) =>
     Theme.of(context).brightness == Brightness.light
         ? reverse

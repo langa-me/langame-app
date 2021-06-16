@@ -43,6 +43,7 @@ const Tag$json = const {
     const {'1': 'origin', '3': 4, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Origin', '9': 0, '10': 'origin'},
     const {'1': 'feedback', '3': 5, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback', '9': 0, '10': 'feedback'},
     const {'1': 'context', '3': 6, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Context', '9': 0, '10': 'context'},
+    const {'1': 'aggregated_feedback', '3': 7, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback', '9': 0, '10': 'aggregatedFeedback'},
   ],
   '3': const [Tag_Topic$json, Tag_Classification$json, Tag_Origin$json, Tag_Feedback$json, Tag_Context$json],
   '8': const [
@@ -139,7 +140,7 @@ const Tag_Context_Type$json = const {
 };
 
 /// Descriptor for `Tag`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSOQoKY3JlYXRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdBIzCgV0b3BpYxgCIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuVGFnLlRvcGljSABSBXRvcGljEk4KDmNsYXNzaWZpY2F0aW9uGAMgASgLMiQubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ2xhc3NpZmljYXRpb25IAFIOY2xhc3NpZmljYXRpb24SNgoGb3JpZ2luGAQgASgLMhwubGFuZ2FtZS5wcm90b2J1Zi5UYWcuT3JpZ2luSABSBm9yaWdpbhI8CghmZWVkYmFjaxgFIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrSABSCGZlZWRiYWNrEjkKB2NvbnRleHQYBiABKAsyHS5sYW5nYW1lLnByb3RvYnVmLlRhZy5Db250ZXh0SABSB2NvbnRleHQaOQoFVG9waWMSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZlbW9qaXMYAyADKAlSBmVtb2ppcxpWCg5DbGFzc2lmaWNhdGlvbhIYCgdjb250ZW50GAEgASgJUgdjb250ZW50EhQKBXNjb3JlGAIgASgBUgVzY29yZRIUCgVodW1hbhgDIAEoCFIFaHVtYW4acwoGT3JpZ2luEj0KBm9wZW5haRgCIAEoCzIjLmxhbmdhbWUucHJvdG9idWYuVGFnLk9yaWdpbi5PcGVuQUlIAFIGb3BlbmFpGiIKBk9wZW5BSRIYCgd2ZXJzaW9uGAEgASgNUgd2ZXJzaW9uQgYKBHR5cGUa/QEKCEZlZWRiYWNrEhcKB3VzZXJfaWQYASABKAlSBnVzZXJJZBJCCgdnZW5lcmFsGAIgASgLMiYubGFuZ2FtZS5wcm90b2J1Zi5UYWcuRmVlZGJhY2suR2VuZXJhbEgAUgdnZW5lcmFsEkgKCXJlbGV2YW5jZRgDIAEoCzIoLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrLlJlbGV2YW5jZUgAUglyZWxldmFuY2UaHwoHR2VuZXJhbBIUCgVzY29yZRgBIAEoDVIFc2NvcmUaIQoJUmVsZXZhbmNlEhQKBXNjb3JlGAEgASgNUgVzY29yZUIGCgR0eXBlGn4KB0NvbnRleHQSGAoHY29udGVudBgBIAEoCVIHY29udGVudBI2CgR0eXBlGAIgASgOMiIubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ29udGV4dC5UeXBlUgR0eXBlIiEKBFR5cGUSDQoJV0lLSVBFRElBEAASCgoGT1BFTkFJEAFCBgoEdHlwZQ==');
+final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSOQoKY3JlYXRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdBIzCgV0b3BpYxgCIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuVGFnLlRvcGljSABSBXRvcGljEk4KDmNsYXNzaWZpY2F0aW9uGAMgASgLMiQubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ2xhc3NpZmljYXRpb25IAFIOY2xhc3NpZmljYXRpb24SNgoGb3JpZ2luGAQgASgLMhwubGFuZ2FtZS5wcm90b2J1Zi5UYWcuT3JpZ2luSABSBm9yaWdpbhI8CghmZWVkYmFjaxgFIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrSABSCGZlZWRiYWNrEjkKB2NvbnRleHQYBiABKAsyHS5sYW5nYW1lLnByb3RvYnVmLlRhZy5Db250ZXh0SABSB2NvbnRleHQSUQoTYWdncmVnYXRlZF9mZWVkYmFjaxgHIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrSABSEmFnZ3JlZ2F0ZWRGZWVkYmFjaxo5CgVUb3BpYxIYCgdjb250ZW50GAIgASgJUgdjb250ZW50EhYKBmVtb2ppcxgDIAMoCVIGZW1vamlzGlYKDkNsYXNzaWZpY2F0aW9uEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnQSFAoFc2NvcmUYAiABKAFSBXNjb3JlEhQKBWh1bWFuGAMgASgIUgVodW1hbhpzCgZPcmlnaW4SPQoGb3BlbmFpGAIgASgLMiMubGFuZ2FtZS5wcm90b2J1Zi5UYWcuT3JpZ2luLk9wZW5BSUgAUgZvcGVuYWkaIgoGT3BlbkFJEhgKB3ZlcnNpb24YASABKA1SB3ZlcnNpb25CBgoEdHlwZRr9AQoIRmVlZGJhY2sSFwoHdXNlcl9pZBgBIAEoCVIGdXNlcklkEkIKB2dlbmVyYWwYAiABKAsyJi5sYW5nYW1lLnByb3RvYnVmLlRhZy5GZWVkYmFjay5HZW5lcmFsSABSB2dlbmVyYWwSSAoJcmVsZXZhbmNlGAMgASgLMigubGFuZ2FtZS5wcm90b2J1Zi5UYWcuRmVlZGJhY2suUmVsZXZhbmNlSABSCXJlbGV2YW5jZRofCgdHZW5lcmFsEhQKBXNjb3JlGAEgASgNUgVzY29yZRohCglSZWxldmFuY2USFAoFc2NvcmUYASABKA1SBXNjb3JlQgYKBHR5cGUafgoHQ29udGV4dBIYCgdjb250ZW50GAEgASgJUgdjb250ZW50EjYKBHR5cGUYAiABKA4yIi5sYW5nYW1lLnByb3RvYnVmLlRhZy5Db250ZXh0LlR5cGVSBHR5cGUiIQoEVHlwZRINCglXSUtJUEVESUEQABIKCgZPUEVOQUkQAUIGCgR0eXBl');
 @$core.Deprecated('Use userDescriptor instead')
 const User$json = const {
   '1': 'User',
@@ -258,165 +259,6 @@ const Note_Definition$json = const {
 
 /// Descriptor for `Note`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List noteDescriptor = $convert.base64Decode('CgROb3RlEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSOgoHZ2VuZXJpYxgCIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuTm90ZS5HZW5lcmljSABSB2dlbmVyaWMSMQoEZ29hbBgDIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuTm90ZS5Hb2FsSABSBGdvYWwSQwoKZGVmaW5pdGlvbhgEIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuTm90ZS5EZWZpbml0aW9uSABSCmRlZmluaXRpb24aIwoHR2VuZXJpYxIYCgdjb250ZW50GAEgASgJUgdjb250ZW50GiAKBEdvYWwSGAoHY29udGVudBgBIAEoCVIHY29udGVudBomCgpEZWZpbml0aW9uEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnRCBgoEdHlwZQ==');
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint$json = const {
-  '1': 'Paint',
-  '2': const [
-    const {'1': 'selection_rectangle', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.SelectionRectangle', '9': 0, '10': 'selectionRectangle'},
-    const {'1': 'selection_circle', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.SelectionCircle', '9': 0, '10': 'selectionCircle'},
-    const {'1': 'selection_line', '3': 3, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.SelectionLine', '9': 0, '10': 'selectionLine'},
-    const {'1': 'selection_text', '3': 4, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.SelectionText', '9': 0, '10': 'selectionText'},
-    const {'1': 'draw_rectangle', '3': 5, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawRectangle', '9': 0, '10': 'drawRectangle'},
-    const {'1': 'draw_circle', '3': 6, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawCircle', '9': 0, '10': 'drawCircle'},
-    const {'1': 'draw_line', '3': 7, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawLine', '9': 0, '10': 'drawLine'},
-    const {'1': 'draw_points', '3': 8, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawPoints', '9': 0, '10': 'drawPoints'},
-    const {'1': 'draw_text', '3': 9, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawText', '9': 0, '10': 'drawText'},
-    const {'1': 'clear_all', '3': 10, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.Clear', '9': 0, '10': 'clearAll'},
-    const {'1': 'edit_text', '3': 11, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.EditText', '9': 0, '10': 'editText'},
-  ],
-  '3': const [Paint_SelectionRectangle$json, Paint_SelectionCircle$json, Paint_SelectionLine$json, Paint_SelectionText$json, Paint_DrawShape$json, Paint_DrawRectangle$json, Paint_DrawCircle$json, Paint_DrawLine$json, Paint_DrawPoints$json, Paint_DrawText$json, Paint_Clear$json, Paint_EditText$json],
-  '4': const [Paint_Shape$json],
-  '8': const [
-    const {'1': 'action'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_SelectionRectangle$json = const {
-  '1': 'SelectionRectangle',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'shift_x', '3': 2, '4': 1, '5': 1, '10': 'shiftX'},
-    const {'1': 'shift_y', '3': 3, '4': 1, '5': 1, '10': 'shiftY'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_SelectionCircle$json = const {
-  '1': 'SelectionCircle',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'shift_x', '3': 2, '4': 1, '5': 1, '10': 'shiftX'},
-    const {'1': 'shift_y', '3': 3, '4': 1, '5': 1, '10': 'shiftY'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_SelectionLine$json = const {
-  '1': 'SelectionLine',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'is_p1', '3': 2, '4': 1, '5': 8, '10': 'isP1'},
-    const {'1': 'new_x', '3': 3, '4': 1, '5': 1, '10': 'newX'},
-    const {'1': 'new_y', '3': 4, '4': 1, '5': 1, '10': 'newY'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_SelectionText$json = const {
-  '1': 'SelectionText',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'new_x', '3': 2, '4': 1, '5': 1, '10': 'newX'},
-    const {'1': 'new_y', '3': 3, '4': 1, '5': 1, '10': 'newY'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_DrawShape$json = const {
-  '1': 'DrawShape',
-  '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
-    const {'1': 'r', '3': 6, '4': 1, '5': 5, '10': 'r'},
-    const {'1': 'g', '3': 7, '4': 1, '5': 5, '10': 'g'},
-    const {'1': 'b', '3': 8, '4': 1, '5': 5, '10': 'b'},
-    const {'1': 'screenWidth', '3': 9, '4': 1, '5': 1, '10': 'screenWidth'},
-    const {'1': 'screenHeight', '3': 10, '4': 1, '5': 1, '10': 'screenHeight'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_DrawRectangle$json = const {
-  '1': 'DrawRectangle',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'bottom_left_x', '3': 2, '4': 1, '5': 1, '10': 'bottomLeftX'},
-    const {'1': 'bottom_left_y', '3': 3, '4': 1, '5': 1, '10': 'bottomLeftY'},
-    const {'1': 'top_right_x', '3': 4, '4': 1, '5': 1, '10': 'topRightX'},
-    const {'1': 'top_right_y', '3': 5, '4': 1, '5': 1, '10': 'topRightY'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_DrawCircle$json = const {
-  '1': 'DrawCircle',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'center_x', '3': 2, '4': 1, '5': 1, '10': 'centerX'},
-    const {'1': 'center_y', '3': 3, '4': 1, '5': 1, '10': 'centerY'},
-    const {'1': 'radius', '3': 4, '4': 1, '5': 1, '10': 'radius'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_DrawLine$json = const {
-  '1': 'DrawLine',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'p1_x', '3': 2, '4': 1, '5': 1, '10': 'p1X'},
-    const {'1': 'p1_y', '3': 3, '4': 1, '5': 1, '10': 'p1Y'},
-    const {'1': 'p2_x', '3': 4, '4': 1, '5': 1, '10': 'p2X'},
-    const {'1': 'p2_y', '3': 5, '4': 1, '5': 1, '10': 'p2Y'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_DrawPoints$json = const {
-  '1': 'DrawPoints',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'position_x', '3': 4, '4': 1, '5': 1, '10': 'positionX'},
-    const {'1': 'position_y', '3': 5, '4': 1, '5': 1, '10': 'positionY'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_DrawText$json = const {
-  '1': 'DrawText',
-  '2': const [
-    const {'1': 'shape_properties', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Paint.DrawShape', '10': 'shapeProperties'},
-    const {'1': 'position_x', '3': 4, '4': 1, '5': 1, '10': 'positionX'},
-    const {'1': 'position_y', '3': 5, '4': 1, '5': 1, '10': 'positionY'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_Clear$json = const {
-  '1': 'Clear',
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_EditText$json = const {
-  '1': 'EditText',
-  '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
-    const {'1': 'text', '3': 2, '4': 1, '5': 9, '10': 'text'},
-  ],
-};
-
-@$core.Deprecated('Use paintDescriptor instead')
-const Paint_Shape$json = const {
-  '1': 'Shape',
-  '2': const [
-    const {'1': 'Rectangle', '2': 0},
-    const {'1': 'Circle', '2': 1},
-    const {'1': 'Line', '2': 2},
-    const {'1': 'Text', '2': 3},
-  ],
-};
-
-/// Descriptor for `Paint`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List paintDescriptor = $convert.base64Decode('CgVQYWludBJdChNzZWxlY3Rpb25fcmVjdGFuZ2xlGAEgASgLMioubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5TZWxlY3Rpb25SZWN0YW5nbGVIAFISc2VsZWN0aW9uUmVjdGFuZ2xlElQKEHNlbGVjdGlvbl9jaXJjbGUYAiABKAsyJy5sYW5nYW1lLnByb3RvYnVmLlBhaW50LlNlbGVjdGlvbkNpcmNsZUgAUg9zZWxlY3Rpb25DaXJjbGUSTgoOc2VsZWN0aW9uX2xpbmUYAyABKAsyJS5sYW5nYW1lLnByb3RvYnVmLlBhaW50LlNlbGVjdGlvbkxpbmVIAFINc2VsZWN0aW9uTGluZRJOCg5zZWxlY3Rpb25fdGV4dBgEIAEoCzIlLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuU2VsZWN0aW9uVGV4dEgAUg1zZWxlY3Rpb25UZXh0Ek4KDmRyYXdfcmVjdGFuZ2xlGAUgASgLMiUubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3UmVjdGFuZ2xlSABSDWRyYXdSZWN0YW5nbGUSRQoLZHJhd19jaXJjbGUYBiABKAsyIi5sYW5nYW1lLnByb3RvYnVmLlBhaW50LkRyYXdDaXJjbGVIAFIKZHJhd0NpcmNsZRI/CglkcmF3X2xpbmUYByABKAsyIC5sYW5nYW1lLnByb3RvYnVmLlBhaW50LkRyYXdMaW5lSABSCGRyYXdMaW5lEkUKC2RyYXdfcG9pbnRzGAggASgLMiIubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3UG9pbnRzSABSCmRyYXdQb2ludHMSPwoJZHJhd190ZXh0GAkgASgLMiAubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3VGV4dEgAUghkcmF3VGV4dBI8CgljbGVhcl9hbGwYCiABKAsyHS5sYW5nYW1lLnByb3RvYnVmLlBhaW50LkNsZWFySABSCGNsZWFyQWxsEj8KCWVkaXRfdGV4dBgLIAEoCzIgLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRWRpdFRleHRIAFIIZWRpdFRleHQalAEKElNlbGVjdGlvblJlY3RhbmdsZRJMChBzaGFwZV9wcm9wZXJ0aWVzGAEgASgLMiEubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3U2hhcGVSD3NoYXBlUHJvcGVydGllcxIXCgdzaGlmdF94GAIgASgBUgZzaGlmdFgSFwoHc2hpZnRfeRgDIAEoAVIGc2hpZnRZGpEBCg9TZWxlY3Rpb25DaXJjbGUSTAoQc2hhcGVfcHJvcGVydGllcxgBIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRHJhd1NoYXBlUg9zaGFwZVByb3BlcnRpZXMSFwoHc2hpZnRfeBgCIAEoAVIGc2hpZnRYEhcKB3NoaWZ0X3kYAyABKAFSBnNoaWZ0WRqcAQoNU2VsZWN0aW9uTGluZRJMChBzaGFwZV9wcm9wZXJ0aWVzGAEgASgLMiEubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3U2hhcGVSD3NoYXBlUHJvcGVydGllcxITCgVpc19wMRgCIAEoCFIEaXNQMRITCgVuZXdfeBgDIAEoAVIEbmV3WBITCgVuZXdfeRgEIAEoAVIEbmV3WRqHAQoNU2VsZWN0aW9uVGV4dBJMChBzaGFwZV9wcm9wZXJ0aWVzGAEgASgLMiEubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3U2hhcGVSD3NoYXBlUHJvcGVydGllcxITCgVuZXdfeBgCIAEoAVIEbmV3WBITCgVuZXdfeRgDIAEoAVIEbmV3WRqLAQoJRHJhd1NoYXBlEg4KAmlkGAEgASgJUgJpZBIMCgFyGAYgASgFUgFyEgwKAWcYByABKAVSAWcSDAoBYhgIIAEoBVIBYhIgCgtzY3JlZW5XaWR0aBgJIAEoAVILc2NyZWVuV2lkdGgSIgoMc2NyZWVuSGVpZ2h0GAogASgBUgxzY3JlZW5IZWlnaHQa5QEKDURyYXdSZWN0YW5nbGUSTAoQc2hhcGVfcHJvcGVydGllcxgBIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRHJhd1NoYXBlUg9zaGFwZVByb3BlcnRpZXMSIgoNYm90dG9tX2xlZnRfeBgCIAEoAVILYm90dG9tTGVmdFgSIgoNYm90dG9tX2xlZnRfeRgDIAEoAVILYm90dG9tTGVmdFkSHgoLdG9wX3JpZ2h0X3gYBCABKAFSCXRvcFJpZ2h0WBIeCgt0b3BfcmlnaHRfeRgFIAEoAVIJdG9wUmlnaHRZGqgBCgpEcmF3Q2lyY2xlEkwKEHNoYXBlX3Byb3BlcnRpZXMYASABKAsyIS5sYW5nYW1lLnByb3RvYnVmLlBhaW50LkRyYXdTaGFwZVIPc2hhcGVQcm9wZXJ0aWVzEhkKCGNlbnRlcl94GAIgASgBUgdjZW50ZXJYEhkKCGNlbnRlcl95GAMgASgBUgdjZW50ZXJZEhYKBnJhZGl1cxgEIAEoAVIGcmFkaXVzGqQBCghEcmF3TGluZRJMChBzaGFwZV9wcm9wZXJ0aWVzGAEgASgLMiEubGFuZ2FtZS5wcm90b2J1Zi5QYWludC5EcmF3U2hhcGVSD3NoYXBlUHJvcGVydGllcxIRCgRwMV94GAIgASgBUgNwMVgSEQoEcDFfeRgDIAEoAVIDcDFZEhEKBHAyX3gYBCABKAFSA3AyWBIRCgRwMl95GAUgASgBUgNwMlkamAEKCkRyYXdQb2ludHMSTAoQc2hhcGVfcHJvcGVydGllcxgBIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRHJhd1NoYXBlUg9zaGFwZVByb3BlcnRpZXMSHQoKcG9zaXRpb25feBgEIAEoAVIJcG9zaXRpb25YEh0KCnBvc2l0aW9uX3kYBSABKAFSCXBvc2l0aW9uWRqWAQoIRHJhd1RleHQSTAoQc2hhcGVfcHJvcGVydGllcxgBIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuUGFpbnQuRHJhd1NoYXBlUg9zaGFwZVByb3BlcnRpZXMSHQoKcG9zaXRpb25feBgEIAEoAVIJcG9zaXRpb25YEh0KCnBvc2l0aW9uX3kYBSABKAFSCXBvc2l0aW9uWRoHCgVDbGVhchouCghFZGl0VGV4dBIOCgJpZBgBIAEoCVICaWQSEgoEdGV4dBgCIAEoCVIEdGV4dCI2CgVTaGFwZRINCglSZWN0YW5nbGUQABIKCgZDaXJjbGUQARIICgRMaW5lEAISCAoEVGV4dBADQggKBmFjdGlvbg==');
 @$core.Deprecated('Use notificationDescriptor instead')
 const Notification$json = const {
   '1': 'Notification',

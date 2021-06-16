@@ -136,16 +136,13 @@ class ImplLangameApi extends LangameApi {
 
     var a = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)
-        .withConverter<lg.Langame>(
-          fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
-          toFirestore: (s, _) => s.toMapStringDynamic(),
-        )
-        .add(lg.Langame(
-          channelName: '',
-          topics: topics,
-          initiator: firebase.auth!.currentUser!.uid, // TODO: risky
-          date: dateAsProtobuf,
-        ));
+        .add({
+      'channelName': '',
+      'topics': topics,
+      'initiator': firebase.auth!.currentUser!.uid, // TODO: risky
+      'date': date,
+      'done': null,
+    });
 
     p.forEach((e) => a
         .collection("players")

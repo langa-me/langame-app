@@ -54,6 +54,7 @@ class _SendLangameState extends State<NewLangamePageView>
           text: nlp.selectedTopics.isEmpty
               ? 'Select a topic'
               : nlp.selectedTopics.first.topic.content,
+          layer: 1,
           padding: EdgeInsets.symmetric(
               vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20)),
       // TextDivider('Invite'),
@@ -65,8 +66,10 @@ class _SendLangameState extends State<NewLangamePageView>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: nlp.shoppingList.isEmpty
                 ? [
-                    LangameButton(FontAwesomeIcons.userPlus, onPressed: () => widget._goToPage(1), text: 'Add people',
-                        
+                    LangameButton(FontAwesomeIcons.userPlus,
+                        onPressed: () => widget._goToPage(1),
+                        text: 'Add people',
+                        layer: 1,
                         padding: EdgeInsets.symmetric(
                             vertical: 10,
                             horizontal: AppSize.safeBlockHorizontal * 20)),
@@ -114,7 +117,8 @@ class _SendLangameState extends State<NewLangamePageView>
         FontAwesomeIcons.comments,
         onPressed: () => onPressedNewLangame(cp, nlp),
         text: 'New Langame',
-        
+        highlighted: true,
+        layer: 1,
         padding: EdgeInsets.symmetric(
             vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20),
       ),
@@ -160,8 +164,7 @@ class _SendLangameState extends State<NewLangamePageView>
       return;
     }
     var dlp = Provider.of<DynamicLinksProvider>(context, listen: false);
-    var createDynamicLink =
-        await dlp.createDynamicLink(snap.channelName, true);
+    var createDynamicLink = await dlp.createDynamicLink(snap.channelName, true);
     cp.dialogComplete();
     if (createDynamicLink.error != null) {
       cp.showFailureDialog('${fp.getFailingRandom()}, please retry later');

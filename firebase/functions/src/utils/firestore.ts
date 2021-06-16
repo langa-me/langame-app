@@ -133,3 +133,18 @@ export const handleError = (
   const p2 = reportError(e, {user: uid});
   return [p1, p2];
 };
+
+export const docRefHandleError = (
+    snap: admin.firestore.DocumentReference | null,
+    msg: string,
+    uid: string,
+): Promise<any>[] => {
+  const e = Error(msg);
+  const p1 = snap ? snap.set({
+    errors: admin.firestore
+        .FieldValue
+        .arrayUnion(userFacingMessage(e)),
+  }, {merge: true}) : Promise.resolve();
+  const p2 = reportError(e, {user: uid});
+  return [p1, p2];
+};

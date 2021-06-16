@@ -75,50 +75,46 @@ class LangameButton extends StatefulWidget {
   final void Function()? onPressed;
   final String? text;
   final IconData icon;
-  final bool? variant;
+  final int layer;
   final bool? border;
   final EdgeInsetsGeometry? padding;
   final bool disabled;
+  final bool highlighted;
 
   const LangameButton(this.icon,
       {Key? key,
       this.text,
       this.onPressed,
-      this.variant,
+      this.layer = 0,
       this.border,
       this.padding,
-      this.disabled = false})
+      this.disabled = false,
+      this.highlighted = false})
       : super(key: key);
   @override
-  State<StatefulWidget> createState() => _LangameButtonState(
-      disabled: this.disabled);
+  State<StatefulWidget> createState() =>
+      _LangameButtonState(disabled: this.disabled);
 }
 
 class _LangameButtonState extends State<LangameButton> {
-   bool disabled = false;
-  _LangameButtonState({
-      this.disabled = false});
+  bool disabled = false;
+  _LangameButtonState({this.disabled = false});
   @override
   Widget build(BuildContext context) {
-    var bg = widget.variant != null && widget.variant!
-        ? disabled
-            ? variantBisIsLightThenDark(context, reverse: true)
-            : variantIsLightThenDark(context, reverse: true)
-        : disabled
-            ? variantIsLightThenDark(context, reverse: true)
-            : isLightThenDark(context, reverse: true);
-    var fg = widget.variant != null && widget.variant!
-        ? disabled
-            ? variantBisIsLightThenDark(context, reverse: false)
-            : variantIsLightThenDark(context, reverse: false)
-        : disabled
-            ? variantIsLightThenDark(context, reverse: false)
-            : isLightThenDark(context, reverse: false);
+    var bg = getBlackAndWhite(context, widget.layer + (disabled ? 1 : 0), reverse: true);
+    var fg = getBlackAndWhite(context, widget.layer + (disabled ? 1 : 0), reverse: false);
+
+    if (widget.highlighted) {
+      bg = Theme.of(context).colorScheme.secondary;
+      fg = isLightThenDark(context, reverse: true);
+    }
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         primary: bg,
+        elevation: 5,
+        shadowColor: variantIsLightThenDark(context, reverse: true),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(64.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         side: widget.border != null && widget.border!
             ? BorderSide(width: 0.5, color: averageGrey())
@@ -127,11 +123,13 @@ class _LangameButtonState extends State<LangameButton> {
       ),
       onPressed: disabled ? null : widget.onPressed,
       icon: Icon(widget.icon, color: fg),
-      label: widget.text != null ? Text(
-        widget.text!,
-        textAlign: TextAlign.center,
-        style: TextStyle(color: fg),
-      ) : SizedBox.shrink(),
+      label: widget.text != null
+          ? Text(
+              widget.text!,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: fg),
+            )
+          : SizedBox.shrink(),
     );
   }
 }
@@ -165,17 +163,17 @@ class _ToggleButtonState extends State<ToggleButton> {
 
   @override
   Widget build(BuildContext context) {
-    var bg = isLightThenDark(context, reverse: true);
+    var bg = variantIsLightThenDark(context, reverse: true);
     var bgSelected = variantBisIsLightThenDark(context, reverse: true);
     var fg = isLightThenDark(context, reverse: false);
     // var fg = isLightThenDark(context, reverse: false);
     var s = ElevatedButton.styleFrom(
       primary: bg,
       side: BorderSide(
-          width: 1.0, color: Theme.of(context).colorScheme.secondary),
+          width: 1.0, color: Colors.transparent),
       padding: EdgeInsets.all(5),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(64.0),
+        borderRadius: BorderRadius.circular(8.0),
       ),
     );
     return AnimatedCrossFade(

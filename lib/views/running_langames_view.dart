@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
@@ -6,6 +7,7 @@ import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
+import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
 
@@ -84,12 +86,11 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
           if (snapshot.hasData &&
               snapshot.data != null &&
               snapshot.data!.result != null) {
-            var format = DateFormat("HH:mm:ss");
+            var format = DateFormat("d/M/y HH:mm:ss");
             var d = format.format(l.date.toDateTime().toLocal());
             var s = format.format(l.started.toDateTime().toLocal());
             var startedString = l.hasStarted() ? '\n\nstarted: $s' : '';
-            return Card(
-              child: ListTile(
+            return ExpansionTile(
                 title: Text(l.topics.join(','),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.caption),
@@ -98,13 +99,18 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
                     children: snapshot.data!.result!
                         .map((e) => buildCroppedRoundedNetworkImage(e.photoUrl))
                         .toList()),
-                trailing: Text('planned: $d$startedString',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.caption),
-                onTap: () =>
-                    cp.pushReplacement(LangameView(l.channelName, false)),
-              ),
-            );
+                trailing: Tooltip(
+                      child: Icon(FontAwesomeIcons.clock),
+                      message: 'planned: $d$startedString'),
+                expandedCrossAxisAlignment: CrossAxisAlignment.center,
+                expandedAlignment: Alignment.center,
+                children: [
+                  LangameButton(FontAwesomeIcons.doorOpen,
+                    text: 'join',
+                      onPressed: () => cp
+                          .pushReplacement(LangameView(l.channelName, false))),
+                  
+                ]);
           }
           return SizedBox.shrink();
         });

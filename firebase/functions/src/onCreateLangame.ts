@@ -82,7 +82,7 @@ export const onCreateLangame = async (
       memes = await offlineMemeSearch(lg.data()!.topics,
           // @ts-ignore
           // eslint-disable-next-line max-len
-          t.parameters.question_count.defaultValue.value * 1, // Casting to number
+          t.parameters.meme_count.defaultValue.value * 1, // Casting to number
       );
     } else if (t.parameters.question_engine.defaultValue.value === "online") {
       throw Error("unimplemented");

@@ -42,8 +42,9 @@ class ContextProvider extends ChangeNotifier {
 
   void showSnackBar(String message, {SnackBarAction? action}) =>
       _snackBarService.show(SnackBar(
+        backgroundColor: variantIsLightThenDark(_scaffoldMessengerKey.currentContext!, reverse: true),
         behavior: SnackBarBehavior.floating,
-        content: Text(message),
+        content: Text(message, style: Theme.of(_scaffoldMessengerKey.currentContext!).textTheme.caption),
         action: action,
       ));
 

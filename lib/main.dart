@@ -30,7 +30,6 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
-import 'package:langame/providers/paint_provider.dart';
 import 'package:langame/providers/payment_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/providers/remote_config_provider.dart';
@@ -186,19 +185,6 @@ void main() async {
               },
               create: (_) => FeedbackProvider(firebase, crashAnalyticsProvider,
                   contextProvider, preferenceProvider),
-            ),
-            ChangeNotifierProxyProvider4<
-                CrashAnalyticsProvider,
-                ContextProvider,
-                AuthenticationProvider,
-                RemoteConfigProvider,
-                PaintingProvider>(
-              update: (_, cap, cp, ap, rcp, pp) => pp!,
-              create: (_) => PaintingProvider(
-                  crashAnalyticsProvider,
-                  contextProvider,
-                  authenticationProvider,
-                  remoteConfigProvider),
             ),
             ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
                 ContextProvider, AuthenticationProvider, PaymentProvider>(

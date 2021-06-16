@@ -194,3 +194,30 @@ async function deleteQueryBatch(db: admin.firestore.Firestore,
     deleteQueryBatch(db, query, resolve);
   });
 }
+
+// eslint-disable-next-line valid-jsdoc
+/**
+ * Takes an Array<V>, and a grouping function,
+ * and returns a Map of the array grouped by the grouping function.
+ *
+ * @param{Array<V>} list An array of type V.
+ * @param{(input: V) => K} keyGetter A Function that takes the
+ * Array type V as an input, and returns a value of type K.
+ * K is generally intended to be a property key of V.
+ *
+ * @return{Map<K, Array<V>>} Map of the array grouped by the grouping function.
+ */
+export function groupBy<K, V>(list: Array<V>, keyGetter: (input: V) => K):
+  Map<K, Array<V>> {
+  const map = new Map<K, Array<V>>();
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
+  });
+  return map;
+}

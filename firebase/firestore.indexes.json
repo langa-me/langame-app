@@ -2,10 +2,19 @@
   "indexes": [
     {
       "collectionGroup": "tags",
-      "queryScope": "COLLECTION",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "content", "order": "ASCENDING" },
-        { "fieldPath": "score", "order": "DESCENDING" }
+        { "fieldPath": "topic.content", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "tags",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "topic.content", "order": "ASCENDING" },
+        { "fieldPath": "aggregatedFeedback.general.score", "order": "DESCENDING" },
+        { "fieldPath": "aggregatedFeedback.relevance.score", "order": "DESCENDING" }
       ]
     },
     {
@@ -43,6 +52,42 @@
         {
           "order": "ASCENDING",
           "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "tags",
+      "fieldPath": "aggregatedFeedback.general.score",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "tags",
+      "fieldPath": "aggregatedFeedback.relevance.score",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
         }
       ]
     }

@@ -31,6 +31,7 @@ class _TopicSearchViewState extends State<TopicSearchView>
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        backgroundColor: isLightThenDark(context, reverse: true),
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -41,6 +42,7 @@ class _TopicSearchViewState extends State<TopicSearchView>
               var cp = Provider.of<ContextProvider>(context, listen: false);
               cp.pop();
             },
+            layer: 1,
             text: 'Done',
           ),
         ),
@@ -105,7 +107,7 @@ class _TopicSearchViewState extends State<TopicSearchView>
 
     return Expanded(
         child: FloatingSearchBar(
-      border: BorderSide(),
+      border: BorderSide(color: Colors.transparent),
       // shadowColor: Colors.transparent,
       // accentColor: Colors.transparent,
       // iconColor: Colors.transparent,
@@ -114,7 +116,7 @@ class _TopicSearchViewState extends State<TopicSearchView>
       // backdropColor: Colors.transparent,
       hint: 'Search topics...',
       leadingActions: [
-        BackButton(color: isLightThenDark(context)),
+        // BackButton(color: isLightThenDark(context)),
       ],
       automaticallyImplyBackButton: false,
       hintStyle: TextStyle(fontSize: 14, color: isLightThenDark(context)),

@@ -43,22 +43,3 @@ class Tag_Context_Type extends $pb.ProtobufEnum {
   const Tag_Context_Type._($core.int v, $core.String n) : super(v, n);
 }
 
-class Paint_Shape extends $pb.ProtobufEnum {
-  static const Paint_Shape Rectangle = Paint_Shape._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Rectangle');
-  static const Paint_Shape Circle = Paint_Shape._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Circle');
-  static const Paint_Shape Line = Paint_Shape._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Line');
-  static const Paint_Shape Text = Paint_Shape._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Text');
-
-  static const $core.List<Paint_Shape> values = <Paint_Shape> [
-    Rectangle,
-    Circle,
-    Line,
-    Text,
-  ];
-
-  static final $core.Map<$core.int, Paint_Shape> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static Paint_Shape? valueOf($core.int value) => _byValue[value];
-
-  const Paint_Shape._($core.int v, $core.String n) : super(v, n);
-}
-

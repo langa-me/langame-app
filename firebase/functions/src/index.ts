@@ -11,10 +11,13 @@ import {notifyPresence} from "./notifyPresence";
 import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
 import {confirmStripePayment} from "./stripe/confirmStripePayment";
 import {createStripeCustomer} from "./stripe/createStripeCustomer";
-import {kLangamesCollection, kStripeCustomersCollection} from "./helpers";
+import {kLangamesCollection,
+  kMemesCollection,
+  kStripeCustomersCollection} from "./helpers";
 import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
+import {onWriteTag} from "./onWriteTag";
 
 
 /*
@@ -111,3 +114,10 @@ exports.onUpdateLangamePlayers = functions.firestore
 
 exports.onDeleteAuthentication =
     functions.auth.user().onDelete(onDeleteAuthentication);
+
+
+// Meme //
+
+exports.onWriteTags =
+    functions.firestore.document(`${kMemesCollection}/{memeId}/tags/{tagId}`)
+        .onWrite(onWriteTag);

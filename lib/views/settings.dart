@@ -1,12 +1,14 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
+import 'package:langame/views/hack.dart';
 import 'package:langame/views/payment.dart';
 import 'package:langame/views/texts/texts.dart';
 import 'package:lottie/lottie.dart';
@@ -82,6 +84,15 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               }),
             ),
             TextDivider('General'),
+            Consumer<AuthenticationProvider>(builder: (ctx, p, c) => 
+            ['antoine.descamps@swiss-commerce.ch', 'albertoschillaci30@gmail.com', 'romain.rom1@gmail.com', 'louis.beaumont@gmail.com', 'sonlight03@gmail.com'].contains(p.user?.email) ? ListTile(
+              onTap: () {
+                cp.push(HackView());
+              },
+              leading: Icon(FontAwesomeIcons.dharmachakra,
+                  color: isLightThenDark(context)),
+              title: Text('Hack', style: Theme.of(context).textTheme.headline6),
+            ) : SizedBox.shrink()),
             ListTile(
               onTap: () {
                 // Only safe in dev mode yet
@@ -151,9 +162,8 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headline6,
                       ),
-                      LangameButton(
-                        Icons.delete_forever_outlined,
-                        onPressed: () {
+                      LangameButton(Icons.delete_forever_outlined,
+                          onPressed: () {
                         cp.dialogComplete();
                         _delete();
                       }, text: 'Delete my account')

@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {kTagsCollection} from "./helpers";
+import {groupBy, kTagsCollection} from "./helpers";
 import {converter} from "./utils/firestore";
 import {langame} from "./langame/protobuf/langame";
 import {shuffle} from "./utils/array";
@@ -25,13 +25,24 @@ export const offlineMemeSearch =
         .collectionGroup(kTagsCollection)
         .where("topic.content", "in", topics)
         .withConverter(converter<langame.protobuf.Tag>())
-        .limit(limit)
+        .limit(100) // Maximum 100 tags
         .get();
 
+    // const tagDocsScored = await tagDocs.query
+    //     .orderBy("aggregatedFeedback.general.score", "desc")
+    //     .orderBy("aggregatedFeedback.relevance.score", "desc")
+    //     .get();
 
-    const r = shuffle(await Promise.all(tagDocs.docs.map((e) => e.ref.parent
-        .parent!.withConverter(converter<langame.protobuf.Meme>())
-        .get())));
-    return r;
+    // TODO: should still randomly pick an unfamous meme sometimes
+
+    // Getting the parent Meme DISTINCTLY
+    const grouped = groupBy(
+        await Promise.all(tagDocs.docs.map((e) => e.ref.parent
+            .parent!.withConverter(converter<langame.protobuf.Meme>())
+            .get())), (e) => e.id);
+    // TODO: is the group by actually properly grouping
+    // in a multi topic context?
+    const ret = shuffle([...grouped.values()].map((e) => e[0])).slice(0, limit);
+    return ret;
   };
 

@@ -38,6 +38,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
+        backgroundColor: isLightThenDark(context, reverse: true),
         resizeToAvoidBottomInset: false,
         appBar: _buildAppBar(),
         body: _buildPageView(),

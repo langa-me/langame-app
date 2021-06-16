@@ -32,14 +32,5 @@
   },
   "storage": {
     "rules": "storage.rules"
-  },
-  "hosting": {
-    "appAssociation": "AUTO",
-    "rewrites": [
-      {
-        "source": "/**",
-        "dynamicLinks": true
-      }
-    ]
   }
 }

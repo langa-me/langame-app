@@ -19,12 +19,8 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
-import 'package:langame/providers/paint_provider.dart';
-import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:lottie/lottie.dart';
-import 'package:material_dialogs/material_dialogs.dart';
-import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
@@ -75,8 +71,6 @@ class _LangameViewState extends State<LangameView> {
     var fp = Provider.of<FunnyProvider>(context, listen: false);
     _loadingMessage = fp.getLoadingRandom();
     _failingMessage = fp.getFailingRandom();
-    Provider.of<PaintingProvider>(context, listen: false)
-        .init(widget.channelName);
     var lp = Provider.of<LangameProvider>(context, listen: false);
 
     if (!widget.notifyOthers) return;
@@ -219,7 +213,7 @@ class _LangameViewState extends State<LangameView> {
     });
 
     return Scaffold(
-      backgroundColor: variantIsLightThenDark(context, reverse: true),
+      backgroundColor: isLightThenDark(context, reverse: true),
       resizeToAvoidBottomInset: false,
       body: _buildHome(l.data()!),
     );
@@ -236,7 +230,7 @@ class _LangameViewState extends State<LangameView> {
             child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            _buildTimerText(l),
+            _buildNavigationButtons(l),
             _buildMeme(l),
             _buildBottomHalf(),
           ],
@@ -257,9 +251,9 @@ class _LangameViewState extends State<LangameView> {
                 style: Theme.of(context).textTheme.headline4,
               ),
               LangameButton(Icons.cancel_outlined,
-                  onPressed: cp.dialogComplete, text: 'Cancel'),
+                  onPressed: cp.dialogComplete, text: 'Cancel', layer: 1),
               LangameButton(Icons.exit_to_app_rounded,
-                  onPressed: _onEnd, text: 'Yes'),
+                  onPressed: _onEnd, text: 'Yes', layer: 1),
             ])),
       ],
       canBack: true,
@@ -428,10 +422,7 @@ class _LangameViewState extends State<LangameView> {
       Provider.of<CrashAnalyticsProvider>(context, listen: false)
           .log('langame end', analyticsMessage: 'langame_end');
       await Future.wait([
-        // mp.sendLangameEnd(langame!.channelName),
         Provider.of<AudioProvider>(context, listen: false).leaveChannel(),
-        // mp.deleteNotification(langame!.channelName),
-        Provider.of<PaintingProvider>(context, listen: false).stop()
       ]);
     } catch (e, s) {
       Provider.of<CrashAnalyticsProvider>(context, listen: false)
@@ -443,12 +434,11 @@ class _LangameViewState extends State<LangameView> {
 
   Widget _buildWaitingScreen(lg.Langame l) {
     return Scaffold(
-      backgroundColor: variantIsLightThenDark(context, reverse: true),
+      backgroundColor: isLightThenDark(context, reverse: true),
       resizeToAvoidBottomInset: false,
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Provider.of<ContextProvider>(context, listen: false).buildLoadingWidget(
-            text: '',
-            backgroundColor: variantIsLightThenDark(context, reverse: true)),
+            text: '', backgroundColor: isLightThenDark(context, reverse: true)),
         SizedBox(height: AppSize.blockSizeVertical * 5),
         Container(
           padding: EdgeInsets.all(12),
@@ -495,15 +485,22 @@ class _LangameViewState extends State<LangameView> {
     return texts.pickAny();
   }
 
-  Widget _buildTimerText(lg.Langame l) {
-    return Consumer<AudioProvider>(builder: (ctx, s, c) =>  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      LangameButton(FontAwesomeIcons.arrowAltCircleLeft, onPressed: () {
-        s.incrementCurrentMeme(l, -1);
-      }, text: 'Previous'/*, disabled: s.currentMeme == 0*/),
-      LangameButton(FontAwesomeIcons.arrowAltCircleRight, onPressed: () {
-        s.incrementCurrentMeme(l, 1);
-      }, text: 'Next'/*, disabled: s.currentMeme >= l.memes.length - 1*/)
-    ]));
+  Widget _buildNavigationButtons(lg.Langame l) {
+    return Consumer<AudioProvider>(
+        builder: (ctx, s, c) =>
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              LangameButton(FontAwesomeIcons.arrowAltCircleLeft, onPressed: () {
+                s.incrementCurrentMeme(l, -1);
+              },
+                  text: 'Previous',
+                  layer: 1 /*, disabled: s.currentMeme == 0*/),
+              LangameButton(FontAwesomeIcons.arrowAltCircleRight,
+                  onPressed: () {
+                s.incrementCurrentMeme(l, 1);
+              },
+                  text: 'Next',
+                  layer: 1 /*, disabled: s.currentMeme >= l.memes.length - 1*/)
+            ]));
   }
 
   Widget _buildMeme(lg.Langame l) {
@@ -584,7 +581,7 @@ class _LangameViewState extends State<LangameView> {
               color: variantBisIsLightThenDark(context),
               width: 5,
             ),
-            color: isLightThenDark(context, reverse: true),
+            color: variantIsLightThenDark(context, reverse: true),
             borderRadius: BorderRadius.all(Radius.circular(10.0))),
         height: AppSize.blockSizeVertical * 40,
         width: AppSize.safeBlockHorizontal * 80,
@@ -605,7 +602,7 @@ class _LangameViewState extends State<LangameView> {
                 color: variantBisIsLightThenDark(context),
                 width: 5,
               ),
-              color: isLightThenDark(context, reverse: true),
+              color: variantIsLightThenDark(context, reverse: true),
             ),
             width: AppSize.safeBlockHorizontal * 70,
             child: Row(
@@ -719,6 +716,10 @@ class _LangameViewState extends State<LangameView> {
 
   Future<void> _showEndDialog() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);
+    var currentLg = Provider.of<LangameProvider>(context, listen: false)
+        .runningLangames
+        .values
+        .firstWhere((e) => e.channelName == widget.channelName);
     cp.showCustomDialog(
       [
         Padding(
@@ -764,17 +765,14 @@ class _LangameViewState extends State<LangameView> {
                 isSelected: s.feedbackMemeGeneralScoreSelected,
               ),
               LangameButton(FontAwesomeIcons.doorOpen, onPressed: () {
-                var currentLg =
-                    Provider.of<LangameProvider>(context, listen: false)
-                        .runningLangames
-                        .values
-                        .firstWhere((e) => e.channelName == widget.channelName);
-                // TODO: handle multiple memes
+                // TODO: handle feedback per memes
+                currentLg.memes.forEach((e) => s.sendMemeFeedback(e));
                 // We don't wait, should not block user
-                s.sendMemeFeedback(currentLg.memes[currentLg.currentMeme]);
                 cp.showSnackBar('Thank you a lot 🥰');
                 _goBackToMainMenu();
               }, text: 'Leave'),
+              LangameButton(FontAwesomeIcons.forward,
+                  onPressed: _goBackToMainMenu, text: 'Skip'),
             ]),
           ),
         ),
