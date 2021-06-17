@@ -61,8 +61,7 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Better handling of multi-topics Langame
-      - Reworked interface a little bit, particularly colors"
+      changelog: "- Old Langames are properly removed"
     )
 
     delete_temp_keychain(keychain_name)

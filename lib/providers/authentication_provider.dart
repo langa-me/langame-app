@@ -79,7 +79,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LangameResponse> _loginWith(OAuthCredential credential) async {
     try {
-      _cap.log('_crashAnalyticsProvider.loginWith');
+      _cap.log('authentication_provider:loginWith');
       var uc = await _authenticationApi.loginWithFirebase(credential);
       if (uc.user == null) throw LangameAuthException('null_user');
       // Shouldn't update profile on new user at login
@@ -125,7 +125,7 @@ class AuthenticationProvider extends ChangeNotifier {
         apple: isApple,
       );
     } catch (e, s) {
-      _cap.log('failed to _crashAnalyticsProvider.loginWith');
+      _cap.log('failed to authentication_provider:loginWith');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -138,7 +138,7 @@ class AuthenticationProvider extends ChangeNotifier {
       var res = await _authenticationApi.loginWithApple();
       return _loginWith(res);
     } catch (e, s) {
-      _cap.log('failed to loginWithApple');
+      _cap.log('authentication_provider:failed to loginWithApple');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
@@ -149,7 +149,7 @@ class AuthenticationProvider extends ChangeNotifier {
       var res = await _authenticationApi.loginWithFacebook();
       return _loginWith(res);
     } catch (e, s) {
-      _cap.log('failed to loginWithFacebook');
+      _cap.log('authentication_provider:failed to loginWithFacebook');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
@@ -160,7 +160,7 @@ class AuthenticationProvider extends ChangeNotifier {
       var res = await _authenticationApi.loginWithGoogle();
       return _loginWith(res);
     } catch (e, s) {
-      _cap.log('failed to loginWithGoogle');
+      _cap.log('authentication_provider:failed to loginWithGoogle');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
@@ -168,7 +168,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LangameResponse> logout() async {
     try {
-      _cap.log('purging local storage');
+      _cap.log('authentication_provider:purging local storage');
       var i = await SharedPreferences.getInstance();
       await i.clear();
       // TODO: permission denied somehow (firestore)
@@ -178,7 +178,7 @@ class AuthenticationProvider extends ChangeNotifier {
       _cap.log('logout');
       return LangameResponse<lg.User>(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('failed to logout');
+      _cap.log('authentication_provider:failed to logout');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -187,7 +187,7 @@ class AuthenticationProvider extends ChangeNotifier {
   // TODO langame response
   Future<LangameResponse<List<lg.User>>> getLangameUsersStartingWithTag(String tag) async {
     try {
-      _cap.log('getLangameUsersStartingWithTag $tag');
+      _cap.log('authentication_provider:getLangameUsersStartingWithTag $tag');
       var u = await _authenticationApi.getLangameUsersStartingWithTag(
           _user!.tag, tag);
       return LangameResponse(LangameStatus.succeed, result: u);

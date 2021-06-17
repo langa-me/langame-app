@@ -77,13 +77,13 @@ class _LangameViewState extends State<LangameView> {
     lp.notifyPresence(widget.channelName);
   }
 
+
   @override
   Widget build(BuildContext context) {
     var crash = Provider.of<CrashAnalyticsProvider>(context, listen: false);
     var lp = Provider.of<LangameProvider>(context, listen: false);
     var audio = Provider.of<AudioProvider>(context, listen: false);
     var cp = Provider.of<ContextProvider>(context, listen: false);
-
     // TODO: might do that on other pages too
     var network = Provider.of<ConnectivityResult>(context, listen: false);
     if (network == ConnectivityResult.none) {
@@ -91,14 +91,14 @@ class _LangameViewState extends State<LangameView> {
         'view': 'langame_view',
       });
       return WillPopScope(
-        onWillPop: _onBackPressed,
+        onWillPop: () => _onBackPressed(showFeedbackDialogOnLeave: false),
         child: cp.buildLoadingWidget(text: 'You are offline!'),
       );
     }
 
     if (langameStream == null) {
       return WillPopScope(
-        onWillPop: _onBackPressed,
+        onWillPop: () => _onBackPressed(showFeedbackDialogOnLeave: false),
         child: FutureBuilder<
                 LangameResponse<Stream<DocumentSnapshot<lg.Langame>>>>(
             future: lp.joinLangame(widget.channelName),
@@ -162,7 +162,7 @@ class _LangameViewState extends State<LangameView> {
     // Fifth-step, initialize audio engine
     if (!engineInitialized) {
       return WillPopScope(
-        onWillPop: _onBackPressed,
+        onWillPop: () => _onBackPressed(showFeedbackDialogOnLeave: false),
         child: FutureBuilder<LangameResponse<void>>(
           future: audio.initEngine(_buildEventHandler()),
           builder: (c, s) {
@@ -237,7 +237,7 @@ class _LangameViewState extends State<LangameView> {
         ))
       ]);
 
-  Future<bool> _onBackPressed() {
+  Future<bool> _onBackPressed({bool showFeedbackDialogOnLeave = true}) {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     return cp.showCustomDialog<bool>(
       [
@@ -253,7 +253,10 @@ class _LangameViewState extends State<LangameView> {
               LangameButton(Icons.cancel_outlined,
                   onPressed: cp.dialogComplete, text: 'Cancel', layer: 1),
               LangameButton(Icons.exit_to_app_rounded,
-                  onPressed: _onEnd, text: 'Yes', layer: 1),
+                  onPressed: () =>
+                      _onEnd(showFeedbackDialog: showFeedbackDialogOnLeave),
+                  text: 'Yes',
+                  layer: 1),
             ])),
       ],
       canBack: true,
@@ -416,20 +419,12 @@ class _LangameViewState extends State<LangameView> {
         },
       );
 
-  Future<void> _onEnd() async {
+  Future<void> _onEnd({bool showFeedbackDialog = true}) async {
+    Provider.of<CrashAnalyticsProvider>(context, listen: false).log('langame end', analyticsMessage: 'langame_end');
+    Provider.of<AudioProvider>(context, listen: false).leaveChannel();
     setState(() => done = true);
-    try {
-      Provider.of<CrashAnalyticsProvider>(context, listen: false)
-          .log('langame end', analyticsMessage: 'langame_end');
-      await Future.wait([
-        Provider.of<AudioProvider>(context, listen: false).leaveChannel(),
-      ]);
-    } catch (e, s) {
-      Provider.of<CrashAnalyticsProvider>(context, listen: false)
-          .crashlytics
-          .recordError(e, s);
-    }
-    Future.delayed(Duration.zero, () => _showEndDialog());
+    if (showFeedbackDialog)
+      Future.delayed(Duration.zero, () => _showEndDialog());
   }
 
   Widget _buildWaitingScreen(lg.Langame l) {
@@ -491,9 +486,7 @@ class _LangameViewState extends State<LangameView> {
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               LangameButton(FontAwesomeIcons.arrowAltCircleLeft, onPressed: () {
                 s.incrementCurrentMeme(l, -1);
-              },
-                  text: 'Previous',
-                  layer: 1 /*, disabled: s.currentMeme == 0*/),
+              }, text: 'Previous', layer: 1 /*, disabled: s.currentMeme == 0*/),
               LangameButton(FontAwesomeIcons.arrowAltCircleRight,
                   onPressed: () {
                 s.incrementCurrentMeme(l, 1);

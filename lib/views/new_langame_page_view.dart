@@ -233,6 +233,7 @@ class _SendLangameState extends State<NewLangamePageView>
                   cap.logNewFeatureClick('new_langame_add_to_calendar');
                 },
                 text: 'Add to calendar',
+                layer: 2,
                 // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 100),
               ),
               Divider(),
@@ -247,7 +248,7 @@ class _SendLangameState extends State<NewLangamePageView>
                       // - a langame is created, anyone with the link can join anytime,
                       // X is notified of date Y
                       cp.push(RunningLangamesView());
-                    }, text: 'Join later'),
+                    }, text: 'Join later', layer: 2),
                     LangameButton(FontAwesomeIcons.hourglass, onPressed: () {
                       // USE CASE: didn't select anybody, any date
                       // - a langame is created, anyone with the link can join anytime
@@ -255,7 +256,7 @@ class _SendLangameState extends State<NewLangamePageView>
                       // - a langame is created, anyone with the link can join anytime,
                       // X is notified of date Y and of presence of self in lg
                       cp.pushReplacement(LangameView(snap.channelName, false));
-                    }, text: 'Join now'),
+                    }, text: 'Join now', layer: 2),
                   ])
             ],
           ),

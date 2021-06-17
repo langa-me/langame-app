@@ -45,15 +45,18 @@ class LangameProvider extends ChangeNotifier {
       var streams = await _langameApi.getLangames(unDoneOnly: false);
       // TODO: what happen if user log in / out, delete acc, to the stream subs?
       streams.forEach((stream) {
+        _finishedLangames.clear();
+        _runningLangames.clear();
         _subs.add(stream.listen((snap) {
           if (snap.data() == null) return;
-          if (snap.data()!.hasDone()) {
+          // Seconds = 0 = null
+          if (snap.data()!.hasDone() && snap.data()?.done.seconds != 0) {
             _finishedLangames[snap.id] = snap.data()!;
           } else {
             _runningLangames[snap.id] = snap.data()!;
           }
-          notifyListeners();
         }));
+        notifyListeners();
       });
 
       _cap.log('initialize and get langames');
@@ -116,7 +119,8 @@ class LangameProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<void>> addNote(String channelName, String note, lg.Note_Type type) async {
+  Future<LangameResponse<void>> addNote(
+      String channelName, String note, lg.Note_Type type) async {
     try {
       await _langameApi.addNoteToLangame(channelName, note, type);
       _cap.log('addNote $note');

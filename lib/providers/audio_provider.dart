@@ -190,8 +190,9 @@ class AudioProvider extends ChangeNotifier {
       }
       _langameSnapId = null;
       _engine = null;
+      _cap.log('audio_provider:leaveChannel');
     } catch (e, s) {
-      _cap.log('failed to leaveChannel');
+      _cap.log('audio_provider:failed to leaveChannel');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

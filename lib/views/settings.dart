@@ -93,21 +93,21 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   color: isLightThenDark(context)),
               title: Text('Hack', style: Theme.of(context).textTheme.headline6),
             ) : SizedBox.shrink()),
-            ListTile(
-              onTap: () {
-                // Only safe in dev mode yet
-                if (kReleaseMode) {
-                  cp.showSnackBar('Coming soon!');
-                  cap.logNewFeatureClick('settings_subscription');
-                  return;
-                }
-                cp.push(PaymentView());
-              },
-              leading: Icon(Icons.subscriptions_rounded,
-                  color: isLightThenDark(context)),
-              title: Text('Subscription',
-                  style: Theme.of(context).textTheme.headline6),
-            ),
+            // ListTile(
+            //   onTap: () {
+            //     // Only safe in dev mode yet
+            //     if (kReleaseMode) {
+            //       cp.showSnackBar('Coming soon!');
+            //       cap.logNewFeatureClick('settings_subscription');
+            //       return;
+            //     }
+            //     cp.push(PaymentView());
+            //   },
+            //   leading: Icon(Icons.subscriptions_rounded,
+            //       color: isLightThenDark(context)),
+            //   title: Text('Subscription',
+            //       style: Theme.of(context).textTheme.headline6),
+            // ),
             ListTile(
               onTap: () {
                 cp.showSnackBar('Coming soon!');
