@@ -152,6 +152,8 @@ message Langame {
   google.protobuf.Timestamp started = 11;
   // When the players can go next meme
   google.protobuf.Timestamp next_meme = 13;
+  int32 memes_seen = 14;
+  google.protobuf.Timestamp meme_changed = 15;
 }
 
 message Player {

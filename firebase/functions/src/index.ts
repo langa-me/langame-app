@@ -18,6 +18,7 @@ import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
 import {onWriteTag} from "./onWriteTag";
+import {onUpdateLangame} from "./onUpdateLangame";
 
 
 /*
@@ -102,9 +103,9 @@ exports.onCreateLangame = functions.firestore
     .document(`${kLangamesCollection}/{pushId}`)
     .onCreate(onCreateLangame);
 
-// exports.onUpdateLangame = functions.firestore
-//     .document(`${kLangamesCollection}/{langameId}`)
-//     .onUpdate(onUpdateLangame);
+exports.onUpdateLangame = functions.firestore
+    .document(`${kLangamesCollection}/{langameId}`)
+    .onUpdate(onUpdateLangame);
 
 exports.onUpdateLangamePlayers = functions.firestore
     .document(`${kLangamesCollection}/{langameId}/players/{playerId}`)

@@ -130,9 +130,6 @@ class ImplLangameApi extends LangameApi {
       List<String> players, List<String> topics, DateTime date) async {
     var p = players.map((e) => lg.Player(userId: e)).toList() +
         [lg.Player(userId: firebase.auth!.currentUser!.uid)];
-    var dateAsProtobuf = gg.Timestamp.fromDateTime(
-      date,
-    );
 
     var a = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)

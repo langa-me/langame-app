@@ -60,8 +60,8 @@ class ContextProvider extends ChangeNotifier {
 
   Future<Widget?> push(Widget route) => _navigationService.push(route);
 
-  Future<Widget?> pushReplacement(Widget route) =>
-      _navigationService.pushReplacement(route);
+  Future<Widget?> pushReplacement(Widget route, {bool tryPopParents = true}) =>
+      _navigationService.pushReplacement(route, tryPopParents: tryPopParents);
 
   void pop() => _navigationService.pop();
 

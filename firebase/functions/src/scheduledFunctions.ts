@@ -33,7 +33,7 @@ export const setLangamesDone =
       const db = admin.firestore();
       const HOUR = 4 * 1000 * 60 * 60;
       const anHourAgo = new Date(Date.now() - HOUR);
-
+      // TODO: delete non-started too old ones?
       try {
         db.runTransaction(async (t) => {
           const langamesThatStartedMoreThanOneHourAgo = await t.get(db

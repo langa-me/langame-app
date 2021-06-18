@@ -106,6 +106,7 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
                 expandedAlignment: Alignment.center,
                 children: [
                   LangameButton(FontAwesomeIcons.doorOpen,
+                  layer: 1,
                     text: 'join',
                       onPressed: () => cp
                           .pushReplacement(LangameView(l.channelName, false))),

@@ -2,6 +2,7 @@ import 'package:after_layout/after_layout.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
@@ -31,6 +32,8 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .setCurrentScreen('main_view');
+    Provider.of<AudioProvider>(context, listen: false).leaveChannel();
+
   }
 
   @override
@@ -67,9 +70,9 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
                 style: Theme.of(context).textTheme.headline4,
               ),
               LangameButton(Icons.cancel_outlined,
-                  onPressed: cp.dialogComplete, text: 'Cancel'),
+                  onPressed: cp.dialogComplete, text: 'Cancel', layer: 1),
               LangameButton(Icons.exit_to_app_rounded,
-                  onPressed: cp.pop, text: 'Yes'),
+                  onPressed: cp.pop, text: 'Yes', layer: 1),
             ])),
       ],
       canBack: true,

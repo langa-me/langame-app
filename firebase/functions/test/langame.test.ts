@@ -1,20 +1,39 @@
 import "mocha";
 
 import * as admin from "firebase-admin";
+import {kLangamesCollection} from "../src/helpers";
+import {langame} from "../src/langame/protobuf/langame";
 
 const cred = admin.credential.cert("./langame-dev-8ac76897c7bc.json");
-// @ts-ignore
-// const fft = require("firebase-functions-test")({
-//   credential: cred,
-//   projectId: "langame-dev",
-// });
+// eslint-disable-next-line max-len
+// const cred = admin.credential.cert("./langame-86ac4-firebase-adminsdk-iojlf-2d6861b97d.json");
+require("firebase-functions-test")({
+  credential: cred,
+  projectId: "langame-dev",
+});
 admin.initializeApp({
   credential: cred,
 });
+import {converter} from "../src/utils/firestore";
 
 describe("Langame stuff", async () => {
   before(() => {
 
+  });
+  it.skip("get done", async () => {
+    const db = admin.firestore();
+    const HOUR = 4 * 1000 * 60 * 60;
+    const anHourAgo = new Date(Date.now() - HOUR);
+    await db.runTransaction(async (t) => {
+      const langamesThatStartedMoreThanOneHourAgo = await t.get(db
+          .collection(kLangamesCollection)
+          .where("done", "==", null)
+          .where("started",
+              "<",
+              admin.firestore.Timestamp.fromDate(anHourAgo))
+          .withConverter(converter<langame.protobuf.Langame>()));
+      console.log(langamesThatStartedMoreThanOneHourAgo);
+    });
   });
   it("onUpdateLangame", async () => {
     // Make snapshot for state of database beforehand

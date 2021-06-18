@@ -101,8 +101,8 @@ class _LangameButtonState extends State<LangameButton> {
   _LangameButtonState({this.disabled = false});
   @override
   Widget build(BuildContext context) {
-    var bg = getBlackAndWhite(context, widget.layer + (disabled ? 1 : 0), reverse: true);
-    var fg = getBlackAndWhite(context, widget.layer + (disabled ? 1 : 0), reverse: false);
+    var bg = getBlackAndWhite(context, widget.layer, reverse: true);
+    var fg = getBlackAndWhite(context, widget.layer, reverse: false);
 
     if (widget.highlighted) {
       bg = Theme.of(context).colorScheme.secondary;
@@ -111,6 +111,8 @@ class _LangameButtonState extends State<LangameButton> {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         primary: bg,
+        // onSurface = disabled
+        onSurface: getBlackAndWhite(context, widget.layer+1, reverse: true),
         elevation: 5,
         shadowColor: variantIsLightThenDark(context, reverse: true),
         shape: RoundedRectangleBorder(

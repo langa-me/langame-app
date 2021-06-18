@@ -1133,6 +1133,8 @@ class Langame extends $pb.GeneratedMessage {
     ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors')
     ..aOM<$0.Timestamp>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'started', subBuilder: $0.Timestamp.create)
     ..aOM<$0.Timestamp>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'nextMeme', subBuilder: $0.Timestamp.create)
+    ..a<$core.int>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memesSeen', $pb.PbFieldType.O3)
+    ..aOM<$0.Timestamp>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memeChanged', subBuilder: $0.Timestamp.create)
     ..hasRequiredFields = false
   ;
 
@@ -1149,6 +1151,8 @@ class Langame extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? errors,
     $0.Timestamp? started,
     $0.Timestamp? nextMeme,
+    $core.int? memesSeen,
+    $0.Timestamp? memeChanged,
   }) {
     final _result = create();
     if (channelName != null) {
@@ -1183,6 +1187,12 @@ class Langame extends $pb.GeneratedMessage {
     }
     if (nextMeme != null) {
       _result.nextMeme = nextMeme;
+    }
+    if (memesSeen != null) {
+      _result.memesSeen = memesSeen;
+    }
+    if (memeChanged != null) {
+      _result.memeChanged = memeChanged;
     }
     return _result;
   }
@@ -1289,6 +1299,26 @@ class Langame extends $pb.GeneratedMessage {
   void clearNextMeme() => clearField(13);
   @$pb.TagNumber(13)
   $0.Timestamp ensureNextMeme() => $_ensure(10);
+
+  @$pb.TagNumber(14)
+  $core.int get memesSeen => $_getIZ(11);
+  @$pb.TagNumber(14)
+  set memesSeen($core.int v) { $_setSignedInt32(11, v); }
+  @$pb.TagNumber(14)
+  $core.bool hasMemesSeen() => $_has(11);
+  @$pb.TagNumber(14)
+  void clearMemesSeen() => clearField(14);
+
+  @$pb.TagNumber(15)
+  $0.Timestamp get memeChanged => $_getN(12);
+  @$pb.TagNumber(15)
+  set memeChanged($0.Timestamp v) { setField(15, v); }
+  @$pb.TagNumber(15)
+  $core.bool hasMemeChanged() => $_has(12);
+  @$pb.TagNumber(15)
+  void clearMemeChanged() => clearField(15);
+  @$pb.TagNumber(15)
+  $0.Timestamp ensureMemeChanged() => $_ensure(12);
 }
 
 class Player extends $pb.GeneratedMessage {

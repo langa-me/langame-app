@@ -6,6 +6,7 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/views/buttons/button.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -77,7 +78,8 @@ class _State extends State<SearchPageView>
               return;
             }
             ap.getLangameUsersStartingWithTag(query).then((v) =>
-                lsp.filteredTagSearchHistory = v.result?.map((e) => e.tag).toList());
+                lsp.filteredTagSearchHistory =
+                    v.result?.map((e) => e.tag).toList());
           },
           onSubmitted: (query) {
             lsp.addSearchHistory(query);
@@ -164,13 +166,15 @@ class _State extends State<SearchPageView>
                       onTap: () {
                         _searchBarController.close();
                         ap.getLangameUsersStartingWithTag(tag).then((users) {
-                          if (users.result != null && users.result!.length == 1) {
+                          if (users.result != null &&
+                              users.result!.length == 1) {
                             lsp.selectedTag = users.result?.first.tag;
                             lsp.selectedUser = users.result?.first;
                             lsp.addSearchHistory(users.result!.first.tag);
 
                             /// Place first
-                            lsp.placeFirstSearchHistory(users.result!.first.tag);
+                            lsp.placeFirstSearchHistory(
+                                users.result!.first.tag);
                           } else {
                             // TODO: should notify "no user found" or several found ...
                             lsp.selectedTag = null;
@@ -229,31 +233,18 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
       return Column(children: [
         Profile(p.selectedUser!),
         Spacer(),
-        OutlinedButton.icon(
-          // TODO: might use ToggleButton instead? (with icon)
+        LangameButton(
+          lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
+              ? Icons.remove_shopping_cart_outlined
+              : Icons.add_shopping_cart_outlined,
+          text: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
+              ? 'Remove'
+              : 'Add',
+          layer: 1,
           onPressed: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
               ? onRemoveFromShoppingList(
                   p.selectedUser!, lp, cp, widget._goToPage)
               : onAddToShoppingList(p.selectedUser!, lp, cp, widget._goToPage),
-          style: ElevatedButton.styleFrom(
-            primary: isLightThenDark(context, reverse: true),
-            side: BorderSide(
-                width: 2.0, color: Theme.of(context).colorScheme.secondary),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(32.0),
-            ),
-          ),
-          label: Text(
-              lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-                  ? 'Remove'
-                  : 'Add',
-              style: TextStyle(color: isLightThenDark(context))),
-          icon: Icon(
-            lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-                ? Icons.remove_shopping_cart_outlined
-                : Icons.add_shopping_cart_outlined,
-            color: Theme.of(context).colorScheme.secondary,
-          ),
         ),
         Spacer(),
       ]);

@@ -38,9 +38,6 @@ class AudioProvider extends ChangeNotifier {
   bool _isJoining = false;
   String? _langameSnapId;
 
-  int _currentMeme = 0;
-  int get currentMeme => _currentMeme;
-
   Future<LangameResponse<bool>> checkPermission() async {
     try {
       // if (defaultTargetPlatform == TargetPlatform.android) {
@@ -109,6 +106,9 @@ class AudioProvider extends ChangeNotifier {
   Future<LangameResponse<void>> joinChannel(
       DocumentSnapshot<Langame> langame) async {
     try {
+      if (_engine == null) {
+        return LangameResponse(LangameStatus.failed, error: 'engine_null');
+      }
       if (_hasJoinedChannel || _isJoining) {
         _cap.log('joinChannel already joining channel or has joined');
         return LangameResponse(LangameStatus.succeed);
@@ -265,17 +265,17 @@ class AudioProvider extends ChangeNotifier {
   Future<LangameResponse<void>> incrementCurrentMeme(
       Langame l, int value) async {
     try {
-      if ((_currentMeme + value) < 0 || (_currentMeme + value) >= (l.memes.length - 1))
-      return LangameResponse(LangameStatus.succeed);
+      if (l.currentMeme + value < 0 || l.currentMeme + value >= l.memes.length)
+        return LangameResponse(LangameStatus.succeed);
       var ref = firebase.firestore!
           .collection(AppConst.firestoreLangamesCollection)
           .doc(_langameSnapId);
       await ref.update({
         'currentMeme': FieldValue.increment(value),
       });
-      _cap.log('incrementCurrentMeme $_currentMeme + $value');
+      _cap.log('incrementCurrentMeme ${l.currentMeme} + $value');
 
-      _currentMeme = _currentMeme + value;
+      l.currentMeme = l.currentMeme + value;
       notifyListeners();
 
       return LangameResponse(LangameStatus.succeed);

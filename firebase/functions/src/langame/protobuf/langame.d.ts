@@ -1371,6 +1371,12 @@ export namespace langame {
 
             /** Langame nextMeme */
             nextMeme?: (google.protobuf.ITimestamp|null);
+
+            /** Langame memesSeen */
+            memesSeen?: (number|null);
+
+            /** Langame memeChanged */
+            memeChanged?: (google.protobuf.ITimestamp|null);
         }
 
         /** Represents a Langame. */
@@ -1414,6 +1420,12 @@ export namespace langame {
 
             /** Langame nextMeme. */
             public nextMeme?: (google.protobuf.ITimestamp|null);
+
+            /** Langame memesSeen. */
+            public memesSeen: number;
+
+            /** Langame memeChanged. */
+            public memeChanged?: (google.protobuf.ITimestamp|null);
 
             /**
              * Creates a new Langame instance using the specified properties.

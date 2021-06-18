@@ -44,6 +44,7 @@ class TagProvider extends ChangeNotifier {
           )
           .get();
       if (meme.data() == null) return LangameResponse(LangameStatus.failed);
+      _cap.log('tag_provider:getMeme $memeId');
       return LangameResponse(LangameStatus.succeed, result: meme.data());
     } catch (e, s) {
       _cap.log('failed to getMeme $memeId');

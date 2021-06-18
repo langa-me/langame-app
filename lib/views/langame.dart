@@ -7,6 +7,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/helpers/toast.dart';
@@ -63,6 +64,9 @@ class _LangameViewState extends State<LangameView> {
   final PageController controller = PageController(initialPage: 0);
   final TextEditingController notesController = new TextEditingController();
 
+  bool _justChangedMeme = false;
+  Timer? _justChangedMemeTimer;
+
   @override
   void initState() {
     super.initState();
@@ -76,7 +80,6 @@ class _LangameViewState extends State<LangameView> {
     if (!widget.notifyOthers) return;
     lp.notifyPresence(widget.channelName);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +126,8 @@ class _LangameViewState extends State<LangameView> {
     }
 
     if (done) {
-      return Center(
+      return Material(
+          child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -145,7 +149,7 @@ class _LangameViewState extends State<LangameView> {
             ),
           ],
         ),
-      );
+      ));
     }
 
     if (!permissionRequested) {
@@ -186,20 +190,28 @@ class _LangameViewState extends State<LangameView> {
     }
     crash.log('engineInitialized $engineInitialized');
 
-    return WillPopScope(
-        onWillPop: _onBackPressed,
-        // Start once two players joined
-        child: StreamBuilder<DocumentSnapshot<lg.Langame>>(
-            builder: (context, langameSnap) {
-              if (langameSnap.hasData && langameSnap.data!.exists) {
-                // If it has started...
-                return langameSnap.data!.data()!.hasStarted()
-                    ? _buildRunningLangame(langameSnap.data!)
-                    : _buildWaitingScreen(langameSnap.data!.data()!);
-              }
-              return cp.buildLoadingWidget(text: _loadingMessage);
-            },
-            stream: langameStream));
+    return StreamBuilder<DocumentSnapshot<lg.Langame>>(
+        builder: (context, langameSnap) {
+          if (langameSnap.hasData && langameSnap.data!.exists) {
+            // If it has started...
+            return langameSnap.data!.data()!.hasStarted()
+                ? WillPopScope(
+                    onWillPop: () =>
+                        _onBackPressed(showFeedbackDialogOnLeave: true),
+                    // Start once two players joined
+                    child: _buildRunningLangame(langameSnap.data!))
+                : WillPopScope(
+                    onWillPop: () =>
+                        _onBackPressed(showFeedbackDialogOnLeave: false),
+                    // Start once two players joined
+                    child: _buildWaitingScreen(langameSnap.data!.data()!));
+          }
+          return WillPopScope(
+              onWillPop: () => _onBackPressed(showFeedbackDialogOnLeave: false),
+              // Start once two players joined
+              child: cp.buildLoadingWidget(text: _loadingMessage));
+        },
+        stream: langameStream);
   }
 
   Widget _buildRunningLangame(DocumentSnapshot<lg.Langame> l) {
@@ -251,12 +263,12 @@ class _LangameViewState extends State<LangameView> {
                 style: Theme.of(context).textTheme.headline4,
               ),
               LangameButton(Icons.cancel_outlined,
-                  onPressed: cp.dialogComplete, text: 'Cancel', layer: 1),
+                  onPressed: cp.dialogComplete, text: 'Cancel', layer: 2),
               LangameButton(Icons.exit_to_app_rounded,
-                  onPressed: () =>
-                      _onEnd(showFeedbackDialog: showFeedbackDialogOnLeave),
+                  onPressed: () async => await _onEnd(
+                      showFeedbackDialog: showFeedbackDialogOnLeave),
                   text: 'Yes',
-                  layer: 1),
+                  layer: 2),
             ])),
       ],
       canBack: true,
@@ -278,11 +290,15 @@ class _LangameViewState extends State<LangameView> {
           child: Column(children: [
             Text('We need your permission to use your microphone',
                 style: Theme.of(context).textTheme.headline6),
-            Lottie.asset('animations/microphone.json'),
+            Lottie.asset(
+              'animations/microphone.json',
+              width: AppSize.safeBlockHorizontal * 70,
+              height: AppSize.safeBlockVertical * 40,
+            ),
             LangameButton(FontAwesomeIcons.doorOpen, onPressed: () {
               cp.dialogComplete();
               _goBackToMainMenu();
-            }, text: 'Leave'),
+            }, text: 'Leave', layer: 2),
             LangameButton(FontAwesomeIcons.checkCircle, onPressed: () async {
               var p = Provider.of<AudioProvider>(context, listen: false);
               var res = await p.requestPermission();
@@ -307,23 +323,24 @@ class _LangameViewState extends State<LangameView> {
                 },
                 onFailure: _goBackToMainMenu,
               );
-            }, text: 'Accept'),
+            }, text: 'Accept', layer: 2),
           ]))
     ]);
   }
 
-  void _handleError({bool failNow = false}) {
+  void _handleError({bool failNow = false}) async {
     if (errors > maxErrors || failNow) {
-      Provider.of<AudioProvider>(context, listen: false).leaveChannel();
-
-      showToast(
+      var f = Provider.of<AudioProvider>(context, listen: false).leaveChannel();
+      var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
+      var cp = Provider.of<ContextProvider>(context, listen: false);
+      cp.showSnackBar(
         _failingMessage,
-        color: Colors.red,
       );
-      Provider.of<CrashAnalyticsProvider>(context, listen: false)
-          .crashlytics
-          .recordError(LangameException('failed to start langame'), null,
-              reason: 'failed to start langame', fatal: true);
+
+      cap.crashlytics.recordError(
+          LangameException('failed to start langame'), null,
+          reason: 'failed to start langame', fatal: true);
+      await f;
       _goBackToMainMenu();
 
       return;
@@ -420,11 +437,14 @@ class _LangameViewState extends State<LangameView> {
       );
 
   Future<void> _onEnd({bool showFeedbackDialog = true}) async {
-    Provider.of<CrashAnalyticsProvider>(context, listen: false).log('langame end', analyticsMessage: 'langame_end');
-    Provider.of<AudioProvider>(context, listen: false).leaveChannel();
+    Provider.of<CrashAnalyticsProvider>(context, listen: false)
+        .log('langame end', analyticsMessage: 'langame_end');
+    await Provider.of<AudioProvider>(context, listen: false).leaveChannel();
     setState(() => done = true);
     if (showFeedbackDialog)
       Future.delayed(Duration.zero, () => _showEndDialog());
+    else
+      _goBackToMainMenu();
   }
 
   Widget _buildWaitingScreen(lg.Langame l) {
@@ -480,20 +500,76 @@ class _LangameViewState extends State<LangameView> {
     return texts.pickAny();
   }
 
+  String _printDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$twoDigitMinutes:$twoDigitSeconds";
+  }
+
   Widget _buildNavigationButtons(lg.Langame l) {
-    return Consumer<AudioProvider>(
-        builder: (ctx, s, c) =>
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              LangameButton(FontAwesomeIcons.arrowAltCircleLeft, onPressed: () {
-                s.incrementCurrentMeme(l, -1);
-              }, text: 'Previous', layer: 1 /*, disabled: s.currentMeme == 0*/),
-              LangameButton(FontAwesomeIcons.arrowAltCircleRight,
-                  onPressed: () {
-                s.incrementCurrentMeme(l, 1);
-              },
-                  text: 'Next',
-                  layer: 1 /*, disabled: s.currentMeme >= l.memes.length - 1*/)
-            ]));
+    var now = DateTime.now().toUtc();
+    var nm = l.nextMeme.toDateTime().toUtc();
+    var mc = l.memeChanged.toDateTime().toUtc();
+    return Consumer<AudioProvider>(builder: (ctx, p, c) {
+      return StreamBuilder<DateTime>(
+          stream: Stream.periodic(Duration(seconds: 1), (i) {
+            now = now.add(Duration(seconds: 1));
+            return now;
+          }),
+          builder: (ctx, s) {
+            if (s.data == null) return CircularProgressIndicator.adaptive();
+            var cannotPrevious = _justChangedMeme ||
+                (l.memeChanged.seconds != 0 && mc.difference(s.data!).inSeconds.abs() < 5) ||
+                l.currentMeme == 0 ||
+                _justChangedMemeTimer != null &&
+                    _justChangedMemeTimer!.isActive;
+            var cannotNext = _justChangedMeme ||
+                (l.memeChanged.seconds != 0 && mc.difference(s.data!).inSeconds.abs() < 5) ||
+                // Just a way to check if null
+                (l.currentMeme >= l.memesSeen - 1 &&
+                    l.nextMeme.seconds != 0 &&
+                    nm.isAfter(
+                      s.data!,
+                    )) ||
+                l.currentMeme == l.memes.length - 1 ||
+                _justChangedMemeTimer != null &&
+                    _justChangedMemeTimer!.isActive;
+            return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              LangameButton(
+                  cannotPrevious
+                      ? FontAwesomeIcons.stopCircle
+                      : FontAwesomeIcons.arrowAltCircleLeft, onPressed: () {
+                if (cannotPrevious) return;
+                setState(() => _justChangedMeme = true);
+                _justChangedMemeTimer = Timer(
+                    Duration(seconds: 3),
+                    () => Future.delayed(Duration(milliseconds: 100),
+                        () => setState(() => _justChangedMeme = false)));
+
+                p.incrementCurrentMeme(l, -1);
+              }, text: 'Previous', layer: 1),
+              LangameButton(
+                cannotNext
+                    ? FontAwesomeIcons.stopCircle
+                    : FontAwesomeIcons.arrowAltCircleRight,
+                onPressed: () {
+                  if (cannotNext) return;
+                  setState(() => _justChangedMeme = true);
+                  _justChangedMemeTimer = Timer(
+                      Duration(seconds: 10),
+                      () => Future.delayed(Duration(milliseconds: 100),
+                          () => setState(() => _justChangedMeme = false)));
+                  p.incrementCurrentMeme(l, 1);
+                },
+                text: nm.isAfter(s.data!)
+                    ? '${_printDuration(nm.difference(s.data!.toUtc()))}'
+                    : 'Next',
+                layer: 1,
+              )
+            ]);
+          });
+    });
   }
 
   Widget _buildMeme(lg.Langame l) {
@@ -763,9 +839,9 @@ class _LangameViewState extends State<LangameView> {
                 // We don't wait, should not block user
                 cp.showSnackBar('Thank you a lot 🥰');
                 _goBackToMainMenu();
-              }, text: 'Leave'),
+              }, text: 'Leave', layer: 2),
               LangameButton(FontAwesomeIcons.forward,
-                  onPressed: _goBackToMainMenu, text: 'Skip'),
+                  onPressed: _goBackToMainMenu, text: 'Skip', layer: 2),
             ]),
           ),
         ),
