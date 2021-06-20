@@ -20,7 +20,7 @@ import 'package:langame/views/langame.dart';
 import 'package:langame/views/running_langames_view.dart';
 import 'package:langame/views/topic_search.dart';
 import 'package:provider/provider.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'colors/colors.dart';
 import 'users/user_tile.dart';
@@ -172,6 +172,8 @@ class _SendLangameState extends State<NewLangamePageView>
       cp.dialogComplete();
       return;
     }
+    // We ignore the result and do not wait
+    lp.addLink(createLangame.result!.id, createDynamicLink.result!.split('/')[4]);
     cp.showCustomDialog(
       [
         Container(
@@ -256,7 +258,7 @@ class _SendLangameState extends State<NewLangamePageView>
                       // - a langame is created, anyone with the link can join anytime,
                       // X is notified of date Y and of presence of self in lg
                       cp.pushReplacement(LangameView(snap.channelName, false));
-                    }, text: 'Join now', layer: 2),
+                    }, text: 'Join now', highlighted: true),
                   ])
             ],
           ),

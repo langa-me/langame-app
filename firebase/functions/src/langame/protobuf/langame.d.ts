@@ -1377,6 +1377,9 @@ export namespace langame {
 
             /** Langame memeChanged */
             memeChanged?: (google.protobuf.ITimestamp|null);
+
+            /** Langame link */
+            link?: (string|null);
         }
 
         /** Represents a Langame. */
@@ -1426,6 +1429,9 @@ export namespace langame {
 
             /** Langame memeChanged. */
             public memeChanged?: (google.protobuf.ITimestamp|null);
+
+            /** Langame link. */
+            public link: string;
 
             /**
              * Creates a new Langame instance using the specified properties.

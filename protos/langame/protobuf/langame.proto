@@ -139,7 +139,7 @@ message Langame {
   // Players is a (Firestore) collection of Player
   repeated string players = 2;
   repeated string topics = 3;
-  // Memes id
+  // Memes
   repeated string memes = 4;
   // Who started this
   string initiator = 5;
@@ -154,6 +154,8 @@ message Langame {
   google.protobuf.Timestamp next_meme = 13;
   int32 memes_seen = 14;
   google.protobuf.Timestamp meme_changed = 15;
+  // Link to the Langame
+  string link = 16;
 }
 
 message Player {

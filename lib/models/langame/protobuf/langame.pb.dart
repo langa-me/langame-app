@@ -1135,6 +1135,7 @@ class Langame extends $pb.GeneratedMessage {
     ..aOM<$0.Timestamp>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'nextMeme', subBuilder: $0.Timestamp.create)
     ..a<$core.int>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memesSeen', $pb.PbFieldType.O3)
     ..aOM<$0.Timestamp>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memeChanged', subBuilder: $0.Timestamp.create)
+    ..aOS(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'link')
     ..hasRequiredFields = false
   ;
 
@@ -1153,6 +1154,7 @@ class Langame extends $pb.GeneratedMessage {
     $0.Timestamp? nextMeme,
     $core.int? memesSeen,
     $0.Timestamp? memeChanged,
+    $core.String? link,
   }) {
     final _result = create();
     if (channelName != null) {
@@ -1193,6 +1195,9 @@ class Langame extends $pb.GeneratedMessage {
     }
     if (memeChanged != null) {
       _result.memeChanged = memeChanged;
+    }
+    if (link != null) {
+      _result.link = link;
     }
     return _result;
   }
@@ -1319,6 +1324,15 @@ class Langame extends $pb.GeneratedMessage {
   void clearMemeChanged() => clearField(15);
   @$pb.TagNumber(15)
   $0.Timestamp ensureMemeChanged() => $_ensure(12);
+
+  @$pb.TagNumber(16)
+  $core.String get link => $_getSZ(13);
+  @$pb.TagNumber(16)
+  set link($core.String v) { $_setString(13, v); }
+  @$pb.TagNumber(16)
+  $core.bool hasLink() => $_has(13);
+  @$pb.TagNumber(16)
+  void clearLink() => clearField(16);
 }
 
 class Player extends $pb.GeneratedMessage {

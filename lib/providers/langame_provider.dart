@@ -187,4 +187,19 @@ class LangameProvider extends ChangeNotifier {
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
+
+  Future<LangameResponse<void>> addLink(String langameId, String link) async {
+    try {
+      await _firebase.firestore!
+          .collection(AppConst.firestoreLangamesCollection)
+          .doc(langameId)
+          .update({'link': link});
+      _cap.log('addLink $langameId $link');
+      return LangameResponse(LangameStatus.succeed);
+    } catch (e, s) {
+      _cap.log('failed to addLink $langameId $link');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
 }

@@ -42,7 +42,7 @@ class _TopicSearchViewState extends State<TopicSearchView>
               var cp = Provider.of<ContextProvider>(context, listen: false);
               cp.pop();
             },
-            layer: 1,
+            highlighted: true,
             text: 'Done',
           ),
         ),

@@ -17,7 +17,7 @@ import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'main_view.dart';
 
@@ -227,7 +227,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
             LangameButton(
               FontAwesomeIcons.shareAlt,
                 onPressed: () => Share.share(
-                    'I\'m using Langame to have more interesting conversations, you should try:\n${AppConst.mainUrl}',
+                    'I\'m using Langame to have incredible conversations, you should try:\n${AppConst.mainUrl}',
                     subject:
                         'Join me on Langame app for incredible conversations!'),
                 text: 'Invite your friends',

@@ -117,6 +117,7 @@ class LangameExt {
       nextMeme: dynamicToProtobufTimestamp(m['nextMeme']),
       memesSeen: m['memesSeen'],
       memeChanged: dynamicToProtobufTimestamp(m['memeChanged']),
+      link: m['link'],
     );
   }
 }

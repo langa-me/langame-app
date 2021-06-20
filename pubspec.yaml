@@ -1,6 +1,6 @@
 name: langame
 description: Gamified conversations instrumented by AI
-version: 1.2.5+37
+version: 1.2.6+38
 authors:
   - Langame <mail@langa.me>
 
@@ -78,7 +78,7 @@ dependencies:
   material_dialogs: ^1.0.0
   lottie: ^1.0.1
   introduction_screen: ^2.1.0
-  share: ^2.0.1
+  share_plus: ^2.1.4
   fab_circular_menu: ^1.0.2
   touchable: ^1.0.0
   sortedmap: ^0.5.0

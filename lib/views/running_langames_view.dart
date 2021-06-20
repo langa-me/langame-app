@@ -100,17 +100,27 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
                         .map((e) => buildCroppedRoundedNetworkImage(e.photoUrl))
                         .toList()),
                 trailing: Tooltip(
-                      child: Icon(FontAwesomeIcons.clock),
-                      message: 'planned: $d$startedString'),
+                    child: Icon(FontAwesomeIcons.clock),
+                    message: 'planned: $d$startedString'),
                 expandedCrossAxisAlignment: CrossAxisAlignment.center,
                 expandedAlignment: Alignment.center,
                 children: [
-                  LangameButton(FontAwesomeIcons.doorOpen,
-                  layer: 1,
+                  LangameButton(
+                    FontAwesomeIcons.doorOpen,
+                    highlighted: true,
                     text: 'join',
-                      onPressed: () => cp
-                          .pushReplacement(LangameView(l.channelName, false))),
-                  
+                    onPressed: () => cp.pushReplacement(
+                      LangameView(l.channelName, false),
+                    ),
+                  ),
+                  // TODO
+                  // LangameButton(
+                  //   FontAwesomeIcons.doorClosed,
+                  //   text: 'quit',
+                  //   onPressed: () => cp.pushReplacement(
+                  //     LangameView(l.channelName, false),
+                  //   ),
+                  // ),
                 ]);
           }
           return SizedBox.shrink();

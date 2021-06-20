@@ -240,7 +240,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           text: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
               ? 'Remove'
               : 'Add',
-          layer: 1,
+          highlighted: true,
           onPressed: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
               ? onRemoveFromShoppingList(
                   p.selectedUser!, lp, cp, widget._goToPage)

@@ -1,0 +1,2 @@
+- Langame initiator can now share the Langame link during game
+- Can share Langame starters

@@ -108,5 +108,7 @@
 		<string>https://langa.me/join</string>
 		<string>https://langamedev.page.link/join</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>  
+	<false/>
 </dict>
 </plist>

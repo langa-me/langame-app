@@ -4,7 +4,7 @@ admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
 import * as functions from "firebase-functions";
 import {newFeedback} from "./feedback";
-import {interactionsDecrement, setLangamesDone} from "./scheduledFunctions";
+import {setLangamesDone} from "./scheduledFunctions";
 import {onDeleteAuthentication} from "./onDeleteAuthentication";
 import {subscribe} from "./subscribe";
 import {notifyPresence} from "./notifyPresence";
@@ -42,10 +42,10 @@ exports.subscribe = functions // TODO: transaction!!! // RENAME
     .https
     .onCall(subscribe);
 
-exports.interactionsDecrement = functions
-    .pubsub
-    .schedule("1 * * * *")
-    .onRun(interactionsDecrement);
+// exports.interactionsDecrement = functions
+//     .pubsub
+//     .schedule("1 * * * *")
+//     .onRun(interactionsDecrement);
 
 exports.setLangamesDone = functions
     .pubsub

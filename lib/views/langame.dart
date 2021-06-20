@@ -23,6 +23,7 @@ import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
@@ -232,12 +233,35 @@ class _LangameViewState extends State<LangameView> {
   }
 
   Widget _buildHome(lg.Langame l) => Column(children: [
-        Align(
+        Stack(children: [
+          l.hasLink() && l.initiator == Provider.of<AuthenticationProvider>(context, listen: false).user!.uid
+              ? Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    onPressed: () => Share.share(
+                        'Join me on Langame for an incredible conversation on ${l.topics.join(',')}!\n' +
+                            'Just open this link: https://langa.me/join/${l.link}\n' +
+                            'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
+                        subject:
+                            'Join me on Langame for an incredible conversation on ${l.topics.join(',')}'),
+                    icon: Icon(
+                      FontAwesomeIcons.shareAlt,
+                      color: isLightThenDark(context),
+                    ),
+                  ),
+                )
+              : SizedBox.shrink(),
+          Align(
             alignment: Alignment.topRight,
             child: IconButton(
-                onPressed: _onBackPressed,
-                icon: Icon(FontAwesomeIcons.times,
-                    color: isLightThenDark(context)))),
+              onPressed: _onBackPressed,
+              icon: Icon(
+                FontAwesomeIcons.times,
+                color: isLightThenDark(context),
+              ),
+            ),
+          ),
+        ]),
         Expanded(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -520,12 +544,14 @@ class _LangameViewState extends State<LangameView> {
           builder: (ctx, s) {
             if (s.data == null) return CircularProgressIndicator.adaptive();
             var cannotPrevious = _justChangedMeme ||
-                (l.memeChanged.seconds != 0 && mc.difference(s.data!).inSeconds.abs() < 5) ||
+                (l.memeChanged.seconds != 0 &&
+                    mc.difference(s.data!).inSeconds.abs() < 5) ||
                 l.currentMeme == 0 ||
                 _justChangedMemeTimer != null &&
                     _justChangedMemeTimer!.isActive;
             var cannotNext = _justChangedMeme ||
-                (l.memeChanged.seconds != 0 && mc.difference(s.data!).inSeconds.abs() < 5) ||
+                (l.memeChanged.seconds != 0 &&
+                    mc.difference(s.data!).inSeconds.abs() < 5) ||
                 // Just a way to check if null
                 (l.currentMeme >= l.memesSeen - 1 &&
                     l.nextMeme.seconds != 0 &&
@@ -612,6 +638,18 @@ class _LangameViewState extends State<LangameView> {
                   ),
                 ),
                 Row(children: [
+                  IconButton(
+                    onPressed: () => Share.share(
+                            'I got into conversations on Langame:\n' +
+                            s.data!.result!.content + '\n' +
+                            'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
+                        subject:
+                            '${s.data!.result!.content.substring(0, 10)}...'),
+                    icon: Icon(
+                      FontAwesomeIcons.shareAlt,
+                      color: isLightThenDark(context),
+                    ),
+                  ),
                   ctxFutureBuilder(),
                   IconButton(
                     icon:
@@ -839,7 +877,7 @@ class _LangameViewState extends State<LangameView> {
                 // We don't wait, should not block user
                 cp.showSnackBar('Thank you a lot 🥰');
                 _goBackToMainMenu();
-              }, text: 'Leave', layer: 2),
+              }, text: 'Send', highlighted: true),
               LangameButton(FontAwesomeIcons.forward,
                   onPressed: _goBackToMainMenu, text: 'Skip', layer: 2),
             ]),
