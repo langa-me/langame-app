@@ -47,25 +47,30 @@ class ImplLangameApi extends LangameApi {
         .collection('players')
         .doc(firebase.auth!.currentUser!.uid)
         .withConverter<lg.Player>(
-          fromFirestore: (snapshot, _) =>
-              PlayerExt.fromObject(snapshot.data()!),
-          toFirestore: (user, _) => user.toMapStringDynamic(),
+          fromFirestore: (s, _) => PlayerExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
         )
         .get();
-    // No audio id, ask an audio id to server
-    if (snapP.data() != null && !snapP.data()!.hasAudioId()) {
+    // Was invited, just request an audio id
+    if (snapP.exists) {
       await snapP.reference.set(
         lg.Player(
           audioId: -1,
         ),
         SetOptions(merge: true),
       );
-      // Wait that server assign a audio id
-      await snapP.reference
-          .snapshots()
-          .firstWhere((e) => e.data()!.audioId != -1)
-          .timeout(Duration(seconds: 20));
+    // Was not invited (link), add self to the langame
+    } else if (!snapP.exists) {
+      await snapP.reference.set(lg.Player(
+        userId: firebase.auth!.currentUser!.uid,
+        audioId: -1,
+      ));
     }
+    // Wait that server assign a audio id
+    await snapP.reference
+        .snapshots()
+        .firstWhere((e) => e.data()!.audioId != -1)
+        .timeout(Duration(seconds: 20));
 
     return snap.docs.first.reference.snapshots();
   }
@@ -148,7 +153,7 @@ class ImplLangameApi extends LangameApi {
           toFirestore: (s, _) => s.toMapStringDynamic(),
         )
         .doc(e.userId)
-        .set(e, SetOptions(merge: true)));
+        .set(e));
     return a
         .withConverter<lg.Langame>(
           fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),

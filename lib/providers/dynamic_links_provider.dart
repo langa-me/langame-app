@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,24 +22,37 @@ class DynamicLinksProvider extends ChangeNotifier {
   ) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      final basePath = !packageInfo.packageName.contains('dev')
+      final basePath = Uri.encodeFull(!packageInfo.packageName.contains('dev')
           ? 'https://langa.me/join'
-          : 'https://langamedev.page.link/join';
+          : 'https://langamedev.page.link/join');
       final DynamicLinkParameters parameters = DynamicLinkParameters(
         uriPrefix: basePath,
-        link: Uri.parse('$basePath/$path'),
+        link: Uri.parse(basePath + Uri.encodeFull('/$path')),
         androidParameters: AndroidParameters(
-          packageName: packageInfo.packageName,
-          minimumVersion: int.parse(packageInfo.buildNumber),
+          packageName: packageInfo.packageName.contains('dev') ?
+          'me.langa.dev' :
+          'me.langa',
+          // minimumVersion: int.parse(packageInfo.buildNumber),
         ),
         dynamicLinkParametersOptions: DynamicLinkParametersOptions(
           shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
         ),
         iosParameters: IosParameters(
-          bundleId: packageInfo.packageName,
-          minimumVersion: packageInfo.buildNumber,
+          bundleId: packageInfo.packageName.contains('dev')
+              ? 'me.langa.dev'
+              : 'me.langa.prod',
+          // minimumVersion: packageInfo.buildNumber,
+          appStoreId: '1564745604',
         ),
+        // socialMetaTagParameters: SocialMetaTagParameters(
+        //   title: 'A link to a Langame',
+        //   description: 'Open this link to join the Langame',
+        // ),
       );
+      print('parameters');
+      print(parameters.androidParameters!.minimumVersion.toString());
+      print(parameters.androidParameters!.packageName.toString());
+      print(parameters.iosParameters!.bundleId);
 
       Uri url;
       if (short) {

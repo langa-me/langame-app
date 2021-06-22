@@ -1,8 +1,8 @@
 name: langame
 description: Gamified conversations instrumented by AI
-version: 1.2.6+38
+version: 1.2.7+39
 authors:
-  - Langame <mail@langa.me>
+  - Langame <contact@langa.me>
 
 homepage: https://github.com/louis030195/langame-app
 
@@ -79,6 +79,11 @@ dependencies:
   lottie: ^1.0.1
   introduction_screen: ^2.1.0
   share_plus: ^2.1.4
+  # share_plus:
+  #   git:
+  #     url: git@github.com:fluttercommunity/plus_plugins.git
+  #     ref: main
+  #     path: packages/share_plus/share_plus
   fab_circular_menu: ^1.0.2
   touchable: ^1.0.0
   sortedmap: ^0.5.0

@@ -12,6 +12,16 @@ import {
 } from "./helpers";
 import {getLangame, getUserData} from "./utils/firestore";
 import {langame} from "./langame/protobuf/langame";
+import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
+
+const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
+    {
+      name: "per_user_limiter",
+      maxCalls: 2,
+      periodSeconds: 15,
+    },
+    admin.firestore(),
+);
 
 export const notifyPresence = async (data: any,
     context: functions.https.CallableContext) => {
@@ -20,6 +30,17 @@ export const notifyPresence = async (data: any,
         FirebaseFunctionsResponseStatusCode.UNAUTHORIZED,
         undefined,
         "not authenticated",
+    );
+  }
+
+  const uidQualifier = "u_" + context.auth.uid;
+  const isQuotaExceeded =
+  await perUserlimiter.isQuotaAlreadyExceeded(uidQualifier);
+  if (isQuotaExceeded) {
+    return new FirebaseFunctionsResponse(
+        429,
+        undefined,
+        undefined,
     );
   }
 

@@ -1,19 +1,19 @@
 import {Change, EventContext} from "firebase-functions";
-import {QueryDocumentSnapshot}
+import {DocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
 import {langame} from "./langame/protobuf/langame";
-import {converter, handleError} from "./utils/firestore";
+import {converter, docRefHandleError} from "./utils/firestore";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {generateAgoraRtcToken} from "./helpers";
 
 /**
  *
- * @param{Change<QueryDocumentSnapshot>} change
+ * @param{Change<DocumentSnapshot>} change
  * @param{EventContext} _
  */
 export const onUpdateLangamePlayers =
-  async (change: Change<QueryDocumentSnapshot>,
+  async (change: Change<DocumentSnapshot>,
       _: EventContext) => {
     try {
       functions.logger.log("onUpdateLangamePlayers", change.after);
@@ -27,8 +27,7 @@ export const onUpdateLangamePlayers =
         const afterPlayers = await t.get(lgAfter.ref.collection("players"));
 
         // If some player has no audio id
-        if (afterPlayer.data()!.audioId === undefined ||
-          afterPlayer.data()!.audioId === -1) {
+        if (afterPlayer.data()!.audioId === -1) {
           functions.logger.log("updating langame with respective audio id",
               lgAfter);
 
@@ -38,9 +37,9 @@ export const onUpdateLangamePlayers =
           };
           const audioId = random(Date.now(), 100_000);
           const audioToken = generateAgoraRtcToken(
-              lgAfter.data()!.channelName,
-              audioId,
-              36_000, // 10 hour
+            lgAfter.data()!.channelName,
+            audioId,
+            36_000, // 10 hour
           );
           t.update(afterPlayer.ref, {
             audioId: audioId,
@@ -55,14 +54,22 @@ export const onUpdateLangamePlayers =
         // set started Langame properties
         if (!lgAfter.data()!.started &&
           afterPlayers.docs.filter((e) => e.data().timeIn).length > 1) {
+          const tmpl = await admin.remoteConfig().getTemplate();
+
+          const d = new Date();
+          d.setMinutes(d.getMinutes() +
+            // @ts-ignore
+            tmpl.parameters.langame_delay_for_next.defaultValue.value * 1);
+
           t.update(lgAfter.ref, {
             started: admin.firestore.FieldValue.serverTimestamp(),
+            nextMeme: admin.firestore.Timestamp.fromDate(d),
           });
 
           functions.logger.log("Langame started, updated start date");
         }
       });
     } catch (e) {
-      await Promise.all(handleError(change.after, e, "null"));
+      await Promise.all(docRefHandleError(change.after.ref, e, "null"));
     }
   };

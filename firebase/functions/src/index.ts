@@ -109,7 +109,7 @@ exports.onUpdateLangame = functions.firestore
 
 exports.onUpdateLangamePlayers = functions.firestore
     .document(`${kLangamesCollection}/{langameId}/players/{playerId}`)
-    .onUpdate(onUpdateLangamePlayers);
+    .onWrite(onUpdateLangamePlayers);
 
 // Authentication //
 

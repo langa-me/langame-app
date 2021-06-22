@@ -5,32 +5,39 @@ import {FirebaseFunctionsResponse,
 import {kBetasCollection, kInvalidRequest} from "./helpers";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
 const Mailchimp = require("mailchimp-api-v3");
 const mailchimpKey = functions.config().mailchimp.key;
 const listId = functions.config().mailchimp.list;
+const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
+    {
+      name: "per_user_limiter",
+      maxCalls: 2,
+      periodSeconds: 15,
+    },
+    admin.firestore(),
+);
 
-const callers = new Map();
-const maxCalls = 10;
-// TODO: wtf how can it work?
-// Every 10 seconds, reduce the rate limit of every caller by one
-setInterval(() => {
-  callers.forEach(function(part, index, callers) {
-    if (part === 0) return;
-    callers.set(index, part-1);
-  });
-}, 10_00);
 
 export const subscribe = async (
     data: any, context: https.CallableContext) => {
-  const caller = callers.get(context.rawRequest.headers.origin);
-  if (caller > maxCalls) {
+  if (!context.rawRequest.headers.origin) {
+    return new FirebaseFunctionsResponse(
+        500,
+        undefined,
+        undefined,
+    );
+  }
+  const uidQualifier = "u_" + context.rawRequest.headers.origin;
+  const isQuotaExceeded =
+  await perUserlimiter.isQuotaAlreadyExceeded(uidQualifier);
+  if (isQuotaExceeded) {
     return new FirebaseFunctionsResponse(
         429,
         undefined,
         "too many requests",
     );
   }
-  callers.set(context.rawRequest.headers.origin, caller ? caller+1 : 1);
 
   if (!data) {
     return new FirebaseFunctionsResponse(

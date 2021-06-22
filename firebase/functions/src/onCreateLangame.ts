@@ -106,15 +106,11 @@ export const onCreateLangame = async (
         .info("found memes for topics", lg.data()!.topics, memes);
     const playersSnap = await snap.ref.collection("players")
         .withConverter(converter<langame.protobuf.Player>()).get();
-    const d = new Date();
-    d.setMinutes(d.getMinutes() +
-    // @ts-ignore
-    t.parameters.langame_delay_for_next.defaultValue.value*1);
+
     await snap.ref.set({
       memes: memes.map((e) => e.id),
       channelName: channelName,
       currentMeme: 0,
-      nextMeme: admin.firestore.Timestamp.fromDate(d),
     }, {merge: true});
 
     const toNotify = playersSnap

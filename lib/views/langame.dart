@@ -299,11 +299,11 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  void _goBackToMainMenu() => Future.delayed(
+  Future<void> _goBackToMainMenu() => Future.delayed(
           //https://stackoverflow.com/questions/55618717/error-thrown-on-navigator-pop-until-debuglocked-is-not-true
           Duration.zero, () {
         var cp = Provider.of<ContextProvider>(context, listen: false);
-        cp.pushReplacement(MainView());
+        return cp.pushReplacement(MainView());
       });
 
   Future<void> showPermissionDialog() {
@@ -356,9 +356,9 @@ class _LangameViewState extends State<LangameView> {
     if (errors > maxErrors || failNow) {
       var f = Provider.of<AudioProvider>(context, listen: false).leaveChannel();
       var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
-      var cp = Provider.of<ContextProvider>(context, listen: false);
-      cp.showSnackBar(
+      showToast(
         _failingMessage,
+        color: Colors.red,
       );
 
       cap.crashlytics.recordError(

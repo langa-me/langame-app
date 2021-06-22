@@ -61,8 +61,7 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Langame initiator can now share the Langame link during game
-      - Can share Langame starters"
+      changelog: "- Fixed a bug related to link to join Langame"
     )
 
     delete_temp_keychain(keychain_name)
