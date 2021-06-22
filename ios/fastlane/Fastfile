@@ -61,7 +61,7 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Fixed a bug related to link to join Langame"
+      changelog: "- Fixed a bug where Langame date was not properly set"
     )
 
     delete_temp_keychain(keychain_name)

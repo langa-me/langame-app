@@ -85,9 +85,10 @@ class LangameProvider extends ChangeNotifier {
           e.data()!.channelName.isNotEmpty);
 
       initialize();
+      _cap.log('created langame with topics ${topics.join(',')} and date $date');
       return LangameResponse(LangameStatus.succeed, result: snap);
     } catch (e, s) {
-      _cap.log('failed to send langame');
+      _cap.log('failed to create langame with topics ${topics.join(',')} and date $date');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

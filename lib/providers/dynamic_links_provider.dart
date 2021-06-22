@@ -49,10 +49,6 @@ class DynamicLinksProvider extends ChangeNotifier {
         //   description: 'Open this link to join the Langame',
         // ),
       );
-      print('parameters');
-      print(parameters.androidParameters!.minimumVersion.toString());
-      print(parameters.androidParameters!.packageName.toString());
-      print(parameters.iosParameters!.bundleId);
 
       Uri url;
       if (short) {

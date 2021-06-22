@@ -110,7 +110,7 @@ class _SendLangameState extends State<NewLangamePageView>
         dateLabelText: 'Date',
         style: Theme.of(context).textTheme.headline6,
         timeLabelText: 'Hour',
-        onSaved: (val) => val ?? nlp.setSelectedDate(DateTime.parse(val!)),
+        onChanged: (val) => nlp.setSelectedDate(DateTime.parse(val)),
       ),
       // SizedBox(height: AppSize.safeBlockVertical * 6),
       LangameButton(
