@@ -38,6 +38,7 @@ class AppConst {
 
   static const String helpUrl = 'https://help.langa.me';
   static const String mainUrl = 'https://langa.me';
+  static const String productificUrl = 'https://productific.com/@Langame';
 }
 
 /// Fonts assets used in this application,

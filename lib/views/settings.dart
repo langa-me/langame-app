@@ -69,7 +69,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
       body: Container(
         child: ListView(
           children: <Widget>[
-            TextDivider('Style'),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Consumer<PreferenceProvider>(builder: (context, s, child) {
@@ -83,16 +82,24 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 );
               }),
             ),
-            TextDivider('General'),
-            Consumer<AuthenticationProvider>(builder: (ctx, p, c) => 
-            ['antoine.descamps@swiss-commerce.ch', 'albertoschillaci30@gmail.com', 'romain.rom1@gmail.com', 'louis.beaumont@gmail.com', 'sonlight03@gmail.com'].contains(p.user?.email) ? ListTile(
-              onTap: () {
-                cp.push(HackView());
-              },
-              leading: Icon(FontAwesomeIcons.dharmachakra,
-                  color: isLightThenDark(context)),
-              title: Text('Hack', style: Theme.of(context).textTheme.headline6),
-            ) : SizedBox.shrink()),
+            Consumer<AuthenticationProvider>(
+                builder: (ctx, p, c) => [
+                      'antoine.descamps2001@gmail.com',
+                      'albertoschillaci30@gmail.com',
+                      'romain.rom1@gmail.com',
+                      'louis.beaumont@gmail.com',
+                      'sonlight03@gmail.com'
+                    ].contains(p.user?.email)
+                        ? ListTile(
+                            onTap: () {
+                              cp.push(HackView());
+                            },
+                            leading: Icon(FontAwesomeIcons.dharmachakra,
+                                color: isLightThenDark(context)),
+                            title: Text('Hack',
+                                style: Theme.of(context).textTheme.headline6),
+                          )
+                        : SizedBox.shrink()),
             // ListTile(
             //   onTap: () {
             //     // Only safe in dev mode yet
@@ -198,7 +205,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title:
                   Text('Log out', style: Theme.of(context).textTheme.headline6),
             ),
-            TextDivider('Experimental features'),
             Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
                 onTap: () {

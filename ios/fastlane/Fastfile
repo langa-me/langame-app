@@ -61,9 +61,17 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Fixed a bug where Langame date was not properly set"
+      changelog: "Add a feature upvote link"
     )
 
     delete_temp_keychain(keychain_name)
+
+    firebase_app_distribution(
+      app: "1:909899959016:ios:47d44be1ab94dfbfc0575d",
+      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
+      ipa_path: "./Runner.ipa",
+      groups: "basic",
+      release_notes: 'Add a feature upvote link'
+    )
   end
 end

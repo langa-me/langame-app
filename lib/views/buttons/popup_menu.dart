@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
@@ -41,6 +42,26 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
                 Icon(Icons.feedback_outlined, color: isLightThenDark(context)),
             title:
                 Text('Feedback', style: Theme.of(context).textTheme.headline6),
+          ),
+        ),
+        PopupMenuItem(
+          child: ListTile(
+            dense: true,
+            minVerticalPadding: 2,
+            onTap: () async {
+              if (await canLaunch(AppConst.productificUrl)) {
+                await launch(AppConst.productificUrl);
+              } else {
+                Provider.of<ContextProvider>(context, listen: false)
+                    .showSnackBar(
+                        Provider.of<FunnyProvider>(context, listen: false)
+                            .getFailingRandom());
+              }
+            },
+            leading:
+                Icon(FontAwesomeIcons.poll, color: isLightThenDark(context)),
+            title:
+                Text('Vote for features', style: Theme.of(context).textTheme.headline6),
           ),
         ),
       ];
