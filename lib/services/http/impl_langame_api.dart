@@ -59,7 +59,7 @@ class ImplLangameApi extends LangameApi {
         ),
         SetOptions(merge: true),
       );
-    // Was not invited (link), add self to the langame
+      // Was not invited (link), add self to the langame
     } else if (!snapP.exists) {
       await snapP.reference.set(lg.Player(
         userId: firebase.auth!.currentUser!.uid,
@@ -139,11 +139,9 @@ class ImplLangameApi extends LangameApi {
     var a = await firebase.firestore!
         .collection(AppConst.firestoreLangamesCollection)
         .add({
-      'channelName': '',
       'topics': topics,
       'initiator': firebase.auth!.currentUser!.uid, // TODO: risky
       'date': date,
-      'done': null,
     });
 
     p.forEach((e) => a

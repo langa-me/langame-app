@@ -111,6 +111,7 @@ export const onCreateLangame = async (
       memes: memes.map((e) => e.id),
       channelName: channelName,
       currentMeme: 0,
+      done: null,
     }, {merge: true});
 
     const toNotify = playersSnap

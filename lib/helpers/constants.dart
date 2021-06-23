@@ -27,7 +27,6 @@ class AppConst {
       'createStripeSubscription';
 
   static const String firestoreUsersCollection = 'users';
-  static const String firestoreNotificationsCollection = 'notifications';
   static const String firestoreLangamesCollection = 'langames';
   static const String firestoreMemesCollection = 'memes';
   static const String firestoreTagsSubCollection = 'tags';

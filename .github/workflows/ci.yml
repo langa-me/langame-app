@@ -75,6 +75,9 @@ jobs:
           npm i
           npm run build
           npm run lint
-          npm run coverage
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: firestore-rules-tests
+          path: firestore-rules-tests.json

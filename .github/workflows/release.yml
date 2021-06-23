@@ -102,6 +102,7 @@ jobs:
         working-directory: ios
       - name: Deploy iOS Beta to TestFlight via Fastlane
         run: |
+          bundle install
           bundle exec fastlane closed_beta
         working-directory: ios
         env:

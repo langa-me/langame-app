@@ -60,9 +60,8 @@ class AuthenticationProvider extends ChangeNotifier {
         final ref = firebase.firestore!
             .collection(AppConst.firestoreUsersCollection)
             .withConverter<lg.User>(
-              fromFirestore: (snapshot, _) =>
-                  UserExt.fromObject(snapshot.data()!),
-              toFirestore: (user, _) => user.toMapStringDynamic(),
+              fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
+              toFirestore: (s, _) => s.toMapStringDynamic(),
             )
             .doc(langameUser.uid);
         t.set(ref, langameUser, SetOptions(merge: true));
@@ -185,7 +184,8 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   // TODO langame response
-  Future<LangameResponse<List<lg.User>>> getLangameUsersStartingWithTag(String tag) async {
+  Future<LangameResponse<List<lg.User>>> getLangameUsersStartingWithTag(
+      String tag) async {
     try {
       _cap.log('authentication_provider:getLangameUsersStartingWithTag $tag');
       var u = await _authenticationApi.getLangameUsersStartingWithTag(
