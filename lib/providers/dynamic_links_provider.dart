@@ -16,22 +16,27 @@ class DynamicLinksProvider extends ChangeNotifier {
 
   DynamicLinksProvider(this._cap, this._cp, this._dynamicLinks);
 
+  String getChannelNameFromLink(String link) {
+    final sp = link.split('/');
+    return sp[sp.length > 3 ? 4 : 3];
+  }
+
   Future<LangameResponse<String>> createDynamicLink(
     String path,
     bool short,
   ) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      final basePath = Uri.encodeFull(!packageInfo.packageName.contains('dev')
-          ? 'https://langa.me/join'
-          : 'https://langamedev.page.link/join');
+      final isDev = packageInfo.packageName.contains('dev');
+      final basePath = Uri.encodeFull(
+          !isDev ? 'https://langa.me/join' : 'https://langamedev.page.link');
       final DynamicLinkParameters parameters = DynamicLinkParameters(
         uriPrefix: basePath,
         link: Uri.parse(basePath + Uri.encodeFull('/$path')),
         androidParameters: AndroidParameters(
-          packageName: packageInfo.packageName.contains('dev') ?
-          'me.langa.dev' :
-          'me.langa',
+          packageName: packageInfo.packageName.contains('dev')
+              ? 'me.langa.dev'
+              : 'me.langa',
           // minimumVersion: int.parse(packageInfo.buildNumber),
         ),
         dynamicLinkParametersOptions: DynamicLinkParametersOptions(
@@ -96,6 +101,10 @@ class DynamicLinksProvider extends ChangeNotifier {
       // i.e. https://DOMAIN/CHANNEL_NAME
       // path starts with "/" thats why the substring
       _cp.pushReplacement(LangameView(dl.link.path.split('/')[2], false));
+    } else if (dl != null) {
+      // Dev, no /join
+      _cap.log('opening view ${dl.link.path.split('/')[1]}');
+      _cp.pushReplacement(LangameView(dl.link.path.split('/')[1], false));
     }
   }
 }

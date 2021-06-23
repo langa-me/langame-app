@@ -52,7 +52,7 @@
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
 		<string>https://langa.me/join</string>
-		<string>https://langamedev.page.link/join</string>
+		<string>https://langamedev.page.link</string>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
