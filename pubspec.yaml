@@ -1,6 +1,6 @@
 name: langame
 description: Gamified conversations instrumented by AI
-version: 1.2.9+42
+version: 1.2.9+43
 authors:
   - Langame <contact@langa.me>
 
@@ -42,6 +42,7 @@ dependencies:
   flutter_facebook_auth: ^3.4.0
   sign_in_with_apple: ^3.0.0
   flutter_local_notifications: ^5.0.0+4
+  firebase_app_check: ^0.0.1+2
   
 
   # Other APIs

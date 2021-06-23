@@ -88,6 +88,8 @@ class FeedbackProvider extends ChangeNotifier {
     //     });
   }
 
+  int _hack = 0;
+
   Null show({bool fromShaking = true}) {
     // TODO: isn't this hack dangerous?
     BetterFeedback.of(_contextProvider.navigationKey.currentContext!)!
@@ -102,6 +104,12 @@ class FeedbackProvider extends ChangeNotifier {
         'packageName': packageInfo.packageName
       };
       final upload = (String deviceInfo) {
+        if (_hack > 10) {
+          // Prevent spamming storage
+          // TODO:https://stackoverflow.com/questions/40513101/setting-limits-on-file-uploads-via-firebase-auth-and-storage-without-server-in-t/61151267#61151267
+          return;
+        }
+        _hack++;
         final Reference storageReference =
             firebase.storage!.ref('/feedbacks').child('$uid.png');
 

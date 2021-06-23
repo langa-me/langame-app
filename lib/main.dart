@@ -6,6 +6,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:feedback/feedback.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -50,6 +51,9 @@ import 'views/colors/colors.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  if (kReleaseMode) {
+    await FirebaseAppCheck.instance.activate();
+  }
   var crashlytics = FirebaseCrashlytics.instance;
   await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
   var analytics = FirebaseAnalytics();
@@ -132,7 +136,8 @@ void main() async {
             ChangeNotifierProvider(
               create: (_) => contextProvider,
             ),
-            ChangeNotifierProvider(create: (_) => TagProvider(firebase, crashAnalyticsProvider)),
+            ChangeNotifierProvider(
+                create: (_) => TagProvider(firebase, crashAnalyticsProvider)),
             ChangeNotifierProvider(create: (_) => funnyProvider),
             ChangeNotifierProvider(create: (_) => NewLangameProvider()),
 
@@ -158,9 +163,11 @@ void main() async {
               },
               create: (_) => preferenceProvider,
             ),
-            ChangeNotifierProxyProvider2<CrashAnalyticsProvider, RemoteConfigProvider, AudioProvider>(
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
+                RemoteConfigProvider, AudioProvider>(
               update: (_, cap, rcp, ap) => ap!,
-              create: (_) => AudioProvider(firebase, crashAnalyticsProvider, remoteConfigProvider),
+              create: (_) => AudioProvider(
+                  firebase, crashAnalyticsProvider, remoteConfigProvider),
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, MessageProvider>(
@@ -195,8 +202,8 @@ void main() async {
                   authenticationProvider,
                   ImplPaymentApi(firebase)),
             ),
-            ChangeNotifierProxyProvider2<CrashAnalyticsProvider, ContextProvider,
-                    DynamicLinksProvider>(
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
+                    ContextProvider, DynamicLinksProvider>(
                 update: (_, cap, cp, dlp) => dlp!,
                 create: (_) => DynamicLinksProvider(
                       crashAnalyticsProvider,
