@@ -23,7 +23,7 @@ platform :android do
       )
       firebase_app_distribution(
         android_artifact_type: 'aab',
-        android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab'
+        android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
         app: '1:909899959016:android:e74963d90d60a74cc0575d',
         firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
         groups: 'basic',
