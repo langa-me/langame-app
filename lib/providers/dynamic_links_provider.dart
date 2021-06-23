@@ -18,7 +18,7 @@ class DynamicLinksProvider extends ChangeNotifier {
 
   String getChannelNameFromLink(String link) {
     final sp = link.split('/');
-    return sp[sp.length > 3 ? 4 : 3];
+    return sp[sp.length > 4 ? 4 : 3];
   }
 
   Future<LangameResponse<String>> createDynamicLink(
@@ -95,16 +95,14 @@ class DynamicLinksProvider extends ChangeNotifier {
   Future<dynamic> _onSuccess(dl) async {
     _cap.log('opened link ${dl?.link.path}',
         analyticsMessage: 'dynamic_links_open');
-    if (dl != null && dl.link.path.split('/').length > 1) {
-      _cap.log('opening view ${dl.link.path.split('/')[2]}');
+    if (dl != null && dl.link.path.split('/').length > 0) {
+      final sp = dl.link.path.split('/');
+      final channel = sp[sp.length > 1 ? 2 : 1];
+      _cap.log('opening view $channel');
       // Opened a Langame link that opened the app
       // i.e. https://DOMAIN/CHANNEL_NAME
       // path starts with "/" thats why the substring
-      _cp.pushReplacement(LangameView(dl.link.path.split('/')[2], false));
-    } else if (dl != null) {
-      // Dev, no /join
-      _cap.log('opening view ${dl.link.path.split('/')[1]}');
-      _cp.pushReplacement(LangameView(dl.link.path.split('/')[1], false));
+      _cp.pushReplacement(LangameView(channel, false));
     }
   }
 }

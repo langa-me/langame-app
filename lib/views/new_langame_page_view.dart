@@ -173,7 +173,8 @@ class _SendLangameState extends State<NewLangamePageView>
       return;
     }
     // We ignore the result and do not wait
-    lp.addLink(createLangame.result!.id, createDynamicLink.result!.split('/')[4]);
+    lp.addLink(createLangame.result!.id,
+        dlp.getChannelNameFromLink(createDynamicLink.result!));
     cp.showCustomDialog(
       [
         Container(
@@ -214,14 +215,10 @@ class _SendLangameState extends State<NewLangamePageView>
                   icon: Icon(FontAwesomeIcons.shareAlt,
                       color: isLightThenDark(context, reverse: false)),
                   onPressed: () => Share.share(
-                      'Join my Langame to talk about ${nlp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
-                      subject:
-                          'Join my Langame to talk about ${nlp.selectedTopics.join(',')}',
-                      sharePositionOrigin: Rect.fromCenter(
-                          center: Offset(AppSize.screenWidth / 2,
-                              AppSize.screenHeight / 2),
-                          height: 0,
-                          width: 0)),
+                    'Join my Langame to talk about ${nlp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
+                    subject:
+                        'Join my Langame to talk about ${nlp.selectedTopics.join(',')}',
+                  ),
                 ),
                 trailing: Icon(FontAwesomeIcons.copy,
                     color: isLightThenDark(context, reverse: false)),

@@ -245,7 +245,7 @@ class _LangameViewState extends State<LangameView> {
                         subject:
                             'Join me on Langame for an incredible conversation on ${l.topics.join(',')}'),
                     icon: Icon(
-                      FontAwesomeIcons.shareAlt,
+                      FontAwesomeIcons.users,
                       color: isLightThenDark(context),
                     ),
                   ),
