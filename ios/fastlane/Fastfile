@@ -53,6 +53,14 @@ platform :ios do
       }
     )
 
+    firebase_app_distribution(
+      app: "1:909899959016:ios:47d44be1ab94dfbfc0575d",
+      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
+      ipa_path: "./Runner.ipa",
+      groups: "basic",
+      release_notes: 'Add a feature upvote link'
+    )
+
     pilot(
       apple_id: "#{DEVELOPER_APP_ID}",
       app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
@@ -65,13 +73,5 @@ platform :ios do
     )
 
     delete_temp_keychain(keychain_name)
-
-    firebase_app_distribution(
-      app: "1:909899959016:ios:47d44be1ab94dfbfc0575d",
-      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
-      ipa_path: "./Runner.ipa",
-      groups: "basic",
-      release_notes: 'Add a feature upvote link'
-    )
   end
 end
