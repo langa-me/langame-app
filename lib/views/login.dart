@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -14,6 +15,7 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/on_boarding.dart';
 import 'package:package_info/package_info.dart';
@@ -31,6 +33,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   Future<void>? successDialogFuture;
   bool isAuthenticating = true;
+  TextEditingController _hackControllerPassword = TextEditingController();
 
   @override
   void initState() {
@@ -117,15 +120,8 @@ class _LoginState extends State<Login> {
     setState(() => isAuthenticating = false);
 
     final ap = Provider.of<AuthenticationProvider>(context, listen: false);
-    var logins = <Widget>[
-      // FacebookSignInButton(
-      //     onPressed: () {
-      //       if (isAuthenticating) return;
-      //       showBasicSnackBar(
-      //           context, 'Facebook authentication is coming soon!');
-      //       // await _handleOnPressedLogin(provider.loginWithFacebook, 'Facebook');
-      //     },
-      //     splashColor: Theme.of(context).colorScheme.primary),
+
+    var logins = [
       GoogleSignInButton(
           onPressed: () async {
             if (isAuthenticating) return;
@@ -141,22 +137,56 @@ class _LoginState extends State<Login> {
               splashColor: Theme.of(context).colorScheme.primary)
           : SizedBox.shrink()
     ];
+
     return Scaffold(
       body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 60.0),
-            child: Center(
-              child: Container(
-                width: AppSize.safeBlockHorizontal * 30,
-                height: AppSize.safeBlockVertical * 30,
-                child: Image.asset('images/logo-colourless.png',
-                    color: Theme.of(context).brightness == Brightness.light
-                        ? Colors.black
-                        : Colors.white),
-              ),
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+              child: GestureDetector(
+            onLongPress: () {
+              var cp = Provider.of<ContextProvider>(context, listen: false);
+              cp.showCustomDialog([
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text('Are you a hacker 🤓?',
+                          style: Theme.of(context).textTheme.headline4),
+                      Divider(),
+                      SizedBox(height: AppSize.safeBlockVertical * 10),
+                      TextField(
+                        controller: _hackControllerPassword,
+                        decoration: InputDecoration(
+                            hintText: "Enter the hack password"),
+                      ),
+                      LangameButton(FontAwesomeIcons.code,
+                          layer: 2,
+                          text: 'Enter the matrix 😈',
+                          border: true,
+                          onPressed: () => _handleOnPressedLogin(
+                              () => ap
+                                  .loginWithHack(_hackControllerPassword.text),
+                              'email')),
+                      LangameButton(
+                        FontAwesomeIcons.baby,
+                        layer: 2,
+                        text:
+                            'Bring me back to right\nside of the force,\nmaster, please 👼',
+                        border: true,
+                        onPressed: cp.dialogComplete,
+                      ),
+                    ]),
+              ], canBack: true);
+            },
+            child: Container(
+              width: AppSize.safeBlockHorizontal * 30,
+              height: AppSize.safeBlockVertical * 30,
+              child: Image.asset('images/logo-colourless.png',
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? Colors.black
+                      : Colors.white),
             ),
-          ),
+          )),
           SizedBox(height: AppSize.safeBlockVertical * 10),
           Column(children: logins, mainAxisAlignment: MainAxisAlignment.center),
           Spacer(),
@@ -205,9 +235,8 @@ class _LoginState extends State<Login> {
       });
 
   Future _handleOnPressedLogin(
-      Future<LangameResponse> Function() fn, String entity) async {
+      Future<LangameResponse<void>> Function() fn, String entity) async {
     setState(() => isAuthenticating = true);
-    // TODO: clean this mess
     var f = fn().timeout(const Duration(seconds: 10));
     var cp = Provider.of<ContextProvider>(context, listen: false);
     cp.showLoadingDialog();
@@ -223,14 +252,8 @@ class _LoginState extends State<Login> {
       }
       cp.handleLangameResponse(
         res,
-        failedMessage: res.error
-                .toString()
-                .contains('network_error') // TODO: hack
-            ? 'Could not authenticate, please check your internet connection'
-            : !kReleaseMode
-                ? 'failed to login to $entity, ${res.error.toString()}'
-                : Provider.of<FunnyProvider>(context, listen: false)
-                    .getFailingRandom(),
+        failedMessage: Provider.of<FunnyProvider>(context, listen: false)
+            .getFailingRandom(),
       );
     });
   }

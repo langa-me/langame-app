@@ -104,6 +104,12 @@ class ImplAuthenticationApi extends AuthenticationApi {
     }
   }
 
+  @override
+  Future<UserCredential> loginWithHack(String password) async {
+    return firebase.auth!
+        .signInWithEmailAndPassword(email: 'hack@langa.me', password: password);
+  }
+
   /// Query Firestore with [uid] looking for a LangameUser
   /// Throw GetUserException if it does not exist
   /// TODO: might use a transaction?
@@ -266,4 +272,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
   @override
   Future<void> reAuthenticate(OAuthCredential credential) =>
       firebase.auth!.currentUser!.reauthenticateWithCredential(credential);
+
+
 }

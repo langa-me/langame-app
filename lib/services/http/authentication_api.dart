@@ -23,6 +23,8 @@ abstract class AuthenticationApi {
   /// Login with Apple, return Apple account and credentials
   Future<OAuthCredential> loginWithApple();
 
+  Future<UserCredential> loginWithHack(String password);
+
   /// Login with firebase with previously acquired credential
   Future<UserCredential> loginWithFirebase(OAuthCredential credential);
 
@@ -33,7 +35,7 @@ abstract class AuthenticationApi {
   Future<void> delete();
 
   /// Get [LangameUser] from Firestore using Firebase uid
-  Stream<DocumentSnapshot<lg.User>>  getLangameUser(String uid);
+  Stream<DocumentSnapshot<lg.User>> getLangameUser(String uid);
 
   /// Get [LangameUser] from Firestore using Langame [tag]
   Future<List<lg.User>> getLangameUsersStartingWithTag(

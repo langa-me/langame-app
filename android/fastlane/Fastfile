@@ -21,14 +21,14 @@ platform :android do
           pubspec_location: '../pubspec.yaml'
         )['version_code'],
       )
-      firebase_app_distribution(
-        android_artifact_type: 'AAB',
-        android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
-        app: '1:909899959016:android:e74963d90d60a74cc0575d',
-        firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
-        groups: 'basic',
-        release_notes: 'Add a feature upvote link'
-      )
+      # firebase_app_distribution(
+      #   android_artifact_type: 'AAB',
+      #   android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
+      #   app: '1:909899959016:android:e74963d90d60a74cc0575d',
+      #   firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
+      #   groups: 'basic, internal',
+      #   release_notes: 'Add a feature upvote link'
+      # )
     end
   end
 end

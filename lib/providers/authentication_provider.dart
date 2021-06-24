@@ -76,10 +76,21 @@ class AuthenticationProvider extends ChangeNotifier {
     });
   }
 
-  Future<LangameResponse> _loginWith(OAuthCredential credential) async {
+  Future<LangameResponse<void>> _loginWith(
+      {OAuthCredential? oAuthCredential,
+      UserCredential? userCredential}) async {
     try {
       _cap.log('authentication_provider:loginWith');
-      var uc = await _authenticationApi.loginWithFirebase(credential);
+      UserCredential uc;
+      if (oAuthCredential != null) {
+        uc = await _authenticationApi.loginWithFirebase(oAuthCredential);
+      } else if (userCredential != null) {
+        uc = userCredential;
+      } else {
+        _cap.log(
+            'should either provide oauth credentials (Google, Apple ...), or UserCredential (email)');
+        return LangameResponse(LangameStatus.failed);
+      }
       if (uc.user == null) throw LangameAuthException('null_user');
       // Shouldn't update profile on new user at login
       if (uc.additionalUserInfo != null && uc.additionalUserInfo!.isNewUser) {
@@ -132,10 +143,10 @@ class AuthenticationProvider extends ChangeNotifier {
     return LangameResponse(LangameStatus.succeed);
   }
 
-  Future<LangameResponse> loginWithApple() async {
+  Future<LangameResponse<void>> loginWithApple() async {
     try {
       var res = await _authenticationApi.loginWithApple();
-      return _loginWith(res);
+      return _loginWith(oAuthCredential: res);
     } catch (e, s) {
       _cap.log('authentication_provider:failed to loginWithApple');
       _cap.recordError(e, s);
@@ -143,21 +154,10 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse> loginWithFacebook() async {
-    try {
-      var res = await _authenticationApi.loginWithFacebook();
-      return _loginWith(res);
-    } catch (e, s) {
-      _cap.log('authentication_provider:failed to loginWithFacebook');
-      _cap.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e.toString());
-    }
-  }
-
-  Future<LangameResponse> loginWithGoogle() async {
+  Future<LangameResponse<void>> loginWithGoogle() async {
     try {
       var res = await _authenticationApi.loginWithGoogle();
-      return _loginWith(res);
+      return _loginWith(oAuthCredential: res);
     } catch (e, s) {
       _cap.log('authentication_provider:failed to loginWithGoogle');
       _cap.recordError(e, s);
@@ -165,7 +165,18 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse> logout() async {
+  Future<LangameResponse<void>> loginWithHack(String password) async {
+    try {
+      var res = await _authenticationApi.loginWithHack(password);
+      return _loginWith(userCredential: res);
+    } catch (e, s) {
+      _cap.log('authentication_provider:failed to loginWithGoogle');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e.toString());
+    }
+  }
+
+  Future<LangameResponse<void>> logout() async {
     try {
       _cap.log('authentication_provider:purging local storage');
       var i = await SharedPreferences.getInstance();
