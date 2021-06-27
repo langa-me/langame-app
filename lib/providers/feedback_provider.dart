@@ -13,8 +13,9 @@ import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shake/shake.dart';
+import 'package:universal_platform/universal_platform.dart';
 import 'package:uuid/uuid.dart';
 
 import 'crash_analytics_provider.dart';
@@ -127,7 +128,7 @@ class FeedbackProvider extends ChangeNotifier {
         );
         uploadTask.catchError((e, s) => _cap.recordError(e, s));
       };
-      if (Platform.isAndroid) {
+      if (UniversalPlatform.isAndroid) {
         // TODO: maybe wrap this device info stuff into helper
         deviceInfo.androidInfo.then((value) {
           upload(jsonEncode({
@@ -142,7 +143,7 @@ class FeedbackProvider extends ChangeNotifier {
             'model': value.model,
           }));
         });
-      } else if (Platform.isIOS) {
+      } else if (UniversalPlatform.isIOS) {
         deviceInfo.iosInfo.then((value) {
           upload(jsonEncode({
             'packageInfo': packageInfoAsMap,

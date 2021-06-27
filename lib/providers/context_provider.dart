@@ -42,9 +42,14 @@ class ContextProvider extends ChangeNotifier {
 
   void showSnackBar(String message, {SnackBarAction? action}) =>
       _snackBarService.show(SnackBar(
-        backgroundColor: variantIsLightThenDark(_scaffoldMessengerKey.currentContext!, reverse: true),
+        backgroundColor: variantIsLightThenDark(
+            _scaffoldMessengerKey.currentContext!,
+            reverse: true),
         behavior: SnackBarBehavior.floating,
-        content: Text(message, style: Theme.of(_scaffoldMessengerKey.currentContext!).textTheme.caption),
+        content: Text(message,
+            style: Theme.of(_scaffoldMessengerKey.currentContext!)
+                .textTheme
+                .caption),
         action: action,
       ));
 
@@ -66,15 +71,44 @@ class ContextProvider extends ChangeNotifier {
   void pop() => _navigationService.pop();
 
   Future<T> showCustomDialog<T>(List<Widget> children,
-          {bool canBack = false, Color? backgroundColor}) =>
+          {Widget? title,
+          bool canBack = false,
+          Color? backgroundColor,
+          int height = 50,
+          int width = 80}) =>
       _showDialog<T>(
         () => WillPopScope(
           onWillPop: () async => canBack,
           child: SimpleDialog(
+            contentPadding: EdgeInsets.all(0),
+            insetPadding: EdgeInsets.all(0),
+            titlePadding: EdgeInsets.all(24),
+            title: title,
             backgroundColor: backgroundColor ??
-                variantIsLightThenDark(_navigationKey.currentContext!,
+                getBlackAndWhite(_navigationKey.currentContext!, 1,
                     reverse: true),
-            children: children,
+            children: [
+              Container(
+                color: backgroundColor ??
+                    getBlackAndWhite(_navigationKey.currentContext!, 1,
+                        reverse: true),
+                height: AppSize.safeBlockVertical * height,
+                width: AppSize.safeBlockHorizontal * width,
+                child: Scaffold(
+                  backgroundColor: backgroundColor ??
+                      getBlackAndWhite(_navigationKey.currentContext!, 1,
+                          reverse: true),
+                  body: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: children,
+                    )),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       );
@@ -94,11 +128,11 @@ class ContextProvider extends ChangeNotifier {
               variantIsLightThenDark(_navigationKey.currentContext!,
                   reverse: true),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _loaders.pickAny()!(isLightThenDark(
                   _navigationKey.currentContext!,
                   reverse: false)),
+              SizedBox(height: AppSize.safeBlockVertical * 5),
               Text(
                 text ?? _funny.getLoadingRandom(),
                 textAlign: TextAlign.center,
@@ -111,43 +145,33 @@ class ContextProvider extends ChangeNotifier {
       );
 
   Future<void> showSuccessDialog(String text) => showCustomDialog([
-        Center(
-          child: Column(children: [
-            Lottie.asset(
-              'animations/check.json',
-              width: AppSize.safeBlockHorizontal * 30,
-              repeat: false,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              text,
-              textAlign: TextAlign.center,
-              style:
-                  Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
-            )
-          ]),
-        )
+        Lottie.asset(
+          'animations/check.json',
+          width: AppSize.safeBlockHorizontal * 30,
+          repeat: false,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
+        ),
       ]);
 
   Future<void> showFailureDialog(String text) => showCustomDialog([
-        Center(
-          child: Column(children: [
-            Lottie.asset(
-              'animations/sad.json',
-              width: AppSize.safeBlockHorizontal * 30,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              text,
-              textAlign: TextAlign.center,
-              style:
-                  Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
-            )
-          ]),
+        Lottie.asset(
+          'animations/sad.json',
+          width: AppSize.safeBlockHorizontal * 30,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
         )
       ]);
 

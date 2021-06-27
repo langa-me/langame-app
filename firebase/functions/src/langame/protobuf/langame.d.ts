@@ -1380,6 +1380,12 @@ export namespace langame {
 
             /** Langame link */
             link?: (string|null);
+
+            /** Langame reservedSpots */
+            reservedSpots?: (string[]|null);
+
+            /** Langame isLocked */
+            isLocked?: (boolean|null);
         }
 
         /** Represents a Langame. */
@@ -1432,6 +1438,12 @@ export namespace langame {
 
             /** Langame link. */
             public link: string;
+
+            /** Langame reservedSpots. */
+            public reservedSpots: string[];
+
+            /** Langame isLocked. */
+            public isLocked: boolean;
 
             /**
              * Creates a new Langame instance using the specified properties.

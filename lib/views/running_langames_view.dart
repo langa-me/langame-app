@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
+import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
@@ -80,6 +81,7 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
   Widget _buildNotificationCard(lg.Langame l) {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var lp = Provider.of<LangameProvider>(context, listen: false);
+    var ap = Provider.of<AuthenticationProvider>(context, listen: false);
     return FutureBuilder<LangameResponse<List<lg.User>>>(
         future: lp.getUsers(l.channelName),
         builder: (BuildContext context, snapshot) {
@@ -91,6 +93,12 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
             var s = format.format(l.started.toDateTime().toLocal());
             var startedString = l.hasStarted() ? '\n\nstarted: $s' : '';
             return ExpansionTile(
+                backgroundColor: l.isLocked &&
+                        (!l.reservedSpots.contains(ap.user!.uid) ||
+                            // Obviously the initiator can always join
+                            ap.user!.uid != l.initiator)
+                    ? getBlackAndWhite(context, 1, reverse: true)
+                    : getBlackAndWhite(context, 0, reverse: true),
                 title: Text(l.topics.join(','),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.caption),

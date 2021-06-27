@@ -1,5 +1,6 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -118,7 +119,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                 // ScaffoldMessenger.of(context)
                 //     .showSnackBar(SnackBar(content: Text('Processing Data')));
               }
-            }, text: 'Choose this tag'),
+            }, text: 'Choose this tag', highlighted: true,),
           ),
         ],
       ),
@@ -175,12 +176,12 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                         p.setShakeToFeedback(!p.preference.shakeToFeedback),
                   ),
                 ),
-                Lottie.asset(
+                !kIsWeb ? Lottie.asset(
                   'animations/feedback.json',
                   height: AppSize.safeBlockVertical * 70,
                   width: AppSize.safeBlockHorizontal * 70,
                   alignment: Alignment.center,
-                ),
+                ) : SizedBox.shrink(),
               ],
             ),
           ),
@@ -204,12 +205,12 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                         !p.preference.unknownPeopleRecommendations),
                   ),
                 ),
-                Lottie.asset(
+                !kIsWeb ? Lottie.asset(
                   'animations/recommendations.json',
                   height: AppSize.safeBlockVertical * 70,
                   width: AppSize.safeBlockHorizontal * 70,
                   alignment: Alignment.center,
-                ),
+                ) : SizedBox.shrink(),
               ],
             ),
           ),
@@ -218,12 +219,12 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           titleWidget: Text('Your friends don\'t have Langame?',
               style: Theme.of(context).textTheme.headline5),
           bodyWidget: Column(children: [
-            Lottie.asset(
+            !kIsWeb ? Lottie.asset(
               'animations/share.json',
               height: AppSize.safeBlockVertical * 70,
               width: AppSize.safeBlockHorizontal * 70,
               alignment: Alignment.center,
-            ),
+            ) : SizedBox.shrink(),
             LangameButton(
               FontAwesomeIcons.shareAlt,
                 onPressed: () => Share.share(

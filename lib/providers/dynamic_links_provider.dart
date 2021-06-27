@@ -3,23 +3,34 @@ import 'dart:convert';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/services/http/firebase.dart';
 import 'package:langame/views/langame.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class DynamicLinksProvider extends ChangeNotifier {
   final CrashAnalyticsProvider _cap;
   final ContextProvider _cp;
-  final FirebaseDynamicLinks _dynamicLinks;
+  final FirebaseDynamicLinks? _dynamicLinks;
+  bool? _isDev;
 
-  DynamicLinksProvider(this._cap, this._cp, this._dynamicLinks);
+  DynamicLinksProvider(
+      this._cap, this._cp, this._dynamicLinks) {
+    PackageInfo.fromPlatform() // TODO: move to smthing global
+        .then((e) => _isDev = e.packageName.contains('dev'));
+  }
 
   String getChannelNameFromLink(String link) {
     final sp = link.split('/');
     return sp[sp.length > 4 ? 4 : 3];
   }
+
+  String getBasePath() => _isDev != null && !_isDev!
+      ? 'https://langa.me/join'
+      : 'https://langamedev.page.link';
 
   Future<LangameResponse<String>> createDynamicLink(
     String path,
@@ -74,16 +85,17 @@ class DynamicLinksProvider extends ChangeNotifier {
 
   Future<LangameResponse<void>> setupAndCheckDynamicLinks() async {
     try {
-      _dynamicLinks.onLink(
+      _dynamicLinks?.onLink(
           onSuccess: _onSuccess,
           onError: (OnLinkErrorException e) async {
             _cap.log('onLinkError $e');
             _cap.recordError(e, null);
           });
 
-      _onSuccess(await _dynamicLinks.getInitialLink()).then((_) => _cap.log(
-          'opened initial langame link',
-          analyticsMessage: 'dynamic_links_open_initial'));
+      if (_dynamicLinks != null)
+        _onSuccess(await _dynamicLinks!.getInitialLink()).then((_) => _cap.log(
+            'opened initial langame link',
+            analyticsMessage: 'dynamic_links_open_initial'));
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
       _cap.log('failed to setupAndCheckDynamicLinks');
@@ -97,8 +109,9 @@ class DynamicLinksProvider extends ChangeNotifier {
         analyticsMessage: 'dynamic_links_open');
     if (dl != null && dl.link.path.split('/').length > 0) {
       final sp = dl.link.path.split('/');
-      final channel = sp[sp.length > 1 ? 2 : 1];
+      final String channel = sp[sp.length > 2 ? 2 : 1];
       _cap.log('opening view $channel');
+
       // Opened a Langame link that opened the app
       // i.e. https://DOMAIN/CHANNEL_NAME
       // path starts with "/" thats why the substring

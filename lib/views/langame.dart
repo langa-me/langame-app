@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -111,6 +112,13 @@ class _LangameViewState extends State<LangameView> {
                   (s.hasData &&
                       s.data != null &&
                       s.data!.status == LangameStatus.failed)) {
+                if (s.data!.error is LangameException &&
+                    (s.data!.error! as LangameException).cause ==
+                        'langame_locked') {
+                  cp.showSnackBar(
+                      'Unfortunately the Langame has been locked by the creator');
+                  _goBackToMainMenu();
+                }
                 _handleError();
               }
               if (s.hasData &&
@@ -234,16 +242,70 @@ class _LangameViewState extends State<LangameView> {
 
   Widget _buildHome(lg.Langame l) => Column(children: [
         Stack(children: [
-          l.hasLink() && l.initiator == Provider.of<AuthenticationProvider>(context, listen: false).user!.uid
+          l.hasLink() &&
+                  l.initiator ==
+                      Provider.of<AuthenticationProvider>(context,
+                              listen: false)
+                          .user!
+                          .uid
               ? Align(
                   alignment: Alignment.topLeft,
                   child: IconButton(
-                    onPressed: () => Share.share(
-                        'Join me on Langame for an incredible conversation on ${l.topics.join(',')}!\n' +
-                            'Just open this link: https://langa.me/join/${l.link}\n' +
-                            'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
-                        subject:
-                            'Join me on Langame for an incredible conversation on ${l.topics.join(',')}'),
+                    onPressed: () {
+                      var cp =
+                          Provider.of<ContextProvider>(context, listen: false);
+
+                      cp.showCustomDialog([
+                        Consumer<LangameProvider>(builder: (c, lp, _) {
+                          final onTap = () => l.isLocked && lp.canLock == null
+                              ? cp.showSnackBar(
+                                  'The Langame is full, initially invited people can still join')
+                              : lp.canLock == null
+                                  ? lp.lock(l.channelName)
+                                  : cp.showSnackBar(
+                                      'You can\'t unlock the Langame ${lp.canLock}');
+                          return ListTile(
+                            onTap: onTap,
+                            leading: Icon(
+                                l.isLocked
+                                    ? FontAwesomeIcons.lock
+                                    : FontAwesomeIcons.lockOpen,
+                                color: l.isLocked && lp.canLock == null
+                                    ? Colors.red
+                                    : getBlackAndWhite(context, 1)),
+                            title: Text(l.isLocked ? 'Unlock' : 'Lock',
+                                style: Theme.of(context).textTheme.headline6),
+                          );
+                        }),
+                        ListTile(
+                          onTap: () => FlutterClipboard.copy(
+                                  'langa.me/join/${l.link}')
+                              .then((v) => cp.showSnackBar(
+                                  'langa.me/join/${l.link} copied to clipboard!')),
+                          tileColor:
+                              getBlackAndWhite(context, 2, reverse: true),
+                          title: Text('langa.me/join/${l.link}',
+                              style: Theme.of(context).textTheme.headline6),
+                          leading: IconButton(
+                            icon: Icon(FontAwesomeIcons.shareAlt,
+                                color:
+                                    isLightThenDark(context, reverse: false)),
+                            onPressed: () => Share.share(
+                                'Join me on Langame for an incredible conversation on ${l.topics.join(',')}!\n' +
+                                    'Just open this link: langa.me/join/${l.link}\n' +
+                                    'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
+                                subject:
+                                    'Join me on Langame for an incredible conversation on ${l.topics.join(',')}'),
+                          ),
+                          trailing: Icon(FontAwesomeIcons.copy,
+                              color: isLightThenDark(context, reverse: false)),
+                        ),
+                      ],
+                          canBack: true,
+                          title: Text('Share',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline4));
+                    },
                     icon: Icon(
                       FontAwesomeIcons.users,
                       color: isLightThenDark(context),
@@ -275,28 +337,26 @@ class _LangameViewState extends State<LangameView> {
 
   Future<bool> _onBackPressed({bool showFeedbackDialogOnLeave = true}) {
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    return cp.showCustomDialog<bool>(
-      [
-        Padding(
-            padding: EdgeInsets.all(20),
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(
-                'Exit the langame?',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headline4,
-              ),
-              LangameButton(Icons.cancel_outlined,
-                  onPressed: cp.dialogComplete, text: 'Cancel', layer: 2),
-              LangameButton(Icons.exit_to_app_rounded,
-                  onPressed: () async => await _onEnd(
-                      showFeedbackDialog: showFeedbackDialogOnLeave),
-                  text: 'Yes',
-                  layer: 2),
-            ])),
-      ],
-      canBack: true,
-    );
+    return cp.showCustomDialog<bool>([
+      LangameButton(
+        Icons.cancel_outlined,
+        onPressed: cp.dialogComplete,
+        text: 'Cancel',
+        highlighted: true,
+      ),
+      LangameButton(Icons.exit_to_app_rounded,
+          onPressed: () async =>
+              await _onEnd(showFeedbackDialog: showFeedbackDialogOnLeave),
+          text: 'Yes',
+          layer: 2),
+    ],
+        canBack: true,
+        height: 30,
+        title: Text(
+          'Exit the langame?',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.headline4,
+        ));
   }
 
   Future<void> _goBackToMainMenu() => Future.delayed(
@@ -309,59 +369,56 @@ class _LangameViewState extends State<LangameView> {
   Future<void> showPermissionDialog() {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     return cp.showCustomDialog([
-      Container(
-          padding: EdgeInsets.all(12),
-          child: Column(children: [
-            Text('We need your permission to use your microphone',
-                style: Theme.of(context).textTheme.headline6),
-            Lottie.asset(
-              'animations/microphone.json',
-              width: AppSize.safeBlockHorizontal * 70,
-              height: AppSize.safeBlockVertical * 40,
-            ),
-            LangameButton(FontAwesomeIcons.doorOpen, onPressed: () {
-              cp.dialogComplete();
-              _goBackToMainMenu();
-            }, text: 'Leave', layer: 2),
-            LangameButton(FontAwesomeIcons.checkCircle, onPressed: () async {
-              var p = Provider.of<AudioProvider>(context, listen: false);
-              var res = await p.requestPermission();
+      Text('We need your permission to use your microphone',
+          style: Theme.of(context).textTheme.headline6),
+      Lottie.asset(
+        'animations/microphone.json',
+        width: AppSize.safeBlockHorizontal * 70,
+        height: AppSize.safeBlockVertical * 40,
+      ),
+      LangameButton(FontAwesomeIcons.doorOpen, onPressed: () {
+        cp.dialogComplete();
+        _goBackToMainMenu();
+      }, text: 'Leave', layer: 2),
+      LangameButton(FontAwesomeIcons.checkCircle, onPressed: () async {
+        var p = Provider.of<AudioProvider>(context, listen: false);
+        var res = await p.requestPermission();
 
-              cp.handleLangameResponse(
-                res,
-                failedMessage: _failingMessage,
-                onSucceed: () {
-                  // Permission granted!
-                  if (res.result != null && res.result!) {
-                    _postFrameCallback((duration) {
-                      setState(() => permissionRequested = true);
-                    });
-                    cp.dialogComplete();
-                    return;
-                  }
-                  showToast(
-                      'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
-                      color: isLightThenDark(context, reverse: true),
-                      textColor: isLightThenDark(context, reverse: false));
-                  _goBackToMainMenu();
-                },
-                onFailure: _goBackToMainMenu,
-              );
-            }, text: 'Accept', layer: 2),
-          ]))
-    ]);
+        cp.handleLangameResponse(
+          res,
+          failedMessage: _failingMessage,
+          onSucceed: () {
+            // Permission granted!
+            if (res.result != null && res.result!) {
+              _postFrameCallback((duration) {
+                setState(() => permissionRequested = true);
+              });
+              cp.dialogComplete();
+              return;
+            }
+            showToast(
+                'You can\'t play Langame without microphone 😭, you can still enable it in your settings later.',
+                color: isLightThenDark(context, reverse: true),
+                textColor: isLightThenDark(context, reverse: false));
+            _goBackToMainMenu();
+          },
+          onFailure: _goBackToMainMenu,
+        );
+      }, text: 'Accept', layer: 2),
+    ], height: 65);
   }
 
-  void _handleError({bool failNow = false}) async {
+  void _handleError({bool failNow = false, bool toast = true}) async {
     if (errors > maxErrors || failNow) {
       var f = Provider.of<AudioProvider>(context, listen: false).leaveChannel();
       var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
-      showToast(
-        _failingMessage,
-        color: Colors.red,
-      );
+      if (toast)
+        showToast(
+          _failingMessage,
+          color: Colors.red,
+        );
 
-      cap.crashlytics.recordError(
+      cap.crashlytics?.recordError(
           LangameException('failed to start langame'), null,
           reason: 'failed to start langame', fatal: true);
       await f;
@@ -640,8 +697,9 @@ class _LangameViewState extends State<LangameView> {
                 Row(children: [
                   IconButton(
                     onPressed: () => Share.share(
-                            'I got into conversations on Langame:\n' +
-                            s.data!.result!.content + '\n' +
+                        'I got into conversations on Langame:\n' +
+                            s.data!.result!.content +
+                            '\n' +
                             'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
                         subject:
                             '${s.data!.result!.content.substring(0, 10)}...'),
@@ -655,22 +713,30 @@ class _LangameViewState extends State<LangameView> {
                     icon:
                         Icon(Icons.warning_amber_rounded, color: Colors.orange),
                     onPressed: () => cp.showCustomDialog([
-                      Text(
-                        'Warning',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headline6,
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Lottie.asset(
+                              'animations/warning.json',
+                              width: AppSize.safeBlockHorizontal * 50,
+                              height: AppSize.safeBlockVertical * 50,
+                            ),
+                            Text(
+                              'Some features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.headline6,
+                            ),
+                          ],
+                        ),
                       ),
-                      Lottie.asset(
-                        'animations/warning.json',
-                        width: AppSize.safeBlockHorizontal * 50,
-                        height: AppSize.safeBlockVertical * 50,
-                      ),
-                      Text(
-                        'Some features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headline6,
-                      ),
-                    ], canBack: true),
+                    ],
+                        canBack: true,
+                        height: 70,
+                        title: Text(
+                          'Warning',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headline4,
+                        )),
                   ),
                 ]),
               ],
@@ -704,44 +770,47 @@ class _LangameViewState extends State<LangameView> {
           Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(40.0)),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
               border: Border.all(
                 color: variantBisIsLightThenDark(context),
                 width: 5,
               ),
               color: variantIsLightThenDark(context, reverse: true),
             ),
-            width: AppSize.safeBlockHorizontal * 70,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _localPlayers.values
-                    .map(
-                      (p) => Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(40),
+            width: AppSize.safeBlockHorizontal * 80,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: _localPlayers.values
+                      .map(
+                        (p) => Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(40),
+                                ),
+                                border: Border.all(
+                                  width: 1,
+                                  color: p.isSpeaking
+                                      ? Colors.red
+                                      : variantIsLightThenDark(context),
+                                  style: BorderStyle.solid,
+                                ),
                               ),
-                              border: Border.all(
-                                width: 1,
-                                color: p.isSpeaking
-                                    ? Colors.red
-                                    : variantIsLightThenDark(context),
-                                style: BorderStyle.solid,
+                              child: Center(
+                                child: buildCroppedRoundedNetworkImage(
+                                    p.langameUser.photoUrl),
                               ),
                             ),
-                            child: Center(
-                              child: buildCroppedRoundedNetworkImage(
-                                  p.langameUser.photoUrl),
-                            ),
-                          ),
-                          // Icon(Icons
-                          //     .mic_rounded), // TODO: use show if other has mic on or not
-                        ],
-                      ),
-                    )
-                    .toList()),
+                            // Icon(Icons
+                            //     .mic_rounded), // TODO: use show if other has mic on or not
+                          ],
+                        ),
+                      )
+                      .toList()),
+            ),
           ),
           SizedBox(height: AppSize.safeBlockVertical * 2),
           Consumer<AudioProvider>(
@@ -827,27 +896,25 @@ class _LangameViewState extends State<LangameView> {
         .runningLangames
         .values
         .firstWhere((e) => e.channelName == widget.channelName);
-    cp.showCustomDialog(
-      [
-        Padding(
-          padding: EdgeInsets.all(10),
-          child: Consumer<FeedbackProvider>(
-            builder: (ctx, s, c) =>
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(
-                'Langame is over, how was it?',
-                style: Theme.of(context).textTheme.headline4,
-              ),
+    cp.showCustomDialog([
+      Consumer<FeedbackProvider>(
+        builder: (ctx, s, c) => Container(
+          height: AppSize.safeBlockVertical * 70,
+          child: ListView(
+            children: [
               LottieBuilder.asset(
                 'animations/congratulations.json',
                 width: AppSize.safeBlockHorizontal * 40,
                 height: AppSize.safeBlockVertical * 40,
               ),
-              Text(
+              Center(
+                  child: Text(
                 'How relevant to the topic the conversation starter was?',
                 style: Theme.of(context).textTheme.headline6,
-              ),
-              ToggleButtons(
+                textAlign: TextAlign.center,
+              )),
+              Center(
+                  child: ToggleButtons(
                 children: <Widget>[
                   Icon(FontAwesomeIcons.frown, color: isLightThenDark(context)),
                   Icon(FontAwesomeIcons.meh, color: isLightThenDark(context)),
@@ -856,12 +923,15 @@ class _LangameViewState extends State<LangameView> {
                 ],
                 onPressed: (int i) => s.feedbackMemeRelevanceScore = i,
                 isSelected: s.feedbackMemeRelevanceSelected,
-              ),
-              Text(
+              )),
+              Center(
+                  child: Text(
                 'How would you rate the conversation starter?',
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headline6,
-              ),
-              ToggleButtons(
+              )),
+              Center(
+                  child: ToggleButtons(
                 children: <Widget>[
                   Icon(FontAwesomeIcons.frown, color: isLightThenDark(context)),
                   Icon(FontAwesomeIcons.meh, color: isLightThenDark(context)),
@@ -870,7 +940,7 @@ class _LangameViewState extends State<LangameView> {
                 ],
                 onPressed: (int i) => s.feedbackMemeGeneralScore = i,
                 isSelected: s.feedbackMemeGeneralScoreSelected,
-              ),
+              )),
               LangameButton(FontAwesomeIcons.doorOpen, onPressed: () {
                 // TODO: handle feedback per memes
                 currentLg.memes.forEach((e) => s.sendMemeFeedback(e));
@@ -880,11 +950,16 @@ class _LangameViewState extends State<LangameView> {
               }, text: 'Send', highlighted: true),
               LangameButton(FontAwesomeIcons.forward,
                   onPressed: _goBackToMainMenu, text: 'Skip', layer: 2),
-            ]),
+            ],
           ),
         ),
-      ],
-      canBack: false,
-    );
+      ),
+    ],
+        canBack: false,
+        height: 75,
+        title: Text(
+          'How was it?',
+          style: Theme.of(context).textTheme.headline4,
+        ));
   }
 }

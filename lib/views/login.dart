@@ -18,8 +18,9 @@ import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/on_boarding.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 import 'buttons/apple.dart';
 import 'langame.dart';
@@ -128,7 +129,7 @@ class _LoginState extends State<Login> {
             await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
           },
           splashColor: Theme.of(context).colorScheme.primary),
-      Platform.isIOS
+      UniversalPlatform.isIOS
           ? AppleSignInButton(
               onPressed: () async {
                 if (isAuthenticating) return;
@@ -139,6 +140,7 @@ class _LoginState extends State<Login> {
     ];
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -155,8 +157,13 @@ class _LoginState extends State<Login> {
                       Divider(),
                       SizedBox(height: AppSize.safeBlockVertical * 10),
                       TextField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                         controller: _hackControllerPassword,
+                        style: Theme.of(context).textTheme.headline6!.merge(TextStyle(color: Colors.transparent)),
                         decoration: InputDecoration(
+                            hintStyle: Theme.of(context).textTheme.headline6,
                             hintText: "Enter the hack password"),
                       ),
                       LangameButton(FontAwesomeIcons.code,

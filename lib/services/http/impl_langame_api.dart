@@ -41,33 +41,30 @@ class ImplLangameApi extends LangameApi {
         )
         .get();
     if (snap.docs.isEmpty || !snap.docs.first.exists)
-      throw LangameMessageException('invalid_channel_name');
+      throw LangameException('invalid_channel_name');
+    if (snap.docs.first.data().hasDone())
+      throw LangameException('langame_done');
+    if (snap.docs.first.data().isLocked)
+      throw LangameException('langame_locked');
+
     // Set time in (whether was in initially invited players or not)
-    var snapP = await snap.docs.first.reference
+    var snapP = snap.docs.first.reference
         .collection('players')
         .doc(firebase.auth!.currentUser!.uid)
         .withConverter<lg.Player>(
           fromFirestore: (s, _) => PlayerExt.fromObject(s.data()!),
           toFirestore: (s, _) => s.toMapStringDynamic(),
-        )
-        .get();
-    // Was invited, just request an audio id
-    if (snapP.exists) {
-      await snapP.reference.set(
-        lg.Player(
-          audioId: -1,
-        ),
-        SetOptions(merge: true),
-      );
-      // Was not invited (link), add self to the langame
-    } else if (!snapP.exists) {
-      await snapP.reference.set(lg.Player(
+        );
+    // No need to await this set as we wait that the server update self
+    snapP.set(
+      lg.Player(
         userId: firebase.auth!.currentUser!.uid,
         audioId: -1,
-      ));
-    }
+      ),
+      SetOptions(merge: true),
+    );
     // Wait that server assign a audio id
-    await snapP.reference
+    await snapP
         .snapshots()
         .firstWhere((e) => e.data()!.audioId != -1)
         .timeout(Duration(seconds: 20));
@@ -132,34 +129,22 @@ class ImplLangameApi extends LangameApi {
 
   @override
   Future<Stream<DocumentSnapshot<lg.Langame>>> createLangame(
-      List<String> players, List<String> topics, DateTime date) async {
-    var p = players.map((e) => lg.Player(userId: e)).toList() +
-        [lg.Player(userId: firebase.auth!.currentUser!.uid)];
-
-    var a = await firebase.firestore!
-        .collection(AppConst.firestoreLangamesCollection)
-        .add({
-      'topics': topics,
-      'initiator': firebase.auth!.currentUser!.uid, // TODO: risky
-      'date': date,
-    });
-
-    p.forEach((e) => a
-        .collection("players")
-        .withConverter<lg.Player>(
-          fromFirestore: (s, _) => PlayerExt.fromObject(s.data()!),
-          toFirestore: (s, _) => s.toMapStringDynamic(),
-        )
-        .doc(e.userId)
-        .set(e));
-    return a
-        .withConverter<lg.Langame>(
-          fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
-          toFirestore: (s, _) => s.toMapStringDynamic(),
-        )
-        .snapshots()
-        .timeout(Duration(seconds: 20));
-  }
+    List<String> players,
+    List<String> topics,
+    DateTime date,
+  ) =>
+      firebase.firestore!.collection(AppConst.firestoreLangamesCollection).add({
+        'topics': topics,
+        'initiator': firebase.auth!.currentUser!.uid, // TODO: risky
+        'date': date,
+        'reservedSpots': players,
+      }).then((e) => e
+          .withConverter<lg.Langame>(
+            fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
+            toFirestore: (s, _) => s.toMapStringDynamic(),
+          )
+          .snapshots()
+          .timeout(Duration(seconds: 20)));
 
   @override
   Future<void> notifyPresence(String channelName) async {

@@ -70,6 +70,9 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
                 <data android:scheme="https" android:host="langa.me/join" />
                 <data android:scheme="https" android:host="langamedev.page.link" />
+                <data android:scheme="https" android:host="help.langa.me" />
+                <data android:scheme="https" android:host="langa.me" />
+                <data android:scheme="https" android:host="productific.com/@Langame" />
             </intent-filter>
         </activity>
 

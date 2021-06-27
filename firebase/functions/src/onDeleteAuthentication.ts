@@ -9,9 +9,18 @@ import {auth} from "firebase-admin/lib/auth";
 import UserRecord = auth.UserRecord;
 import Stripe from "stripe";
 import {reportError} from "./errors";
+import {html} from "./utils/html";
 const stripe = new Stripe(functions.config().stripe.key, {
   apiVersion: "2020-08-27",
 });
+
+const title = "Farewell from Langame 😥";
+/* eslint-disable max-len */
+const body = `We are saddened by your departure, we will miss you.
+<br>
+Please do not hesitate to give us feedback <a href="https://help.langa.me/feedback">here.</a>, thank you!`;
+/* eslint-disable max-len */
+
 
 /**
  * When a user deletes their account, clean up after them
@@ -79,7 +88,16 @@ export const onDeleteAuthentication = async (user: UserRecord,
 
     functions.logger.info("preparing interactions, preferences, user deletion");
 
-    return batch.delete(userDocToDelete).commit();
+    batch.delete(userDocToDelete).commit();
+    return db.collection("mails").add({
+      to: user.email,
+      message: {
+        subject: title,
+        html: `<code>
+          ${html(title, body, "Have a great day 😇.")}
+        </code>`,
+      },
+    });
   } catch (e) {
     return reportError(e, {user: context.params.userId});
   }

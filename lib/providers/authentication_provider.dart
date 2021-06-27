@@ -42,17 +42,19 @@ class AuthenticationProvider extends ChangeNotifier {
     _firebaseUserStream = _authenticationApi.userChanges;
     _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
-      // data.refreshToken being null means need to re-auth basically
-      if (data == null) {
+      if (data == null || firebase.auth!.currentUser == null) {
         // If logged out, set logout time
-        if (user != null) {
-          firebase.firestore!
-              .collection(AppConst.firestoreUsersCollection)
-              .doc(user!.uid)
-              .update({
-            'lastLogout': FieldValue.serverTimestamp(),
-          });
-        }
+        // TODO: can't update firestore when disconnected
+        // if (user != null) {
+        //   firebase.firestore!
+        //       .collection(AppConst.firestoreUsersCollection)
+        //       .doc(user!.uid)
+        //       .update({
+        //     'lastLogout': FieldValue.serverTimestamp(),
+        //   });
+        //   _user = null;
+        // }
+        _user = null;
         return null;
       }
       var r = await firebase.firestore!.runTransaction((t) async {
@@ -185,6 +187,7 @@ class AuthenticationProvider extends ChangeNotifier {
       // _crashAnalyticsProvider.log('purging local firestore');
       // await firebase.firestore!.clearPersistence();
       await _authenticationApi.logout();
+      _user = null;
       _cap.log('logout');
       return LangameResponse<lg.User>(LangameStatus.succeed);
     } catch (e, s) {

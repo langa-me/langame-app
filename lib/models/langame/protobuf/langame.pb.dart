@@ -1136,6 +1136,8 @@ class Langame extends $pb.GeneratedMessage {
     ..a<$core.int>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memesSeen', $pb.PbFieldType.O3)
     ..aOM<$0.Timestamp>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memeChanged', subBuilder: $0.Timestamp.create)
     ..aOS(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'link')
+    ..pPS(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'reservedSpots')
+    ..aOB(19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isLocked')
     ..hasRequiredFields = false
   ;
 
@@ -1155,6 +1157,8 @@ class Langame extends $pb.GeneratedMessage {
     $core.int? memesSeen,
     $0.Timestamp? memeChanged,
     $core.String? link,
+    $core.Iterable<$core.String>? reservedSpots,
+    $core.bool? isLocked,
   }) {
     final _result = create();
     if (channelName != null) {
@@ -1198,6 +1202,12 @@ class Langame extends $pb.GeneratedMessage {
     }
     if (link != null) {
       _result.link = link;
+    }
+    if (reservedSpots != null) {
+      _result.reservedSpots.addAll(reservedSpots);
+    }
+    if (isLocked != null) {
+      _result.isLocked = isLocked;
     }
     return _result;
   }
@@ -1333,6 +1343,18 @@ class Langame extends $pb.GeneratedMessage {
   $core.bool hasLink() => $_has(13);
   @$pb.TagNumber(16)
   void clearLink() => clearField(16);
+
+  @$pb.TagNumber(18)
+  $core.List<$core.String> get reservedSpots => $_getList(14);
+
+  @$pb.TagNumber(19)
+  $core.bool get isLocked => $_getBF(15);
+  @$pb.TagNumber(19)
+  set isLocked($core.bool v) { $_setBool(15, v); }
+  @$pb.TagNumber(19)
+  $core.bool hasIsLocked() => $_has(15);
+  @$pb.TagNumber(19)
+  void clearIsLocked() => clearField(19);
 }
 
 class Player extends $pb.GeneratedMessage {

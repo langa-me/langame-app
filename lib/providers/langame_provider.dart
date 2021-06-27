@@ -32,6 +32,10 @@ class LangameProvider extends ChangeNotifier {
 
   List<StreamSubscription<DocumentSnapshot<lg.Langame>>> _subs = [];
 
+  Timer? _lockTimer;
+  String? get canLock =>
+      _lockTimer == null || !_lockTimer!.isActive ? null : 'a moment please...';
+
   clearLangames() {
     _subs.forEach((e) => e.cancel());
     _subs.clear();
@@ -85,10 +89,12 @@ class LangameProvider extends ChangeNotifier {
           e.data()!.channelName.isNotEmpty);
 
       initialize();
-      _cap.log('created langame with topics ${topics.join(',')} and date $date');
+      _cap.log(
+          'created langame with topics ${topics.join(',')} and date $date');
       return LangameResponse(LangameStatus.succeed, result: snap);
     } catch (e, s) {
-      _cap.log('failed to create langame with topics ${topics.join(',')} and date $date');
+      _cap.log(
+          'failed to create langame with topics ${topics.join(',')} and date $date');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -202,5 +208,34 @@ class LangameProvider extends ChangeNotifier {
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
+  }
+
+  Future<LangameResponse<void>> lock(String channelName) async {
+    try {
+      if (_lockTimer != null && _lockTimer!.isActive)
+        return LangameResponse(LangameStatus.failed);
+      final lgId = _runningLangames.entries
+          .firstWhere((e) => e.value.channelName == channelName)
+          .key;
+      var langame = await _firebase.firestore!
+          .collection(AppConst.firestoreLangamesCollection)
+          .withConverter<lg.Langame>(
+            fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
+            toFirestore: (e, _) => e.toMapStringDynamic(),
+          )
+          .doc(lgId)
+          .get();
+      if (langame.data()!.isLocked) {
+        return LangameResponse(LangameStatus.failed);
+      }
+      await langame.reference.update({'isLocked': !langame.data()!.isLocked});
+      _cap.log('lock $lgId ${!langame.data()!.isLocked}');
+      _lockTimer = Timer(Duration(seconds: 5), () {});
+    } catch (e, s) {
+      _cap.log('failed to notifyPresence');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+    return LangameResponse(LangameStatus.succeed);
   }
 }

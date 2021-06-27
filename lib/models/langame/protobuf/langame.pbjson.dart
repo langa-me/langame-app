@@ -201,11 +201,13 @@ const Langame$json = const {
     const {'1': 'memes_seen', '3': 14, '4': 1, '5': 5, '10': 'memesSeen'},
     const {'1': 'meme_changed', '3': 15, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'memeChanged'},
     const {'1': 'link', '3': 16, '4': 1, '5': 9, '10': 'link'},
+    const {'1': 'reserved_spots', '3': 18, '4': 3, '5': 9, '10': 'reservedSpots'},
+    const {'1': 'is_locked', '3': 19, '4': 1, '5': 8, '10': 'isLocked'},
   ],
 };
 
 /// Descriptor for `Langame`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSGAoHcGxheWVycxgCIAMoCVIHcGxheWVycxIWCgZ0b3BpY3MYAyADKAlSBnRvcGljcxIUCgVtZW1lcxgEIAMoCVIFbWVtZXMSHAoJaW5pdGlhdG9yGAUgASgJUglpbml0aWF0b3ISLgoEZG9uZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBGRvbmUSIQoMY3VycmVudF9tZW1lGAggASgFUgtjdXJyZW50TWVtZRIuCgRkYXRlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIEZGF0ZRIWCgZlcnJvcnMYCiADKAlSBmVycm9ycxI0CgdzdGFydGVkGAsgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIHc3RhcnRlZBI3CgluZXh0X21lbWUYDSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUghuZXh0TWVtZRIdCgptZW1lc19zZWVuGA4gASgFUgltZW1lc1NlZW4SPQoMbWVtZV9jaGFuZ2VkGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFILbWVtZUNoYW5nZWQSEgoEbGluaxgQIAEoCVIEbGluaw==');
+final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSGAoHcGxheWVycxgCIAMoCVIHcGxheWVycxIWCgZ0b3BpY3MYAyADKAlSBnRvcGljcxIUCgVtZW1lcxgEIAMoCVIFbWVtZXMSHAoJaW5pdGlhdG9yGAUgASgJUglpbml0aWF0b3ISLgoEZG9uZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBGRvbmUSIQoMY3VycmVudF9tZW1lGAggASgFUgtjdXJyZW50TWVtZRIuCgRkYXRlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIEZGF0ZRIWCgZlcnJvcnMYCiADKAlSBmVycm9ycxI0CgdzdGFydGVkGAsgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIHc3RhcnRlZBI3CgluZXh0X21lbWUYDSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUghuZXh0TWVtZRIdCgptZW1lc19zZWVuGA4gASgFUgltZW1lc1NlZW4SPQoMbWVtZV9jaGFuZ2VkGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFILbWVtZUNoYW5nZWQSEgoEbGluaxgQIAEoCVIEbGluaxIlCg5yZXNlcnZlZF9zcG90cxgSIAMoCVINcmVzZXJ2ZWRTcG90cxIbCglpc19sb2NrZWQYEyABKAhSCGlzTG9ja2Vk');
 @$core.Deprecated('Use playerDescriptor instead')
 const Player$json = const {
   '1': 'Player',

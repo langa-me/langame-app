@@ -4,14 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CrashAnalyticsProvider extends ChangeNotifier {
-  FirebaseCrashlytics crashlytics;
+  FirebaseCrashlytics? crashlytics;
   FirebaseAnalytics analytics;
   CrashAnalyticsProvider(this.crashlytics, this.analytics);
 
   void log(String message,
       {String? analyticsMessage, Map<String, Object?>? analyticsParameters}) {
     if (!kReleaseMode) debugPrint(message);
-    crashlytics.log(message);
+    crashlytics?.log(message);
     if (analyticsMessage != null)
       analytics.logEvent(
           name: analyticsMessage, parameters: analyticsParameters);
@@ -24,10 +24,10 @@ class CrashAnalyticsProvider extends ChangeNotifier {
 
   void setCurrentScreen(String screenName) {
     analytics.setCurrentScreen(screenName: screenName);
-    crashlytics.setCustomKey('screenName', screenName);
+    crashlytics?.setCustomKey('screenName', screenName);
   }
 
   void recordError(dynamic exception, StackTrace? stack) {
-    crashlytics.recordError(exception, stack, printDetails: !kReleaseMode);
+    crashlytics?.recordError(exception, stack, printDetails: !kReleaseMode);
   }
 }

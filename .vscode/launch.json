@@ -1,5 +1,6 @@
 {
     "configurations": [
+        
         {
             "name": "dev-pocophone",
             "type": "dart",
@@ -87,6 +88,74 @@
             // Set to run a Flutter app on a specific device, ignoring the device selected
             // in the status bar.
             "deviceId": "P6LDU16A10000080",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "dev-web",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+                "--web-renderer=html",
+                "--verbose",
+                "--web-port=5000",
+                "--web-enable-expression-evaluation"
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "chrome",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "prod-web",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "prod",
+                "--web-renderer=html",
+                "--verbose",
+                "--web-port=5000",
+                "--web-enable-expression-evaluation"
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "chrome",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "dev-macos",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "macos",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "prod-macos",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "prod",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "macos",
             // "debug", "profile" or "release".
             "flutterMode": "debug",
         },

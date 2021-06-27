@@ -50,6 +50,14 @@ export const onUpdateLangamePlayers =
           // eslint-disable-next-line max-len
           functions.logger.log(`updated langame with new player ${afterPlayer.id}, audio id ${audioId}, audio token ${audioToken}`);
         }
+
+        // If the Langame is now full, set locked
+        if (!lgAfter.data()!.isLocked &&
+            afterPlayers.size >= 5 - lgAfter.data()!.reservedSpots.length) {
+          t.update(lgAfter.ref, {
+            isLocked: true,
+          });
+        }
         // If not started and enough player joined (2),
         // set started Langame properties
         if (!lgAfter.data()!.started &&

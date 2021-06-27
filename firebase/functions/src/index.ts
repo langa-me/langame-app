@@ -19,6 +19,7 @@ import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
 import {onWriteTag} from "./onWriteTag";
 import {onUpdateLangame} from "./onUpdateLangame";
+import {onCreateAuthentication} from "./onCreateAuthentication";
 
 
 /*
@@ -115,6 +116,9 @@ exports.onUpdateLangamePlayers = functions.firestore
 
 exports.onDeleteAuthentication =
     functions.auth.user().onDelete(onDeleteAuthentication);
+
+exports.onCreateAuthentication =
+    functions.auth.user().onCreate(onCreateAuthentication);
 
 
 // Meme //

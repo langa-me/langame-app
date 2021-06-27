@@ -13,13 +13,18 @@ Widget buildUserTile(BuildContext context, NewLangameProvider lp, lg.User u,
     ListTile(
       subtitle:
           l != null ? l.toFaIcon() : FaIcon(FontAwesomeIcons.questionCircle),
-      title: Text('${u.displayName}'),
+      title: Text(
+        '${u.tag}',
+        style: Theme.of(context).textTheme.caption,
+      ),
       leading: buildCroppedRoundedNetworkImage(u.photoUrl),
       trailing: MaterialButton(
         // TODO: might use ToggleButton instead? (with icon)
         onPressed: lp.shoppingList.any((e) => e.uid == u.uid)
-            ? onRemoveFromShoppingList(u, lp, Provider.of<ContextProvider>(context, listen: false), goToPage)
-            : onAddToShoppingList(u, lp, Provider.of<ContextProvider>(context, listen: false), goToPage),
+            ? onRemoveFromShoppingList(u, lp,
+                Provider.of<ContextProvider>(context, listen: false), goToPage)
+            : onAddToShoppingList(u, lp,
+                Provider.of<ContextProvider>(context, listen: false), goToPage),
         splashColor: Theme.of(context).colorScheme.secondaryVariant,
         color: Theme.of(context).colorScheme.secondary,
         shape: CircleBorder(),

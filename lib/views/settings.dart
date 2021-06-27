@@ -173,7 +173,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                           onPressed: () {
                         cp.dialogComplete();
                         _delete();
-                      }, text: 'Delete my account')
+                      }, text: 'Delete my account', layer: 2)
                     ]),
                   )
                 ], canBack: true);

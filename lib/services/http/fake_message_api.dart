@@ -8,29 +8,29 @@ class FakeMessageApi extends MessageApi {
       : super(firebase, onBackgroundOrForegroundOpened);
 
   @override
-  void cancel() {
+  Future<void> cancel() async {
     // TODO: implement cancel
   }
 
 
   @override
-  Future getInitialMessage() {
+  Future getInitialMessage() async {
     // TODO: implement getInitialMessage
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 
 
 
   @override
-  Future<LangameResponse> initializePermissions() {
+  Future<void> initializePermissions() async {
     // TODO: implement initializePermissions
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 
   @override
-  Future<void> listen(Function(dynamic)? add) {
+  Future<void> listen(Function(dynamic)? add) async {
     // TODO: implement listen
-    throw UnimplementedError();
+    // throw UnimplementedError();
   }
 
 }

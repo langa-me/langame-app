@@ -12,21 +12,16 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    var children = [
-      Align(
-        alignment: Alignment.topCenter,
-        child: Column(children: [
-          Text(
-            _user.displayName,
-            style: theme.textTheme.headline6,
-            textAlign: TextAlign.center,
-          ),
-          buildCroppedRoundedNetworkImage(_user.photoUrl,
-              width: AppSize.blockSizeHorizontal * 20),
-        ]),
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+      Text(
+        _user.tag,
+        style: theme.textTheme.headline6,
+        textAlign: TextAlign.center,
       ),
-    ];
-    // TODO: maybe instead something scrollable
-    return Column(children: children);
+      buildCroppedRoundedNetworkImage(_user.photoUrl,
+          width: AppSize.blockSizeHorizontal * 20),
+    ]);
   }
 }

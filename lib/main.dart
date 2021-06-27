@@ -54,11 +54,27 @@ void main() async {
   if (kReleaseMode) {
     await FirebaseAppCheck.instance.activate();
   }
-  var crashlytics = FirebaseCrashlytics.instance;
-  await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
+  FirebaseCrashlytics? crashlytics;
+  RemoteConfig? remoteConfig;
+  FirebaseDynamicLinks? dynamicLinks;
+
+  // Crashlytics does not support web https://firebase.flutter.dev/
+  if (!kIsWeb) {
+    crashlytics = FirebaseCrashlytics.instance;
+    await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
+    // Pass all uncaught errors from the framework to Crashlytics.
+    FlutterError.onError = crashlytics.recordFlutterError;
+    Isolate.current.addErrorListener(RawReceivePort((pair) async {
+      final List<dynamic> errorAndStacktrace = pair;
+      await crashlytics!.recordError(
+        errorAndStacktrace.first,
+        errorAndStacktrace.last,
+      );
+    }).sendPort);
+    remoteConfig = RemoteConfig.instance;
+    dynamicLinks = FirebaseDynamicLinks.instance;
+  }
   var analytics = FirebaseAnalytics();
-  var remoteConfig = RemoteConfig.instance;
-  var dynamicLinks = FirebaseDynamicLinks.instance;
   var useEmulator = false;
   FirebaseApi firebase = FirebaseApi(
     messaging: FirebaseMessaging.instance,
@@ -76,15 +92,6 @@ void main() async {
     useEmulator: useEmulator,
   );
 
-  // Pass all uncaught errors from the framework to Crashlytics.
-  FlutterError.onError = crashlytics.recordFlutterError;
-  Isolate.current.addErrorListener(RawReceivePort((pair) async {
-    final List<dynamic> errorAndStacktrace = pair;
-    await crashlytics.recordError(
-      errorAndStacktrace.first,
-      errorAndStacktrace.last,
-    );
-  }).sendPort);
   var navigationKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
   var scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>(debugLabel: 'scaffoldKey');
@@ -92,14 +99,15 @@ void main() async {
   var contextProvider =
       ContextProvider(navigationKey, scaffoldMessengerKey, funnyProvider);
   var crashAnalyticsProvider =
-      CrashAnalyticsProvider(firebase.crashlytics!, firebase.analytics!);
+      CrashAnalyticsProvider(firebase.crashlytics, firebase.analytics!);
   var authenticationApi = ImplAuthenticationApi(firebase);
   var authenticationProvider = AuthenticationProvider(
       firebase, authenticationApi, crashAnalyticsProvider);
   // Cloud messaging is fucked-up with emulator
   // (something with, messaging stuff have to happen on Google infra)
   // So using fake api when using emulator
-  var messageApi = useEmulator
+  var messageApi = useEmulator ||
+          kIsWeb // TODO: web unimplemented https://firebase.flutter.dev/docs/messaging/usage#web-tokens
       ? FakeMessageApi(firebase, (_) {})
       : ImplMessageApi(firebase, (n) {
           debugPrint('opening $n');
@@ -172,7 +180,10 @@ void main() async {
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, MessageProvider>(
               // TODO: for now does not change on auth change
-              update: (_, cap, ap, mp) => mp ?? messageProvider,
+              update: (_, cap, ap, mp) {
+                if (ap.user == null) mp!.cancel();
+                return mp!;
+              },
               create: (_) => messageProvider,
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,

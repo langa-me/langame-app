@@ -87,6 +87,7 @@ class PreferenceProvider extends ChangeNotifier {
 
   Future<LangameResponse> save() async {
     try {
+      if (_ap.user == null) return LangameResponse(LangameStatus.succeed);
       await _api.savePreference(_ap.user!.uid, _preference);
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
         'shakeToFeedback': preference.shakeToFeedback,

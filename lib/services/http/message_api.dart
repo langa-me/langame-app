@@ -14,7 +14,7 @@ abstract class MessageApi {
 
   /// Initialize permissions (required only on iOS) and some asynchronous
   /// configuration for notifications...
-  Future<LangameResponse> initializePermissions();
+  Future<void> initializePermissions();
 
   /// Start listening to messages
   Future<void> listen(void Function(dynamic)? add);
@@ -23,5 +23,5 @@ abstract class MessageApi {
   Future<dynamic> getInitialMessage();
 
   /// Stop listening to messages
-  void cancel();
+  Future<void> cancel();
 }

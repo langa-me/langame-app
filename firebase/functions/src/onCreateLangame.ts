@@ -104,8 +104,6 @@ export const onCreateLangame = async (
     functions
         .logger
         .info("found memes for topics", lg.data()!.topics, memes);
-    const playersSnap = await snap.ref.collection("players")
-        .withConverter(converter<langame.protobuf.Player>()).get();
 
     await snap.ref.set({
       memes: memes.map((e) => e.id),
@@ -114,20 +112,18 @@ export const onCreateLangame = async (
       done: null,
     }, {merge: true});
 
-    const toNotify = playersSnap
-        .docs
-        .filter((pl) => pl.data()!.userId !== lg.data()!.initiator);
+    const toNotify = lg.data()!.reservedSpots;
     for (const p of toNotify) {
       const player = await db
           .users
-          .doc(p.data()!.userId)
+          .doc(p)
           .get();
       if (!player.data() || !player.data()!.tokens) {
         // Need to wait the promise to avoid concurrency issues on the db
         await Promise.all(handleError(
             snap,
-            `${p.data()!.userId}, has no devices`,
-          p.data()!.userId!,
+            `${p}, has no devices`,
+            p,
         ));
         continue;
       }
@@ -161,13 +157,13 @@ export const onCreateLangame = async (
           admin
               .firestore()
               .collection(kUsersCollection)
-              .doc(p.data().userId)
+              .doc(p)
               .update({
                 tokens: admin.firestore.FieldValue.arrayRemove(t),
               }).then(() => functions.logger.info("removed invalid token", t))
               .catch(() =>
                 handleError(snap, "failed to remove invalid token",
-                p.data().userId!));
+                    p));
         }
       });
     }

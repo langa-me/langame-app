@@ -10,6 +10,8 @@ class NewLangameProvider extends ChangeNotifier {
   List<lg.Tag> get selectedTopics => _selectedTopics;
   DateTime? _selectedDate;
   DateTime? get selectedDate => _selectedDate;
+  int _maximumPlayers = 5;
+  int get maximumPlayers => _maximumPlayers;
 
   void addPlayer(lg.User player) {
     _shoppingList.add(player);
@@ -33,6 +35,11 @@ class NewLangameProvider extends ChangeNotifier {
 
   void setSelectedDate(DateTime? date) {
     _selectedDate = date;
+    notifyListeners();
+  }
+
+  void setMaximumPlayers(int value) {
+    _maximumPlayers = value;
     notifyListeners();
   }
 }

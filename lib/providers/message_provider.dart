@@ -22,12 +22,12 @@ class MessageProvider extends ChangeNotifier {
   MessageApi _messageApi;
 
   /// Create an authentication provider, and
-  MessageProvider(this.firebase, this._messageApi, this._authApi,
-      this._cap, this._ap);
+  MessageProvider(
+      this.firebase, this._messageApi, this._authApi, this._cap, this._ap);
 
   Future<LangameResponse<void>> initializeMessageApi() async {
     try {
-      _messageApi.cancel();
+      await _messageApi.cancel();
       await _messageApi.initializePermissions();
       await _messageApi.listen(null);
 
@@ -41,11 +41,6 @@ class MessageProvider extends ChangeNotifier {
     return LangameResponse(LangameStatus.succeed);
   }
 
-
-
-
-
-
   Future<LangameResponse<dynamic>> getInitialMessage() async {
     try {
       var r = await _messageApi.getInitialMessage();
@@ -58,5 +53,15 @@ class MessageProvider extends ChangeNotifier {
     }
   }
 
-
+  Future<LangameResponse<void>> cancel() async {
+    try {
+      await _messageApi.cancel();
+      _cap.log('langame_provider:cancel');
+      return LangameResponse(LangameStatus.succeed);
+    } catch (e, s) {
+      _cap.log('langame_provider:failed to cancel');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
 }

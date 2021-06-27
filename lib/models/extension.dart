@@ -118,6 +118,8 @@ class LangameExt {
       memesSeen: m['memesSeen'],
       memeChanged: dynamicToProtobufTimestamp(m['memeChanged']),
       link: m['link'],
+      reservedSpots: (m['reservedSpots'] as List<dynamic>?)?.map((e) => e as String),
+      isLocked: m['isLocked'],
     );
   }
 }

@@ -156,6 +156,10 @@ message Langame {
   google.protobuf.Timestamp meme_changed = 15;
   // Link to the Langame
   string link = 16;
+  // Players that have reserved spots
+  repeated string reserved_spots = 18;
+  // Server-set simple discrete property to know whether the Langame is locked or not
+  bool is_locked = 19;
 }
 
 message Player {

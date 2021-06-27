@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/services/http/message_api.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 import 'firebase.dart';
 
@@ -74,7 +75,7 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<LangameResponse> initializePermissions() async {
+  Future<void> initializePermissions() async {
     /// lot of mess https://pub.dev/packages/flutter_local_notifications#initialisation
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -92,7 +93,7 @@ class ImplMessageApi extends MessageApi {
       onBackgroundOrForegroundOpened(jsonDecode(payload));
     });
 
-    if (Platform.isAndroid) {
+    if (UniversalPlatform.isAndroid) {
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
@@ -118,11 +119,10 @@ class ImplMessageApi extends MessageApi {
     // https://firebase.flutter.dev/docs/messaging/permissions
     if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
-      return LangameResponse(LangameStatus.succeed);
+      return;
     }
     throw LangameMessagePermissionException('Permissions denied');
   }
-
 
   @override
   Future<void> listen(Function(dynamic)? add) async {
@@ -161,15 +161,20 @@ class ImplMessageApi extends MessageApi {
   Future<void> _emptyHandler(RemoteMessage message) async {}
 
   @override
-  void cancel() {
-    _onTokenRefresh?.cancel();
-    _onForegroundMessage?.cancel();
+  Future<void> cancel() {
     runZonedGuarded(
         () => FirebaseMessaging.onBackgroundMessage(_emptyHandler),
         (_, __) => debugPrint(
             'ignoring usual FirebaseMessaging.onBackgroundMessage Null check'));
 
-    _onNonTerminatedOpened?.cancel();
+    List<Future> futures = [];
+    if (_onTokenRefresh != null) futures.add(_onTokenRefresh!.cancel());
+    if (_onForegroundMessage != null)
+      futures.add(_onForegroundMessage!.cancel());
+    if (_onNonTerminatedOpened != null)
+      futures.add(_onNonTerminatedOpened!.cancel());
+    futures.add(firebase.messaging!.deleteToken());
+    return Future.wait<void>(futures);
   }
 
   Future<void> _saveTokenToDatabase(String token) async {
@@ -194,6 +199,4 @@ class ImplMessageApi extends MessageApi {
     if (rawNotification == null || rawNotification.payload == null) return null;
     return jsonDecode(rawNotification.payload!);
   }
-
-
 }
