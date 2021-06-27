@@ -117,9 +117,10 @@ class _LangameViewState extends State<LangameView> {
                         'langame_locked') {
                   cp.showSnackBar(
                       'Unfortunately the Langame has been locked by the creator');
-                  _goBackToMainMenu();
+                  _handleError(failNow: true, toast: false);
+                } else {
+                  _handleError();
                 }
-                _handleError();
               }
               if (s.hasData &&
                   s.data != null &&
