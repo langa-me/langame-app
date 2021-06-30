@@ -73,4 +73,5 @@ make proto
 2. update changelogs in fastlane (android/fastlane/changelogs and ios/fastlane/Fastfile)
 3. commit & push
 4. once CI/CD is done, update langame_version from remote config
+    1. maybe test app again before releasing
 5. deploy new Firebase stuff in prod
