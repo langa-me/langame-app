@@ -152,7 +152,6 @@ const User$json = const {
     const {'1': 'photo_url', '3': 5, '4': 1, '5': 9, '10': 'photoUrl'},
     const {'1': 'online', '3': 6, '4': 1, '5': 8, '10': 'online'},
     const {'1': 'google', '3': 7, '4': 1, '5': 8, '10': 'google'},
-    const {'1': 'facebook', '3': 8, '4': 1, '5': 8, '10': 'facebook'},
     const {'1': 'apple', '3': 9, '4': 1, '5': 8, '10': 'apple'},
     const {'1': 'favourite_topics', '3': 10, '4': 3, '5': 9, '10': 'favouriteTopics'},
     const {'1': 'tag', '3': 11, '4': 1, '5': 9, '10': 'tag'},
@@ -163,11 +162,22 @@ const User$json = const {
     const {'1': 'last_logout', '3': 16, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'lastLogout'},
     const {'1': 'creation_time', '3': 17, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'creationTime'},
     const {'1': 'disabled', '3': 18, '4': 1, '5': 8, '10': 'disabled'},
+    const {'1': 'devices', '3': 19, '4': 3, '5': 11, '6': '.langame.protobuf.User.Device', '10': 'devices'},
+  ],
+  '3': const [User_Device$json],
+};
+
+@$core.Deprecated('Use userDescriptor instead')
+const User_Device$json = const {
+  '1': 'Device',
+  '2': const [
+    const {'1': 'langame_version', '3': 1, '4': 1, '5': 9, '10': 'langameVersion'},
+    const {'1': 'device_info', '3': 2, '4': 1, '5': 9, '10': 'deviceInfo'},
   ],
 };
 
 /// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIaCghmYWNlYm9vaxgIIAEoCFIIZmFjZWJvb2sSFAoFYXBwbGUYCSABKAhSBWFwcGxlEikKEGZhdm91cml0ZV90b3BpY3MYCiADKAlSD2Zhdm91cml0ZVRvcGljcxIQCgN0YWcYCyABKAlSA3RhZxIWCgZ0b2tlbnMYDCADKAlSBnRva2VucxIvChNsYXRlc3RfaW50ZXJhY3Rpb25zGA0gAygJUhJsYXRlc3RJbnRlcmFjdGlvbnMSFgoGZXJyb3JzGA4gAygJUgZlcnJvcnMSOQoKbGFzdF9sb2dpbhgPIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWxhc3RMb2dpbhI7CgtsYXN0X2xvZ291dBgQIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCmxhc3RMb2dvdXQSPwoNY3JlYXRpb25fdGltZRgRIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSDGNyZWF0aW9uVGltZRIaCghkaXNhYmxlZBgSIAEoCFIIZGlzYWJsZWQ=');
+final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIUCgVhcHBsZRgJIAEoCFIFYXBwbGUSKQoQZmF2b3VyaXRlX3RvcGljcxgKIAMoCVIPZmF2b3VyaXRlVG9waWNzEhAKA3RhZxgLIAEoCVIDdGFnEhYKBnRva2VucxgMIAMoCVIGdG9rZW5zEi8KE2xhdGVzdF9pbnRlcmFjdGlvbnMYDSADKAlSEmxhdGVzdEludGVyYWN0aW9ucxIWCgZlcnJvcnMYDiADKAlSBmVycm9ycxI5CgpsYXN0X2xvZ2luGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIJbGFzdExvZ2luEjsKC2xhc3RfbG9nb3V0GBAgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIKbGFzdExvZ291dBI/Cg1jcmVhdGlvbl90aW1lGBEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIMY3JlYXRpb25UaW1lEhoKCGRpc2FibGVkGBIgASgIUghkaXNhYmxlZBI3CgdkZXZpY2VzGBMgAygLMh0ubGFuZ2FtZS5wcm90b2J1Zi5Vc2VyLkRldmljZVIHZGV2aWNlcxpSCgZEZXZpY2USJwoPbGFuZ2FtZV92ZXJzaW9uGAEgASgJUg5sYW5nYW1lVmVyc2lvbhIfCgtkZXZpY2VfaW5mbxgCIAEoCVIKZGV2aWNlSW5mbw==');
 @$core.Deprecated('Use userPreferenceDescriptor instead')
 const UserPreference$json = const {
   '1': 'UserPreference',
@@ -289,3 +299,36 @@ const Subscription$json = const {
 
 /// Descriptor for `Subscription`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List subscriptionDescriptor = $convert.base64Decode('CgxTdWJzY3JpcHRpb24SFgoGc3RhdHVzGAEgASgJUgZzdGF0dXM=');
+@$core.Deprecated('Use functionResponseDescriptor instead')
+const FunctionResponse$json = const {
+  '1': 'FunctionResponse',
+  '2': const [
+    const {'1': 'version_check', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.FunctionResponse.VersionCheck', '9': 0, '10': 'versionCheck'},
+  ],
+  '3': const [FunctionResponse_VersionCheck$json],
+  '8': const [
+    const {'1': 'type'},
+  ],
+};
+
+@$core.Deprecated('Use functionResponseDescriptor instead')
+const FunctionResponse_VersionCheck$json = const {
+  '1': 'VersionCheck',
+  '2': const [
+    const {'1': 'update', '3': 1, '4': 1, '5': 14, '6': '.langame.protobuf.FunctionResponse.VersionCheck.UpdateRequired', '10': 'update'},
+  ],
+  '4': const [FunctionResponse_VersionCheck_UpdateRequired$json],
+};
+
+@$core.Deprecated('Use functionResponseDescriptor instead')
+const FunctionResponse_VersionCheck_UpdateRequired$json = const {
+  '1': 'UpdateRequired',
+  '2': const [
+    const {'1': 'OK', '2': 0},
+    const {'1': 'REQUIRED', '2': 1},
+    const {'1': 'RETRO_COMPATIBLE', '2': 2},
+  ],
+};
+
+/// Descriptor for `FunctionResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List functionResponseDescriptor = $convert.base64Decode('ChBGdW5jdGlvblJlc3BvbnNlElYKDXZlcnNpb25fY2hlY2sYASABKAsyLy5sYW5nYW1lLnByb3RvYnVmLkZ1bmN0aW9uUmVzcG9uc2UuVmVyc2lvbkNoZWNrSABSDHZlcnNpb25DaGVjaxqkAQoMVmVyc2lvbkNoZWNrElYKBnVwZGF0ZRgBIAEoDjI+LmxhbmdhbWUucHJvdG9idWYuRnVuY3Rpb25SZXNwb25zZS5WZXJzaW9uQ2hlY2suVXBkYXRlUmVxdWlyZWRSBnVwZGF0ZSI8Cg5VcGRhdGVSZXF1aXJlZBIGCgJPSxAAEgwKCFJFUVVJUkVEEAESFAoQUkVUUk9fQ09NUEFUSUJMRRACQgYKBHR5cGU=');

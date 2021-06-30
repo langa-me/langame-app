@@ -43,3 +43,20 @@ class Tag_Context_Type extends $pb.ProtobufEnum {
   const Tag_Context_Type._($core.int v, $core.String n) : super(v, n);
 }
 
+class FunctionResponse_VersionCheck_UpdateRequired extends $pb.ProtobufEnum {
+  static const FunctionResponse_VersionCheck_UpdateRequired OK = FunctionResponse_VersionCheck_UpdateRequired._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OK');
+  static const FunctionResponse_VersionCheck_UpdateRequired REQUIRED = FunctionResponse_VersionCheck_UpdateRequired._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'REQUIRED');
+  static const FunctionResponse_VersionCheck_UpdateRequired RETRO_COMPATIBLE = FunctionResponse_VersionCheck_UpdateRequired._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'RETRO_COMPATIBLE');
+
+  static const $core.List<FunctionResponse_VersionCheck_UpdateRequired> values = <FunctionResponse_VersionCheck_UpdateRequired> [
+    OK,
+    REQUIRED,
+    RETRO_COMPATIBLE,
+  ];
+
+  static final $core.Map<$core.int, FunctionResponse_VersionCheck_UpdateRequired> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static FunctionResponse_VersionCheck_UpdateRequired? valueOf($core.int value) => _byValue[value];
+
+  const FunctionResponse_VersionCheck_UpdateRequired._($core.int v, $core.String n) : super(v, n);
+}
+

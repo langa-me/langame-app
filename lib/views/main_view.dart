@@ -59,7 +59,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   Future<bool> _onBackPressed() {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     return cp.showCustomDialog<bool>(
-      [
+      stateless: [
         Padding(
             padding: EdgeInsets.all(20),
             child:

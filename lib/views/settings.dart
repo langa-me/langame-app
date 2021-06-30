@@ -153,7 +153,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   cap.logNewFeatureClick('settings_delete_account');
                   return;
                 }
-                cp.showCustomDialog([
+                cp.showCustomDialog(stateless: [
                   Center(
                     child: Column(children: [
                       Lottie.asset(

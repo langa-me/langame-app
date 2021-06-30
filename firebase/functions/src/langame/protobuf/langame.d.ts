@@ -1040,9 +1040,6 @@ export namespace langame {
             /** Google account linked? */
             google?: (boolean|null);
 
-            /** Facebook account linked? */
-            facebook?: (boolean|null);
-
             /** Apple account linked? */
             apple?: (boolean|null);
 
@@ -1072,6 +1069,9 @@ export namespace langame {
 
             /** User disabled */
             disabled?: (boolean|null);
+
+            /** User devices */
+            devices?: (langame.protobuf.User.IDevice[]|null);
         }
 
         /** Represents a User. */
@@ -1104,9 +1104,6 @@ export namespace langame {
             /** Google account linked? */
             public google: boolean;
 
-            /** Facebook account linked? */
-            public facebook: boolean;
-
             /** Apple account linked? */
             public apple: boolean;
 
@@ -1136,6 +1133,9 @@ export namespace langame {
 
             /** User disabled. */
             public disabled: boolean;
+
+            /** User devices. */
+            public devices: langame.protobuf.User.IDevice[];
 
             /**
              * Creates a new User instance using the specified properties.
@@ -1206,6 +1206,105 @@ export namespace langame {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
+        }
+
+        namespace User {
+
+            /** Properties of a Device. */
+            interface IDevice {
+
+                /** Device langameVersion */
+                langameVersion?: (string|null);
+
+                /** Device deviceInfo */
+                deviceInfo?: (string|null);
+            }
+
+            /** Represents a Device. */
+            class Device implements IDevice {
+
+                /**
+                 * Constructs a new Device.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.User.IDevice);
+
+                /** Device langameVersion. */
+                public langameVersion: string;
+
+                /** Device deviceInfo. */
+                public deviceInfo: string;
+
+                /**
+                 * Creates a new Device instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Device instance
+                 */
+                public static create(properties?: langame.protobuf.User.IDevice): langame.protobuf.User.Device;
+
+                /**
+                 * Encodes the specified Device message. Does not implicitly {@link langame.protobuf.User.Device.verify|verify} messages.
+                 * @param message Device message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.User.IDevice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Device message, length delimited. Does not implicitly {@link langame.protobuf.User.Device.verify|verify} messages.
+                 * @param message Device message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.User.IDevice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a Device message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Device
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.User.Device;
+
+                /**
+                 * Decodes a Device message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Device
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.User.Device;
+
+                /**
+                 * Verifies a Device message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a Device message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Device
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.User.Device;
+
+                /**
+                 * Creates a plain object from a Device message. Also converts values to other types if specified.
+                 * @param message Device
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.User.Device, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Device to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
         }
 
         /** InteractionLevel enum. */
@@ -2228,6 +2327,202 @@ export namespace langame {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
+        }
+
+        /** Properties of a FunctionResponse. */
+        interface IFunctionResponse {
+
+            /** FunctionResponse versionCheck */
+            versionCheck?: (langame.protobuf.FunctionResponse.IVersionCheck|null);
+        }
+
+        /** Represents a FunctionResponse. */
+        class FunctionResponse implements IFunctionResponse {
+
+            /**
+             * Constructs a new FunctionResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: langame.protobuf.IFunctionResponse);
+
+            /** FunctionResponse versionCheck. */
+            public versionCheck?: (langame.protobuf.FunctionResponse.IVersionCheck|null);
+
+            /** FunctionResponse type. */
+            public type?: "versionCheck";
+
+            /**
+             * Creates a new FunctionResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns FunctionResponse instance
+             */
+            public static create(properties?: langame.protobuf.IFunctionResponse): langame.protobuf.FunctionResponse;
+
+            /**
+             * Encodes the specified FunctionResponse message. Does not implicitly {@link langame.protobuf.FunctionResponse.verify|verify} messages.
+             * @param message FunctionResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: langame.protobuf.IFunctionResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified FunctionResponse message, length delimited. Does not implicitly {@link langame.protobuf.FunctionResponse.verify|verify} messages.
+             * @param message FunctionResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: langame.protobuf.IFunctionResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a FunctionResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns FunctionResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.FunctionResponse;
+
+            /**
+             * Decodes a FunctionResponse message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns FunctionResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.FunctionResponse;
+
+            /**
+             * Verifies a FunctionResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a FunctionResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns FunctionResponse
+             */
+            public static fromObject(object: { [k: string]: any }): langame.protobuf.FunctionResponse;
+
+            /**
+             * Creates a plain object from a FunctionResponse message. Also converts values to other types if specified.
+             * @param message FunctionResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: langame.protobuf.FunctionResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this FunctionResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+
+        namespace FunctionResponse {
+
+            /** Properties of a VersionCheck. */
+            interface IVersionCheck {
+
+                /** VersionCheck update */
+                update?: (langame.protobuf.FunctionResponse.VersionCheck.UpdateRequired|null);
+            }
+
+            /** Represents a VersionCheck. */
+            class VersionCheck implements IVersionCheck {
+
+                /**
+                 * Constructs a new VersionCheck.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.FunctionResponse.IVersionCheck);
+
+                /** VersionCheck update. */
+                public update: langame.protobuf.FunctionResponse.VersionCheck.UpdateRequired;
+
+                /**
+                 * Creates a new VersionCheck instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns VersionCheck instance
+                 */
+                public static create(properties?: langame.protobuf.FunctionResponse.IVersionCheck): langame.protobuf.FunctionResponse.VersionCheck;
+
+                /**
+                 * Encodes the specified VersionCheck message. Does not implicitly {@link langame.protobuf.FunctionResponse.VersionCheck.verify|verify} messages.
+                 * @param message VersionCheck message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.FunctionResponse.IVersionCheck, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified VersionCheck message, length delimited. Does not implicitly {@link langame.protobuf.FunctionResponse.VersionCheck.verify|verify} messages.
+                 * @param message VersionCheck message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.FunctionResponse.IVersionCheck, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a VersionCheck message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns VersionCheck
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.FunctionResponse.VersionCheck;
+
+                /**
+                 * Decodes a VersionCheck message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns VersionCheck
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.FunctionResponse.VersionCheck;
+
+                /**
+                 * Verifies a VersionCheck message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a VersionCheck message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns VersionCheck
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.FunctionResponse.VersionCheck;
+
+                /**
+                 * Creates a plain object from a VersionCheck message. Also converts values to other types if specified.
+                 * @param message VersionCheck
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.FunctionResponse.VersionCheck, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this VersionCheck to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+
+            namespace VersionCheck {
+
+                /** UpdateRequired enum. */
+                enum UpdateRequired {
+                    OK = 0,
+                    REQUIRED = 1,
+                    RETRO_COMPATIBLE = 2
+                }
+            }
         }
     }
 }

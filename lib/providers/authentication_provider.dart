@@ -1,18 +1,24 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/future.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/authentication_api.dart';
 import 'package:langame/services/http/firebase.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   FirebaseApi firebase;
@@ -43,6 +49,7 @@ class AuthenticationProvider extends ChangeNotifier {
     _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
       if (data == null || firebase.auth!.currentUser == null) {
+        // TODO: should go back to login automatically
         // If logged out, set logout time
         // TODO: can't update firestore when disconnected
         // if (user != null) {
@@ -278,9 +285,7 @@ class AuthenticationProvider extends ChangeNotifier {
           ? _authenticationApi.loginWithGoogle()
           : user!.apple
               ? _authenticationApi.loginWithApple()
-              : user!.facebook
-                  ? _authenticationApi.loginWithFacebook()
-                  : null);
+              : null);
       if (cred == null)
         throw LangameException(
             'the user is authenticated without any social providers');
@@ -299,5 +304,69 @@ class AuthenticationProvider extends ChangeNotifier {
       return LangameResponse(LangameStatus.failed, error: e);
     }
     return LangameResponse(LangameStatus.succeed);
+  }
+
+  String _getLangameVersion(PackageInfo packageInfo) =>
+      '${packageInfo.version.replaceAll('-dev', '')}+${packageInfo.buildNumber}';
+
+  Future<LangameResponse<lg.FunctionResponse_VersionCheck_UpdateRequired>>
+      checkVersion() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+
+      final raw = await firebase.functions!
+          .httpsCallable(
+        'versionCheck',
+        options: HttpsCallableOptions(
+          timeout: Duration(seconds: 10),
+        ),
+      )
+          .call(<String, dynamic>{
+        'version': _getLangameVersion(packageInfo),
+      });
+      _cap.log('authentication_provider:checkVersion response ${raw.data}');
+      // Asynchronously, update devices information in db
+      waitUntil(() =>
+       _user != null
+      , maxIterations: 1000).then((_) async {
+        final deviceInfo = UniversalPlatform.isAndroid
+            ? (await DeviceInfoPlugin().androidInfo).model
+            : UniversalPlatform.isIOS
+                ? (await DeviceInfoPlugin().iosInfo).utsname.machine
+                : null; // TODO other platforms not supported
+        bool newDevice = true;
+        for (var i = 0; i < _user!.devices.length; i++) {
+          if (_user!.devices[i].deviceInfo == deviceInfo) {
+            _user!.devices[i].langameVersion = _getLangameVersion(packageInfo);
+            newDevice = false;
+          }
+        }
+        if (newDevice) {
+          _user!.devices.add(
+            lg.User_Device(
+              langameVersion: _getLangameVersion(packageInfo),
+              deviceInfo: deviceInfo.toString(),
+            ),
+          );
+        }
+        firebase.firestore!
+            .collection(AppConst.firestoreUsersCollection)
+            .doc(_user!.uid)
+            .withConverter<lg.User>(
+              fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
+              toFirestore: (s, _) => s.toMapStringDynamic(),
+            )
+            .set(lg.User(devices: _user!.devices), SetOptions(merge: true))
+            .then((_) => _cap.log('authentication_provider:updated devices'));
+      });
+      return LangameResponse(LangameStatus.succeed,
+          result: lg.FunctionResponse_VersionCheck_UpdateRequired.values[
+              (raw.data as Map<String, dynamic>)['versionCheck']['update']
+                  as int]);
+    } catch (e, s) {
+      _cap.log('authentication_provider:failed to checkVersion');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
   }
 }

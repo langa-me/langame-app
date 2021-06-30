@@ -742,6 +742,67 @@ class Tag extends $pb.GeneratedMessage {
   Tag_Feedback ensureAggregatedFeedback() => $_ensure(6);
 }
 
+class User_Device extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'User.Device', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'langameVersion')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'deviceInfo')
+    ..hasRequiredFields = false
+  ;
+
+  User_Device._() : super();
+  factory User_Device({
+    $core.String? langameVersion,
+    $core.String? deviceInfo,
+  }) {
+    final _result = create();
+    if (langameVersion != null) {
+      _result.langameVersion = langameVersion;
+    }
+    if (deviceInfo != null) {
+      _result.deviceInfo = deviceInfo;
+    }
+    return _result;
+  }
+  factory User_Device.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory User_Device.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  User_Device clone() => User_Device()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  User_Device copyWith(void Function(User_Device) updates) => super.copyWith((message) => updates(message as User_Device)) as User_Device; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static User_Device create() => User_Device._();
+  User_Device createEmptyInstance() => create();
+  static $pb.PbList<User_Device> createRepeated() => $pb.PbList<User_Device>();
+  @$core.pragma('dart2js:noInline')
+  static User_Device getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<User_Device>(create);
+  static User_Device? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get langameVersion => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set langameVersion($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasLangameVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLangameVersion() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get deviceInfo => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set deviceInfo($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasDeviceInfo() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDeviceInfo() => clearField(2);
+}
+
 class User extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'User', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'uid')
@@ -751,7 +812,6 @@ class User extends $pb.GeneratedMessage {
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'photoUrl')
     ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'online')
     ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'google')
-    ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'facebook')
     ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'apple')
     ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'favouriteTopics')
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tag')
@@ -762,6 +822,7 @@ class User extends $pb.GeneratedMessage {
     ..aOM<$0.Timestamp>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'lastLogout', subBuilder: $0.Timestamp.create)
     ..aOM<$0.Timestamp>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'creationTime', subBuilder: $0.Timestamp.create)
     ..aOB(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disabled')
+    ..pc<User_Device>(19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'devices', $pb.PbFieldType.PM, subBuilder: User_Device.create)
     ..hasRequiredFields = false
   ;
 
@@ -774,7 +835,6 @@ class User extends $pb.GeneratedMessage {
     $core.String? photoUrl,
     $core.bool? online,
     $core.bool? google,
-    $core.bool? facebook,
     $core.bool? apple,
     $core.Iterable<$core.String>? favouriteTopics,
     $core.String? tag,
@@ -785,6 +845,7 @@ class User extends $pb.GeneratedMessage {
     $0.Timestamp? lastLogout,
     $0.Timestamp? creationTime,
     $core.bool? disabled,
+    $core.Iterable<User_Device>? devices,
   }) {
     final _result = create();
     if (uid != null) {
@@ -807,9 +868,6 @@ class User extends $pb.GeneratedMessage {
     }
     if (google != null) {
       _result.google = google;
-    }
-    if (facebook != null) {
-      _result.facebook = facebook;
     }
     if (apple != null) {
       _result.apple = apple;
@@ -840,6 +898,9 @@ class User extends $pb.GeneratedMessage {
     }
     if (disabled != null) {
       _result.disabled = disabled;
+    }
+    if (devices != null) {
+      _result.devices.addAll(devices);
     }
     return _result;
   }
@@ -927,86 +988,80 @@ class User extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   void clearGoogle() => clearField(7);
 
-  @$pb.TagNumber(8)
-  $core.bool get facebook => $_getBF(7);
-  @$pb.TagNumber(8)
-  set facebook($core.bool v) { $_setBool(7, v); }
-  @$pb.TagNumber(8)
-  $core.bool hasFacebook() => $_has(7);
-  @$pb.TagNumber(8)
-  void clearFacebook() => clearField(8);
-
   @$pb.TagNumber(9)
-  $core.bool get apple => $_getBF(8);
+  $core.bool get apple => $_getBF(7);
   @$pb.TagNumber(9)
-  set apple($core.bool v) { $_setBool(8, v); }
+  set apple($core.bool v) { $_setBool(7, v); }
   @$pb.TagNumber(9)
-  $core.bool hasApple() => $_has(8);
+  $core.bool hasApple() => $_has(7);
   @$pb.TagNumber(9)
   void clearApple() => clearField(9);
 
   @$pb.TagNumber(10)
-  $core.List<$core.String> get favouriteTopics => $_getList(9);
+  $core.List<$core.String> get favouriteTopics => $_getList(8);
 
   @$pb.TagNumber(11)
-  $core.String get tag => $_getSZ(10);
+  $core.String get tag => $_getSZ(9);
   @$pb.TagNumber(11)
-  set tag($core.String v) { $_setString(10, v); }
+  set tag($core.String v) { $_setString(9, v); }
   @$pb.TagNumber(11)
-  $core.bool hasTag() => $_has(10);
+  $core.bool hasTag() => $_has(9);
   @$pb.TagNumber(11)
   void clearTag() => clearField(11);
 
   @$pb.TagNumber(12)
-  $core.List<$core.String> get tokens => $_getList(11);
+  $core.List<$core.String> get tokens => $_getList(10);
 
   @$pb.TagNumber(13)
-  $core.List<$core.String> get latestInteractions => $_getList(12);
+  $core.List<$core.String> get latestInteractions => $_getList(11);
 
   @$pb.TagNumber(14)
-  $core.List<$core.String> get errors => $_getList(13);
+  $core.List<$core.String> get errors => $_getList(12);
 
   @$pb.TagNumber(15)
-  $0.Timestamp get lastLogin => $_getN(14);
+  $0.Timestamp get lastLogin => $_getN(13);
   @$pb.TagNumber(15)
   set lastLogin($0.Timestamp v) { setField(15, v); }
   @$pb.TagNumber(15)
-  $core.bool hasLastLogin() => $_has(14);
+  $core.bool hasLastLogin() => $_has(13);
   @$pb.TagNumber(15)
   void clearLastLogin() => clearField(15);
   @$pb.TagNumber(15)
-  $0.Timestamp ensureLastLogin() => $_ensure(14);
+  $0.Timestamp ensureLastLogin() => $_ensure(13);
 
   @$pb.TagNumber(16)
-  $0.Timestamp get lastLogout => $_getN(15);
+  $0.Timestamp get lastLogout => $_getN(14);
   @$pb.TagNumber(16)
   set lastLogout($0.Timestamp v) { setField(16, v); }
   @$pb.TagNumber(16)
-  $core.bool hasLastLogout() => $_has(15);
+  $core.bool hasLastLogout() => $_has(14);
   @$pb.TagNumber(16)
   void clearLastLogout() => clearField(16);
   @$pb.TagNumber(16)
-  $0.Timestamp ensureLastLogout() => $_ensure(15);
+  $0.Timestamp ensureLastLogout() => $_ensure(14);
 
   @$pb.TagNumber(17)
-  $0.Timestamp get creationTime => $_getN(16);
+  $0.Timestamp get creationTime => $_getN(15);
   @$pb.TagNumber(17)
   set creationTime($0.Timestamp v) { setField(17, v); }
   @$pb.TagNumber(17)
-  $core.bool hasCreationTime() => $_has(16);
+  $core.bool hasCreationTime() => $_has(15);
   @$pb.TagNumber(17)
   void clearCreationTime() => clearField(17);
   @$pb.TagNumber(17)
-  $0.Timestamp ensureCreationTime() => $_ensure(16);
+  $0.Timestamp ensureCreationTime() => $_ensure(15);
 
   @$pb.TagNumber(18)
-  $core.bool get disabled => $_getBF(17);
+  $core.bool get disabled => $_getBF(16);
   @$pb.TagNumber(18)
-  set disabled($core.bool v) { $_setBool(17, v); }
+  set disabled($core.bool v) { $_setBool(16, v); }
   @$pb.TagNumber(18)
-  $core.bool hasDisabled() => $_has(17);
+  $core.bool hasDisabled() => $_has(16);
   @$pb.TagNumber(18)
   void clearDisabled() => clearField(18);
+
+  @$pb.TagNumber(19)
+  $core.List<User_Device> get devices => $_getList(17);
 }
 
 class UserPreference extends $pb.GeneratedMessage {
@@ -1877,5 +1932,114 @@ class Subscription extends $pb.GeneratedMessage {
   $core.bool hasStatus() => $_has(0);
   @$pb.TagNumber(1)
   void clearStatus() => clearField(1);
+}
+
+class FunctionResponse_VersionCheck extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'FunctionResponse.VersionCheck', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..e<FunctionResponse_VersionCheck_UpdateRequired>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'update', $pb.PbFieldType.OE, defaultOrMaker: FunctionResponse_VersionCheck_UpdateRequired.OK, valueOf: FunctionResponse_VersionCheck_UpdateRequired.valueOf, enumValues: FunctionResponse_VersionCheck_UpdateRequired.values)
+    ..hasRequiredFields = false
+  ;
+
+  FunctionResponse_VersionCheck._() : super();
+  factory FunctionResponse_VersionCheck({
+    FunctionResponse_VersionCheck_UpdateRequired? update,
+  }) {
+    final _result = create();
+    if (update != null) {
+      _result.update = update;
+    }
+    return _result;
+  }
+  factory FunctionResponse_VersionCheck.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FunctionResponse_VersionCheck.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FunctionResponse_VersionCheck clone() => FunctionResponse_VersionCheck()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FunctionResponse_VersionCheck copyWith(void Function(FunctionResponse_VersionCheck) updates) => super.copyWith((message) => updates(message as FunctionResponse_VersionCheck)) as FunctionResponse_VersionCheck; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static FunctionResponse_VersionCheck create() => FunctionResponse_VersionCheck._();
+  FunctionResponse_VersionCheck createEmptyInstance() => create();
+  static $pb.PbList<FunctionResponse_VersionCheck> createRepeated() => $pb.PbList<FunctionResponse_VersionCheck>();
+  @$core.pragma('dart2js:noInline')
+  static FunctionResponse_VersionCheck getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FunctionResponse_VersionCheck>(create);
+  static FunctionResponse_VersionCheck? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  FunctionResponse_VersionCheck_UpdateRequired get update => $_getN(0);
+  @$pb.TagNumber(1)
+  set update(FunctionResponse_VersionCheck_UpdateRequired v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUpdate() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUpdate() => clearField(1);
+}
+
+enum FunctionResponse_Type {
+  versionCheck, 
+  notSet
+}
+
+class FunctionResponse extends $pb.GeneratedMessage {
+  static const $core.Map<$core.int, FunctionResponse_Type> _FunctionResponse_TypeByTag = {
+    1 : FunctionResponse_Type.versionCheck,
+    0 : FunctionResponse_Type.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'FunctionResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..oo(0, [1])
+    ..aOM<FunctionResponse_VersionCheck>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'versionCheck', subBuilder: FunctionResponse_VersionCheck.create)
+    ..hasRequiredFields = false
+  ;
+
+  FunctionResponse._() : super();
+  factory FunctionResponse({
+    FunctionResponse_VersionCheck? versionCheck,
+  }) {
+    final _result = create();
+    if (versionCheck != null) {
+      _result.versionCheck = versionCheck;
+    }
+    return _result;
+  }
+  factory FunctionResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FunctionResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FunctionResponse clone() => FunctionResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FunctionResponse copyWith(void Function(FunctionResponse) updates) => super.copyWith((message) => updates(message as FunctionResponse)) as FunctionResponse; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static FunctionResponse create() => FunctionResponse._();
+  FunctionResponse createEmptyInstance() => create();
+  static $pb.PbList<FunctionResponse> createRepeated() => $pb.PbList<FunctionResponse>();
+  @$core.pragma('dart2js:noInline')
+  static FunctionResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FunctionResponse>(create);
+  static FunctionResponse? _defaultInstance;
+
+  FunctionResponse_Type whichType() => _FunctionResponse_TypeByTag[$_whichOneof(0)]!;
+  void clearType() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  FunctionResponse_VersionCheck get versionCheck => $_getN(0);
+  @$pb.TagNumber(1)
+  set versionCheck(FunctionResponse_VersionCheck v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasVersionCheck() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearVersionCheck() => clearField(1);
+  @$pb.TagNumber(1)
+  FunctionResponse_VersionCheck ensureVersionCheck() => $_ensure(0);
 }
 

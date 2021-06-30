@@ -37,7 +37,7 @@ void main() {
     //   expect(user!.displayName, getMockUser().displayName);
     // });
 
-    // TODO: (would need to mock facebook, apple ...)
+    // TODO: (would need to mock, apple ...)
     // test('Should properly authenticate Bob with Apple', () async {
     //   var credential = await api.loginWithApple();
     //   var stream = await api.loginWithFirebase(credential);
@@ -45,12 +45,7 @@ void main() {
     //   expect(user!.displayName, mockUser.displayName);
     // });
     //
-    // test('Should properly authenticate Bob with Facebook', () async {
-    //   var credential = await api.loginWithFacebook();
-    //   var stream = await api.loginWithFirebase(credential);
-    //   var user = await stream.first;
-    //   expect(user!.displayName, mockUser.displayName);
-    // });
+
 
     // MockUser doesn't properly latest version of firebase auth, skipped (emailVerified)
     // test('Should properly add LangameUser', () async {
@@ -106,7 +101,7 @@ void main() {
     //   expect(user.length, 0);
     // });
 
-    // TODO: api.getRelations, need to mock Google, Apple, Facebook api :)
+    // TODO: api.getRelations, need to mock Google, Apple,  api :)
     // test('getRelations', () async {
     // });
 

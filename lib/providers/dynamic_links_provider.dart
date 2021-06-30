@@ -105,9 +105,9 @@ class DynamicLinksProvider extends ChangeNotifier {
   }
 
   Future<dynamic> _onSuccess(dl) async {
-    _cap.log('opened link ${dl?.link.path}',
-        analyticsMessage: 'dynamic_links_open');
     if (dl != null && dl.link.path.split('/').length > 0) {
+      _cap.log('opened link ${dl?.link.path}',
+          analyticsMessage: 'dynamic_links_open');
       final sp = dl.link.path.split('/');
       final String channel = sp[sp.length > 2 ? 2 : 1];
       _cap.log('opening view $channel');

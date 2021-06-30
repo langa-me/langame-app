@@ -38,6 +38,9 @@ class AppConst {
   static const String helpUrl = 'https://help.langa.me';
   static const String mainUrl = 'https://langa.me';
   static const String productificUrl = 'https://productific.com/@Langame';
+  static const String testFlightUrl = 'https://testflight.apple.com/join/pxxfLXZc';
+  static const String appStoreUrl = 'https://apps.apple.com/us/app/langame/id1564745604';
+  static const String googlePlayUrl = 'https://play.google.com/store/apps/details?id=me.langa';
 }
 
 /// Fonts assets used in this application,

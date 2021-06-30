@@ -23,10 +23,6 @@ class LangameAppleSignInException extends LangameException {
   LangameAppleSignInException(String cause) : super(cause);
 }
 
-class LangameFacebookSignInException extends LangameException {
-  LangameFacebookSignInException(String cause) : super(cause);
-}
-
 class LangameGoogleSignInException extends LangameException {
   LangameGoogleSignInException(String cause) : super(cause);
 }

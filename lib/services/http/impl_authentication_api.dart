@@ -16,7 +16,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
   GoogleSignInAccount? _google;
   AuthorizationCredentialAppleID? _apple;
 
-  // FacebookUser? _facebook;
   late Stream<User?> _authStateChanges;
 
   @override
@@ -56,11 +55,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
     }
   }
 
-  @override
-  Future<OAuthCredential> loginWithFacebook() async {
-    // TODO: https://developers.facebook.com/docs/permissions/reference/user_friends
-    throw UnimplementedError('nop');
-  }
 
   @override
   Future<OAuthCredential> loginWithGoogle() async {
@@ -155,7 +149,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
     if (_google != null) await firebase.googleSignIn!.signOut();
     // if (_apple != null) await SignInWithApple.
     await firebase.auth!.signOut();
-    // TODO: Facebook, Apple
+    // TODO: Apple
   }
 
   @override

@@ -99,7 +99,7 @@ class _PaymentState extends State<PaymentView> {
                         await Future.delayed(Duration(seconds: 2));
                         cp.dialogComplete();
                       };
-                      cp.showCustomDialog([
+                      cp.showCustomDialog(stateless: [
                         Column(
                           children: [
                             Container(

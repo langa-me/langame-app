@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/langame/protobuf/langame.pbenum.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -21,6 +22,7 @@ import 'package:langame/views/on_boarding.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:universal_platform/universal_platform.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'buttons/apple.dart';
 import 'langame.dart';
@@ -41,23 +43,54 @@ class _LoginState extends State<Login> {
     super.initState();
     var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
     cap.setCurrentScreen('login');
-    final provider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    final ap = Provider.of<AuthenticationProvider>(context, listen: false);
     Provider.of<FeedbackProvider>(context, listen: false).init();
     var cp = Provider.of<ContextProvider>(context, listen: false);
-
     Connectivity().checkConnectivity().then((network) async {
       if (network == ConnectivityResult.none) {
-        cp.showFailureDialog('You have no access to the internet!');
-        await Future.delayed(Duration(seconds: 2));
-        cp.dialogComplete();
         cap.log('I am offline', analyticsMessage: 'offline');
+        // Wait until internet then
+        await Connectivity().onConnectivityChanged.first;
+      }
+      cp.showLoadingDialog(text: 'Checking version...');
+      final checkVersion = await ap.checkVersion();
+      cp.dialogComplete();
+      if (checkVersion.result !=
+              FunctionResponse_VersionCheck_UpdateRequired.OK &&
+          checkVersion.result !=
+              FunctionResponse_VersionCheck_UpdateRequired.RETRO_COMPATIBLE) {
+        cp.showCustomDialog(
+          stateless: [
+            UniversalPlatform.isAndroid || UniversalPlatform.isIOS
+                ? LangameButton(
+                    FontAwesomeIcons.externalLinkAlt,
+                    text: 'Update',
+                    onPressed: () async {
+                      final url = UniversalPlatform.isAndroid
+                          ? AppConst.googlePlayUrl
+                          : UniversalPlatform.isIOS
+                              ? AppConst.testFlightUrl
+                              : null;
+                      if (await canLaunch(url!)) {
+                        await launch(url);
+                      }
+                    },
+                    highlighted: true,
+                  )
+                : SizedBox.shrink()
+          ],
+          title: Text('You need to update your application 😓',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headline3),
+          height: 20,
+        );
+        setState(() => isAuthenticating = false);
         return;
       }
       setState(() => isAuthenticating = false);
 
       // Bunch of spaghetti code to check if it is a new user or already authenticated
-      provider.userStream.first.then((user) async {
+      ap.userStream.first.then((user) async {
         cap.log('login - userStream');
         if (user == null || successDialogFuture != null) {
           return null;
@@ -71,7 +104,6 @@ class _LoginState extends State<Login> {
           cp.dialogComplete();
           return;
         }
-        // TODO: what happen if no internet?
         Provider.of<LangameProvider>(context, listen: false).initialize();
         // Once arriving on login page, if coming from a notification tap coming
         // from a terminated state (app closed, have notification in bar)
@@ -116,7 +148,8 @@ class _LoginState extends State<Login> {
       crash.log('I am offline', analyticsMessage: 'offline');
       setState(() => isAuthenticating = true);
 
-      return cp.buildLoadingWidget(text: 'You are offline!');
+      return Scaffold(
+          body: Center(child: cp.buildLoadingWidget(text: 'Offline')));
     }
     setState(() => isAuthenticating = false);
 
@@ -148,7 +181,7 @@ class _LoginState extends State<Login> {
               child: GestureDetector(
             onLongPress: () {
               var cp = Provider.of<ContextProvider>(context, listen: false);
-              cp.showCustomDialog([
+              cp.showCustomDialog(stateless: [
                 Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -161,7 +194,10 @@ class _LoginState extends State<Login> {
                         enableSuggestions: false,
                         autocorrect: false,
                         controller: _hackControllerPassword,
-                        style: Theme.of(context).textTheme.headline6!.merge(TextStyle(color: Colors.transparent)),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6!
+                            .merge(TextStyle(color: Colors.transparent)),
                         decoration: InputDecoration(
                             hintStyle: Theme.of(context).textTheme.headline6,
                             hintText: "Enter the hack password"),

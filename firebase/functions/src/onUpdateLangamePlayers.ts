@@ -54,8 +54,11 @@ export const onUpdateLangamePlayers =
         // If the Langame is now full, set locked
         if (!lgAfter.data()!.isLocked &&
             afterPlayers.size >= 5 - lgAfter.data()!.reservedSpots.length) {
+          // eslint-disable-next-line max-len
+          functions.logger.log(`langame is full, ${afterPlayers.size} players, locking`);
+
           t.update(lgAfter.ref, {
-            isLocked: true,
+            isLocked: admin.firestore.FieldValue.delete(),
           });
         }
         // If not started and enough player joined (2),

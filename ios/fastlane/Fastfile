@@ -69,8 +69,7 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Langame are now limited to a number of players
-      - Possibility to lock / unlock a Langame (when a link has been shared to it)"
+      changelog: "- Better handling of connectivity problems"
     )
 
     delete_temp_keychain(keychain_name)

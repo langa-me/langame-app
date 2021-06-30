@@ -1,5 +1,4 @@
 import * as admin from "firebase-admin";
-// Initialize admin firebase
 admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
 import * as functions from "firebase-functions";
@@ -20,10 +19,12 @@ import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
 import {onWriteTag} from "./onWriteTag";
 import {onUpdateLangame} from "./onUpdateLangame";
 import {onCreateAuthentication} from "./onCreateAuthentication";
-
+import {versionCheck} from "./versionCheck";
 
 /*
- admin.auth() // TODO: should kick everyone
+ admin.auth() // TODO: should kick everyone,
+            // notify clients update or change remoteconfig
+            // maybe FCM topic push version
      .listUsers()
      .then((r) => r.users.forEach((u) =>
      functions.logger.info(u.displayName)
@@ -32,16 +33,22 @@ import {onCreateAuthentication} from "./onCreateAuthentication";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
-  maxInstances: 10,
+  maxInstances: 10, // TODO: remoteconfig
 };
 // TODO: somehow doesn't work then on client
 const region = "us-central1";
 
-exports.subscribe = functions // TODO: transaction!!! // RENAME
+exports.subscribe = functions
     .region(region)
     .runWith(runtimeOpts)
     .https
     .onCall(subscribe);
+
+exports.versionCheck = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .https
+    .onCall(versionCheck);
 
 // exports.interactionsDecrement = functions
 //     .pubsub

@@ -30,6 +30,8 @@ class MessageProvider extends ChangeNotifier {
       await _messageApi.cancel();
       await _messageApi.initializePermissions();
       await _messageApi.listen(null);
+      // firebase.messaging.subscribeToTopic('topic');
+      // _ap.checkVersion()
 
       // i.e. no internet
       // TODO  Caused by: java.net.UnknownHostException: Unable to resolve host "firestore.googleapis.com": No address associated with hostname

@@ -92,7 +92,7 @@ class _State extends State<OldLangamePageView>
                         .toList()),
                 subtitle: Text(l.topics.join(',')),
                 trailing: Text('started: $s\n\nlength: $lengthInMinutes'),
-                onTap: () => cp.showCustomDialog([
+                onTap: () => cp.showCustomDialog(stateless: [
                   FutureBuilder(future: notesFuture, builder: _buildNotes),
                 ]),
               ),

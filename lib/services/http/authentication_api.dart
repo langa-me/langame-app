@@ -17,9 +17,6 @@ abstract class AuthenticationApi {
   /// Login with Google, return Google account and credentials
   Future<OAuthCredential> loginWithGoogle();
 
-  /// Login with Facebook, return Facebook account and credentials
-  Future<OAuthCredential> loginWithFacebook();
-
   /// Login with Apple, return Apple account and credentials
   Future<OAuthCredential> loginWithApple();
 

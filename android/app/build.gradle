@@ -74,12 +74,15 @@ android {
     productFlavors {
         dev {
             dimension "env"
-            versionNameSuffix "-dev"
-            applicationIdSuffix ".dev"
-            
+            // versionName "langame-dev"
+            resValue "string", "app_name", "Langame-dev"
+            applicationId = "me.langa.dev"
         }
         prod {
             dimension "env"
+            // versionName "langame"
+            resValue "string", "app_name", "Langame"
+            applicationId = "me.langa"
         }
     }
 }

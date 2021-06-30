@@ -13,7 +13,6 @@ export const appCertificate = functions.config().agora.certificate;
 
 export const role = RtcRole.PUBLISHER;
 
-
 export const kUserDoesNotExist = (id: string) => `user ${id} does not exist`;
 export const kInvalidRequest: string = "invalid request";
 export const kNotAuthenticated: string = "not authenticated";

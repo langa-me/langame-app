@@ -9,6 +9,7 @@ on:
         required: false
         default: "ci.yml"
 
+# TODO: should fail if commit is not of format "[version]+[versionCode]:"
 jobs:
   # CD
   deploy_android:
@@ -116,3 +117,7 @@ jobs:
           TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
           TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
           FIREBASE_CLI_TOKEN: '${{ secrets.FIREBASE_CLI_TOKEN }}'
+
+
+# TODO: might deploy firebase stuff automatically after both finished processing,
+# TODO: also updating remote config, langame_version for example

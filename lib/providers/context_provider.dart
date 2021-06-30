@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/future.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
@@ -33,11 +37,26 @@ class ContextProvider extends ChangeNotifier {
   late NavigationService _navigationService;
   final FunnyProvider _funny;
 
+  bool _isLoading = false;
+
   ContextProvider(
       this._navigationKey, this._scaffoldMessengerKey, this._funny) {
     _dialogService = DialogService(_navigationKey);
     _navigationService = NavigationService(_navigationKey);
     _snackBarService = SnackBarService(_scaffoldMessengerKey);
+    final noInternet = (ConnectivityResult e) {
+      if (e == ConnectivityResult.none) {
+        showLoadingDialog(text: 'You have no Internet access 😥');
+      } else if (_isLoading) {
+        dialogComplete();
+        _isLoading = false;
+      }
+    };
+    Connectivity().checkConnectivity().then((e) {
+      waitUntil(() => _navigationKey.currentContext != null, maxIterations: 500)
+          .then((_) => noInternet(e));
+    });
+    Connectivity().onConnectivityChanged.listen(noInternet);
   }
 
   void showSnackBar(String message, {SnackBarAction? action}) =>
@@ -70,54 +89,60 @@ class ContextProvider extends ChangeNotifier {
 
   void pop() => _navigationService.pop();
 
-  Future<T> showCustomDialog<T>(List<Widget> children,
-          {Widget? title,
-          bool canBack = false,
-          Color? backgroundColor,
-          int height = 50,
-          int width = 80}) =>
-      _showDialog<T>(
-        () => WillPopScope(
-          onWillPop: () async => canBack,
-          child: SimpleDialog(
-            contentPadding: EdgeInsets.all(0),
-            insetPadding: EdgeInsets.all(0),
-            titlePadding: EdgeInsets.all(24),
-            title: title,
-            backgroundColor: backgroundColor ??
-                getBlackAndWhite(_navigationKey.currentContext!, 1,
-                    reverse: true),
-            children: [
-              Container(
-                color: backgroundColor ??
+  Future<T> showCustomDialog<T>({
+    List<Widget>? stateless,
+    Widget? title,
+    bool canBack = false,
+    Color? backgroundColor,
+    int height = 50,
+    int width = 80,
+  }) =>
+      _showDialog<T>(() {
+        final dialog = SimpleDialog(
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          titlePadding: EdgeInsets.all(24),
+          title: title,
+          backgroundColor: backgroundColor ??
+              getBlackAndWhite(_navigationKey.currentContext!, 1,
+                  reverse: true),
+          children: [
+            Container(
+              color: backgroundColor ??
+                  getBlackAndWhite(_navigationKey.currentContext!, 1,
+                      reverse: true),
+              height: AppSize.safeBlockVertical * height,
+              width: AppSize.safeBlockHorizontal * width,
+              child: Scaffold(
+                backgroundColor: backgroundColor ??
                     getBlackAndWhite(_navigationKey.currentContext!, 1,
                         reverse: true),
-                height: AppSize.safeBlockVertical * height,
-                width: AppSize.safeBlockHorizontal * width,
-                child: Scaffold(
-                  backgroundColor: backgroundColor ??
-                      getBlackAndWhite(_navigationKey.currentContext!, 1,
-                          reverse: true),
-                  body: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Center(
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: children,
-                    )),
-                  ),
+                body: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: stateless != null ? stateless : [],
+                  )),
                 ),
               ),
-            ],
-          ),
-        ),
-      );
+            ),
+          ],
+        );
+        return WillPopScope(
+          onWillPop: () async => canBack,
+          child: dialog,
+        );
+      });
 
-  Future showLoadingDialog({String? text}) => showCustomDialog(
-        [
-          buildLoadingWidget(text: text, backgroundColor: Colors.transparent),
-        ],
-      );
+  Future showLoadingDialog({String? text}) {
+    _isLoading = true;
+    return showCustomDialog(
+      stateless: [
+        buildLoadingWidget(text: text, backgroundColor: Colors.transparent),
+      ],
+    );
+  }
 
   /// Note: Material is needed because of this
   /// https://stackoverflow.com/questions/47114639/yellow-lines-under-text-widgets-in-flutter
@@ -144,7 +169,7 @@ class ContextProvider extends ChangeNotifier {
         ),
       );
 
-  Future<void> showSuccessDialog(String text) => showCustomDialog([
+  Future<void> showSuccessDialog(String text) => showCustomDialog(stateless: [
         Lottie.asset(
           'animations/check.json',
           width: AppSize.safeBlockHorizontal * 30,
@@ -160,7 +185,7 @@ class ContextProvider extends ChangeNotifier {
         ),
       ]);
 
-  Future<void> showFailureDialog(String text) => showCustomDialog([
+  Future<void> showFailureDialog(String text) => showCustomDialog(stateless: [
         Lottie.asset(
           'animations/sad.json',
           width: AppSize.safeBlockHorizontal * 30,
@@ -195,4 +220,52 @@ class ContextProvider extends ChangeNotifier {
         break;
     }
   }
+
+  Future<T> showCustomStatefulDialog<T>({
+    Widget Function(BuildContext, void Function(void Function()))? stateful,
+    Widget? title,
+    bool canBack = false,
+    Color? backgroundColor,
+    int height = 50,
+    int width = 80,
+  }) =>
+      _showDialog<T>(() {
+        final dialog = StatefulBuilder(
+            builder: (c, s) => SimpleDialog(
+                  contentPadding: EdgeInsets.all(0),
+                  insetPadding: EdgeInsets.all(0),
+                  titlePadding: EdgeInsets.all(24),
+                  title: title,
+                  backgroundColor: backgroundColor ??
+                      getBlackAndWhite(_navigationKey.currentContext!, 1,
+                          reverse: true),
+                  children: [
+                    Container(
+                      color: backgroundColor ??
+                          getBlackAndWhite(_navigationKey.currentContext!, 1,
+                              reverse: true),
+                      height: AppSize.safeBlockVertical * height,
+                      width: AppSize.safeBlockHorizontal * width,
+                      child: Scaffold(
+                        backgroundColor: backgroundColor ??
+                            getBlackAndWhite(_navigationKey.currentContext!, 1,
+                                reverse: true),
+                        body: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Center(
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: stateful != null ? [stateful(c, s)] : [],
+                          )),
+                        ),
+                      ),
+                    ),
+                  ],
+                ));
+        
+        return WillPopScope(
+          onWillPop: () async => canBack,
+          child: dialog,
+        );
+      });
 }

@@ -18,14 +18,14 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
             dense: true,
             minVerticalPadding: 2,
             onTap: () async {
-              if (await canLaunch(AppConst.helpUrl)) {
-                await launch(AppConst.helpUrl);
-              } else {
-                Provider.of<ContextProvider>(context, listen: false)
-                    .showSnackBar(
-                        Provider.of<FunnyProvider>(context, listen: false)
-                            .getFailingRandom());
-              }
+              // if (await canLaunch(AppConst.helpUrl)) {
+              await launch(AppConst.helpUrl);
+              // } else {
+              //   Provider.of<ContextProvider>(context, listen: false)
+              //       .showSnackBar(
+              //           Provider.of<FunnyProvider>(context, listen: false)
+              //               .getFailingRandom());
+              // }
             },
             leading: Icon(Icons.help_center_outlined,
                 color: isLightThenDark(context)),
@@ -60,8 +60,8 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
             },
             leading:
                 Icon(FontAwesomeIcons.poll, color: isLightThenDark(context)),
-            title:
-                Text('Vote for features', style: Theme.of(context).textTheme.headline6),
+            title: Text('Vote for features',
+                style: Theme.of(context).textTheme.headline6),
           ),
         ),
       ];

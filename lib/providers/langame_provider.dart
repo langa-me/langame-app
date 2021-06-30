@@ -212,7 +212,7 @@ class LangameProvider extends ChangeNotifier {
 
   Future<LangameResponse<void>> lock(String channelName) async {
     try {
-      if (_lockTimer != null && _lockTimer!.isActive)
+      if (canLock != null)
         return LangameResponse(LangameStatus.failed);
       final lgId = _runningLangames.entries
           .firstWhere((e) => e.value.channelName == channelName)
@@ -225,7 +225,7 @@ class LangameProvider extends ChangeNotifier {
           )
           .doc(lgId)
           .get();
-      if (langame.data()!.isLocked) {
+      if (!langame.data()!.hasIsLocked()) {
         return LangameResponse(LangameStatus.failed);
       }
       await langame.reference.update({'isLocked': !langame.data()!.isLocked});

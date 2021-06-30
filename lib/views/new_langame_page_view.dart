@@ -220,7 +220,7 @@ class _SendLangameState extends State<NewLangamePageView>
     // We ignore the result and do not wait
     lp.addLink(createLangame.result!.id,
         dlp.getChannelNameFromLink(createDynamicLink.result!));
-    cp.showCustomDialog([
+    cp.showCustomDialog(stateless: [
       Text(
           'Copy this link and send it to people you want to meet with. '
           'Be sure to save it so you can use it later, too.',

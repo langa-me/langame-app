@@ -93,9 +93,6 @@ message User {
   /// Google account linked?
   bool google = 7;
 
-  /// Facebook account linked?
-  bool facebook = 8;
-
   /// Apple account linked?
   bool apple = 9;
 
@@ -114,6 +111,12 @@ message User {
   google.protobuf.Timestamp last_logout = 16;
   google.protobuf.Timestamp creation_time = 17;
   bool disabled = 18;
+  repeated Device devices = 19;
+
+  message Device {
+    string langame_version = 1;
+    string device_info = 2;
+  }
 }
 
 enum InteractionLevel {
@@ -208,4 +211,19 @@ message Notification {
 
 message Subscription {
   string status = 1;
+}
+
+message FunctionResponse {
+  oneof type {
+    VersionCheck version_check = 1;
+  }
+
+  message VersionCheck {
+    UpdateRequired update = 1;
+    enum UpdateRequired {
+      OK = 0;
+      REQUIRED = 1;
+      RETRO_COMPATIBLE = 2;
+    }
+  }
 }

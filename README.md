@@ -72,4 +72,5 @@ make proto
 1. bump pubspec.yaml version number and version code
 2. update changelogs in fastlane (android/fastlane/changelogs and ios/fastlane/Fastfile)
 3. commit & push
-4. once CI/CD is done, deploy new Firebase stuff in prod, click release new version in app stores
+4. once CI/CD is done, update langame_version from remote config
+5. deploy new Firebase stuff in prod

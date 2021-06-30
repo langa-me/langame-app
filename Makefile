@@ -26,5 +26,10 @@ proto:
 	protos/${LANGAME_PROTO_SUBPATH}/langame.proto && \
 	pbts -o ${FUNCTIONS_PATH}/src/${LANGAME_PROTO_SUBPATH}/langame.d.ts ${FUNCTIONS_PATH}/lib/${LANGAME_PROTO_SUBPATH}/langame.js
 
-compile_models:
-	flutter pub run build_runner watch --delete-conflicting-outputs
+icon:
+	flutter pub run flutter_launcher_icons:main -f flutter_launcher_icons-prod.yaml
+
+android_sync:
+	cp android/app/src/prod/AndroidManifest.xml android/app/src/dev/AndroidManifest.xml
+	cp android/app/src/prod/AndroidManifest.xml android/app/src/debug/AndroidManifest.xml
+	cp android/app/src/prod/AndroidManifest.xml android/app/src/profile/AndroidManifest.xml

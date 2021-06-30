@@ -1,3 +1,5 @@
+import {HttpsError} from "firebase-functions/lib/providers/https";
+
 /**
  * Enum representing status code
  */
@@ -38,3 +40,9 @@ export class FirebaseFunctionsResponse {
     }
 }
 
+/**
+ * Functions error
+ */
+export class LangameFunctionsError extends HttpsError {
+
+}

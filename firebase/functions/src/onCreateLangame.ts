@@ -110,6 +110,7 @@ export const onCreateLangame = async (
       channelName: channelName,
       currentMeme: 0,
       done: null,
+      isLocked: false,
     }, {merge: true});
 
     const toNotify = lg.data()!.reservedSpots;

@@ -54,26 +54,28 @@ class UserExt {
   static lg.User fromObject(Object o) {
     var m = o as Map<String, dynamic>;
     return lg.User(
-        uid: m['uid'],
-        email: m['email'],
-        displayName: m['displayName'],
-        phoneNumber: m['phoneNumber'],
-        photoUrl: m['photoUrl'],
-        online: m['online'],
-        google: m['google'],
-        facebook: m['facebook'],
-        apple: m['apple'],
-        favouriteTopics:
-            (m['favouriteTopics'] as List<dynamic>?)?.map((e) => e as String),
-        tag: m['tag'],
-        tokens: (m['tokens'] as List<dynamic>?)?.map((e) => e as String),
-        latestInteractions: (m['latestInteractions'] as List<dynamic>?)
-            ?.map((e) => e as String),
-        errors: (m['errors'] as List<dynamic>?)?.map((e) => e as String),
-        lastLogin: dynamicToProtobufTimestamp(m['lastLogin']),
-        lastLogout: dynamicToProtobufTimestamp(m['lastLogout']),
-        creationTime: dynamicToProtobufTimestamp(m['creationTime']),
-        disabled: m['disabled']);
+      uid: m['uid'],
+      email: m['email'],
+      displayName: m['displayName'],
+      phoneNumber: m['phoneNumber'],
+      photoUrl: m['photoUrl'],
+      online: m['online'],
+      google: m['google'],
+      apple: m['apple'],
+      favouriteTopics:
+          (m['favouriteTopics'] as List<dynamic>?)?.map((e) => e as String),
+      tag: m['tag'],
+      tokens: (m['tokens'] as List<dynamic>?)?.map((e) => e as String),
+      latestInteractions:
+          (m['latestInteractions'] as List<dynamic>?)?.map((e) => e as String),
+      errors: (m['errors'] as List<dynamic>?)?.map((e) => e as String),
+      lastLogin: dynamicToProtobufTimestamp(m['lastLogin']),
+      lastLogout: dynamicToProtobufTimestamp(m['lastLogout']),
+      creationTime: dynamicToProtobufTimestamp(m['creationTime']),
+      disabled: m['disabled'],
+      devices: (m['devices'] as List<dynamic>?)
+          ?.map((e) => DeviceExt.fromObject(e)),
+    );
   }
 
   static lg.User fromFirebase(fb.User user) => lg.User(
@@ -86,6 +88,16 @@ class UserExt {
         apple: user.providerData.any((e) => e.providerId == "apple.com"),
         creationTime: dynamicToProtobufTimestamp(user.metadata.creationTime),
       );
+}
+
+class DeviceExt {
+  static lg.User_Device fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.User_Device(
+      langameVersion: m['langameVersion'],
+      deviceInfo: m['deviceInfo'],
+    );
+  }
 }
 
 class NotificationExt {
@@ -118,7 +130,8 @@ class LangameExt {
       memesSeen: m['memesSeen'],
       memeChanged: dynamicToProtobufTimestamp(m['memeChanged']),
       link: m['link'],
-      reservedSpots: (m['reservedSpots'] as List<dynamic>?)?.map((e) => e as String),
+      reservedSpots:
+          (m['reservedSpots'] as List<dynamic>?)?.map((e) => e as String),
       isLocked: m['isLocked'],
     );
   }
