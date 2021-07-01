@@ -50,8 +50,6 @@ jobs:
           flutter-version: 2.2.0
       - name: Install Flutter dependencies
         run: flutter pub get
-      # ultra hack
-      - run: rm -rf android/app/src/main/kotlin
       - run: flutter build apk --release --flavor prod
       - uses: ruby/setup-ruby@v1
         with:
