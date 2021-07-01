@@ -69,9 +69,9 @@ platform :ios do
       distribute_external: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Better handling of connectivity problems"
+      changelog: "- Better handling of connectivity problems",
       distribute_external: true,
-      groups: "Public", # TODO might be array
+      groups: "Public",
     )
 
     delete_temp_keychain(keychain_name)

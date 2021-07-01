@@ -52,7 +52,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   // if (kReleaseMode) {
-    await FirebaseAppCheck.instance.activate();
+    FirebaseAppCheck.instance.activate();
   // }
   FirebaseCrashlytics? crashlytics;
   RemoteConfig? remoteConfig;

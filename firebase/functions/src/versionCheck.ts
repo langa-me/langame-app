@@ -9,7 +9,7 @@ import {langame} from "./langame/protobuf/langame";
 const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
     {
       name: "per_user_limiter",
-      maxCalls: 2,
+      maxCalls: 5,
       periodSeconds: 15,
     },
     admin.firestore(),
@@ -18,10 +18,14 @@ const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
 
 export const versionCheck = async (
     data: any, context: https.CallableContext) => {
-  if (!context.app) {
+  // if (!context.app) {
+  //   throw new LangameFunctionsError("internal", "");
+  // }
+  if (!context.rawRequest.ip) {
     throw new LangameFunctionsError("internal", "");
   }
-  const uidQualifier = "u_" + context.app;
+  // const uidQualifier = "u_" + context.app;
+  const uidQualifier = "u_" + context.rawRequest.ip;
   const isQuotaExceeded =
         await perUserlimiter.isQuotaAlreadyExceeded(uidQualifier);
   if (isQuotaExceeded) {
@@ -29,7 +33,7 @@ export const versionCheck = async (
     throw new LangameFunctionsError("resource-exhausted", m, m);
   }
 
-  if (!data || !data.version) {
+  if (!data || !data.version || data.version.split("+").length < 2) {
     const m = "you must provide a version";
     throw new LangameFunctionsError("invalid-argument", m, m);
   }
@@ -41,9 +45,10 @@ export const versionCheck = async (
   const langameVersion = t.parameters.langame_version.defaultValue.value;
 
   // TODO: might fail if client send garbage
-  //   let [version, versionCode] = data.version.split("+");
+  // eslint-disable-next-line no-unused-vars
+  const version = data.version.split("+")[0];
   // Naive for now, hard check
-  if (data.version !== langameVersion) {
+  if (version !== langameVersion.split("+")[0]) {
     return new langame.protobuf.FunctionResponse({
       versionCheck: new langame.protobuf.FunctionResponse.VersionCheck({
         update:

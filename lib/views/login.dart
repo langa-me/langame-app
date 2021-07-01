@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
@@ -19,6 +20,7 @@ import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/on_boarding.dart';
+import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:universal_platform/universal_platform.dart';
@@ -52,9 +54,41 @@ class _LoginState extends State<Login> {
         // Wait until internet then
         await Connectivity().onConnectivityChanged.first;
       }
+      // HACK TODO
+      await Future.delayed(Duration(milliseconds: 100));
       cp.showLoadingDialog(text: 'Checking version...');
       final checkVersion = await ap.checkVersion();
       cp.dialogComplete();
+      if (checkVersion.status == LangameStatus.failed) {
+        cp.showCustomDialog(stateless: [
+          Center(
+            child: Column(children: [
+              Lottie.asset(
+                'animations/sad2.json',
+                width: AppSize.safeBlockHorizontal * 20,
+                repeat: false,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Unfortunately, something seems broken, please restart your application',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              LangameButton(
+                FontAwesomeIcons.doorOpen,
+                onPressed: () {
+                  SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                },
+                text: 'Quit',
+                highlighted: true,
+              )
+            ]),
+          )
+        ]);
+        return;
+      }
       if (checkVersion.result !=
               FunctionResponse_VersionCheck_UpdateRequired.OK &&
           checkVersion.result !=

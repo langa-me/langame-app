@@ -318,7 +318,7 @@ class AuthenticationProvider extends ChangeNotifier {
           .httpsCallable(
         'versionCheck',
         options: HttpsCallableOptions(
-          timeout: Duration(seconds: 10),
+          timeout: Duration(seconds: 20),
         ),
       )
           .call(<String, dynamic>{
@@ -326,9 +326,7 @@ class AuthenticationProvider extends ChangeNotifier {
       });
       _cap.log('authentication_provider:checkVersion response ${raw.data}');
       // Asynchronously, update devices information in db
-      waitUntil(() =>
-       _user != null
-      , maxIterations: 1000).then((_) async {
+      waitUntil(() => _user != null, maxIterations: 1000).then((_) async {
         final deviceInfo = UniversalPlatform.isAndroid
             ? (await DeviceInfoPlugin().androidInfo).model
             : UniversalPlatform.isIOS
@@ -358,7 +356,7 @@ class AuthenticationProvider extends ChangeNotifier {
             )
             .set(lg.User(devices: _user!.devices), SetOptions(merge: true))
             .then((_) => _cap.log('authentication_provider:updated devices'));
-      });
+      }).catchError((_) {}); // IGNORE, TODO: put this in stream user
       return LangameResponse(LangameStatus.succeed,
           result: lg.FunctionResponse_VersionCheck_UpdateRequired.values[
               (raw.data as Map<String, dynamic>)['versionCheck']['update']
