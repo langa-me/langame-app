@@ -1,13 +1,11 @@
-import 'dart:convert';
-
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/services/http/firebase.dart';
 import 'package:langame/views/langame.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -15,12 +13,17 @@ class DynamicLinksProvider extends ChangeNotifier {
   final CrashAnalyticsProvider _cap;
   final ContextProvider _cp;
   final FirebaseDynamicLinks? _dynamicLinks;
+  final AuthenticationProvider _ap;
   bool? _isDev;
 
-  DynamicLinksProvider(
-      this._cap, this._cp, this._dynamicLinks) {
+  DynamicLinksProvider(this._cap, this._cp, this._dynamicLinks, this._ap) {
     PackageInfo.fromPlatform() // TODO: move to smthing global
         .then((e) => _isDev = e.packageName.contains('dev'));
+    _ap.userStream.listen((e) {
+      if (e.type == UserChangeType.NewAuthentication) {
+        setupAndCheckDynamicLinks();
+      } else if (e.type == UserChangeType.Disconnection) {}
+    });
   }
 
   String getChannelNameFromLink(String link) {
@@ -93,20 +96,23 @@ class DynamicLinksProvider extends ChangeNotifier {
           });
 
       if (_dynamicLinks != null)
-        _onSuccess(await _dynamicLinks!.getInitialLink()).then((_) => _cap.log(
-            'opened initial langame link',
-            analyticsMessage: 'dynamic_links_open_initial'));
+        // Leave some time for UI
+        await Future.delayed(Duration(seconds: 1));
+      var l = await _dynamicLinks!.getInitialLink();
+      _onSuccess(l).then((_) => _cap.log('opened initial langame link',
+          analyticsMessage: 'dynamic_links_open_initial'));
+      _cap.log('dynamic_links_provider:setupAndCheckDynamicLinks');
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('failed to setupAndCheckDynamicLinks');
+      _cap.log('dynamic_links_provider:failed to setupAndCheckDynamicLinks');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
   }
 
-  Future<dynamic> _onSuccess(dl) async {
+  Future<dynamic> _onSuccess(PendingDynamicLinkData? dl) async {
     if (dl != null && dl.link.path.split('/').length > 0) {
-      _cap.log('opened link ${dl?.link.path}',
+      _cap.log('opened link ${dl.link.path}',
           analyticsMessage: 'dynamic_links_open');
       final sp = dl.link.path.split('/');
       final String channel = sp[sp.length > 2 ? 2 : 1];

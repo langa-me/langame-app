@@ -38,6 +38,7 @@ import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
+import 'package:langame/services/http/preference/preference_service.dart';
 import 'package:langame/views/langame.dart';
 import 'package:langame/views/login.dart';
 import 'package:provider/provider.dart';
@@ -52,7 +53,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   // if (kReleaseMode) {
-    FirebaseAppCheck.instance.activate();
+  FirebaseAppCheck.instance.activate();
   // }
   FirebaseCrashlytics? crashlytics;
   RemoteConfig? remoteConfig;
@@ -61,7 +62,7 @@ void main() async {
   // Crashlytics does not support web https://firebase.flutter.dev/
   if (!kIsWeb) {
     crashlytics = FirebaseCrashlytics.instance;
-    await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
+    await crashlytics.setCrashlyticsCollectionEnabled(true);
     // Pass all uncaught errors from the framework to Crashlytics.
     FlutterError.onError = crashlytics.recordFlutterError;
     Isolate.current.addErrorListener(RawReceivePort((pair) async {
@@ -117,15 +118,26 @@ void main() async {
             );
           }
         });
-  var messageProvider = MessageProvider(firebase, messageApi, authenticationApi,
-      crashAnalyticsProvider, authenticationProvider);
+  var messageProvider = MessageProvider(firebase, messageApi,
+      crashAnalyticsProvider, authenticationProvider, contextProvider);
   var relationProvider = RelationProvider(
       authenticationApi, crashAnalyticsProvider, authenticationProvider);
   var preferenceProvider = PreferenceProvider(
       firebase, crashAnalyticsProvider, authenticationProvider);
   var remoteConfigProvider =
       RemoteConfigProvider(crashAnalyticsProvider, remoteConfig);
+  var audioProvider = AudioProvider(firebase, crashAnalyticsProvider,
+      remoteConfigProvider, authenticationProvider);
+  var dynamicLinksProvider = DynamicLinksProvider(
+    crashAnalyticsProvider,
+    contextProvider,
+    dynamicLinks,
+    authenticationProvider,
+  );
+  var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
+      authenticationProvider, ImplLangameApi(firebase));
 
+  await Future.delayed(Duration(milliseconds: 100));
   SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then(
@@ -165,25 +177,18 @@ void main() async {
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, PreferenceProvider>(
-              update: (_, cap, ap, pp) {
-                pp!.init();
-                return pp;
-              },
+              update: (_, cap, ap, pp) => pp!,
               create: (_) => preferenceProvider,
             ),
-            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
-                RemoteConfigProvider, AudioProvider>(
-              update: (_, cap, rcp, ap) => ap!,
-              create: (_) => AudioProvider(
-                  firebase, crashAnalyticsProvider, remoteConfigProvider),
+            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
+                RemoteConfigProvider, AuthenticationProvider, AudioProvider>(
+              update: (_, cap, rcp, authP, ap) => ap!,
+              create: (_) => audioProvider,
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, MessageProvider>(
               // TODO: for now does not change on auth change
-              update: (_, cap, ap, mp) {
-                if (ap.user == null) mp!.cancel();
-                return mp!;
-              },
+              update: (_, cap, ap, mp) => mp!,
               create: (_) => messageProvider,
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
@@ -213,19 +218,15 @@ void main() async {
                   authenticationProvider,
                   ImplPaymentApi(firebase)),
             ),
-            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
-                    ContextProvider, DynamicLinksProvider>(
-                update: (_, cap, cp, dlp) => dlp!,
-                create: (_) => DynamicLinksProvider(
-                      crashAnalyticsProvider,
-                      contextProvider,
-                      dynamicLinks,
-                    )),
+            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
+                ContextProvider, AuthenticationProvider, DynamicLinksProvider>(
+              update: (_, cap, cp, ap, dlp) => dlp!,
+              create: (_) => dynamicLinksProvider,
+            ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, LangameProvider>(
               update: (_, cap, ap, lp) => lp!,
-              create: (_) => LangameProvider(firebase, crashAnalyticsProvider,
-                  authenticationProvider, ImplLangameApi(firebase)),
+              create: (_) => langameProvider,
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),
@@ -265,7 +266,9 @@ class _MyAppState extends State<MyApp> {
     return Consumer<PreferenceProvider>(builder: (context, s, child) {
       return MaterialApp(
         title: 'Langame',
-        themeMode: ThemeMode.values[s.preference.themeIndex],
+        themeMode: ThemeMode.values[s.preference != null
+            ? s.preference!.themeIndex
+            : PreferenceService.defaultPreference.themeIndex],
         theme: FlexColorScheme.light(
           scheme: scheme,
           fontFamily: AppFont.mainFont,
@@ -302,7 +305,7 @@ class _MyAppState extends State<MyApp> {
                 headline6: TextStyle(fontSize: 15, color: Colors.white),
               ),
             ),
-        home: Login(),
+        home: LoginView(),
         navigatorKey: navigationKey,
         scaffoldMessengerKey: scaffoldMessengerKey,
         navigatorObservers: [

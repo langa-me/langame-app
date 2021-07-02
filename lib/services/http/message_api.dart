@@ -20,7 +20,7 @@ abstract class MessageApi {
   Future<void> listen(void Function(dynamic)? add);
 
   /// Overlay on top of FirebaseMessaging.getInitialMessage that get
-  Future<dynamic> getInitialMessage();
+  Future<Map<String, String>?> getInitialMessage();
 
   /// Stop listening to messages
   Future<void> cancel();

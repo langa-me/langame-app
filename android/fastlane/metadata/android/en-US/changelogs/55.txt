@@ -1,0 +1,2 @@
+- Now opening a Langame link or notification when the application is in background or stopped properly open the Langame.
+- You can now get the Langame share link from the Langame list (only the creator)

@@ -17,8 +17,23 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/authentication_api.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:retry/retry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_platform/universal_platform.dart';
+
+enum UserChangeType {
+  NewAuthentication,
+  Disconnection,
+  ProfileEdition,
+}
+
+class UserChange {
+  UserChangeType type;
+  lg.User? before;
+  lg.User? after;
+
+  UserChange(this.type, this.before, this.after);
+}
 
 class AuthenticationProvider extends ChangeNotifier {
   FirebaseApi firebase;
@@ -31,9 +46,9 @@ class AuthenticationProvider extends ChangeNotifier {
   late Stream<User?> _firebaseUserStream;
 
   // ignore: close_sinks
-  late StreamController<lg.User?> _userStream;
+  late StreamController<UserChange> _userStream;
 
-  Stream<lg.User?> get userStream {
+  Stream<UserChange> get userStream {
     return _userStream.stream.asBroadcastStream();
   }
 
@@ -61,9 +76,15 @@ class AuthenticationProvider extends ChangeNotifier {
         //   });
         //   _user = null;
         // }
+        final change = UserChange(UserChangeType.Disconnection, _user, null);
         _user = null;
+        _userStream.add(change);
+        _cap.log('authentication_provider:${change.type}');
+
+        notifyListeners();
         return null;
       }
+
       var r = await firebase.firestore!.runTransaction((t) async {
         final langameUser = UserExt.fromFirebase(data);
         final ref = firebase.firestore!
@@ -77,10 +98,18 @@ class AuthenticationProvider extends ChangeNotifier {
         return ref;
       });
 
-      _user = (await r.get()).data();
+      final newUser = (await r.get()).data();
+      final change = UserChange(
+          _user == null
+              ? UserChangeType.NewAuthentication
+              : UserChangeType.ProfileEdition,
+          _user,
+          newUser);
+      _userStream.add(change);
+      _user = newUser;
+      _cap.log('authentication_provider:${change.type}');
       await firebase.crashlytics?.setUserIdentifier(data.uid);
       await firebase.analytics?.setUserId(data.uid);
-      _userStream.add(_user);
       notifyListeners();
     });
   }
@@ -168,6 +197,9 @@ class AuthenticationProvider extends ChangeNotifier {
       var res = await _authenticationApi.loginWithGoogle();
       return _loginWith(oAuthCredential: res);
     } catch (e, s) {
+      // HACK
+      if (e is LangameGoogleSignInException && e.cause.contains('cancel'))
+        return LangameResponse(LangameStatus.cancelled);
       _cap.log('authentication_provider:failed to loginWithGoogle');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
@@ -314,19 +346,25 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
 
-      final raw = await firebase.functions!
-          .httpsCallable(
+      final callable = firebase.functions!.httpsCallable(
         'versionCheck',
         options: HttpsCallableOptions(
           timeout: Duration(seconds: 20),
         ),
-      )
-          .call(<String, dynamic>{
-        'version': _getLangameVersion(packageInfo),
+      );
+      final raw = await retry(
+          () async => await callable.call(<String, dynamic>{
+                'version': _getLangameVersion(packageInfo),
+              }),
+          maxAttempts: 3, onRetry: (e) async {
+        _cap.log('authentication_provider:failed to checkVersion');
+        return _cap.recordError(e, null);
       });
       _cap.log('authentication_provider:checkVersion response ${raw.data}');
       // Asynchronously, update devices information in db
-      waitUntil(() => _user != null, maxIterations: 1000).then((_) async {
+      waitUntil(() => _user != null,
+              step: Duration(seconds: 1000), maxIterations: 10)
+          .then((_) async {
         final deviceInfo = UniversalPlatform.isAndroid
             ? (await DeviceInfoPlugin().androidInfo).model
             : UniversalPlatform.isIOS

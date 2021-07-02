@@ -14,7 +14,7 @@ class FakeMessageApi extends MessageApi {
 
 
   @override
-  Future getInitialMessage() async {
+  Future<Map<String, String>?> getInitialMessage() async {
     // TODO: implement getInitialMessage
     // throw UnimplementedError();
   }

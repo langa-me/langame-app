@@ -27,7 +27,7 @@ proto:
 	pbts -o ${FUNCTIONS_PATH}/src/${LANGAME_PROTO_SUBPATH}/langame.d.ts ${FUNCTIONS_PATH}/lib/${LANGAME_PROTO_SUBPATH}/langame.js
 
 icon:
-	flutter pub run flutter_launcher_icons:main -f flutter_launcher_icons-prod.yaml
+	flutter pub run flutter_launcher_icons:main -f flutter_launcher_icons-main.yaml
 
 android_sync:
 	cp android/app/src/prod/AndroidManifest.xml android/app/src/dev/AndroidManifest.xml

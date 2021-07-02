@@ -18,7 +18,15 @@ class LangameProvider extends ChangeNotifier {
   final AuthenticationProvider _ap;
   final LangameApi _langameApi;
 
-  LangameProvider(this._firebase, this._cap, this._ap, this._langameApi);
+  LangameProvider(this._firebase, this._cap, this._ap, this._langameApi) {
+    _ap.userStream.listen((e) {
+      if (e.type == UserChangeType.NewAuthentication) {
+        initialize();
+      } else if (e.type == UserChangeType.Disconnection) {
+        _clearState();
+      }
+    });
+  }
 
   Map<String, lg.Langame> _runningLangames = {};
 
@@ -35,6 +43,11 @@ class LangameProvider extends ChangeNotifier {
   Timer? _lockTimer;
   String? get canLock =>
       _lockTimer == null || !_lockTimer!.isActive ? null : 'a moment please...';
+
+  _clearState() {
+    clearLangames();
+    _lockTimer = null;
+  }
 
   clearLangames() {
     _subs.forEach((e) => e.cancel());
@@ -63,10 +76,10 @@ class LangameProvider extends ChangeNotifier {
         notifyListeners();
       });
 
-      _cap.log('initialize and get langames');
+      _cap.log('langame_provider:initialize and get langames');
       return LangameResponse<void>(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('failed to initialize and get langames');
+      _cap.log('langame_provider:failed to initialize and get langames');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -90,7 +103,7 @@ class LangameProvider extends ChangeNotifier {
 
       initialize();
       _cap.log(
-          'created langame with topics ${topics.join(',')} and date $date');
+          'created langame with topics ${topics.map((e) => e.topic.content).join(',')} and date $date');
       return LangameResponse(LangameStatus.succeed, result: snap);
     } catch (e, s) {
       _cap.log(
@@ -212,8 +225,7 @@ class LangameProvider extends ChangeNotifier {
 
   Future<LangameResponse<void>> lock(String channelName) async {
     try {
-      if (canLock != null)
-        return LangameResponse(LangameStatus.failed);
+      if (canLock != null) return LangameResponse(LangameStatus.failed);
       final lgId = _runningLangames.entries
           .firstWhere((e) => e.value.channelName == channelName)
           .key;

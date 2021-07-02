@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +12,7 @@ import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'colors/colors.dart';
 import 'images/image.dart';
@@ -113,14 +115,34 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
                 expandedCrossAxisAlignment: CrossAxisAlignment.center,
                 expandedAlignment: Alignment.center,
                 children: [
-                  LangameButton(
-                    FontAwesomeIcons.doorOpen,
-                    highlighted: true,
-                    text: 'join',
-                    onPressed: () => cp.pushReplacement(
-                      LangameView(l.channelName, false),
-                    ),
-                  ),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    height: AppSize.safeBlockVertical * 10,
+                    child: Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: 
+                    LangameButton(
+                      FontAwesomeIcons.doorOpen,
+                      highlighted: true,
+                      text: 'join',
+                      onPressed: () => cp.pushReplacement(
+                        LangameView(l.channelName, false),
+                      ),
+                    )),
+                    l.initiator == ap.user!.uid
+                        ? Align(
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            icon: Icon(FontAwesomeIcons.users,
+                                color:
+                                    isLightThenDark(context, reverse: false)),
+                            onPressed: () => _onOpenLangameLink(l),
+                        ))
+                        : SizedBox.shrink(),
+                  ])),
+
                   // TODO
                   // LangameButton(
                   //   FontAwesomeIcons.doorClosed,
@@ -133,5 +155,37 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
           }
           return SizedBox.shrink();
         });
+  }
+
+  void _onOpenLangameLink(lg.Langame l) {
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    cp.showCustomDialog(
+      stateless: [
+        ListTile(
+          onTap: () => FlutterClipboard.copy('langa.me/join/${l.link}').then(
+              (v) => cp.showSnackBar(
+                  'langa.me/join/${l.link} copied to clipboard!')),
+          tileColor: getBlackAndWhite(context, 2, reverse: true),
+          title: Text('langa.me/join/${l.link}',
+              style: Theme.of(context).textTheme.headline6),
+          leading: IconButton(
+            icon: Icon(FontAwesomeIcons.shareAlt,
+                color: isLightThenDark(context, reverse: false)),
+            onPressed: () => Share.share(
+                'Join me on Langame for an incredible conversation on ${l.topics.join(',')}!\n' +
+                    'Just open this link: langa.me/join/${l.link}\n' +
+                    'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
+                subject:
+                    'Join me on Langame for an incredible conversation on ${l.topics.join(',')}'),
+          ),
+          trailing: Icon(FontAwesomeIcons.copy,
+              color: isLightThenDark(context, reverse: false)),
+        ),
+      ],
+      canBack: true,
+      title: Text('Share',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.headline4),
+    );
   }
 }

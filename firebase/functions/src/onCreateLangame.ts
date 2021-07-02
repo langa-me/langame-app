@@ -136,9 +136,9 @@ export const onCreateLangame = async (
             tag: channelName,
             // TODO: date in notification?
             // eslint-disable-next-line max-len
-            body: `${senderData.data()!.displayName} invited you to play ${lg.data()!.topics.join(",")}`,
+            body: `${senderData.data()!.tag} invited you to play ${lg.data()!.topics.join(",")}`,
             // eslint-disable-next-line max-len
-            title: `Play ${lg.data()!.topics.join(",")} with ${senderData.data()!.displayName}?`,
+            title: `Play ${lg.data()!.topics.join(",")} with ${senderData.data()!.tag}?`,
           },
         },
         {

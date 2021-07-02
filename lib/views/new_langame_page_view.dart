@@ -232,7 +232,7 @@ class _SendLangameState extends State<NewLangamePageView>
                 '${createDynamicLink.result!} copied to clipboard!')),
         tileColor: getBlackAndWhite(context, 2, reverse: true),
         title: Text(
-          createDynamicLink.result!,
+          createDynamicLink.result!.replaceAll('https://', ''),
           style: Theme.of(context).textTheme.headline6,
         ),
         leading: IconButton(

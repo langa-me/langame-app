@@ -15,15 +15,25 @@ class ImplLangameApi extends LangameApi {
   @override
   Future<Iterable<Stream<DocumentSnapshot<lg.Langame>>>> getLangames(
       {bool unDoneOnly = false}) async {
-    var players = await firebase.firestore!
-        .collectionGroup('players')
-        .where('userId', isEqualTo: firebase.auth!.currentUser!.uid)
-        .get();
-    return players.docs.map((e) => e.reference.parent.parent!
+    var p = await Future.wait([
+      firebase.firestore!
+          .collectionGroup('players')
+          .where('userId', isEqualTo: firebase.auth!.currentUser!.uid)
+          .get(),
+      firebase.firestore!
+          .collection(AppConst.firestoreLangamesCollection)
+          .where('initiator', isEqualTo: firebase.auth!.currentUser!.uid)
+          .get()
+    ]);
+    var langamesParticipant = p[0]
+        .docs
+        .where((e) => e.reference.parent.parent != null)
+        .map((e) => e.reference.parent.parent!);
+    var langamesInitiator = p[1].docs.map((e) => e.reference);
+    return [...langamesParticipant, ...langamesInitiator].map((e) => e
         .withConverter<lg.Langame>(
-          fromFirestore: (snapshot, _) =>
-              LangameExt.fromObject(snapshot.data()!),
-          toFirestore: (user, _) => user.toMapStringDynamic(),
+          fromFirestore: (e, _) => LangameExt.fromObject(e.data()!),
+          toFirestore: (e, _) => e.toMapStringDynamic(),
         )
         .snapshots());
   }

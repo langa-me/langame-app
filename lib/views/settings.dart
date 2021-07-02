@@ -76,7 +76,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   title: Text('Theme',
                       style: Theme.of(context).textTheme.headline6),
                   padding: EdgeInsets.all(5),
-                  themeMode: ThemeMode.values[s.preference.themeIndex],
+                  themeMode: ThemeMode.values[s.preference!.themeIndex],
                   onThemeModeChanged: s.setTheme,
                   flexSchemeData: flexSchemeData,
                 );
@@ -198,7 +198,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                     .logout();
                 await Future.delayed(Duration(seconds: 1));
                 cp.dialogComplete();
-                cp.pushReplacement(Login());
+                cp.pushReplacement(LoginView());
               },
               leading:
                   Icon(Icons.login_outlined, color: isLightThenDark(context)),
@@ -213,16 +213,16 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                     cap.logNewFeatureClick('settings_shake_to_feedback');
                     return;
                   }
-                  p.setShakeToFeedback(!p.preference.shakeToFeedback);
+                  p.setShakeToFeedback(!p.preference!.shakeToFeedback);
                 },
                 leading: Icon(Icons.feedback_outlined,
                     color: isLightThenDark(context)),
                 title: Text('Shake-to-feedback',
                     style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
-                    value: p.preference.shakeToFeedback,
+                    value: p.preference!.shakeToFeedback,
                     onChanged: (v) =>
-                        p.setShakeToFeedback(!p.preference.shakeToFeedback)),
+                        p.setShakeToFeedback(!p.preference!.shakeToFeedback)),
               ),
             ),
             Consumer<PreferenceProvider>(
@@ -234,13 +234,13 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                     return;
                   }
                   p.setRecommendations(
-                      !p.preference.unknownPeopleRecommendations);
+                      !p.preference!.unknownPeopleRecommendations);
                 },
                 leading: Icon(Icons.recommend, color: isLightThenDark(context)),
                 title: Text('User recommendations',
                     style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
-                    value: p.preference.unknownPeopleRecommendations,
+                    value: p.preference!.unknownPeopleRecommendations,
                     onChanged: (v) {
                       if (kReleaseMode) {
                         cp.showSnackBar('Coming soon!');
@@ -248,7 +248,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                         return;
                       }
                       p.setRecommendations(
-                          !p.preference.unknownPeopleRecommendations);
+                          !p.preference!.unknownPeopleRecommendations);
                     }),
               ),
             ),
@@ -268,7 +268,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
       cp.showSuccessDialog('You will miss us!');
       await Future.delayed(Duration(seconds: 2));
       cp.dialogComplete();
-      cp.pushReplacement(Login());
+      cp.pushReplacement(LoginView());
     }, onFailure: () async {
       cp.dialogComplete();
       cp.showFailureDialog(

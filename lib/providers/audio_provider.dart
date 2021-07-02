@@ -10,6 +10,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
+import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/services/http/firebase.dart';
@@ -25,8 +26,16 @@ class AudioProvider extends ChangeNotifier {
   FirebaseApi firebase;
   CrashAnalyticsProvider _cap;
   RemoteConfigProvider _rcp;
+  AuthenticationProvider _ap;
 
-  AudioProvider(this.firebase, this._cap, this._rcp);
+  AudioProvider(this.firebase, this._cap, this._rcp, this._ap) {
+    this._ap.userStream.listen((e) {
+      if (e.type == UserChangeType.NewAuthentication) {
+      } else if (e.type == UserChangeType.NewAuthentication) {
+        leaveChannel();
+      }
+    });
+  }
 
   bool _isMicrophoneEnabled = false;
 

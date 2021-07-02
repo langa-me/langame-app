@@ -47,7 +47,7 @@ class _State extends State<InteractionsPageView>
 
   Widget _buildRecommendations(RelationProvider r) =>
       Consumer<PreferenceProvider>(
-        builder: (context, pp, c) => !pp.preference.unknownPeopleRecommendations
+        builder: (context, pp, c) => !pp.preference!.unknownPeopleRecommendations
             ? SizedBox.shrink()
             : Container(
                 height: AppSize.safeBlockVertical * 40,
@@ -61,13 +61,13 @@ class _State extends State<InteractionsPageView>
                         style: Theme.of(context).textTheme.headline6,
                       ),
                       leading: Switch(
-                          value: pp.preference.unknownPeopleRecommendations,
+                          value: pp.preference!.unknownPeopleRecommendations,
                           onChanged: (v) {
                             Provider.of<ContextProvider>(context, listen: false)
                                 .showSnackBar(
                                     'Understood, you can still reactivate recommendations in settings later');
                             pp.setRecommendations(
-                                !pp.preference.unknownPeopleRecommendations);
+                                !pp.preference!.unknownPeopleRecommendations);
                           }),
                       trailing: Stack(children: [
                         Tooltip(

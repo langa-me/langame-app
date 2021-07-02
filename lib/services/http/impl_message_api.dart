@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/toast.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/services/http/message_api.dart';
 import 'package:universal_platform/universal_platform.dart';
@@ -22,8 +23,11 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 );
 
 class ImplMessageApi extends MessageApi {
+  // ignore: cancel_subscriptions
   StreamSubscription<String>? _onTokenRefresh;
+  // ignore: cancel_subscriptions
   StreamSubscription<RemoteMessage>? _onForegroundMessage;
+  // ignore: cancel_subscriptions
   StreamSubscription<RemoteMessage>? _onNonTerminatedOpened;
   Function(dynamic)? _addCallback;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -173,7 +177,14 @@ class ImplMessageApi extends MessageApi {
       futures.add(_onForegroundMessage!.cancel());
     if (_onNonTerminatedOpened != null)
       futures.add(_onNonTerminatedOpened!.cancel());
-    futures.add(firebase.messaging!.deleteToken());
+    futures.add(firebase.messaging!.deleteToken().catchError((_) {}));
+    // TODO:
+    /*
+     FLTFirebaseMessaging: An error occurred while calling method Messaging#deleteToken, errorOrNil => {
+      NSLocalizedFailureReason = "Failed to checkin before token registration.";
+     }
+    [VERBOSE-2:ui_dart_state.cc(199)] Unhandled Exception: [firebase_messaging/unknown] An unknown error has occurred.
+     */
     return Future.wait<void>(futures);
   }
 
@@ -193,10 +204,20 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<dynamic> getInitialMessage() async {
-    var rawNotification =
-        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-    if (rawNotification == null || rawNotification.payload == null) return null;
-    return jsonDecode(rawNotification.payload!);
+  Future<Map<String, String>?> getInitialMessage() async {
+    var n2 = await Future.wait([
+      flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails(),
+      firebase.messaging!.getInitialMessage(),
+    ]);
+
+    // if (n2.length > 0 &&
+    //     n2[0] != null &&
+    //     (n2[0] as NotificationAppLaunchDetails).payload != null) {
+    //   return jsonDecode((n2[0] as NotificationAppLaunchDetails).payload!);
+    // }
+    if (n2.length > 1 && n2[1] != null && (n2[1] as RemoteMessage?) != null) {
+      return {'channelName': (n2[1] as RemoteMessage).data['channelName']};
+    }
+    return null;
   }
 }

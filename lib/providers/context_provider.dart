@@ -12,6 +12,8 @@ import 'package:langame/services/context/dialog_service.dart';
 import 'package:langame/services/context/navigation_service.dart';
 import 'package:langame/services/context/snack_bar_service.dart';
 import 'package:langame/views/colors/colors.dart';
+import 'package:langame/views/langame.dart';
+import 'package:langame/views/login.dart';
 import 'package:lottie/lottie.dart';
 
 enum spinKitType { SpinKitChasingDots, SpinKitDualRing, SpinKitWanderingCubes }
@@ -28,6 +30,12 @@ List<Function(Color)> _loaders = [
   (Color c) => SpinKitPumpingHeart(color: c),
 ];
 
+enum LangameRoute {
+  LoginView,
+  MainView,
+  LangameView,
+}
+
 class ContextProvider extends ChangeNotifier {
   final GlobalKey<NavigatorState> _navigationKey;
   GlobalKey<NavigatorState> get navigationKey => _navigationKey;
@@ -38,6 +46,9 @@ class ContextProvider extends ChangeNotifier {
   final FunnyProvider _funny;
 
   bool _isLoading = false;
+
+  LangameRoute _route = LangameRoute.LoginView;
+  LangameRoute get route => _route;
 
   ContextProvider(
       this._navigationKey, this._scaffoldMessengerKey, this._funny) {
@@ -82,12 +93,31 @@ class ContextProvider extends ChangeNotifier {
   /// Completes the _dialogCompleter to resume the Future's execution call
   void dialogComplete() => _dialogService.dialogComplete();
 
-  Future<Widget?> push(Widget route) => _navigationService.push(route);
+  _updateRoute(Widget route) {
+    if (Widget is LangameView) {
+      _route = LangameRoute.LangameView;
+    } else if (Widget is LoginView) {
+      _route = LangameRoute.LoginView;
+    } else {
+      _route = LangameRoute.MainView;
+    }
+    notifyListeners();
+  }
 
-  Future<Widget?> pushReplacement(Widget route, {bool tryPopParents = true}) =>
-      _navigationService.pushReplacement(route, tryPopParents: tryPopParents);
+  Future<Widget?> push(Widget route) {
+    _updateRoute(route);
+    return _navigationService.push(route);
+  }
 
-  void pop() => _navigationService.pop();
+  Future<Widget?> pushReplacement(Widget route, {bool tryPopParents = true}) {
+    _updateRoute(route);
+    return _navigationService.pushReplacement(route,
+        tryPopParents: tryPopParents);
+  }
+
+  
+
+  void pop() => _navigationService.pop(); // TODO: not updating route, I think its ok, staying in mainview w/e
 
   Future<T> showCustomDialog<T>({
     List<Widget>? stateless,
@@ -185,7 +215,7 @@ class ContextProvider extends ChangeNotifier {
         ),
       ]);
 
-  Future<void> showFailureDialog(String text) => showCustomDialog(stateless: [
+  Future<void> showFailureDialog(String? text) => showCustomDialog(stateless: [
         Lottie.asset(
           'animations/sad.json',
           width: AppSize.safeBlockHorizontal * 30,
@@ -194,7 +224,7 @@ class ContextProvider extends ChangeNotifier {
           height: 10,
         ),
         Text(
-          text,
+          text ?? _funny.getFailingRandom(),
           textAlign: TextAlign.center,
           style: Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
         )
@@ -262,7 +292,7 @@ class ContextProvider extends ChangeNotifier {
                     ),
                   ],
                 ));
-        
+
         return WillPopScope(
           onWillPop: () async => canBack,
           child: dialog,

@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/future.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -114,10 +115,6 @@ class _OnBoardingState extends State with AfterLayoutMixin {
             child: LangameButton(FontAwesomeIcons.tag, onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_formKey.currentState!.validate()) {
-                // If the form is valid, display a snackbar. In the real world,
-                // you'd often call a server or save the information in a database.
-                // ScaffoldMessenger.of(context)
-                //     .showSnackBar(SnackBar(content: Text('Processing Data')));
               }
             }, text: 'Choose this tag', highlighted: true,),
           ),
@@ -127,15 +124,6 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   }
 
   void _onDone() async {
-    // Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
-    //   'favourite topics ${favouriteTopics.map((e) => e.content).join(',')}',
-    //   analyticsMessage: 'favourite_topics',
-    //   analyticsParameters: {'topics': favouriteTopics.join(',')},
-    // );
-
-    LangameResponse res =
-        await Provider.of<MessageProvider>(context, listen: false)
-            .initializeMessageApi();
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var fp = Provider.of<FunnyProvider>(context, listen: false);
     cp.showLoadingDialog();
@@ -145,15 +133,13 @@ class _OnBoardingState extends State with AfterLayoutMixin {
       await Future.delayed(Duration(seconds: 2));
       cp.dialogComplete();
     };
-    cp.handleLangameResponse(res, onSucceed: () async {
       var pp = Provider.of<PreferenceProvider>(context, listen: false);
-      pp.preference.hasDoneOnBoarding = true;
+      pp.preference!.hasDoneOnBoarding = true;
       var r = await pp.save();
       cp.handleLangameResponse(r, onFailure: showFailure, onSucceed: () {
         cp.dialogComplete();
         cp.pushReplacement(MainView());
       });
-    }, onFailure: showFailure);
   }
 
   List<PageViewModel> _buildPageModels() => [
@@ -166,14 +152,14 @@ class _OnBoardingState extends State with AfterLayoutMixin {
               children: [
                 ListTile(
                   onTap: () =>
-                      p.setShakeToFeedback(!p.preference.shakeToFeedback),
+                      p.setShakeToFeedback(!p.preference!.shakeToFeedback),
                   leading: Icon(Icons.feedback_outlined),
                   title: Text('Shake-to-feedback',
                       style: Theme.of(context).textTheme.headline6),
                   trailing: Switch(
-                    value: p.preference.shakeToFeedback,
+                    value: p.preference!.shakeToFeedback,
                     onChanged: (v) =>
-                        p.setShakeToFeedback(!p.preference.shakeToFeedback),
+                        p.setShakeToFeedback(!p.preference!.shakeToFeedback),
                   ),
                 ),
                 !kIsWeb ? Lottie.asset(
@@ -195,14 +181,14 @@ class _OnBoardingState extends State with AfterLayoutMixin {
               children: [
                 ListTile(
                   onTap: () => p.setRecommendations(
-                      !p.preference.unknownPeopleRecommendations),
+                      !p.preference!.unknownPeopleRecommendations),
                   leading: Icon(Icons.recommend),
                   title: Text('Unknown user recommendations',
                       style: Theme.of(context).textTheme.headline6),
                   trailing: Switch(
-                    value: p.preference.unknownPeopleRecommendations,
+                    value: p.preference!.unknownPeopleRecommendations,
                     onChanged: (v) => p.setRecommendations(
-                        !p.preference.unknownPeopleRecommendations),
+                        !p.preference!.unknownPeopleRecommendations),
                   ),
                 ),
                 !kIsWeb ? Lottie.asset(

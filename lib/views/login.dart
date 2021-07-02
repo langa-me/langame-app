@@ -1,20 +1,16 @@
-import 'dart:io';
-
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/future.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pbenum.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
@@ -27,18 +23,18 @@ import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'buttons/apple.dart';
-import 'langame.dart';
 import 'main_view.dart';
 
-class Login extends StatefulWidget {
+class LoginView extends StatefulWidget {
   @override
-  _LoginState createState() => _LoginState();
+  _LoginViewState createState() => _LoginViewState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginViewState extends State<LoginView> {
   Future<void>? successDialogFuture;
   bool isAuthenticating = true;
   TextEditingController _hackControllerPassword = TextEditingController();
+  bool _isVersionCheckOk = false;
 
   @override
   void initState() {
@@ -54,9 +50,54 @@ class _LoginState extends State<Login> {
         // Wait until internet then
         await Connectivity().onConnectivityChanged.first;
       }
+      // Bunch of spaghetti code to check if it is a new user or already authenticated
+      ap.userStream.first.then((user) async {
+        // 10 seconds
+        await waitUntil(() => _isVersionCheckOk == true, maxIterations: 10000);
+        if (user.after == null || successDialogFuture != null) {
+          return null;
+        }
+        setState(() => isAuthenticating = true);
+
+        if (user.after!.disabled) {
+          cp.showFailureDialog(
+              'Unfortunately, your account has been disabled, please contact customer support');
+          await Future.delayed(Duration(seconds: 2));
+          cp.dialogComplete();
+          return;
+        }
+        // Once arriving on login page, if coming from a notification tap coming
+        // from a terminated state (app closed, have notification in bar)
+        // and the user is properly authenticated, will open directly langame view
+        // otherwise it will go to setup or friends according to auth state
+        cp.showSuccessDialog(
+            'Connected${user.after!.tag.isNotEmpty ? ' as ' : ''}${user.after!.tag}!');
+
+        // TODO: ultra hack to wait for pref update
+        await Future.delayed(Duration(milliseconds: 100));
+        var pp = Provider.of<PreferenceProvider>(context, listen: false);
+        await waitUntil(() => pp.preference != null);
+        // TODO: should probably quit if fail to initialize pref
+        if (pp.preference != null && pp.preference!.hasDoneOnBoarding) {
+          // Probably logged-out, skip message api init
+          var mp = Provider.of<MessageProvider>(context, listen: false);
+          await waitUntil(() => mp.isReady == true, maxIterations: 10000)
+              .catchError((_) =>
+                  // ignore: invalid_return_type_for_catch_error
+                  Provider.of<ContextProvider>(context, listen: false)
+                      .showFailureDialog(null));
+          // Just a check that we didn't open notification / DL
+          if (cp.route == LangameRoute.LoginView)
+            cp.pushReplacement(MainView());
+        } else {
+          // User previously authenticated but didn't do setup
+          // User is not opening the app from a notification
+          cp.pushReplacement(OnBoarding());
+        }
+      });
       // HACK TODO
       await Future.delayed(Duration(milliseconds: 100));
-      cp.showLoadingDialog(text: 'Checking version...');
+      cp.showLoadingDialog();
       final checkVersion = await ap.checkVersion();
       cp.dialogComplete();
       if (checkVersion.status == LangameStatus.failed) {
@@ -118,54 +159,18 @@ class _LoginState extends State<Login> {
               style: Theme.of(context).textTheme.headline3),
           height: 20,
         );
-        setState(() => isAuthenticating = false);
+        setState(() {
+          isAuthenticating = false;
+          _isVersionCheckOk = false;
+        });
         return;
+      } else {
+        setState(() {
+          _isVersionCheckOk = true;
+        });
       }
-      setState(() => isAuthenticating = false);
-
-      // Bunch of spaghetti code to check if it is a new user or already authenticated
-      ap.userStream.first.then((user) async {
-        cap.log('login - userStream');
-        if (user == null || successDialogFuture != null) {
-          return null;
-        }
-        setState(() => isAuthenticating = true);
-
-        if (user.disabled) {
-          cp.showFailureDialog(
-              'Unfortunately, your account has been disabled, please contact customer support');
-          await Future.delayed(Duration(seconds: 2));
-          cp.dialogComplete();
-          return;
-        }
-        Provider.of<LangameProvider>(context, listen: false).initialize();
-        // Once arriving on login page, if coming from a notification tap coming
-        // from a terminated state (app closed, have notification in bar)
-        // and the user is properly authenticated, will open directly langame view
-        // otherwise it will go to setup or friends according to auth state
-        var displayName =
-            user.displayName.isNotEmpty ? ' as ${user.displayName}' : '';
-        cp.showSuccessDialog('Connected$displayName!');
-        // Kind of hack to wait for preference update // TODO shouldn't need
-        await Future.delayed(Duration(seconds: 1));
-        var hasDoneOnBoarding =
-            Provider.of<PreferenceProvider>(context, listen: false)
-                .preference
-                .hasDoneOnBoarding;
-        if (hasDoneOnBoarding) {
-          // Probably logged-out, skip message api init
-          initMessageApi(
-              Provider.of<MessageProvider>(context, listen: false), cp);
-        } else {
-          // User previously authenticated but didn't do setup
-          Future.delayed(Duration(seconds: 1), () {
-            cp.pop();
-            // User is not opening the app from a notification
-            cp.pushReplacement(OnBoarding());
-          });
-        }
-      });
-      // TODO: fix button on/off according to state
+      if (cp.route == LangameRoute.LoginView)
+        setState(() => isAuthenticating = false);
     });
   }
 
@@ -280,36 +285,6 @@ class _LoginState extends State<Login> {
       ),
     );
   }
-
-  Future initMessageApi(MessageProvider mp, ContextProvider cp) =>
-      mp.initializeMessageApi().then((res) {
-        cp.handleLangameResponse(res,
-            failedMessage: res.error
-                    .toString()
-                    .contains('firebase_functions/unavailable')
-                ? 'Could not authenticate, please check your internet connection'
-                : !kReleaseMode
-                    ? 'failed to initializeMessageApi ${res.error.toString()}'
-                    : Provider.of<FunnyProvider>(context, listen: false)
-                        .getFailingRandom(),
-            onSucceed: () async {
-              cp.dialogComplete();
-              var messages = await mp.getInitialMessage();
-              cp.handleLangameResponse(messages, onSucceed: () async {
-                await Provider.of<DynamicLinksProvider>(context, listen: false)
-                    .setupAndCheckDynamicLinks();
-                // Note that we ignore failures in dynamic link initialization
-                if (messages.result != null) {
-                  cp.pushReplacement(
-                      LangameView(messages.result!.channelName, false));
-                } else {
-                  cp.pushReplacement(MainView());
-                  // User is not opening the app from a notification
-                }
-              });
-            },
-            onFailure: () => cp.dialogComplete());
-      });
 
   Future _handleOnPressedLogin(
       Future<LangameResponse<void>> Function() fn, String entity) async {

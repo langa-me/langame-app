@@ -253,7 +253,6 @@ class _LangameViewState extends State<LangameView> {
                           Provider.of<ContextProvider>(context, listen: false);
                       cp.showCustomStatefulDialog(
                           stateful: (c, s) {
-                            bool isLocked = l.isLocked;
                             IconData icon = l.isLocked
                                 ? FontAwesomeIcons.lock
                                 : FontAwesomeIcons.lockOpen;
@@ -261,20 +260,6 @@ class _LangameViewState extends State<LangameView> {
                             String txt = l.isLocked ? 'Unlock' : 'Lock';
                             return Column(children: [
                               Consumer<LangameProvider>(builder: (c, lp, _) {
-                                // waitUntil(() => l.isLocked != isLocked,
-                                //         maxIterations: 1000)
-                                //     .then((_) => s(() {
-                                //           print('fujkc');
-                                //           icon = l.isLocked
-                                //               ? FontAwesomeIcons.lock
-                                //               : FontAwesomeIcons.lockOpen;
-                                //           iconColor = l.isLocked &&
-                                //                   lp.canLock != null
-                                //               ? Colors.red
-                                //               : getBlackAndWhite(context, 1);
-                                //           txt = l.isLocked ? 'Unlock' : 'Lock';
-                                //         }));
-
                                 var onTap = () => !l.hasIsLocked()
                                     ? cp.showSnackBar(
                                         'The Langame is full, initially invited people can still join')

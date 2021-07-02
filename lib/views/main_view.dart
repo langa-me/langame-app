@@ -33,7 +33,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .setCurrentScreen('main_view');
     Provider.of<AudioProvider>(context, listen: false).leaveChannel();
-
   }
 
   @override

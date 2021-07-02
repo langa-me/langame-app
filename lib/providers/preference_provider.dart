@@ -24,21 +24,21 @@ class PreferenceProvider extends ChangeNotifier {
   Stream<UserPreference>? _stream;
   // ignore: cancel_subscriptions
   StreamSubscription<UserPreference>? _streamSubscription;
-  UserPreference _preference = PreferenceService.defaultPreference;
-  UserPreference get preference => _preference;
+  UserPreference? _preference;
+  UserPreference? get preference => _preference;
 
   setTheme(ThemeMode t) {
-    _preference.themeIndex = t.index;
+    _preference?.themeIndex = t.index;
     notifyListeners();
   }
 
   setShakeToFeedback(bool value) {
-    _preference.shakeToFeedback = value;
+    _preference?.shakeToFeedback = value;
     notifyListeners();
   }
 
   setRecommendations(bool v) {
-    _preference.unknownPeopleRecommendations = v;
+    _preference?.unknownPeopleRecommendations = v;
     notifyListeners();
   }
 
@@ -65,35 +65,43 @@ class PreferenceProvider extends ChangeNotifier {
 
   PreferenceProvider(this.firebase, this._cap, this._ap) {
     this._api = ImplPreferenceService(this.firebase);
-  }
-
-  void init() {
-    _api.tryFetchFromLocalStorage().then((p) {
-      if (p != null) {
-        _preference = p;
-        notifyListeners();
+    // _api.tryFetchFromLocalStorage().then((p) {
+    //   if (p != null) {
+    //     _preference = p;
+    //     notifyListeners();
+    //   }
+    // });
+    // TODO: idc about local storage?
+    _ap.userStream.listen((e) {
+      if (e.type == UserChangeType.NewAuthentication) {
+        _stream = _api.streamPreference(e.after!);
+        _streamSubscription = _stream!.listen((p) {
+          _cap.log('streamPreference');
+          _preference = p;
+          notifyListeners();
+        });
+      } else if (e.type == UserChangeType.Disconnection) {
+        _streamSubscription?.cancel();
+        _stream?.drain(); // TODO: necessary?
+        _stream = null;
+        _streamSubscription = null;
+        _preference = null;
       }
     });
-    _streamSubscription?.cancel();
-    if (_ap.user == null) return;
-
-    _stream = _api.streamPreference(_ap.user!);
-    _streamSubscription = _stream!.listen((p) {
-      _cap.log('streamPreference');
-      _preference = p;
-      notifyListeners();
-    });
+    _preference =
+        _preference == null ? PreferenceService.defaultPreference : _preference;
+    notifyListeners();
   }
 
   Future<LangameResponse> save() async {
     try {
       if (_ap.user == null) return LangameResponse(LangameStatus.succeed);
-      await _api.savePreference(_ap.user!.uid, _preference);
+      await _api.savePreference(_ap.user!.uid, _preference!);
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
-        'shakeToFeedback': preference.shakeToFeedback,
-        'hasDoneOnBoarding': preference.hasDoneOnBoarding,
-        'unknownPeopleRecommendations': preference.unknownPeopleRecommendations,
-        'themeIndex': preference.themeIndex,
+        'shakeToFeedback': preference!.shakeToFeedback,
+        'hasDoneOnBoarding': preference!.hasDoneOnBoarding,
+        'unknownPeopleRecommendations': preference!.unknownPeopleRecommendations,
+        'themeIndex': preference!.themeIndex,
       });
       _cap.log('save preference');
     } catch (e, s) {
@@ -105,11 +113,11 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   void addSearchHistory(String tag) {
-    _preference.searchHistory.add(tag);
-    if (_preference.searchHistory.length > _historyLength) {
-      for (var i = _preference.searchHistory.length; i > _historyLength; i--) {
-        _preference.searchHistory
-            .remove(_preference.searchHistory.elementAt(i));
+    _preference!.searchHistory.add(tag);
+    if (_preference!.searchHistory.length > _historyLength) {
+      for (var i = _preference!.searchHistory.length; i > _historyLength; i--) {
+        _preference!.searchHistory
+            .remove(_preference!.searchHistory.elementAt(i));
       }
     }
     _cap.log('addSearchHistory');
@@ -122,14 +130,14 @@ class PreferenceProvider extends ChangeNotifier {
   void placeFirstSearchHistory(String tag) {
     _cap.log('placeFirstSearchHistory');
 
-    _preference.searchHistory.removeWhere((e) => e == tag);
-    _preference.searchHistory.add(tag);
+    _preference!.searchHistory.removeWhere((e) => e == tag);
+    _preference!.searchHistory.add(tag);
   }
 
   void deleteSearchHistory(String tag) {
     _cap.log('deleteSearchHistory');
 
-    _preference.searchHistory.removeWhere((e) => e == tag);
+    _preference!.searchHistory.removeWhere((e) => e == tag);
     _filteredTagSearchHistory.removeWhere((e) => e == tag);
     notifyListeners();
     firebase.analytics
@@ -139,7 +147,7 @@ class PreferenceProvider extends ChangeNotifier {
   void resetFilteredSearchTagHistory() {
     _cap.log('resetFilteredSearchTagHistory');
 
-    _filteredTagSearchHistory = _preference.searchHistory;
+    _filteredTagSearchHistory = _preference!.searchHistory;
     notifyListeners();
   }
 }
