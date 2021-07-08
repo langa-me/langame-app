@@ -1,12 +1,16 @@
 import {Change, EventContext} from "firebase-functions";
-import {kTagsCollection} from "./helpers";
-import {docRefHandleError} from "./utils/firestore";
+import {kTagsCollection} from "../helpers";
+import {docRefHandleError} from "../utils/firestore";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
 export const onWriteTag = async (
     change: Change<admin.firestore.DocumentSnapshot>,
-    _: EventContext) => {
+    ctx: EventContext) => {
+  // if (ctx.eventType === "google.firestore.document.create") {
+  //
+  // }
+  // TODO: should also compute and set the prompt fitness
   // Basically if the change is a creation of feedback tag
   // or a feedback tag has been updated
   if (change.before.data() == null &&

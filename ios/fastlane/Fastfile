@@ -64,9 +64,8 @@ platform :ios do
     pilot(
       apple_id: "#{DEVELOPER_APP_ID}",
       app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
-      skip_waiting_for_build_processing: true,
-      skip_submission: true,
-      distribute_external: false,
+      skip_waiting_for_build_processing: false,
+      skip_submission: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
       changelog: "- Now opening a Langame link or notification when the application is in background or stopped properly open the Langame.

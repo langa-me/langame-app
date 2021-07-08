@@ -11,6 +11,7 @@ message Meme {
   google.protobuf.Timestamp created_at = 1;
   string content = 2;
   repeated Tag tags = 4;
+  string prompt_id = 5;
 }
 
 // Tag associated to a question, for example, representing a meaning, "philosophy"
@@ -21,7 +22,7 @@ message Tag {
   oneof type {
     Topic topic = 2;
     Classification classification = 3;
-    Origin origin = 4;
+    Engine engine = 4;
     // User feedback on a question, note, score etc.. (See Airbnb style XD)
     Feedback feedback = 5;
     Context context = 6;
@@ -41,15 +42,18 @@ message Tag {
     // Model, version ...
   }
 
-  message Origin {
-    oneof type {
-      OpenAI openai = 2;
+  message Engine {
+    Parameters parameters = 1;
+    message Parameters {
+        double temperature = 1;
+        uint32 max_tokens = 2;
+        uint32 top_p = 3;
+        double frequency_penalty = 4;
+        double presence_penalty = 5;
+        repeated string stop = 6;
+        string model = 7;
     }
-
-    message OpenAI {
-      uint32 version = 1;
-    }
-  }
+}
 
   message Feedback {
     string user_id = 1;
@@ -226,4 +230,19 @@ message FunctionResponse {
       RETRO_COMPATIBLE = 2;
     }
   }
+}
+
+message Prompt {
+  // Type corresponds to the Input.type name
+  string type = 1;
+  // i.e. "This is a conversation starter on [TOPIC]"
+  string template = 2;
+  repeated Tag tags = 3;
+}
+
+enum FirestoreCollection {
+  USERS = 0;
+  MEMES = 1;
+  PROMPTS = 2;
+  LANGAMES = 3;
 }
