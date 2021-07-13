@@ -73,8 +73,8 @@ class UserExt {
       lastLogout: dynamicToProtobufTimestamp(m['lastLogout']),
       creationTime: dynamicToProtobufTimestamp(m['creationTime']),
       disabled: m['disabled'],
-      devices: (m['devices'] as List<dynamic>?)
-          ?.map((e) => DeviceExt.fromObject(e)),
+      devices:
+          (m['devices'] as List<dynamic>?)?.map((e) => DeviceExt.fromObject(e)),
     );
   }
 
@@ -204,7 +204,7 @@ class TagExt {
       classification: m['classification'] != null
           ? TagClassificationExt.fromObject(m['classification'])
           : null,
-      origin: m['origin'] != null ? TagOriginExt.fromObject(m['origin']) : null,
+      engine: m['engine'] != null ? TagEngineExt.fromObject(m['origin']) : null,
       feedback: m['feedback'] != null
           ? TagFeedbackExt.fromObject(m['feedback'])
           : null,
@@ -235,12 +235,20 @@ class TagClassificationExt {
   }
 }
 
-class TagOriginExt {
-  static lg.Tag_Origin fromObject(Object o) {
+class TagEngineExt {
+  static lg.Tag_Engine fromObject(Object o) {
     var m = o as Map<String, dynamic>;
-    return lg.Tag_Origin(
-        openai: m['openai'] != null
-            ? lg.Tag_Origin_OpenAI(version: m['openai']!['version'])
+    return lg.Tag_Engine(
+        parameters: m['parameters'] != null
+            ? lg.Tag_Engine_Parameters(
+                temperature: m['parameters']!['temperature'],
+                maxTokens: m['parameters']!['maxTokens'],
+                topP: m['parameters']!['topP'],
+                frequencyPenalty: m['parameters']!['frequencyPenalty'],
+                presencePenalty: m['parameters']!['presencePenalty'],
+                stop: m['parameters']!['stop'],
+                model: m['parameters']!['model'],
+              )
             : null);
   }
 }

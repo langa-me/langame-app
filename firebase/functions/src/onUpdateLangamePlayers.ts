@@ -17,7 +17,8 @@ export const onUpdateLangamePlayers =
       _: EventContext) => {
     try {
       functions.logger.log("onUpdateLangamePlayers", change.after);
-
+      // Deleted?
+      if (!change.after.exists || !change.after.ref.parent.parent) return;
       await admin.firestore().runTransaction(async (t) => {
         const lgAfter =
           await t.get(change.after.ref.parent.parent!

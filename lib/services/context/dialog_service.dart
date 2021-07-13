@@ -16,7 +16,9 @@ class DialogService {
 
   /// Completes the _dialogCompleter to resume the Future's execution call
   void dialogComplete() {
-    _navigationKey.currentState!.pop();
+    if (_navigationKey.currentState!.canPop()) {
+      _navigationKey.currentState!.pop();
+    }
     _dialogCompleter?.complete();
     _dialogCompleter = null;
   }

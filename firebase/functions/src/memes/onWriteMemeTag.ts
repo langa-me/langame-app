@@ -1,12 +1,16 @@
 import {Change, EventContext} from "firebase-functions";
-import {kTagsCollection} from "./helpers";
-import {docRefHandleError} from "./utils/firestore";
+import {kTagsCollection} from "../helpers";
+import {docRefHandleError} from "../utils/firestore";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
-export const onWriteTag = async (
+export const onWriteMemeTag = async (
     change: Change<admin.firestore.DocumentSnapshot>,
-    _: EventContext) => {
+    ctx: EventContext) => {
+  // if (ctx.eventType === "google.firestore.document.create") {
+  //
+  // }
+  // TODO: should also compute and set the prompt fitness
   // Basically if the change is a creation of feedback tag
   // or a feedback tag has been updated
   if (change.before.data() == null &&
@@ -17,7 +21,7 @@ export const onWriteTag = async (
         change.after.data() != null &&
         change.after.data()!.feedback) {
     try {
-      functions.logger.log("onWriteTag", change.after);
+      functions.logger.log("onWriteMemeTag", change.after);
       await admin.firestore().runTransaction(async (t) => {
         // Now we want to compute the new meme aggregated score accordingly
         const aggregatedFeedbackGeneral =
@@ -31,8 +35,9 @@ export const onWriteTag = async (
             .where("aggregatedFeedback.relevance.score", ">", 0));
         const relevanceScore = change.after.data()!.feedback?.general?.score;
 
+        const promises: Promise<any>[] = [];
         if (aggregatedFeedbackGeneral.empty) {
-          change.after.ref.parent.parent!
+          promises.push(change.after.ref.parent.parent!
               .collection(kTagsCollection)
               .add({
                 aggregatedFeedback: {
@@ -40,7 +45,7 @@ export const onWriteTag = async (
                     score: generalScore ?? 0,
                   },
                 },
-              });
+              }));
         } else {
           t.set(aggregatedFeedbackGeneral.docs[0].ref,
               {
@@ -55,7 +60,7 @@ export const onWriteTag = async (
 
 
         if (aggregatedFeedbackRelevance.empty) {
-          change.after.ref.parent.parent!
+          promises.push(change.after.ref.parent.parent!
               .collection(kTagsCollection)
               .add({
                 aggregatedFeedback: {
@@ -63,7 +68,7 @@ export const onWriteTag = async (
                     score: relevanceScore ?? 0,
                   },
                 },
-              });
+              }));
         } else {
           t.set(aggregatedFeedbackRelevance.docs[0].ref,
               {
@@ -75,6 +80,7 @@ export const onWriteTag = async (
                 },
               }, {merge: true});
         }
+        return Promise.all(promises);
       });
     } catch (e) {
       await Promise.all(docRefHandleError(

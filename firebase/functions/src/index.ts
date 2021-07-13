@@ -11,15 +11,16 @@ import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
 import {confirmStripePayment} from "./stripe/confirmStripePayment";
 import {createStripeCustomer} from "./stripe/createStripeCustomer";
 import {kLangamesCollection,
-  kMemesCollection,
   kStripeCustomersCollection} from "./helpers";
 import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
-import {onWriteTag} from "./onWriteTag";
+import {onWriteMemeTag} from "./memes/onWriteMemeTag";
 import {onUpdateLangame} from "./onUpdateLangame";
 import {onCreateAuthentication} from "./onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
+import {langame} from "./langame/protobuf/langame";
+import {onCreateMeme} from "./memes/onCreateMeme";
 
 /*
  admin.auth() // TODO: should kick everyone,
@@ -130,6 +131,13 @@ exports.onCreateAuthentication =
 
 // Meme //
 
-exports.onWriteTags =
-    functions.firestore.document(`${kMemesCollection}/{memeId}/tags/{tagId}`)
-        .onWrite(onWriteTag);
+// eslint-disable-next-line max-len
+const memesCollection = langame.protobuf.FirestoreCollection[langame.protobuf.FirestoreCollection.MEMES].toLowerCase();
+
+exports.onWriteMemeTag =
+    functions.firestore.document(`${memesCollection}/{memeId}/tags/{tagId}`)
+        .onWrite(onWriteMemeTag);
+
+exports.onCreateMeme =
+    functions.firestore.document(`${memesCollection}/{memeId}`)
+        .onCreate(onCreateMeme);

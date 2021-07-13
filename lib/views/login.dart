@@ -146,9 +146,12 @@ class _LoginViewState extends State<LoginView> {
                           : UniversalPlatform.isIOS
                               ? AppConst.testFlightUrl
                               : null;
-                      if (await canLaunch(url!)) {
-                        await launch(url);
-                      }
+                      canLaunch(url!).then((e) {
+                        if (e) launch(url);
+                      }).catchError((e) {
+                        cp.showFailureDialog(
+                            'An error has occurred, please update your application manually');
+                      });
                     },
                     highlighted: true,
                   )

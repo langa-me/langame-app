@@ -6,6 +6,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
 import {langame} from "./langame/protobuf/langame";
+const satisfies = require("semver/functions/satisfies");
 const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
     {
       name: "per_user_limiter",
@@ -43,12 +44,8 @@ export const versionCheck = async (
   const t = await admin.remoteConfig().getTemplate();
   // @ts-ignore
   const langameVersion = t.parameters.langame_version.defaultValue.value;
-
-  // TODO: might fail if client send garbage
-  // eslint-disable-next-line no-unused-vars
-  const version = data.version.split("+")[0];
-  // Naive for now, hard check
-  if (version !== langameVersion.split("+")[0]) {
+  // TODO: test
+  if (!satisfies(data.version, langameVersion)) {
     return new langame.protobuf.FunctionResponse({
       versionCheck: new langame.protobuf.FunctionResponse.VersionCheck({
         update:

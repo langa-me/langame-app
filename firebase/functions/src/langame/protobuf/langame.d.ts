@@ -16,6 +16,9 @@ export namespace langame {
 
             /** Meme tags */
             tags?: (langame.protobuf.ITag[]|null);
+
+            /** Meme promptId */
+            promptId?: (string|null);
         }
 
         /** Represents a Meme. */
@@ -35,6 +38,9 @@ export namespace langame {
 
             /** Meme tags. */
             public tags: langame.protobuf.ITag[];
+
+            /** Meme promptId. */
+            public promptId: string;
 
             /**
              * Creates a new Meme instance using the specified properties.
@@ -119,8 +125,8 @@ export namespace langame {
             /** Tag classification */
             classification?: (langame.protobuf.Tag.IClassification|null);
 
-            /** Tag origin */
-            origin?: (langame.protobuf.Tag.IOrigin|null);
+            /** Tag engine */
+            engine?: (langame.protobuf.Tag.IEngine|null);
 
             /** Tag feedback */
             feedback?: (langame.protobuf.Tag.IFeedback|null);
@@ -150,8 +156,8 @@ export namespace langame {
             /** Tag classification. */
             public classification?: (langame.protobuf.Tag.IClassification|null);
 
-            /** Tag origin. */
-            public origin?: (langame.protobuf.Tag.IOrigin|null);
+            /** Tag engine. */
+            public engine?: (langame.protobuf.Tag.IEngine|null);
 
             /** Tag feedback. */
             public feedback?: (langame.protobuf.Tag.IFeedback|null);
@@ -163,7 +169,7 @@ export namespace langame {
             public aggregatedFeedback?: (langame.protobuf.Tag.IFeedback|null);
 
             /** Tag type. */
-            public type?: ("topic"|"classification"|"origin"|"feedback"|"context"|"aggregatedFeedback");
+            public type?: ("topic"|"classification"|"engine"|"feedback"|"context"|"aggregatedFeedback");
 
             /**
              * Creates a new Tag instance using the specified properties.
@@ -436,186 +442,219 @@ export namespace langame {
                 public toJSON(): { [k: string]: any };
             }
 
-            /** Properties of an Origin. */
-            interface IOrigin {
+            /** Properties of an Engine. */
+            interface IEngine {
 
-                /** Origin openai */
-                openai?: (langame.protobuf.Tag.Origin.IOpenAI|null);
+                /** Engine parameters */
+                parameters?: (langame.protobuf.Tag.Engine.IParameters|null);
             }
 
-            /** Represents an Origin. */
-            class Origin implements IOrigin {
+            /** Represents an Engine. */
+            class Engine implements IEngine {
 
                 /**
-                 * Constructs a new Origin.
+                 * Constructs a new Engine.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: langame.protobuf.Tag.IOrigin);
+                constructor(properties?: langame.protobuf.Tag.IEngine);
 
-                /** Origin openai. */
-                public openai?: (langame.protobuf.Tag.Origin.IOpenAI|null);
-
-                /** Origin type. */
-                public type?: "openai";
+                /** Engine parameters. */
+                public parameters?: (langame.protobuf.Tag.Engine.IParameters|null);
 
                 /**
-                 * Creates a new Origin instance using the specified properties.
+                 * Creates a new Engine instance using the specified properties.
                  * @param [properties] Properties to set
-                 * @returns Origin instance
+                 * @returns Engine instance
                  */
-                public static create(properties?: langame.protobuf.Tag.IOrigin): langame.protobuf.Tag.Origin;
+                public static create(properties?: langame.protobuf.Tag.IEngine): langame.protobuf.Tag.Engine;
 
                 /**
-                 * Encodes the specified Origin message. Does not implicitly {@link langame.protobuf.Tag.Origin.verify|verify} messages.
-                 * @param message Origin message or plain object to encode
+                 * Encodes the specified Engine message. Does not implicitly {@link langame.protobuf.Tag.Engine.verify|verify} messages.
+                 * @param message Engine message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: langame.protobuf.Tag.IOrigin, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: langame.protobuf.Tag.IEngine, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified Origin message, length delimited. Does not implicitly {@link langame.protobuf.Tag.Origin.verify|verify} messages.
-                 * @param message Origin message or plain object to encode
+                 * Encodes the specified Engine message, length delimited. Does not implicitly {@link langame.protobuf.Tag.Engine.verify|verify} messages.
+                 * @param message Engine message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: langame.protobuf.Tag.IOrigin, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: langame.protobuf.Tag.IEngine, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Decodes an Origin message from the specified reader or buffer.
+                 * Decodes an Engine message from the specified reader or buffer.
                  * @param reader Reader or buffer to decode from
                  * @param [length] Message length if known beforehand
-                 * @returns Origin
+                 * @returns Engine
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Tag.Origin;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Tag.Engine;
 
                 /**
-                 * Decodes an Origin message from the specified reader or buffer, length delimited.
+                 * Decodes an Engine message from the specified reader or buffer, length delimited.
                  * @param reader Reader or buffer to decode from
-                 * @returns Origin
+                 * @returns Engine
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Tag.Origin;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Tag.Engine;
 
                 /**
-                 * Verifies an Origin message.
+                 * Verifies an Engine message.
                  * @param message Plain object to verify
                  * @returns `null` if valid, otherwise the reason why it is not
                  */
                 public static verify(message: { [k: string]: any }): (string|null);
 
                 /**
-                 * Creates an Origin message from a plain object. Also converts values to their respective internal types.
+                 * Creates an Engine message from a plain object. Also converts values to their respective internal types.
                  * @param object Plain object
-                 * @returns Origin
+                 * @returns Engine
                  */
-                public static fromObject(object: { [k: string]: any }): langame.protobuf.Tag.Origin;
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.Tag.Engine;
 
                 /**
-                 * Creates a plain object from an Origin message. Also converts values to other types if specified.
-                 * @param message Origin
+                 * Creates a plain object from an Engine message. Also converts values to other types if specified.
+                 * @param message Engine
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: langame.protobuf.Tag.Origin, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: langame.protobuf.Tag.Engine, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
-                 * Converts this Origin to JSON.
+                 * Converts this Engine to JSON.
                  * @returns JSON object
                  */
                 public toJSON(): { [k: string]: any };
             }
 
-            namespace Origin {
+            namespace Engine {
 
-                /** Properties of an OpenAI. */
-                interface IOpenAI {
+                /** Properties of a Parameters. */
+                interface IParameters {
 
-                    /** OpenAI version */
-                    version?: (number|null);
+                    /** Parameters temperature */
+                    temperature?: (number|null);
+
+                    /** Parameters maxTokens */
+                    maxTokens?: (number|null);
+
+                    /** Parameters topP */
+                    topP?: (number|null);
+
+                    /** Parameters frequencyPenalty */
+                    frequencyPenalty?: (number|null);
+
+                    /** Parameters presencePenalty */
+                    presencePenalty?: (number|null);
+
+                    /** Parameters stop */
+                    stop?: (string[]|null);
+
+                    /** Parameters model */
+                    model?: (string|null);
                 }
 
-                /** Represents an OpenAI. */
-                class OpenAI implements IOpenAI {
+                /** Represents a Parameters. */
+                class Parameters implements IParameters {
 
                     /**
-                     * Constructs a new OpenAI.
+                     * Constructs a new Parameters.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: langame.protobuf.Tag.Origin.IOpenAI);
+                    constructor(properties?: langame.protobuf.Tag.Engine.IParameters);
 
-                    /** OpenAI version. */
-                    public version: number;
+                    /** Parameters temperature. */
+                    public temperature: number;
+
+                    /** Parameters maxTokens. */
+                    public maxTokens: number;
+
+                    /** Parameters topP. */
+                    public topP: number;
+
+                    /** Parameters frequencyPenalty. */
+                    public frequencyPenalty: number;
+
+                    /** Parameters presencePenalty. */
+                    public presencePenalty: number;
+
+                    /** Parameters stop. */
+                    public stop: string[];
+
+                    /** Parameters model. */
+                    public model: string;
 
                     /**
-                     * Creates a new OpenAI instance using the specified properties.
+                     * Creates a new Parameters instance using the specified properties.
                      * @param [properties] Properties to set
-                     * @returns OpenAI instance
+                     * @returns Parameters instance
                      */
-                    public static create(properties?: langame.protobuf.Tag.Origin.IOpenAI): langame.protobuf.Tag.Origin.OpenAI;
+                    public static create(properties?: langame.protobuf.Tag.Engine.IParameters): langame.protobuf.Tag.Engine.Parameters;
 
                     /**
-                     * Encodes the specified OpenAI message. Does not implicitly {@link langame.protobuf.Tag.Origin.OpenAI.verify|verify} messages.
-                     * @param message OpenAI message or plain object to encode
+                     * Encodes the specified Parameters message. Does not implicitly {@link langame.protobuf.Tag.Engine.Parameters.verify|verify} messages.
+                     * @param message Parameters message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: langame.protobuf.Tag.Origin.IOpenAI, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: langame.protobuf.Tag.Engine.IParameters, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified OpenAI message, length delimited. Does not implicitly {@link langame.protobuf.Tag.Origin.OpenAI.verify|verify} messages.
-                     * @param message OpenAI message or plain object to encode
+                     * Encodes the specified Parameters message, length delimited. Does not implicitly {@link langame.protobuf.Tag.Engine.Parameters.verify|verify} messages.
+                     * @param message Parameters message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: langame.protobuf.Tag.Origin.IOpenAI, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: langame.protobuf.Tag.Engine.IParameters, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Decodes an OpenAI message from the specified reader or buffer.
+                     * Decodes a Parameters message from the specified reader or buffer.
                      * @param reader Reader or buffer to decode from
                      * @param [length] Message length if known beforehand
-                     * @returns OpenAI
+                     * @returns Parameters
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Tag.Origin.OpenAI;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Tag.Engine.Parameters;
 
                     /**
-                     * Decodes an OpenAI message from the specified reader or buffer, length delimited.
+                     * Decodes a Parameters message from the specified reader or buffer, length delimited.
                      * @param reader Reader or buffer to decode from
-                     * @returns OpenAI
+                     * @returns Parameters
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Tag.Origin.OpenAI;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Tag.Engine.Parameters;
 
                     /**
-                     * Verifies an OpenAI message.
+                     * Verifies a Parameters message.
                      * @param message Plain object to verify
                      * @returns `null` if valid, otherwise the reason why it is not
                      */
                     public static verify(message: { [k: string]: any }): (string|null);
 
                     /**
-                     * Creates an OpenAI message from a plain object. Also converts values to their respective internal types.
+                     * Creates a Parameters message from a plain object. Also converts values to their respective internal types.
                      * @param object Plain object
-                     * @returns OpenAI
+                     * @returns Parameters
                      */
-                    public static fromObject(object: { [k: string]: any }): langame.protobuf.Tag.Origin.OpenAI;
+                    public static fromObject(object: { [k: string]: any }): langame.protobuf.Tag.Engine.Parameters;
 
                     /**
-                     * Creates a plain object from an OpenAI message. Also converts values to other types if specified.
-                     * @param message OpenAI
+                     * Creates a plain object from a Parameters message. Also converts values to other types if specified.
+                     * @param message Parameters
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: langame.protobuf.Tag.Origin.OpenAI, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: langame.protobuf.Tag.Engine.Parameters, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
-                     * Converts this OpenAI to JSON.
+                     * Converts this Parameters to JSON.
                      * @returns JSON object
                      */
                     public toJSON(): { [k: string]: any };
@@ -2523,6 +2562,116 @@ export namespace langame {
                     RETRO_COMPATIBLE = 2
                 }
             }
+        }
+
+        /** Properties of a Prompt. */
+        interface IPrompt {
+
+            /** Prompt type */
+            type?: (string|null);
+
+            /** Prompt template */
+            template?: (string|null);
+
+            /** Prompt tags */
+            tags?: (langame.protobuf.ITag[]|null);
+        }
+
+        /** Represents a Prompt. */
+        class Prompt implements IPrompt {
+
+            /**
+             * Constructs a new Prompt.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: langame.protobuf.IPrompt);
+
+            /** Prompt type. */
+            public type: string;
+
+            /** Prompt template. */
+            public template: string;
+
+            /** Prompt tags. */
+            public tags: langame.protobuf.ITag[];
+
+            /**
+             * Creates a new Prompt instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Prompt instance
+             */
+            public static create(properties?: langame.protobuf.IPrompt): langame.protobuf.Prompt;
+
+            /**
+             * Encodes the specified Prompt message. Does not implicitly {@link langame.protobuf.Prompt.verify|verify} messages.
+             * @param message Prompt message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: langame.protobuf.IPrompt, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Prompt message, length delimited. Does not implicitly {@link langame.protobuf.Prompt.verify|verify} messages.
+             * @param message Prompt message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: langame.protobuf.IPrompt, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Prompt message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Prompt
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Prompt;
+
+            /**
+             * Decodes a Prompt message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Prompt
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Prompt;
+
+            /**
+             * Verifies a Prompt message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Prompt message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Prompt
+             */
+            public static fromObject(object: { [k: string]: any }): langame.protobuf.Prompt;
+
+            /**
+             * Creates a plain object from a Prompt message. Also converts values to other types if specified.
+             * @param message Prompt
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: langame.protobuf.Prompt, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Prompt to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+
+        /** FirestoreCollection enum. */
+        enum FirestoreCollection {
+            USERS = 0,
+            MEMES = 1,
+            PROMPTS = 2,
+            LANGAMES = 3
         }
     }
 }

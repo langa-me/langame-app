@@ -27,11 +27,13 @@
     "@google-cloud/logging": "^9.2.3",
     "@octokit/rest": "^18.5.2",
     "agora-access-token": "^2.0.1",
+    "algoliasearch": "^4.10.3",
     "firebase-admin": "^9.9.0",
     "firebase-functions": "^3.14.1",
     "firebase-functions-rate-limiter": "^3.8.3",
     "mailchimp-api-v3": "^1.15.0",
     "node-fetch": "^2.6.1",
+    "semver": "^7.3.5",
     "stripe": "^8.148.0"
   },
   "devDependencies": {
