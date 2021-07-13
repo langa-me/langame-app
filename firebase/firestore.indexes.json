@@ -2,13 +2,6 @@
   "indexes": [
     {
       "collectionGroup": "tags",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "topic.content", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "tags",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         { "fieldPath": "topic.content", "order": "ASCENDING" },

@@ -33,27 +33,16 @@ export const setLangamesDone =
       const db = admin.firestore();
       const HOUR = 4 * 1000 * 60 * 60;
       const anHourAgo = new Date(Date.now() - HOUR);
-      // TODO: delete non-started too old ones?
       try {
-        db.runTransaction(async (t) => {
-          const langamesThatStartedMoreThanOneHourAgo = await t.get(db
+        return db.runTransaction(async (t) => {
+          const langamesOlderThanOneHourAgo = await t.get(db
               .collection(kLangamesCollection)
-              .where("done", "==", null)
-              .where("started",
+              .where("date",
                   "<",
                   admin.firestore.Timestamp.fromDate(anHourAgo))
               .withConverter(converter<langame.protobuf.Langame>()));
 
-          for (const doc of langamesThatStartedMoreThanOneHourAgo.docs) {
-            // const players = await t.get(doc.ref.collection("players")
-            //     .withConverter(converter<langame.protobuf.Player>()));
-            // // TODO: does not work if player does not signal
-            // // time out properly obviously
-            // const isEmpty =
-            // players.docs
-            //     .filter((e) => e.data().timeOut !== undefined).length ===
-            // players.docs.length;
-            // if (!isEmpty) continue;
+          for (const doc of langamesOlderThanOneHourAgo.docs) {
             t.update(doc.ref, {
               done: admin.firestore.FieldValue.serverTimestamp(),
             });
@@ -62,6 +51,6 @@ export const setLangamesDone =
           }
         });
       } catch (e) {
-        reportError(e);
+        return reportError(e);
       }
     };

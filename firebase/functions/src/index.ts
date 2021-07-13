@@ -15,7 +15,7 @@ import {kLangamesCollection,
 import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
-import {onWriteTag} from "./memes/onWriteTag";
+import {onWriteMemeTag} from "./memes/onWriteMemeTag";
 import {onUpdateLangame} from "./onUpdateLangame";
 import {onCreateAuthentication} from "./onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
@@ -134,9 +134,9 @@ exports.onCreateAuthentication =
 // eslint-disable-next-line max-len
 const memesCollection = langame.protobuf.FirestoreCollection[langame.protobuf.FirestoreCollection.MEMES].toLowerCase();
 
-exports.onWriteTags =
+exports.onWriteMemeTag =
     functions.firestore.document(`${memesCollection}/{memeId}/tags/{tagId}`)
-        .onWrite(onWriteTag);
+        .onWrite(onWriteMemeTag);
 
 exports.onCreateMeme =
     functions.firestore.document(`${memesCollection}/{memeId}`)

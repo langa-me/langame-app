@@ -10,6 +10,7 @@ firebase login
 firebase remoteconfig:get > remoteconfig.template.json
 ```
 
+
 ### Secrets
 
 ```bash

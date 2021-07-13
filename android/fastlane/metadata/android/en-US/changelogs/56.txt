@@ -1,0 +1,7 @@
+New:
+- Fixed a bug which, sometimes, turned the screen gray
+
+Known issues:
+- Launching URL does not work on some Android phones
+- Sharing does not work on some iPads
+- Usage of bluetooth headphones are not tested

@@ -38,7 +38,7 @@ platform :ios do
       git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
       readonly: true,
       keychain_name: keychain_name,
-      keychain_password: keychain_password 
+      keychain_password: keychain_password
     )
 
     gym(
@@ -47,7 +47,7 @@ platform :ios do
       scheme: "prod",
       export_method: "app-store",
       export_options: {
-        provisioningProfiles: { 
+        provisioningProfiles: {
             DEVELOPER_APP_ID => PROVISIONING_PROFILE_SPECIFIER
         }
       }
@@ -68,8 +68,13 @@ platform :ios do
       skip_submission: false,
       notify_external_testers: false,
       ipa: "./Runner.ipa",
-      changelog: "- Now opening a Langame link or notification when the application is in background or stopped properly open the Langame.
-      - You can now get the Langame share link from the Langame list (only the creator)",
+      changelog: "New:
+                  - Fixed a bug which, sometimes, turned the screen gray
+
+                  Known issues:
+                  - Launching URL does not work on some Android phones
+                  - Sharing does not work on some iPads
+                  - Usage of bluetooth headphones are not tested",
       distribute_external: true,
       groups: "Public",
     )

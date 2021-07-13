@@ -6,7 +6,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
 import {langame} from "./langame/protobuf/langame";
-const semverSatisfies = require("semver/functions/satisfies");
+const satisfies = require("semver/functions/satisfies");
 const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
     {
       name: "per_user_limiter",
@@ -45,7 +45,7 @@ export const versionCheck = async (
   // @ts-ignore
   const langameVersion = t.parameters.langame_version.defaultValue.value;
   // TODO: test
-  if (!semverSatisfies.satisfies(data.version, langameVersion)) {
+  if (!satisfies(data.version, langameVersion)) {
     return new langame.protobuf.FunctionResponse({
       versionCheck: new langame.protobuf.FunctionResponse.VersionCheck({
         update:
