@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -7,9 +6,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/helpers/future.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
@@ -105,6 +102,11 @@ class AuthenticationProvider extends ChangeNotifier {
               : UserChangeType.ProfileEdition,
           _user,
           newUser);
+      // First auth, hack to notify only after other dependencies have constructed
+      // if (_user == null) await Future.delayed(Duration(milliseconds: 1000));
+      if (_user == null) {
+        _onNewAuthentication();
+      }
       _userStream.add(change);
       _user = newUser;
       _cap.log('authentication_provider:${change.type}');
@@ -112,6 +114,41 @@ class AuthenticationProvider extends ChangeNotifier {
       await firebase.analytics?.setUserId(data.uid);
       notifyListeners();
     });
+  }
+
+  _onNewAuthentication() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    // Asynchronously, update devices information in db
+
+    final deviceInfo = UniversalPlatform.isAndroid
+        ? (await DeviceInfoPlugin().androidInfo).model
+        : UniversalPlatform.isIOS
+            ? (await DeviceInfoPlugin().iosInfo).utsname.machine
+            : null; // TODO other platforms not supported
+    bool newDevice = true;
+    for (var i = 0; i < _user!.devices.length; i++) {
+      if (_user!.devices[i].deviceInfo == deviceInfo) {
+        _user!.devices[i].langameVersion = _getLangameVersion(packageInfo);
+        newDevice = false;
+      }
+    }
+    if (newDevice) {
+      _user!.devices.add(
+        lg.User_Device(
+          langameVersion: _getLangameVersion(packageInfo),
+          deviceInfo: deviceInfo.toString(),
+        ),
+      );
+    }
+    await firebase.firestore!
+        .collection(AppConst.firestoreUsersCollection)
+        .doc(_user!.uid)
+        .withConverter<lg.User>(
+          fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
+        )
+        .set(lg.User(devices: _user!.devices), SetOptions(merge: true));
+    _cap.log('authentication_provider:updated devices');
   }
 
   Future<LangameResponse<void>> _loginWith(
@@ -135,12 +172,12 @@ class AuthenticationProvider extends ChangeNotifier {
         firebase.analytics?.logLogin();
         return LangameResponse(LangameStatus.succeed);
       }
+      var userDoc = await firebase.firestore!
+          .collection(AppConst.firestoreUsersCollection)
+          .doc(uc.user!.uid)
+          .get();
       // TODO: Temporary hack because above if doesn't work
-      if (!(await firebase.firestore!
-              .collection(AppConst.firestoreUsersCollection)
-              .doc(uc.user!.uid)
-              .get())
-          .exists) return LangameResponse(LangameStatus.succeed);
+      if (!userDoc.exists) return LangameResponse(LangameStatus.succeed);
 
       // If it's an existing user and it has some new data from auth
       // i.e. updated social profile maybe? Or simply
@@ -153,10 +190,6 @@ class AuthenticationProvider extends ChangeNotifier {
               uc.user!.displayName!.isNotEmpty
           ? uc.user!.displayName
           : null;
-      // TODO: not implemented
-      // var newPhoneNumber = _user != null && _user!.phoneNumber.isEmpty &&
-      //     data.phoneNumber != null &&
-      //     data.phoneNumber!.isNotEmpty ? data.phoneNumber : null;
       var newPhotoUrl = _user != null &&
               _user!.photoUrl.isEmpty &&
               uc.user!.photoURL != null &&
@@ -166,12 +199,12 @@ class AuthenticationProvider extends ChangeNotifier {
 
       var isGoogle = uc.credential!.providerId == 'google.com';
       var isApple = uc.credential!.providerId == 'apple.com';
-      await _authenticationApi.updateProfile(
-        displayName: newDisplayName,
-        photoURL: newPhotoUrl,
-        google: isGoogle,
-        apple: isApple,
-      );
+      await userDoc.reference.update({
+        'displayName': newDisplayName,
+        'photoUrl': newPhotoUrl,
+        'google': isGoogle,
+        'apple': isApple,
+      });
     } catch (e, s) {
       _cap.log('failed to authentication_provider:loginWith');
       _cap.recordError(e, s);
@@ -285,26 +318,43 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse> updateProfile(
-      {String? displayName,
-      String? photoURL,
-      String? newEmail,
-      String? tag,
-      List<String>? topics}) async {
+  Future<LangameResponse> updateTag(String tag) async {
     try {
-      await _authenticationApi.updateProfile(
-          displayName: displayName,
-          photoURL: photoURL,
-          newEmail: newEmail,
-          tag: tag,
-          topics: topics);
-      _cap.log('updateProfile');
+      var sameTag = await _authenticationApi.getLangameUsersStartingWithTag(
+          user!.tag, tag);
+      if (sameTag.map((e) => e.tag).contains(tag)) {
+        return LangameResponse(LangameStatus.failed,
+            error: 'tag_already_exist');
+      }
+      await firebase.firestore!
+          .collection('users')
+          .doc(user!.uid)
+          .update({'tag': tag});
+      _cap.log('updateTag');
+      _user!.tag = tag;
+      notifyListeners();
+      return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('failed to updateProfile');
+      _cap.log('failed to updateTag');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
-    return LangameResponse(LangameStatus.succeed);
+  }
+
+  Future<LangameResponse> removePhoto() async {
+    try {
+      await firebase.firestore!
+          .collection('users')
+          .doc(user!.uid)
+          .update({'photoUrl': null});
+      await firebase.auth!.currentUser!.updatePhotoURL(null);
+      _cap.log('removePhoto');
+      return LangameResponse(LangameStatus.succeed);
+    } catch (e, s) {
+      _cap.log('failed to removePhoto');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
   }
 
   Future<LangameResponse<void>> delete() async {
@@ -361,40 +411,7 @@ class AuthenticationProvider extends ChangeNotifier {
         return _cap.recordError(e, null);
       });
       _cap.log('authentication_provider:checkVersion response ${raw.data}');
-      // Asynchronously, update devices information in db
-      waitUntil(() => _user != null,
-              step: Duration(seconds: 1000), maxIterations: 10)
-          .then((_) async {
-        final deviceInfo = UniversalPlatform.isAndroid
-            ? (await DeviceInfoPlugin().androidInfo).model
-            : UniversalPlatform.isIOS
-                ? (await DeviceInfoPlugin().iosInfo).utsname.machine
-                : null; // TODO other platforms not supported
-        bool newDevice = true;
-        for (var i = 0; i < _user!.devices.length; i++) {
-          if (_user!.devices[i].deviceInfo == deviceInfo) {
-            _user!.devices[i].langameVersion = _getLangameVersion(packageInfo);
-            newDevice = false;
-          }
-        }
-        if (newDevice) {
-          _user!.devices.add(
-            lg.User_Device(
-              langameVersion: _getLangameVersion(packageInfo),
-              deviceInfo: deviceInfo.toString(),
-            ),
-          );
-        }
-        firebase.firestore!
-            .collection(AppConst.firestoreUsersCollection)
-            .doc(_user!.uid)
-            .withConverter<lg.User>(
-              fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
-              toFirestore: (s, _) => s.toMapStringDynamic(),
-            )
-            .set(lg.User(devices: _user!.devices), SetOptions(merge: true))
-            .then((_) => _cap.log('authentication_provider:updated devices'));
-      }).catchError((_) {}); // IGNORE, TODO: put this in stream user
+
       return LangameResponse(LangameStatus.succeed,
           result: lg.FunctionResponse_VersionCheck_UpdateRequired.values[
               (raw.data as Map<String, dynamic>)['versionCheck']['update']

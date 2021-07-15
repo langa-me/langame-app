@@ -37,6 +37,14 @@ class FunnyProvider extends ChangeNotifier {
     'Eh! The data center is burning',
   ];
 
-  String getLoadingRandom() => _loadingSentences.pickAny()!;
+  String? _lastLoadingRandom;
+
+  String getLoadingRandom({bool last = false}) {
+    if (!last || _lastLoadingRandom == null) {
+      _lastLoadingRandom = _loadingSentences.pickAny()!;
+    }
+    return _lastLoadingRandom!;
+  }
+
   String getFailingRandom() => _failingSentences.pickAny()!;
 }

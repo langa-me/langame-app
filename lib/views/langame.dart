@@ -8,9 +8,9 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/helpers/future.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/helpers/toast.dart';
+import 'package:langame/helpers/widget.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/audio_provider.dart';
@@ -122,7 +122,7 @@ class _LangameViewState extends State<LangameView> {
                   s.data != null &&
                   s.data!.status == LangameStatus.succeed &&
                   s.data!.result != null) {
-                _postFrameCallback((_) => setState(() {
+                postFrameCallback((_) => setState(() {
                       langameStream = s.data!.result!;
                     }));
               }
@@ -164,7 +164,7 @@ class _LangameViewState extends State<LangameView> {
         if (r.result == null || !r.result!) {
           showPermissionDialog();
         }
-        _postFrameCallback((_) => setState(() => permissionRequested = true));
+        postFrameCallback((_) => setState(() => permissionRequested = true));
       });
     }
     crash.log('permissionRequested $permissionRequested');
@@ -180,13 +180,13 @@ class _LangameViewState extends State<LangameView> {
             if (s.hasData &&
                 s.data != null &&
                 s.data!.status == LangameStatus.succeed) {
-              _postFrameCallback(
+              postFrameCallback(
                   (_) => setState(() => engineInitialized = true));
             } else if (s.hasData &&
                 s.data != null &&
                 s.data!.status == LangameStatus.failed) {
               _handleError();
-              _postFrameCallback(
+              postFrameCallback(
                   (_) => setState(() => engineInitialized = false));
             }
             return cp.buildLoadingWidget(text: _loadingMessage);
@@ -396,7 +396,7 @@ class _LangameViewState extends State<LangameView> {
           onSucceed: () {
             // Permission granted!
             if (res.result != null && res.result!) {
-              _postFrameCallback((duration) {
+              postFrameCallback((duration) {
                 setState(() => permissionRequested = true);
               });
               cp.dialogComplete();
@@ -432,11 +432,7 @@ class _LangameViewState extends State<LangameView> {
 
       return;
     }
-    _postFrameCallback((_) => setState(() => errors++));
-  }
-
-  void _postFrameCallback(FrameCallback callback) {
-    WidgetsBinding.instance!.addPostFrameCallback(callback);
+    postFrameCallback((_) => setState(() => errors++));
   }
 
   RtcEngineEventHandler _buildEventHandler() => RtcEngineEventHandler(
@@ -539,8 +535,8 @@ class _LangameViewState extends State<LangameView> {
       backgroundColor: isLightThenDark(context, reverse: true),
       resizeToAvoidBottomInset: false,
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Provider.of<ContextProvider>(context, listen: false).buildLoadingWidget(
-            text: '', backgroundColor: isLightThenDark(context, reverse: true)),
+        Provider.of<ContextProvider>(context, listen: false)
+            .buildLoadingWidget(text: ''),
         SizedBox(height: AppSize.blockSizeVertical * 5),
         Container(
           padding: EdgeInsets.all(12),

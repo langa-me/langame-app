@@ -170,7 +170,6 @@ const User$json = const {
     const {'1': 'online', '3': 6, '4': 1, '5': 8, '10': 'online'},
     const {'1': 'google', '3': 7, '4': 1, '5': 8, '10': 'google'},
     const {'1': 'apple', '3': 9, '4': 1, '5': 8, '10': 'apple'},
-    const {'1': 'favourite_topics', '3': 10, '4': 3, '5': 9, '10': 'favouriteTopics'},
     const {'1': 'tag', '3': 11, '4': 1, '5': 9, '10': 'tag'},
     const {'1': 'tokens', '3': 12, '4': 3, '5': 9, '10': 'tokens'},
     const {'1': 'latest_interactions', '3': 13, '4': 3, '5': 9, '10': 'latestInteractions'},
@@ -194,7 +193,7 @@ const User_Device$json = const {
 };
 
 /// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIUCgVhcHBsZRgJIAEoCFIFYXBwbGUSKQoQZmF2b3VyaXRlX3RvcGljcxgKIAMoCVIPZmF2b3VyaXRlVG9waWNzEhAKA3RhZxgLIAEoCVIDdGFnEhYKBnRva2VucxgMIAMoCVIGdG9rZW5zEi8KE2xhdGVzdF9pbnRlcmFjdGlvbnMYDSADKAlSEmxhdGVzdEludGVyYWN0aW9ucxIWCgZlcnJvcnMYDiADKAlSBmVycm9ycxI5CgpsYXN0X2xvZ2luGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIJbGFzdExvZ2luEjsKC2xhc3RfbG9nb3V0GBAgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIKbGFzdExvZ291dBI/Cg1jcmVhdGlvbl90aW1lGBEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIMY3JlYXRpb25UaW1lEhoKCGRpc2FibGVkGBIgASgIUghkaXNhYmxlZBI3CgdkZXZpY2VzGBMgAygLMh0ubGFuZ2FtZS5wcm90b2J1Zi5Vc2VyLkRldmljZVIHZGV2aWNlcxpSCgZEZXZpY2USJwoPbGFuZ2FtZV92ZXJzaW9uGAEgASgJUg5sYW5nYW1lVmVyc2lvbhIfCgtkZXZpY2VfaW5mbxgCIAEoCVIKZGV2aWNlSW5mbw==');
+final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIUCgVhcHBsZRgJIAEoCFIFYXBwbGUSEAoDdGFnGAsgASgJUgN0YWcSFgoGdG9rZW5zGAwgAygJUgZ0b2tlbnMSLwoTbGF0ZXN0X2ludGVyYWN0aW9ucxgNIAMoCVISbGF0ZXN0SW50ZXJhY3Rpb25zEhYKBmVycm9ycxgOIAMoCVIGZXJyb3JzEjkKCmxhc3RfbG9naW4YDyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUglsYXN0TG9naW4SOwoLbGFzdF9sb2dvdXQYECABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgpsYXN0TG9nb3V0Ej8KDWNyZWF0aW9uX3RpbWUYESABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgxjcmVhdGlvblRpbWUSGgoIZGlzYWJsZWQYEiABKAhSCGRpc2FibGVkEjcKB2RldmljZXMYEyADKAsyHS5sYW5nYW1lLnByb3RvYnVmLlVzZXIuRGV2aWNlUgdkZXZpY2VzGlIKBkRldmljZRInCg9sYW5nYW1lX3ZlcnNpb24YASABKAlSDmxhbmdhbWVWZXJzaW9uEh8KC2RldmljZV9pbmZvGAIgASgJUgpkZXZpY2VJbmZv');
 @$core.Deprecated('Use userPreferenceDescriptor instead')
 const UserPreference$json = const {
   '1': 'UserPreference',
@@ -205,11 +204,12 @@ const UserPreference$json = const {
     const {'1': 'has_done_on_boarding', '3': 5, '4': 1, '5': 8, '10': 'hasDoneOnBoarding'},
     const {'1': 'search_history', '3': 6, '4': 3, '5': 9, '10': 'searchHistory'},
     const {'1': 'shake_to_feedback', '3': 7, '4': 1, '5': 8, '10': 'shakeToFeedback'},
+    const {'1': 'favorite_topics', '3': 8, '4': 3, '5': 9, '10': 'favoriteTopics'},
   ],
 };
 
 /// Descriptor for `UserPreference`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List userPreferenceDescriptor = $convert.base64Decode('Cg5Vc2VyUHJlZmVyZW5jZRIXCgd1c2VyX2lkGAIgASgJUgZ1c2VySWQSRAoedW5rbm93bl9wZW9wbGVfcmVjb21tZW5kYXRpb25zGAMgASgIUhx1bmtub3duUGVvcGxlUmVjb21tZW5kYXRpb25zEh8KC3RoZW1lX2luZGV4GAQgASgFUgp0aGVtZUluZGV4Ei8KFGhhc19kb25lX29uX2JvYXJkaW5nGAUgASgIUhFoYXNEb25lT25Cb2FyZGluZxIlCg5zZWFyY2hfaGlzdG9yeRgGIAMoCVINc2VhcmNoSGlzdG9yeRIqChFzaGFrZV90b19mZWVkYmFjaxgHIAEoCFIPc2hha2VUb0ZlZWRiYWNr');
+final $typed_data.Uint8List userPreferenceDescriptor = $convert.base64Decode('Cg5Vc2VyUHJlZmVyZW5jZRIXCgd1c2VyX2lkGAIgASgJUgZ1c2VySWQSRAoedW5rbm93bl9wZW9wbGVfcmVjb21tZW5kYXRpb25zGAMgASgIUhx1bmtub3duUGVvcGxlUmVjb21tZW5kYXRpb25zEh8KC3RoZW1lX2luZGV4GAQgASgFUgp0aGVtZUluZGV4Ei8KFGhhc19kb25lX29uX2JvYXJkaW5nGAUgASgIUhFoYXNEb25lT25Cb2FyZGluZxIlCg5zZWFyY2hfaGlzdG9yeRgGIAMoCVINc2VhcmNoSGlzdG9yeRIqChFzaGFrZV90b19mZWVkYmFjaxgHIAEoCFIPc2hha2VUb0ZlZWRiYWNrEicKD2Zhdm9yaXRlX3RvcGljcxgIIAMoCVIOZmF2b3JpdGVUb3BpY3M=');
 @$core.Deprecated('Use langameDescriptor instead')
 const Langame$json = const {
   '1': 'Langame',

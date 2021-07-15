@@ -56,6 +56,11 @@ stripe prices create \
 #### Proto gen
 
 ```bash
+npm install protobufjs -g
+# Also install dart & python stuff protoc
+```
+
+```bash
 cd ..
 git clone org-856813@github.com:stripe/openapi.git
 go get -u github.com/NYTimes/openapi2proto/cmd/openapi2proto
@@ -71,7 +76,7 @@ make proto
 
 1. bump pubspec.yaml version number and version code
 2. update changelogs in fastlane (android/fastlane/changelogs and ios/fastlane/Fastfile)
-3. commit & push
-4. once CI/CD is done, update langame_version from remote config
-    1. maybe test app again before releasing
+3. commit (x.x.x+x: new features...) & push
+4. once CI/CD is done
+   1. update langame_version from remote config if you want to force user update (non-backward compatible changes)
 5. deploy new Firebase stuff in prod

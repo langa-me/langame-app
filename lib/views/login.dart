@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/future.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/langame/protobuf/langame.pbenum.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -23,6 +23,7 @@ import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'buttons/apple.dart';
+import 'colors/colors.dart';
 import 'main_view.dart';
 
 class LoginView extends StatefulWidget {
@@ -31,7 +32,6 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  Future<void>? successDialogFuture;
   bool isAuthenticating = true;
   TextEditingController _hackControllerPassword = TextEditingController();
   bool _isVersionCheckOk = false;
@@ -44,6 +44,8 @@ class _LoginViewState extends State<LoginView> {
     final ap = Provider.of<AuthenticationProvider>(context, listen: false);
     Provider.of<FeedbackProvider>(context, listen: false).init();
     var cp = Provider.of<ContextProvider>(context, listen: false);
+    // Load for this page
+    Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom();
     Connectivity().checkConnectivity().then((network) async {
       if (network == ConnectivityResult.none) {
         cap.log('I am offline', analyticsMessage: 'offline');
@@ -54,10 +56,9 @@ class _LoginViewState extends State<LoginView> {
       ap.userStream.first.then((user) async {
         // 10 seconds
         await waitUntil(() => _isVersionCheckOk == true, maxIterations: 10000);
-        if (user.after == null || successDialogFuture != null) {
+        if (user.after == null) {
           return null;
         }
-        setState(() => isAuthenticating = true);
 
         if (user.after!.disabled) {
           cp.showFailureDialog(
@@ -66,18 +67,12 @@ class _LoginViewState extends State<LoginView> {
           cp.dialogComplete();
           return;
         }
-        // Once arriving on login page, if coming from a notification tap coming
-        // from a terminated state (app closed, have notification in bar)
-        // and the user is properly authenticated, will open directly langame view
-        // otherwise it will go to setup or friends according to auth state
-        cp.showSuccessDialog(
-            'Connected${user.after!.tag.isNotEmpty ? ' as ' : ''}${user.after!.tag}!');
 
-        // TODO: ultra hack to wait for pref update
-        await Future.delayed(Duration(milliseconds: 100));
         var pp = Provider.of<PreferenceProvider>(context, listen: false);
-        await waitUntil(() => pp.preference != null);
-        // TODO: should probably quit if fail to initialize pref
+        pp.preferenceStream.first
+            .timeout(Duration(milliseconds: 500))
+            .catchError((_) => lg.UserPreference());
+
         if (pp.preference != null && pp.preference!.hasDoneOnBoarding) {
           // Probably logged-out, skip message api init
           var mp = Provider.of<MessageProvider>(context, listen: false);
@@ -95,11 +90,7 @@ class _LoginViewState extends State<LoginView> {
           cp.pushReplacement(OnBoarding());
         }
       });
-      // HACK TODO
-      await Future.delayed(Duration(milliseconds: 100));
-      cp.showLoadingDialog();
       final checkVersion = await ap.checkVersion();
-      cp.dialogComplete();
       if (checkVersion.status == LangameStatus.failed) {
         cp.showCustomDialog(stateless: [
           Center(
@@ -131,9 +122,10 @@ class _LoginViewState extends State<LoginView> {
         return;
       }
       if (checkVersion.result !=
-              FunctionResponse_VersionCheck_UpdateRequired.OK &&
+              lg.FunctionResponse_VersionCheck_UpdateRequired.OK &&
           checkVersion.result !=
-              FunctionResponse_VersionCheck_UpdateRequired.RETRO_COMPATIBLE) {
+              lg.FunctionResponse_VersionCheck_UpdateRequired
+                  .RETRO_COMPATIBLE) {
         cp.showCustomDialog(
           stateless: [
             UniversalPlatform.isAndroid || UniversalPlatform.isIOS
@@ -146,12 +138,9 @@ class _LoginViewState extends State<LoginView> {
                           : UniversalPlatform.isIOS
                               ? AppConst.testFlightUrl
                               : null;
-                      canLaunch(url!).then((e) {
-                        if (e) launch(url);
-                      }).catchError((e) {
-                        cp.showFailureDialog(
-                            'An error has occurred, please update your application manually');
-                      });
+                      if (await canLaunch(url!)) {
+                        await launch(url);
+                      }
                     },
                     highlighted: true,
                   )
@@ -173,7 +162,9 @@ class _LoginViewState extends State<LoginView> {
         });
       }
       if (cp.route == LangameRoute.LoginView)
-        setState(() => isAuthenticating = false);
+        setState(() {
+          isAuthenticating = false;
+        });
     });
   }
 
@@ -191,8 +182,27 @@ class _LoginViewState extends State<LoginView> {
       setState(() => isAuthenticating = true);
 
       return Scaffold(
-          body: Center(child: cp.buildLoadingWidget(text: 'Offline')));
+          backgroundColor: getBlackAndWhite(context, 0, reverse: true),
+          body: Center(
+              child: cp.buildLoadingWidget(text: 'Offline', last: true)));
     }
+
+    if (!_isVersionCheckOk) {
+      return Scaffold(
+          backgroundColor: getBlackAndWhite(context, 0, reverse: true),
+          body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Image(
+              width: AppSize.blockSizeHorizontal * 30,
+              image: AssetImage('images/logo-colourless.png'),
+            ),
+            SizedBox(height: AppSize.safeBlockVertical * 20),
+            cp.buildLoadingWidget(
+                text: Provider.of<FunnyProvider>(context, listen: false)
+                    .getLoadingRandom(last: true),
+                last: true)
+          ]));
+    }
+
     setState(() => isAuthenticating = false);
 
     final ap = Provider.of<AuthenticationProvider>(context, listen: false);

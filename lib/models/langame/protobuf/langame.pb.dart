@@ -892,7 +892,6 @@ class User extends $pb.GeneratedMessage {
     ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'online')
     ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'google')
     ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'apple')
-    ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'favouriteTopics')
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tag')
     ..pPS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tokens')
     ..pPS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'latestInteractions')
@@ -915,7 +914,6 @@ class User extends $pb.GeneratedMessage {
     $core.bool? online,
     $core.bool? google,
     $core.bool? apple,
-    $core.Iterable<$core.String>? favouriteTopics,
     $core.String? tag,
     $core.Iterable<$core.String>? tokens,
     $core.Iterable<$core.String>? latestInteractions,
@@ -950,9 +948,6 @@ class User extends $pb.GeneratedMessage {
     }
     if (apple != null) {
       _result.apple = apple;
-    }
-    if (favouriteTopics != null) {
-      _result.favouriteTopics.addAll(favouriteTopics);
     }
     if (tag != null) {
       _result.tag = tag;
@@ -1076,71 +1071,68 @@ class User extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   void clearApple() => clearField(9);
 
-  @$pb.TagNumber(10)
-  $core.List<$core.String> get favouriteTopics => $_getList(8);
-
   @$pb.TagNumber(11)
-  $core.String get tag => $_getSZ(9);
+  $core.String get tag => $_getSZ(8);
   @$pb.TagNumber(11)
-  set tag($core.String v) { $_setString(9, v); }
+  set tag($core.String v) { $_setString(8, v); }
   @$pb.TagNumber(11)
-  $core.bool hasTag() => $_has(9);
+  $core.bool hasTag() => $_has(8);
   @$pb.TagNumber(11)
   void clearTag() => clearField(11);
 
   @$pb.TagNumber(12)
-  $core.List<$core.String> get tokens => $_getList(10);
+  $core.List<$core.String> get tokens => $_getList(9);
 
   @$pb.TagNumber(13)
-  $core.List<$core.String> get latestInteractions => $_getList(11);
+  $core.List<$core.String> get latestInteractions => $_getList(10);
 
   @$pb.TagNumber(14)
-  $core.List<$core.String> get errors => $_getList(12);
+  $core.List<$core.String> get errors => $_getList(11);
 
   @$pb.TagNumber(15)
-  $0.Timestamp get lastLogin => $_getN(13);
+  $0.Timestamp get lastLogin => $_getN(12);
   @$pb.TagNumber(15)
   set lastLogin($0.Timestamp v) { setField(15, v); }
   @$pb.TagNumber(15)
-  $core.bool hasLastLogin() => $_has(13);
+  $core.bool hasLastLogin() => $_has(12);
   @$pb.TagNumber(15)
   void clearLastLogin() => clearField(15);
   @$pb.TagNumber(15)
-  $0.Timestamp ensureLastLogin() => $_ensure(13);
+  $0.Timestamp ensureLastLogin() => $_ensure(12);
 
   @$pb.TagNumber(16)
-  $0.Timestamp get lastLogout => $_getN(14);
+  $0.Timestamp get lastLogout => $_getN(13);
   @$pb.TagNumber(16)
   set lastLogout($0.Timestamp v) { setField(16, v); }
   @$pb.TagNumber(16)
-  $core.bool hasLastLogout() => $_has(14);
+  $core.bool hasLastLogout() => $_has(13);
   @$pb.TagNumber(16)
   void clearLastLogout() => clearField(16);
   @$pb.TagNumber(16)
-  $0.Timestamp ensureLastLogout() => $_ensure(14);
+  $0.Timestamp ensureLastLogout() => $_ensure(13);
 
   @$pb.TagNumber(17)
-  $0.Timestamp get creationTime => $_getN(15);
+  $0.Timestamp get creationTime => $_getN(14);
   @$pb.TagNumber(17)
   set creationTime($0.Timestamp v) { setField(17, v); }
   @$pb.TagNumber(17)
-  $core.bool hasCreationTime() => $_has(15);
+  $core.bool hasCreationTime() => $_has(14);
   @$pb.TagNumber(17)
   void clearCreationTime() => clearField(17);
   @$pb.TagNumber(17)
-  $0.Timestamp ensureCreationTime() => $_ensure(15);
+  $0.Timestamp ensureCreationTime() => $_ensure(14);
 
   @$pb.TagNumber(18)
-  $core.bool get disabled => $_getBF(16);
+  $core.bool get disabled => $_getBF(15);
   @$pb.TagNumber(18)
-  set disabled($core.bool v) { $_setBool(16, v); }
+  set disabled($core.bool v) { $_setBool(15, v); }
   @$pb.TagNumber(18)
-  $core.bool hasDisabled() => $_has(16);
+  $core.bool hasDisabled() => $_has(15);
   @$pb.TagNumber(18)
   void clearDisabled() => clearField(18);
 
   @$pb.TagNumber(19)
-  $core.List<User_Device> get devices => $_getList(17);
+  $core.List<User_Device> get devices => $_getList(16);
 }
 
 class UserPreference extends $pb.GeneratedMessage {
@@ -1151,6 +1143,7 @@ class UserPreference extends $pb.GeneratedMessage {
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'hasDoneOnBoarding')
     ..pPS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'searchHistory')
     ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'shakeToFeedback')
+    ..pPS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'favoriteTopics')
     ..hasRequiredFields = false
   ;
 
@@ -1162,6 +1155,7 @@ class UserPreference extends $pb.GeneratedMessage {
     $core.bool? hasDoneOnBoarding,
     $core.Iterable<$core.String>? searchHistory,
     $core.bool? shakeToFeedback,
+    $core.Iterable<$core.String>? favoriteTopics,
   }) {
     final _result = create();
     if (userId != null) {
@@ -1181,6 +1175,9 @@ class UserPreference extends $pb.GeneratedMessage {
     }
     if (shakeToFeedback != null) {
       _result.shakeToFeedback = shakeToFeedback;
+    }
+    if (favoriteTopics != null) {
+      _result.favoriteTopics.addAll(favoriteTopics);
     }
     return _result;
   }
@@ -1252,6 +1249,9 @@ class UserPreference extends $pb.GeneratedMessage {
   $core.bool hasShakeToFeedback() => $_has(5);
   @$pb.TagNumber(7)
   void clearShakeToFeedback() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.List<$core.String> get favoriteTopics => $_getList(6);
 }
 
 class Langame extends $pb.GeneratedMessage {

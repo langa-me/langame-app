@@ -39,19 +39,6 @@ abstract class AuthenticationApi {
       String ignoreTag, String tag,
       {int limit = 5});
 
-  /// Update current authenticated user, at the firebase level
-  /// and firestore [LangameUser], throw if not authenticated
-  Future<void> updateProfile({
-    String? displayName,
-    String? photoURL,
-    String? newEmail,
-    String? newPhoneNumber,
-    String? tag,
-    List<String>? topics,
-    bool google = false,
-    bool apple = false,
-  });
-
   Future<List<lg.User>> getUserRecommendations(lg.User user);
 
   Future<int?> getInteraction(String uid, String otherUid);

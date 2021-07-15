@@ -38,9 +38,12 @@ class AppConst {
   static const String helpUrl = 'https://help.langa.me';
   static const String mainUrl = 'https://langa.me';
   static const String productificUrl = 'https://productific.com/@Langame';
-  static const String testFlightUrl = 'https://testflight.apple.com/join/pxxfLXZc';
-  static const String appStoreUrl = 'https://apps.apple.com/us/app/langame/id1564745604';
-  static const String googlePlayUrl = 'https://play.google.com/store/apps/details?id=me.langa';
+  static const String testFlightUrl =
+      'https://testflight.apple.com/join/pxxfLXZc';
+  static const String appStoreUrl =
+      'https://apps.apple.com/us/app/langame/id1564745604';
+  static const String googlePlayUrl =
+      'https://play.google.com/store/apps/details?id=me.langa';
 }
 
 /// Fonts assets used in this application,
@@ -74,6 +77,7 @@ class AppSize {
   static late double screenHeight;
   static late double blockSizeHorizontal;
   static late double blockSizeVertical;
+  static late bool isLargeWidth;
 
   static late double _safeAreaHorizontal;
   static late double _safeAreaVertical;
@@ -93,5 +97,6 @@ class AppSize {
         _mediaQueryData.padding.top + _mediaQueryData.padding.bottom;
     safeBlockHorizontal = (screenWidth - _safeAreaHorizontal) / 100;
     safeBlockVertical = (screenHeight - _safeAreaVertical) / 100;
+    isLargeWidth = screenWidth > 1000;
   }
 }

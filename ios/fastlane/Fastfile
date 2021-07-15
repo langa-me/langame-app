@@ -66,15 +66,17 @@ platform :ios do
       app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
       skip_waiting_for_build_processing: false,
       skip_submission: false,
-      notify_external_testers: false,
+      notify_external_testers: true,
       ipa: "./Runner.ipa",
       changelog: "New:
-                  - Fixed a bug which, sometimes, turned the screen gray
+                  - Basic profile edition
+                  - Choose your favorite topics (will be used for user matching)
 
                   Known issues:
                   - Launching URL does not work on some Android phones
                   - Sharing does not work on some iPads
-                  - Usage of bluetooth headphones are not tested",
+                  - Handling sleep / background in Langame is not implemented yet
+",
       distribute_external: true,
       groups: "Public",
     )

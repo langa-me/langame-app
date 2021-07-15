@@ -1,0 +1,8 @@
+New:
+- Basic profile edition
+- Choose your favorite topics (will be used for user matching)
+
+Known issues:
+- Launching URL does not work on some Android phones
+- Sharing does not work on some iPads
+- Handling sleep / background in Langame is not implemented yet

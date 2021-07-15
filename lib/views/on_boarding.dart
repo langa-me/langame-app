@@ -7,15 +7,12 @@ import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/helpers/future.dart';
-import 'package:langame/models/errors.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -89,11 +86,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
               cp.showLoadingDialog(text: 'Validating...');
               var ap =
                   Provider.of<AuthenticationProvider>(context, listen: false);
-              ap // Sometimes the user has no displayName (apple hidden mail), using the tag then
-                  .updateProfile(
-                      tag: value,
-                      displayName: ap.user!.displayName.isEmpty ? value : null)
-                  .then((res) {
+              ap.updateTag(value).then((res) {
                 cp.handleLangameResponse(
                   res,
                   succeedMessage: 'Welcome to Langame $value',
@@ -112,11 +105,15 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: LangameButton(FontAwesomeIcons.tag, onPressed: () {
-              // Validate returns true if the form is valid, or false otherwise.
-              if (_formKey.currentState!.validate()) {
-              }
-            }, text: 'Choose this tag', highlighted: true,),
+            child: LangameButton(
+              FontAwesomeIcons.tag,
+              onPressed: () {
+                // Validate returns true if the form is valid, or false otherwise.
+                if (_formKey.currentState!.validate()) {}
+              },
+              text: 'Choose this tag',
+              highlighted: true,
+            ),
           ),
         ],
       ),
@@ -133,16 +130,59 @@ class _OnBoardingState extends State with AfterLayoutMixin {
       await Future.delayed(Duration(seconds: 2));
       cp.dialogComplete();
     };
-      var pp = Provider.of<PreferenceProvider>(context, listen: false);
-      pp.preference!.hasDoneOnBoarding = true;
-      var r = await pp.save();
-      cp.handleLangameResponse(r, onFailure: showFailure, onSucceed: () {
-        cp.dialogComplete();
-        cp.pushReplacement(MainView());
-      });
+    var pp = Provider.of<PreferenceProvider>(context, listen: false);
+    pp.preference!.hasDoneOnBoarding = true;
+    var r = await pp.save();
+    cp.handleLangameResponse(r, onFailure: showFailure, onSucceed: () {
+      cp.dialogComplete();
+      cp.pushReplacement(MainView());
+    });
   }
 
   List<PageViewModel> _buildPageModels() => [
+        PageViewModel(
+          titleWidget: Text('What are your interests?',
+              style: Theme.of(context).textTheme.headline5),
+          bodyWidget: Container(
+              height: AppSize.safeBlockVertical * 80,
+              width: AppSize.safeBlockHorizontal *
+                  45 *
+                  (AppSize.isLargeWidth ? 1 : 2),
+              child: Consumer2<PreferenceProvider, TagProvider>(
+                builder: (context, pp, tp, child) => Container(
+                    height: AppSize.safeBlockVertical * 80,
+                    width: AppSize.safeBlockHorizontal *
+                        45 *
+                        (AppSize.isLargeWidth ? 1 : 2),
+                    alignment: Alignment.center,
+                    child: ListView(
+                      physics: BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(20.0),
+                      children: tp.topics.values
+                          .map(
+                            (e) => ToggleButton(
+                                width: AppSize.safeBlockHorizontal *
+                                    45 *
+                                    (AppSize.isLargeWidth ? 1 : 2),
+                                selected: pp.preference != null &&
+                                    pp.preference!.favoriteTopics
+                                        .contains(e.topic.content),
+                                onChange: (bool selected) {
+                                  if (selected)
+                                    pp.addFavoriteTopic(e.topic.content);
+                                  else
+                                    pp.removeFavoriteTopic(e.topic.content);
+                                },
+                                textUnselected:
+                                    '${e.topic.emojis.join('')}\n${e.topic.content}',
+                                textSelected:
+                                    '${e.topic.emojis.join('')}\n${e.topic.content}'),
+                          )
+                          .toList(),
+                    )),
+              )),
+        ),
         PageViewModel(
           titleWidget: Text('Send us a feedback anytime?',
               style: Theme.of(context).textTheme.headline5),
@@ -162,12 +202,14 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                         p.setShakeToFeedback(!p.preference!.shakeToFeedback),
                   ),
                 ),
-                !kIsWeb ? Lottie.asset(
-                  'animations/feedback.json',
-                  height: AppSize.safeBlockVertical * 70,
-                  width: AppSize.safeBlockHorizontal * 70,
-                  alignment: Alignment.center,
-                ) : SizedBox.shrink(),
+                !kIsWeb
+                    ? Lottie.asset(
+                        'animations/feedback.json',
+                        height: AppSize.safeBlockVertical * 70,
+                        width: AppSize.safeBlockHorizontal * 70,
+                        alignment: Alignment.center,
+                      )
+                    : SizedBox.shrink(),
               ],
             ),
           ),
@@ -191,12 +233,14 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                         !p.preference!.unknownPeopleRecommendations),
                   ),
                 ),
-                !kIsWeb ? Lottie.asset(
-                  'animations/recommendations.json',
-                  height: AppSize.safeBlockVertical * 70,
-                  width: AppSize.safeBlockHorizontal * 70,
-                  alignment: Alignment.center,
-                ) : SizedBox.shrink(),
+                !kIsWeb
+                    ? Lottie.asset(
+                        'animations/recommendations.json',
+                        height: AppSize.safeBlockVertical * 70,
+                        width: AppSize.safeBlockHorizontal * 70,
+                        alignment: Alignment.center,
+                      )
+                    : SizedBox.shrink(),
               ],
             ),
           ),
@@ -205,20 +249,22 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           titleWidget: Text('Your friends don\'t have Langame?',
               style: Theme.of(context).textTheme.headline5),
           bodyWidget: Column(children: [
-            !kIsWeb ? Lottie.asset(
-              'animations/share.json',
-              height: AppSize.safeBlockVertical * 70,
-              width: AppSize.safeBlockHorizontal * 70,
-              alignment: Alignment.center,
-            ) : SizedBox.shrink(),
+            !kIsWeb
+                ? Lottie.asset(
+                    'animations/share.json',
+                    height: AppSize.safeBlockVertical * 70,
+                    width: AppSize.safeBlockHorizontal * 70,
+                    alignment: Alignment.center,
+                  )
+                : SizedBox.shrink(),
             LangameButton(
               FontAwesomeIcons.shareAlt,
-                onPressed: () => Share.share(
-                    'I\'m using Langame to have incredible conversations, you should try:\n${AppConst.mainUrl}',
-                    subject:
-                        'Join me on Langame app for incredible conversations!'),
-                text: 'Invite your friends',
-                )
+              onPressed: () => Share.share(
+                  'I\'m using Langame to have incredible conversations, you should try:\n${AppConst.mainUrl}',
+                  subject:
+                      'Join me on Langame app for incredible conversations!'),
+              text: 'Invite your friends',
+            )
           ]),
         ),
         PageViewModel(

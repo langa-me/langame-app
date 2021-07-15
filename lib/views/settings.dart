@@ -9,14 +9,13 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/hack.dart';
-import 'package:langame/views/payment.dart';
-import 'package:langame/views/texts/texts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
 import 'login.dart';
+import 'profile_view.dart';
 
 class SettingsView extends StatefulWidget {
   _SettingsState createState() => _SettingsState();
@@ -117,8 +116,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             // ),
             ListTile(
               onTap: () {
-                cp.showSnackBar('Coming soon!');
-                cap.logNewFeatureClick('settings_profile');
+                cp.push(ProfileView());
               },
               leading: Icon(Icons.account_circle_outlined,
                   color: isLightThenDark(context)),
@@ -135,16 +133,55 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title: Text('Notifications',
                   style: Theme.of(context).textTheme.headline6),
             ),
-            ListTile(
-              onTap: () {
-                cp.showSnackBar('Coming soon!');
-                cap.logNewFeatureClick('settings_digital_wellbeing');
-              },
-              leading: Icon(Icons.self_improvement_outlined,
-                  color: isLightThenDark(context)),
-              title: Text('Digital Wellbeing',
-                  style: Theme.of(context).textTheme.headline6),
-            ),
+
+            // Consumer<PreferenceProvider>(
+            //   builder: (context, p, child) => ListTile(
+            //     onTap: () {
+            //       if (kReleaseMode) {
+            //         cp.showSnackBar('Coming soon!');
+            //         cap.logNewFeatureClick('settings_shake_to_feedback');
+            //         return;
+            //       }
+            //       p.setShakeToFeedback(!p.preference!.shakeToFeedback);
+            //     },
+            //     leading: Icon(Icons.feedback_outlined,
+            //         color: isLightThenDark(context)),
+            //     title: Text('Shake-to-feedback',
+            //         style: Theme.of(context).textTheme.headline6),
+            //     trailing: Switch(
+            //         value: p.preference!.shakeToFeedback,
+            //         onChanged: (v) =>
+            //             p.setShakeToFeedback(!p.preference!.shakeToFeedback)),
+            //   ),
+            // ),
+            // Consumer<PreferenceProvider>(
+            //   builder: (context, p, child) => ListTile(
+            //     onTap: () {
+            //       if (kReleaseMode) {
+            //         cp.showSnackBar('Coming soon!');
+            //         cap.logNewFeatureClick('settings_user_recommendations');
+            //         return;
+            //       }
+            //       p.setRecommendations(
+            //           !p.preference!.unknownPeopleRecommendations);
+            //     },
+            //     leading: Icon(Icons.recommend, color: isLightThenDark(context)),
+            //     title: Text('User recommendations',
+            //         style: Theme.of(context).textTheme.headline6),
+            //     trailing: Switch(
+            //         value: p.preference!.unknownPeopleRecommendations,
+            //         onChanged: (v) {
+            //           if (kReleaseMode) {
+            //             cp.showSnackBar('Coming soon!');
+            //             cap.logNewFeatureClick('settings_subscription');
+            //             return;
+            //           }
+            //           p.setRecommendations(
+            //               !p.preference!.unknownPeopleRecommendations);
+            //         }),
+            //   ),
+            // ),
+            Divider(),
             ListTile(
               onTap: () {
                 // Only safe in dev mode yet
@@ -204,53 +241,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   Icon(Icons.login_outlined, color: isLightThenDark(context)),
               title:
                   Text('Log out', style: Theme.of(context).textTheme.headline6),
-            ),
-            Consumer<PreferenceProvider>(
-              builder: (context, p, child) => ListTile(
-                onTap: () {
-                  if (kReleaseMode) {
-                    cp.showSnackBar('Coming soon!');
-                    cap.logNewFeatureClick('settings_shake_to_feedback');
-                    return;
-                  }
-                  p.setShakeToFeedback(!p.preference!.shakeToFeedback);
-                },
-                leading: Icon(Icons.feedback_outlined,
-                    color: isLightThenDark(context)),
-                title: Text('Shake-to-feedback',
-                    style: Theme.of(context).textTheme.headline6),
-                trailing: Switch(
-                    value: p.preference!.shakeToFeedback,
-                    onChanged: (v) =>
-                        p.setShakeToFeedback(!p.preference!.shakeToFeedback)),
-              ),
-            ),
-            Consumer<PreferenceProvider>(
-              builder: (context, p, child) => ListTile(
-                onTap: () {
-                  if (kReleaseMode) {
-                    cp.showSnackBar('Coming soon!');
-                    cap.logNewFeatureClick('settings_user_recommendations');
-                    return;
-                  }
-                  p.setRecommendations(
-                      !p.preference!.unknownPeopleRecommendations);
-                },
-                leading: Icon(Icons.recommend, color: isLightThenDark(context)),
-                title: Text('User recommendations',
-                    style: Theme.of(context).textTheme.headline6),
-                trailing: Switch(
-                    value: p.preference!.unknownPeopleRecommendations,
-                    onChanged: (v) {
-                      if (kReleaseMode) {
-                        cp.showSnackBar('Coming soon!');
-                        cap.logNewFeatureClick('settings_subscription');
-                        return;
-                      }
-                      p.setRecommendations(
-                          !p.preference!.unknownPeopleRecommendations);
-                    }),
-              ),
             ),
           ],
         ),

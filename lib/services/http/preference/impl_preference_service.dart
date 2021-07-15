@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:langame/models/extension.dart';
 
 import 'preference_service.dart';
 
@@ -15,6 +15,7 @@ class ImplPreferenceService extends PreferenceService {
 
   // ignore: close_sinks
   StreamController<lg.UserPreference>? _streamPreference;
+
   // ignore: cancel_subscriptions
   StreamSubscription<DocumentSnapshot>? _streamSubscription;
 
@@ -24,6 +25,7 @@ class ImplPreferenceService extends PreferenceService {
     if (!preferences.hasUserId() && userId != null) {
       preferences.userId = userId;
     }
+    // TODO: typed
     String jsonString = preferences.writeToJson();
     final prefs = await SharedPreferences.getInstance();
     final result =
@@ -33,8 +35,11 @@ class ImplPreferenceService extends PreferenceService {
     return firebase.firestore!
         .collection(AppConst.firestorePreferencesCollection)
         .doc(userId)
-        .set(preferences.toMapStringDynamic(),
-            SetOptions(merge: true));
+        .withConverter<lg.UserPreference>(
+          fromFirestore: (s, _) => UserPreferenceExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
+        )
+        .set(preferences, SetOptions(merge: true));
   }
 
   @override
@@ -44,25 +49,17 @@ class ImplPreferenceService extends PreferenceService {
     _streamSubscription = firebase.firestore!
         .collection(AppConst.firestorePreferencesCollection)
         .doc(user.uid)
+        .withConverter<lg.UserPreference>(
+          fromFirestore: (s, _) => UserPreferenceExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
+        )
         .snapshots()
         .listen(
       (e) {
-        _streamPreference!
-            .add(e.data() == null || e.data()!['hasDoneOnBoarding'] == null
+        _streamPreference!.add(
+            e.data() == null || !e.data()!.hasHasDoneOnBoarding()
                 ? PreferenceService.defaultPreference
-                : lg.UserPreference(
-                    // TODO: might do a helper
-                    userId: user.uid,
-                    unknownPeopleRecommendations:
-                        e.data()!['unknownPeopleRecommendations'],
-                    themeIndex: e.data()!['themeIndex'],
-                    hasDoneOnBoarding: e.data()!['hasDoneOnBoarding'],
-                    searchHistory: e.data()!['searchHistory'] != null
-                        ? (e.data()!['searchHistory'] as Iterable<dynamic>)
-                            .map((e) => e.toString())
-                        : [],
-                    shakeToFeedback: e.data()!['shakeToFeedback'],
-                  ));
+                : e.data()!);
       },
       cancelOnError: false,
     ); // Can happen when listening to in-existent document (yet)

@@ -55,7 +55,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
     }
   }
 
-
   @override
   Future<OAuthCredential> loginWithGoogle() async {
     try {
@@ -137,8 +136,8 @@ class ImplAuthenticationApi extends AuthenticationApi {
         .where('tag', isLessThan: tag + 'z')
         .limit(limit)
         .withConverter<lg.User>(
-          fromFirestore: (snapshot, _) => UserExt.fromObject(snapshot.data()!),
-          toFirestore: (user, _) => user.toMapStringDynamic(),
+          fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
         )
         .get();
     return doc.docs.map((e) => e.data()).toList();
@@ -150,60 +149,6 @@ class ImplAuthenticationApi extends AuthenticationApi {
     // if (_apple != null) await SignInWithApple.
     await firebase.auth!.signOut();
     // TODO: Apple
-  }
-
-  @override
-  Future<void> updateProfile({
-    String? displayName,
-    String? photoURL,
-    String? newEmail,
-    String? newPhoneNumber,
-    String? tag,
-    List<String>? topics,
-    bool google = false,
-    bool apple = false,
-  }) async {
-    Map<String, dynamic> data = {};
-    if (displayName != null) data['displayName'] = displayName;
-    if (photoURL != null) data['photoUrl'] = photoURL;
-    if (newEmail != null)
-      throw LangameUpdateProfileException(cause: 'email_not_implemented');
-    if (newPhoneNumber != null)
-      throw LangameUpdateProfileException(
-          cause: 'phone_number_not_implemented');
-    if (tag != null) data['tag'] = tag;
-    if (topics != null) data['favouriteTopics'] = topics;
-    if (google) data['google'] = google;
-    if (apple) data['apple'] = apple;
-
-    if (firebase.auth!.currentUser == null)
-      throw LangameUpdateProfileException(cause: kNotAuthenticated);
-    // If the user want to change tag and someone already has this tag, fail
-    if (tag != null &&
-        (await getLangameUsersStartingWithTag('', tag)).any(
-            (e) => firebase.auth!.currentUser!.uid != e.uid && e.tag == tag))
-      throw LangameUpdateProfileException(cause: 'tag_already_existing');
-
-    data['uid'] = firebase.auth!.currentUser!.uid;
-    var f = firebase.firestore!
-        .collection(AppConst.firestoreUsersCollection)
-        .doc(firebase.auth!.currentUser!.uid)
-        .update(data);
-
-    return f.then((_) async {
-      await firebase.auth!.currentUser!
-          .updateProfile(displayName: displayName, photoURL: photoURL);
-      if (newEmail != null)
-        await firebase.auth!.currentUser!.updateEmail(newEmail);
-
-      // TODO: phone
-      // firebase.auth.verifyPhoneNumber(phoneNumber: phoneNumber,
-      //     verificationCompleted: verificationCompleted,
-      //     verificationFailed: verificationFailed,
-      //     codeSent: codeSent,
-      //     codeAutoRetrievalTimeout: codeAutoRetrievalTimeout)
-      // firebase.auth.currentUser.updatePhoneNumber()
-    });
   }
 
   @override
@@ -266,6 +211,4 @@ class ImplAuthenticationApi extends AuthenticationApi {
   @override
   Future<void> reAuthenticate(OAuthCredential credential) =>
       firebase.auth!.currentUser!.reauthenticateWithCredential(credential);
-
-
 }

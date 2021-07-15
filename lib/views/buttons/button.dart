@@ -112,7 +112,7 @@ class _LangameButtonState extends State<LangameButton> {
       style: ElevatedButton.styleFrom(
         primary: bg,
         // onSurface = disabled
-        onSurface: getBlackAndWhite(context, widget.layer+1, reverse: true),
+        onSurface: getBlackAndWhite(context, widget.layer + 1, reverse: true),
         elevation: 5,
         shadowColor: variantIsLightThenDark(context, reverse: true),
         shape: RoundedRectangleBorder(
@@ -145,14 +145,16 @@ class ToggleButton extends StatefulWidget {
 
   /// Whether to trigger the toggle on long press instead of simple tap
   final bool onLongPress;
+  final int initialLayer;
 
   ToggleButton(
       {this.textSelected = '',
       this.textUnselected = '',
       this.selected = false,
       this.onChange,
-      this.width = 150,
-      this.onLongPress = false});
+      this.width = 100,
+      this.onLongPress = false,
+      this.initialLayer = 1});
 
   @override
   _ToggleButtonState createState() => _ToggleButtonState(selected: selected);
@@ -165,14 +167,14 @@ class _ToggleButtonState extends State<ToggleButton> {
 
   @override
   Widget build(BuildContext context) {
-    var bg = variantIsLightThenDark(context, reverse: true);
-    var bgSelected = variantBisIsLightThenDark(context, reverse: true);
-    var fg = isLightThenDark(context, reverse: false);
+    var bg = getBlackAndWhite(context, widget.initialLayer, reverse: true);
+    var bgSelected =
+        getBlackAndWhite(context, widget.initialLayer + 1, reverse: true);
+    var fg = getBlackAndWhite(context, 0, reverse: false);
     // var fg = isLightThenDark(context, reverse: false);
     var s = ElevatedButton.styleFrom(
       primary: bg,
-      side: BorderSide(
-          width: 1.0, color: Colors.transparent),
+      side: BorderSide(width: 1.0, color: Colors.transparent),
       padding: EdgeInsets.all(5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),

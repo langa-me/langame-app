@@ -18,7 +18,7 @@ import 'package:lottie/lottie.dart';
 
 enum spinKitType { SpinKitChasingDots, SpinKitDualRing, SpinKitWanderingCubes }
 
-List<Function(Color)> _loaders = [
+List<Widget Function(Color)> _loaders = [
   (Color c) => SpinKitChasingDots(color: c),
   (Color c) => SpinKitDualRing(color: c),
   (Color c) => SpinKitWanderingCubes(color: c),
@@ -46,6 +46,7 @@ class ContextProvider extends ChangeNotifier {
   final FunnyProvider _funny;
 
   bool _isLoading = false;
+  Widget? _lastLoadingWidget;
 
   LangameRoute _route = LangameRoute.LoginView;
   LangameRoute get route => _route;
@@ -115,9 +116,8 @@ class ContextProvider extends ChangeNotifier {
         tryPopParents: tryPopParents);
   }
 
-  
-
-  void pop() => _navigationService.pop(); // TODO: not updating route, I think its ok, staying in mainview w/e
+  void pop() => _navigationService
+      .pop(); // TODO: not updating route, I think its ok, staying in mainview w/e
 
   Future<T> showCustomDialog<T>({
     List<Widget>? stateless,
@@ -165,39 +165,43 @@ class ContextProvider extends ChangeNotifier {
         );
       });
 
-  Future showLoadingDialog({String? text}) {
+  Future showLoadingDialog({String? text, bool last = false}) {
     _isLoading = true;
     return showCustomDialog(
       stateless: [
-        buildLoadingWidget(text: text, backgroundColor: Colors.transparent),
+        buildLoadingWidget(text: text, layer: 1, last: last),
       ],
     );
   }
 
   /// Note: Material is needed because of this
   /// https://stackoverflow.com/questions/47114639/yellow-lines-under-text-widgets-in-flutter
-  Widget buildLoadingWidget({String? text, Color? backgroundColor}) => Material(
-        type: MaterialType.transparency,
-        child: Container(
-          color: backgroundColor ??
-              variantIsLightThenDark(_navigationKey.currentContext!,
-                  reverse: true),
-          child: Column(
-            children: [
-              _loaders.pickAny()!(isLightThenDark(
-                  _navigationKey.currentContext!,
-                  reverse: false)),
-              SizedBox(height: AppSize.safeBlockVertical * 5),
-              Text(
-                text ?? _funny.getLoadingRandom(),
-                textAlign: TextAlign.center,
-                style:
-                    Theme.of(_navigationKey.currentContext!).textTheme.caption!,
-              )
-            ],
-          ),
+  Widget buildLoadingWidget({String? text, int layer = 0, bool last = false}) {
+    if (!last || _lastLoadingWidget == null) {
+      _lastLoadingWidget = _loaders.pickAny()!(getBlackAndWhite(
+          _navigationKey.currentContext!, layer,
+          reverse: false));
+    }
+    return Material(
+      type: MaterialType.transparency,
+      child: Container(
+        color: getBlackAndWhite(_navigationKey.currentContext!, layer,
+            reverse: true),
+        child: Column(
+          children: [
+            _lastLoadingWidget!,
+            SizedBox(height: AppSize.safeBlockVertical * 5),
+            Text(
+              text ?? _funny.getLoadingRandom(),
+              textAlign: TextAlign.center,
+              style:
+                  Theme.of(_navigationKey.currentContext!).textTheme.caption!,
+            )
+          ],
         ),
-      );
+      ),
+    );
+  }
 
   Future<void> showSuccessDialog(String text) => showCustomDialog(stateless: [
         Lottie.asset(

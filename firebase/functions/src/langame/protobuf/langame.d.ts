@@ -1082,9 +1082,6 @@ export namespace langame {
             /** Apple account linked? */
             apple?: (boolean|null);
 
-            /** Favourite topics the user has picked, should impact recommendations */
-            favouriteTopics?: (string[]|null);
-
             /** Twitter-like [tag] i.e. @steveTheApple */
             tag?: (string|null);
 
@@ -1145,9 +1142,6 @@ export namespace langame {
 
             /** Apple account linked? */
             public apple: boolean;
-
-            /** Favourite topics the user has picked, should impact recommendations */
-            public favouriteTopics: string[];
 
             /** Twitter-like [tag] i.e. @steveTheApple */
             public tag: string;
@@ -1374,6 +1368,9 @@ export namespace langame {
 
             /** UserPreference shakeToFeedback */
             shakeToFeedback?: (boolean|null);
+
+            /** UserPreference favoriteTopics */
+            favoriteTopics?: (string[]|null);
         }
 
         /** Represents a UserPreference. */
@@ -1402,6 +1399,9 @@ export namespace langame {
 
             /** UserPreference shakeToFeedback. */
             public shakeToFeedback: boolean;
+
+            /** UserPreference favoriteTopics. */
+            public favoriteTopics: string[];
 
             /**
              * Creates a new UserPreference instance using the specified properties.

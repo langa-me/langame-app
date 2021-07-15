@@ -32,6 +32,7 @@ message Tag {
   message Topic {
     string content = 2;
     repeated string emojis = 3;
+    // TODO: might have tags too? i.e. "mind" == tag philosophy...
   }
 
   message Classification {
@@ -100,9 +101,6 @@ message User {
   /// Apple account linked?
   bool apple = 9;
 
-  /// Favourite topics the user has picked, should impact recommendations
-  repeated string favourite_topics = 10;
-
   /// Twitter-like [tag] i.e. @steveTheApple
   string tag = 11;
 
@@ -139,6 +137,7 @@ message UserPreference {
   // Searched user tags
   repeated string search_history = 6;
   bool shake_to_feedback = 7;
+  repeated string favorite_topics = 8;
 }
 
 message Langame {

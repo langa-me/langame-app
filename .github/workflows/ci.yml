@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches:
-      - dev
       - main
   pull_request:
 
@@ -70,7 +69,7 @@ jobs:
         with:
           node-version: '12'
       - name: npm install, build and test
-        run: | 
+        run: |
           cd firebase/functions
           npm i
           npm run build

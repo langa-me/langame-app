@@ -62,8 +62,6 @@ class UserExt {
       online: m['online'],
       google: m['google'],
       apple: m['apple'],
-      favouriteTopics:
-          (m['favouriteTopics'] as List<dynamic>?)?.map((e) => e as String),
       tag: m['tag'],
       tokens: (m['tokens'] as List<dynamic>?)?.map((e) => e as String),
       latestInteractions:
@@ -88,6 +86,23 @@ class UserExt {
         apple: user.providerData.any((e) => e.providerId == "apple.com"),
         creationTime: dynamicToProtobufTimestamp(user.metadata.creationTime),
       );
+}
+
+class UserPreferenceExt {
+  static lg.UserPreference fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.UserPreference(
+      userId: m['userId'],
+      unknownPeopleRecommendations: m['unknownPeopleRecommendations'],
+      themeIndex: m['themeIndex'],
+      hasDoneOnBoarding: m['hasDoneOnBoarding'],
+      searchHistory:
+          (m['searchHistory'] as List<dynamic>?)?.map((e) => e as String),
+      shakeToFeedback: m['shakeToFeedback'],
+      favoriteTopics:
+          (m['favoriteTopics'] as List<dynamic>?)?.map((e) => e as String),
+    );
+  }
 }
 
 class DeviceExt {

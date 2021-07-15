@@ -1,10 +1,17 @@
 rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
+        // TODO: overall prevent DDOSes by setting "last update" stuff
         match /users/{userId} {
             // TODO: Maybe more strict
+            // TODO: how to prevent taking someone else tag?
             allow update, delete, create: if request.auth != null && request.auth.uid == userId;
             allow read: if request.auth != null;
+        }
+        match /preferences/{preferenceId} {
+            // Only auth & self preferences
+            allow read, update, delete: if request.auth != null && request.auth.uid == preferenceId;
+            allow create: if request.auth != null;
         }
         match /memes/{memeId} {
             allow read: if request.auth != null;
@@ -45,7 +52,7 @@ service cloud.firestore {
                 // TODO:
                 // It can only do so if does not hit the hard limit of 6 players
                 // resource.data.players.size() < 6 - resouce.data.reversedSpots.size();
-            
+
             function canEnterLangame() {
                 let langame = get(/databases/$(database)/documents/langames/$(langameId)).data;
                 // Can enter only if the room is not full or I have a reserved spot
@@ -62,7 +69,7 @@ service cloud.firestore {
                 allow create: if request.auth != null &&
                     request.auth.uid == uid &&
                     canEnterLangame();
-                    
+
                 match /notes/{noteId} {
                     allow read: if request.auth != null;
                     allow write: if request.auth != null && request.auth.uid == uid;
@@ -77,11 +84,7 @@ service cloud.firestore {
             // TODO: allow only see self interactions?
             allow read: if request.auth != null; // && request.auth.uid in resource.data.usersArray;
         }
-        match /preferences/{preferenceId} {
-            // Only auth & self preferences
-            allow read, update, delete: if request.auth != null && request.auth.uid == preferenceId;
-            allow create: if request.auth != null;
-        }
+
         match /stripe_customers/{uid} {
             allow read, write: if request.auth != null && request.auth.uid == uid;
             match /payment_methods/{id} {

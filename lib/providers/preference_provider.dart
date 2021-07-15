@@ -24,8 +24,25 @@ class PreferenceProvider extends ChangeNotifier {
   Stream<UserPreference>? _stream;
   // ignore: cancel_subscriptions
   StreamSubscription<UserPreference>? _streamSubscription;
+  // ignore: close_sinks
+  late StreamController<UserPreference> _preferenceStream;
+
+  Stream<UserPreference> get preferenceStream {
+    return _preferenceStream.stream.asBroadcastStream();
+  }
+
   UserPreference? _preference;
   UserPreference? get preference => _preference;
+
+  addFavoriteTopic(String topic) {
+    _preference?.favoriteTopics.add(topic);
+    notifyListeners();
+  }
+
+  removeFavoriteTopic(String topic) {
+    _preference?.favoriteTopics.remove(topic);
+    notifyListeners();
+  }
 
   setTheme(ThemeMode t) {
     _preference?.themeIndex = t.index;
@@ -65,19 +82,15 @@ class PreferenceProvider extends ChangeNotifier {
 
   PreferenceProvider(this.firebase, this._cap, this._ap) {
     this._api = ImplPreferenceService(this.firebase);
-    // _api.tryFetchFromLocalStorage().then((p) {
-    //   if (p != null) {
-    //     _preference = p;
-    //     notifyListeners();
-    //   }
-    // });
-    // TODO: idc about local storage?
+    _preferenceStream = StreamController.broadcast();
+
     _ap.userStream.listen((e) {
       if (e.type == UserChangeType.NewAuthentication) {
         _stream = _api.streamPreference(e.after!);
         _streamSubscription = _stream!.listen((p) {
           _cap.log('streamPreference');
           _preference = p;
+          _preferenceStream.add(p);
           notifyListeners();
         });
       } else if (e.type == UserChangeType.Disconnection) {
@@ -88,9 +101,33 @@ class PreferenceProvider extends ChangeNotifier {
         _preference = null;
       }
     });
-    _preference =
-        _preference == null ? PreferenceService.defaultPreference : _preference;
-    notifyListeners();
+    // _preference =
+    //     _preference == null ? PreferenceService.defaultPreference : _preference;
+    // _api.tryFetchFromLocalStorage().then((p) {
+    //   if (p != null) {
+    //     _preference = p;
+    //     _preferenceStream.add(p);
+    //     notifyListeners();
+    //   }
+    // });
+    // notifyListeners();
+    // waitUntil(() => _ap.user != null).then((_) {
+    //   firebase.firestore!
+    //       .collection(AppConst.firestorePreferencesCollection)
+    //       .doc(_ap.user!.uid)
+    //       .withConverter<lg.UserPreference>(
+    //         fromFirestore: (s, _) => UserPreferenceExt.fromObject(s.data()!),
+    //         toFirestore: (s, _) => s.toMapStringDynamic(),
+    //       )
+    //       .get()
+    //       .then((p) {
+    //     _cap.log('first preference ${p.data()}');
+    //     if (p.data() == null) return;
+    //     _preference = p.data();
+    //     _preferenceStream.add(p.data()!);
+    //     notifyListeners();
+    //   });
+    // });
   }
 
   Future<LangameResponse> save() async {
@@ -100,7 +137,8 @@ class PreferenceProvider extends ChangeNotifier {
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
         'shakeToFeedback': preference!.shakeToFeedback,
         'hasDoneOnBoarding': preference!.hasDoneOnBoarding,
-        'unknownPeopleRecommendations': preference!.unknownPeopleRecommendations,
+        'unknownPeopleRecommendations':
+            preference!.unknownPeopleRecommendations,
         'themeIndex': preference!.themeIndex,
       });
       _cap.log('save preference');
