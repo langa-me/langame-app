@@ -5,6 +5,288 @@ export namespace langame {
     /** Namespace protobuf. */
     namespace protobuf {
 
+        /** Properties of a SeenMemes. */
+        interface ISeenMemes {
+
+            /** SeenMemes seen */
+            seen?: (langame.protobuf.SeenMemes.ISeen|null);
+        }
+
+        /** Represents a SeenMemes. */
+        class SeenMemes implements ISeenMemes {
+
+            /**
+             * Constructs a new SeenMemes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: langame.protobuf.ISeenMemes);
+
+            /** SeenMemes seen. */
+            public seen?: (langame.protobuf.SeenMemes.ISeen|null);
+
+            /**
+             * Creates a new SeenMemes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SeenMemes instance
+             */
+            public static create(properties?: langame.protobuf.ISeenMemes): langame.protobuf.SeenMemes;
+
+            /**
+             * Encodes the specified SeenMemes message. Does not implicitly {@link langame.protobuf.SeenMemes.verify|verify} messages.
+             * @param message SeenMemes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: langame.protobuf.ISeenMemes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified SeenMemes message, length delimited. Does not implicitly {@link langame.protobuf.SeenMemes.verify|verify} messages.
+             * @param message SeenMemes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: langame.protobuf.ISeenMemes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SeenMemes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SeenMemes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.SeenMemes;
+
+            /**
+             * Decodes a SeenMemes message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns SeenMemes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.SeenMemes;
+
+            /**
+             * Verifies a SeenMemes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SeenMemes message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SeenMemes
+             */
+            public static fromObject(object: { [k: string]: any }): langame.protobuf.SeenMemes;
+
+            /**
+             * Creates a plain object from a SeenMemes message. Also converts values to other types if specified.
+             * @param message SeenMemes
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: langame.protobuf.SeenMemes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SeenMemes to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+
+        namespace SeenMemes {
+
+            /** Properties of a Seen. */
+            interface ISeen {
+
+                /** Seen s */
+                s?: (langame.protobuf.SeenMemes.Seen.ISingle[]|null);
+            }
+
+            /** Represents a Seen. */
+            class Seen implements ISeen {
+
+                /**
+                 * Constructs a new Seen.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.SeenMemes.ISeen);
+
+                /** Seen s. */
+                public s: langame.protobuf.SeenMemes.Seen.ISingle[];
+
+                /**
+                 * Creates a new Seen instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Seen instance
+                 */
+                public static create(properties?: langame.protobuf.SeenMemes.ISeen): langame.protobuf.SeenMemes.Seen;
+
+                /**
+                 * Encodes the specified Seen message. Does not implicitly {@link langame.protobuf.SeenMemes.Seen.verify|verify} messages.
+                 * @param message Seen message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.SeenMemes.ISeen, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Seen message, length delimited. Does not implicitly {@link langame.protobuf.SeenMemes.Seen.verify|verify} messages.
+                 * @param message Seen message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.SeenMemes.ISeen, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a Seen message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Seen
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.SeenMemes.Seen;
+
+                /**
+                 * Decodes a Seen message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Seen
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.SeenMemes.Seen;
+
+                /**
+                 * Verifies a Seen message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a Seen message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Seen
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.SeenMemes.Seen;
+
+                /**
+                 * Creates a plain object from a Seen message. Also converts values to other types if specified.
+                 * @param message Seen
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.SeenMemes.Seen, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Seen to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+
+            namespace Seen {
+
+                /** Properties of a Single. */
+                interface ISingle {
+
+                    /** Single date */
+                    date?: (google.protobuf.ITimestamp|null);
+
+                    /** Single meme */
+                    meme?: (string|null);
+                }
+
+                /** Represents a Single. */
+                class Single implements ISingle {
+
+                    /**
+                     * Constructs a new Single.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: langame.protobuf.SeenMemes.Seen.ISingle);
+
+                    /** Single date. */
+                    public date?: (google.protobuf.ITimestamp|null);
+
+                    /** Single meme. */
+                    public meme: string;
+
+                    /**
+                     * Creates a new Single instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns Single instance
+                     */
+                    public static create(properties?: langame.protobuf.SeenMemes.Seen.ISingle): langame.protobuf.SeenMemes.Seen.Single;
+
+                    /**
+                     * Encodes the specified Single message. Does not implicitly {@link langame.protobuf.SeenMemes.Seen.Single.verify|verify} messages.
+                     * @param message Single message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: langame.protobuf.SeenMemes.Seen.ISingle, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified Single message, length delimited. Does not implicitly {@link langame.protobuf.SeenMemes.Seen.Single.verify|verify} messages.
+                     * @param message Single message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: langame.protobuf.SeenMemes.Seen.ISingle, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a Single message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns Single
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.SeenMemes.Seen.Single;
+
+                    /**
+                     * Decodes a Single message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns Single
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.SeenMemes.Seen.Single;
+
+                    /**
+                     * Verifies a Single message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a Single message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns Single
+                     */
+                    public static fromObject(object: { [k: string]: any }): langame.protobuf.SeenMemes.Seen.Single;
+
+                    /**
+                     * Creates a plain object from a Single message. Also converts values to other types if specified.
+                     * @param message Single
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: langame.protobuf.SeenMemes.Seen.Single, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this Single to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+                }
+            }
+        }
+
         /** Properties of a Meme. */
         interface IMeme {
 
@@ -19,6 +301,9 @@ export namespace langame {
 
             /** Meme promptId */
             promptId?: (string|null);
+
+            /** Meme translated */
+            translated?: ({ [k: string]: string }|null);
         }
 
         /** Represents a Meme. */
@@ -41,6 +326,9 @@ export namespace langame {
 
             /** Meme promptId. */
             public promptId: string;
+
+            /** Meme translated. */
+            public translated: { [k: string]: string };
 
             /**
              * Creates a new Meme instance using the specified properties.
@@ -1108,6 +1396,9 @@ export namespace langame {
 
             /** User devices */
             devices?: (langame.protobuf.User.IDevice[]|null);
+
+            /** User credits */
+            credits?: (number|null);
         }
 
         /** Represents a User. */
@@ -1169,6 +1460,9 @@ export namespace langame {
 
             /** User devices. */
             public devices: langame.protobuf.User.IDevice[];
+
+            /** User credits. */
+            public credits: number;
 
             /**
              * Creates a new User instance using the specified properties.

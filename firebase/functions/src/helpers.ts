@@ -26,6 +26,8 @@ export const kInteractionsCollection: string = "interactions";
 export const kPreferencesCollection: string = "preferences";
 export const kStripeCustomersCollection: string = "stripe_customers";
 export const kProductsCollection: string = "products";
+export const isDev = process.env.GCLOUD_PROJECT?.includes("dev");
+
 
 export const filterOutSendLangameCalls =
     (data: any, context: functions.https.CallableContext) => {

@@ -7,6 +7,7 @@ import {auth} from "firebase-admin/lib/auth";
 import UserRecord = auth.UserRecord;
 import {reportError} from "./errors";
 import {html} from "./utils/html";
+import {ImplAiApi} from "./aiApi/implAiApi";
 
 const title = "Welcome to Langame 👋";
 /* eslint-disable max-len */
@@ -33,10 +34,21 @@ export const onCreateAuthentication = async (user: UserRecord,
     delete clone.passwordSalt;
     delete clone.photoURL;
     clone.photoUrl = photo;
+    clone.credits = 5;
     await db.runTransaction(async (t) => {
       return t.set(db.collection(kUsersCollection).doc(user.uid), clone);
     });
-
+    const api = new ImplAiApi();
+    await api.save(process.env.GCLOUD_PROJECT?.includes("dev") ?
+    "dev_users" :
+    "prod_users", [
+      {
+        object: {
+          user,
+        },
+        id: user.uid,
+      },
+    ]);
     return db.collection("mails").add({
       to: user.email,
       message: {

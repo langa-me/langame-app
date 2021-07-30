@@ -27,7 +27,6 @@ import 'package:share_plus/share_plus.dart';
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
-import 'images/image.dart';
 import 'main_view.dart';
 
 class LangameView extends StatefulWidget {
@@ -215,7 +214,11 @@ class _LangameViewState extends State<LangameView> {
           return WillPopScope(
               onWillPop: () => _onBackPressed(showFeedbackDialogOnLeave: false),
               // Start once two players joined
-              child: cp.buildLoadingWidget(text: _loadingMessage));
+              child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+              child: cp.buildLoadingWidget(text: _loadingMessage))]));
         },
         stream: langameStream);
   }
@@ -661,93 +664,66 @@ class _LangameViewState extends State<LangameView> {
     var theme = Theme.of(context);
     var tp = Provider.of<TagProvider>(context, listen: false);
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    var ctxFutureBuilder = () => FutureBuilder(
-        future: tp.getMemeTags(l.memes[l.currentMeme]),
-        builder: (ctx, AsyncSnapshot<LangameResponse<List<lg.Tag>>> tags) {
-          if (tags.hasData &&
-              tags.data!.result != null &&
-              tags.data!.result!.length > 0) {
-            return IconButton(
-              icon: FaIcon(FontAwesomeIcons.brain,
-                  color: isLightThenDark(context, reverse: false)),
-              onPressed: () => _showContexts(tags.data!.result!
-                  .where((e) => e.hasContext())
-                  .map((e) => e.context)
-                  .toList()),
-            );
-          }
-          return CircularProgressIndicator();
-        });
-    var memeFutureBuilder = () => FutureBuilder(
-        future: tp.getMeme(l.memes[l.currentMeme]),
-        builder: (ctx, AsyncSnapshot<LangameResponse<lg.Meme>> s) {
-          if (s.hasData && s.data!.result != null) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Text(
-                      s.data!.result!.content,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headline6!.merge(TextStyle(
-                          color: isLightThenDark(context, reverse: false))),
-                    ),
-                  ),
-                ),
-                Row(children: [
-                  IconButton(
-                    onPressed: () => Share.share(
-                        'I got into conversations on Langame:\n' +
-                            s.data!.result!.content +
-                            '\n' +
-                            'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
-                        subject:
-                            '${s.data!.result!.content.substring(0, 10)}...'),
-                    icon: Icon(
-                      FontAwesomeIcons.shareAlt,
-                      color: isLightThenDark(context),
-                    ),
-                  ),
-                  ctxFutureBuilder(),
-                  IconButton(
-                    icon:
-                        Icon(Icons.warning_amber_rounded, color: Colors.orange),
-                    onPressed: () => cp.showCustomDialog(
-                        stateless: [
-                          SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                Lottie.asset(
-                                  'animations/warning.json',
-                                  width: AppSize.safeBlockHorizontal * 50,
-                                  height: AppSize.safeBlockVertical * 50,
-                                ),
-                                Text(
-                                  'Some features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.headline6,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                        canBack: true,
-                        height: 70,
-                        title: Text(
-                          'Warning',
+
+    var memeWidget = Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Text(
+              l.memes[l.currentMeme],
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headline6!.merge(
+                  TextStyle(color: isLightThenDark(context, reverse: false))),
+            ),
+          ),
+        ),
+        Row(children: [
+          IconButton(
+            onPressed: () => Share.share(
+                'I got into conversations on Langame:\n' +
+                    l.memes[l.currentMeme] +
+                    '\n' +
+                    'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
+                subject: '${l.memes[l.currentMeme].substring(0, 10)}...'),
+            icon: Icon(
+              FontAwesomeIcons.shareAlt,
+              color: isLightThenDark(context),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            onPressed: () => cp.showCustomDialog(
+                stateless: [
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Lottie.asset(
+                          'animations/warning.json',
+                          width: AppSize.safeBlockHorizontal * 50,
+                          height: AppSize.safeBlockVertical * 50,
+                        ),
+                        Text(
+                          'Some features are experimental, we are working hard on improving the AI behind it, we are grateful for your understanding 🤍',
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.headline4,
-                        )),
+                          style: theme.textTheme.headline6,
+                        ),
+                      ],
+                    ),
                   ),
-                ]),
-              ],
-            );
-          }
-          return Provider.of<ContextProvider>(context, listen: false)
-              .buildLoadingWidget(text: '');
-        });
+                ],
+                canBack: true,
+                height: 70,
+                title: Text(
+                  'Warning',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headline4,
+                )),
+          ),
+        ]),
+      ],
+    );
 
     return Center(
       child: Container(
@@ -761,7 +737,7 @@ class _LangameViewState extends State<LangameView> {
             borderRadius: BorderRadius.all(Radius.circular(10.0))),
         height: AppSize.blockSizeVertical * 40,
         width: AppSize.safeBlockHorizontal * 80,
-        child: memeFutureBuilder(),
+        child: memeWidget,
       ),
     );
   }
@@ -803,9 +779,14 @@ class _LangameViewState extends State<LangameView> {
                                 ),
                               ),
                               child: Center(
-                                child: buildCroppedRoundedNetworkImage(
-                                    p.langameUser.photoUrl),
-                              ),
+                                  child: p.langameUser.hasPhotoUrl()
+                                      ? CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              p.langameUser.photoUrl),
+                                        )
+                                      : CircleAvatar(
+                                          child: Text(p.langameUser.tag),
+                                        )),
                             ),
                             // Icon(Icons
                             //     .mic_rounded), // TODO: use show if other has mic on or not
@@ -839,59 +820,6 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-  Future _showContexts(List<lg.Tag_Context> contexts) => showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Align(
-              child: FaIcon(FontAwesomeIcons.brain,
-                  color: isLightThenDark(context, reverse: false))),
-          content: Container(
-            width: AppSize.safeBlockHorizontal * 70,
-            height: AppSize.safeBlockVertical * 50,
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: variantIsLightThenDark(context),
-                width: 5,
-              ),
-              color: isLightThenDark(context, reverse: true),
-              borderRadius: BorderRadius.all(
-                Radius.circular(10.0),
-              ),
-            ),
-            child: PageView(
-              children: contexts.length == 0
-                  ? [
-                      Column(children: [
-                        Image(
-                          width: AppSize.safeBlockHorizontal * 30,
-                          height: AppSize.safeBlockVertical * 30,
-                          image: AssetImage('images/logo-colourless.png'),
-                        ),
-                        Spacer(),
-                        Text('No contexts for this!',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline4),
-                      ]),
-                    ]
-                  : contexts
-                      .map(
-                        (c) => SingleChildScrollView(
-                          scrollDirection: Axis.vertical, //.horizontal
-                          child: Text(
-                            c.content,
-                            style: TextStyle(
-                              color: isLightThenDark(context),
-                              fontSize: AppSize.blockSizeVertical * 2,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-            ),
-          ),
-        ),
-      );
 
   Future<void> _showEndDialog() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);

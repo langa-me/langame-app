@@ -73,6 +73,7 @@ class UserExt {
       disabled: m['disabled'],
       devices:
           (m['devices'] as List<dynamic>?)?.map((e) => DeviceExt.fromObject(e)),
+      credits: m['credits'],
     );
   }
 
@@ -206,6 +207,7 @@ class MemeExt {
       createdAt: dynamicToProtobufTimestamp(m['createdAt']),
       content: m['content'],
       tags: (m['tags'] as List<dynamic>?)?.map((e) => TagExt.fromObject(e)),
+      translated: m['translated'],
     );
   }
 }

@@ -34,6 +34,35 @@ const FirestoreCollection$json = const {
 
 /// Descriptor for `FirestoreCollection`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List firestoreCollectionDescriptor = $convert.base64Decode('ChNGaXJlc3RvcmVDb2xsZWN0aW9uEgkKBVVTRVJTEAASCQoFTUVNRVMQARILCgdQUk9NUFRTEAISDAoITEFOR0FNRVMQAw==');
+@$core.Deprecated('Use seenMemesDescriptor instead')
+const SeenMemes$json = const {
+  '1': 'SeenMemes',
+  '2': const [
+    const {'1': 'seen', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.SeenMemes.Seen', '10': 'seen'},
+  ],
+  '3': const [SeenMemes_Seen$json],
+};
+
+@$core.Deprecated('Use seenMemesDescriptor instead')
+const SeenMemes_Seen$json = const {
+  '1': 'Seen',
+  '2': const [
+    const {'1': 's', '3': 1, '4': 3, '5': 11, '6': '.langame.protobuf.SeenMemes.Seen.Single', '10': 's'},
+  ],
+  '3': const [SeenMemes_Seen_Single$json],
+};
+
+@$core.Deprecated('Use seenMemesDescriptor instead')
+const SeenMemes_Seen_Single$json = const {
+  '1': 'Single',
+  '2': const [
+    const {'1': 'date', '3': 1, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'date'},
+    const {'1': 'meme', '3': 2, '4': 1, '5': 9, '10': 'meme'},
+  ],
+};
+
+/// Descriptor for `SeenMemes`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List seenMemesDescriptor = $convert.base64Decode('CglTZWVuTWVtZXMSNAoEc2VlbhgBIAEoCzIgLmxhbmdhbWUucHJvdG9idWYuU2Vlbk1lbWVzLlNlZW5SBHNlZW4aiwEKBFNlZW4SNQoBcxgBIAMoCzInLmxhbmdhbWUucHJvdG9idWYuU2Vlbk1lbWVzLlNlZW4uU2luZ2xlUgFzGkwKBlNpbmdsZRIuCgRkYXRlGAEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIEZGF0ZRISCgRtZW1lGAIgASgJUgRtZW1l');
 @$core.Deprecated('Use memeDescriptor instead')
 const Meme$json = const {
   '1': 'Meme',
@@ -42,11 +71,23 @@ const Meme$json = const {
     const {'1': 'content', '3': 2, '4': 1, '5': 9, '10': 'content'},
     const {'1': 'tags', '3': 4, '4': 3, '5': 11, '6': '.langame.protobuf.Tag', '10': 'tags'},
     const {'1': 'prompt_id', '3': 5, '4': 1, '5': 9, '10': 'promptId'},
+    const {'1': 'translated', '3': 6, '4': 3, '5': 11, '6': '.langame.protobuf.Meme.TranslatedEntry', '10': 'translated'},
   ],
+  '3': const [Meme_TranslatedEntry$json],
+};
+
+@$core.Deprecated('Use memeDescriptor instead')
+const Meme_TranslatedEntry$json = const {
+  '1': 'TranslatedEntry',
+  '2': const [
+    const {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    const {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+  '7': const {'7': true},
 };
 
 /// Descriptor for `Meme`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List memeDescriptor = $convert.base64Decode('CgRNZW1lEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIpCgR0YWdzGAQgAygLMhUubGFuZ2FtZS5wcm90b2J1Zi5UYWdSBHRhZ3MSGwoJcHJvbXB0X2lkGAUgASgJUghwcm9tcHRJZA==');
+final $typed_data.Uint8List memeDescriptor = $convert.base64Decode('CgRNZW1lEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIpCgR0YWdzGAQgAygLMhUubGFuZ2FtZS5wcm90b2J1Zi5UYWdSBHRhZ3MSGwoJcHJvbXB0X2lkGAUgASgJUghwcm9tcHRJZBJGCgp0cmFuc2xhdGVkGAYgAygLMiYubGFuZ2FtZS5wcm90b2J1Zi5NZW1lLlRyYW5zbGF0ZWRFbnRyeVIKdHJhbnNsYXRlZBo9Cg9UcmFuc2xhdGVkRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4AQ==');
 @$core.Deprecated('Use tagDescriptor instead')
 const Tag$json = const {
   '1': 'Tag',
@@ -179,6 +220,7 @@ const User$json = const {
     const {'1': 'creation_time', '3': 17, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'creationTime'},
     const {'1': 'disabled', '3': 18, '4': 1, '5': 8, '10': 'disabled'},
     const {'1': 'devices', '3': 19, '4': 3, '5': 11, '6': '.langame.protobuf.User.Device', '10': 'devices'},
+    const {'1': 'credits', '3': 20, '4': 1, '5': 5, '10': 'credits'},
   ],
   '3': const [User_Device$json],
 };
@@ -193,7 +235,7 @@ const User_Device$json = const {
 };
 
 /// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIUCgVhcHBsZRgJIAEoCFIFYXBwbGUSEAoDdGFnGAsgASgJUgN0YWcSFgoGdG9rZW5zGAwgAygJUgZ0b2tlbnMSLwoTbGF0ZXN0X2ludGVyYWN0aW9ucxgNIAMoCVISbGF0ZXN0SW50ZXJhY3Rpb25zEhYKBmVycm9ycxgOIAMoCVIGZXJyb3JzEjkKCmxhc3RfbG9naW4YDyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUglsYXN0TG9naW4SOwoLbGFzdF9sb2dvdXQYECABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgpsYXN0TG9nb3V0Ej8KDWNyZWF0aW9uX3RpbWUYESABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgxjcmVhdGlvblRpbWUSGgoIZGlzYWJsZWQYEiABKAhSCGRpc2FibGVkEjcKB2RldmljZXMYEyADKAsyHS5sYW5nYW1lLnByb3RvYnVmLlVzZXIuRGV2aWNlUgdkZXZpY2VzGlIKBkRldmljZRInCg9sYW5nYW1lX3ZlcnNpb24YASABKAlSDmxhbmdhbWVWZXJzaW9uEh8KC2RldmljZV9pbmZvGAIgASgJUgpkZXZpY2VJbmZv');
+final $typed_data.Uint8List userDescriptor = $convert.base64Decode('CgRVc2VyEhAKA3VpZBgBIAEoCVIDdWlkEhQKBWVtYWlsGAIgASgJUgVlbWFpbBIhCgxkaXNwbGF5X25hbWUYAyABKAlSC2Rpc3BsYXlOYW1lEiEKDHBob25lX251bWJlchgEIAEoCVILcGhvbmVOdW1iZXISGwoJcGhvdG9fdXJsGAUgASgJUghwaG90b1VybBIWCgZvbmxpbmUYBiABKAhSBm9ubGluZRIWCgZnb29nbGUYByABKAhSBmdvb2dsZRIUCgVhcHBsZRgJIAEoCFIFYXBwbGUSEAoDdGFnGAsgASgJUgN0YWcSFgoGdG9rZW5zGAwgAygJUgZ0b2tlbnMSLwoTbGF0ZXN0X2ludGVyYWN0aW9ucxgNIAMoCVISbGF0ZXN0SW50ZXJhY3Rpb25zEhYKBmVycm9ycxgOIAMoCVIGZXJyb3JzEjkKCmxhc3RfbG9naW4YDyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUglsYXN0TG9naW4SOwoLbGFzdF9sb2dvdXQYECABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgpsYXN0TG9nb3V0Ej8KDWNyZWF0aW9uX3RpbWUYESABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgxjcmVhdGlvblRpbWUSGgoIZGlzYWJsZWQYEiABKAhSCGRpc2FibGVkEjcKB2RldmljZXMYEyADKAsyHS5sYW5nYW1lLnByb3RvYnVmLlVzZXIuRGV2aWNlUgdkZXZpY2VzEhgKB2NyZWRpdHMYFCABKAVSB2NyZWRpdHMaUgoGRGV2aWNlEicKD2xhbmdhbWVfdmVyc2lvbhgBIAEoCVIObGFuZ2FtZVZlcnNpb24SHwoLZGV2aWNlX2luZm8YAiABKAlSCmRldmljZUluZm8=');
 @$core.Deprecated('Use userPreferenceDescriptor instead')
 const UserPreference$json = const {
   '1': 'UserPreference',

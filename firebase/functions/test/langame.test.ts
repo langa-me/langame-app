@@ -4,9 +4,9 @@ import * as admin from "firebase-admin";
 import {kLangamesCollection} from "../src/helpers";
 import {langame} from "../src/langame/protobuf/langame";
 
-const cred = admin.credential.cert("./langame-dev-8ac76897c7bc.json");
+// const cred = admin.credential.cert("./langame-dev-8ac76897c7bc.json");
 // eslint-disable-next-line max-len
-// const cred = admin.credential.cert("./langame-86ac4-firebase-adminsdk-iojlf-2d6861b97d.json");
+const cred = admin.credential.cert("./langame-86ac4-firebase-adminsdk-iojlf-2d6861b97d.json");
 require("firebase-functions-test")({
   credential: cred,
   projectId: "langame-dev",
@@ -15,6 +15,8 @@ admin.initializeApp({
   credential: cred,
 });
 import {converter} from "../src/utils/firestore";
+import {internalSetUserRecommendation} from "../src/setUserRecommendation";
+import {ImplAiApi} from "../src/aiApi/implAiApi";
 
 describe("Langame stuff", async () => {
   before(() => {
@@ -78,3 +80,28 @@ describe("Langame stuff", async () => {
     //     }));
   });
 });
+
+
+describe("Random", async () => {
+  it("reco", async () => {
+    const db = admin.firestore();
+    await internalSetUserRecommendation(db);
+  });
+  it("meme to algolia", async () => {
+    const api = new ImplAiApi();
+    // eslint-disable-next-line max-len
+    for (const memeDoc of await admin.firestore().collection("memes").listDocuments()) {
+      const meme = await memeDoc.get();
+      await api.getIndex(
+          "dev_memes").partialUpdateObject({
+        objectID: meme.id,
+        translated: meme.data()!.translated,
+      });
+    }
+  });
+  it("rr", async () => {
+    const l = await admin.firestore().collection("langames").limit(1).get();
+    console.log(l);
+  });
+});
+

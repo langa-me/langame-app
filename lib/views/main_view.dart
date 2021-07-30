@@ -8,6 +8,7 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/views/new_langame_page_view.dart';
+import 'package:langame/views/physical_langame_page_view.dart';
 import 'package:langame/views/settings.dart';
 import 'package:provider/provider.dart';
 
@@ -123,6 +124,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
         NewLangamePageView(goToPage),
         // OldLangamePageView(goToPage),
         // InteractionsPageView(goToPage),
+        PhysicalLangamePageView(goToPage),
         SearchPageView(goToPage),
       ],
     );
@@ -168,28 +170,20 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
           activeIcon: _buildStartIcon(Theme.of(context).colorScheme.secondary),
           label: 'Start',
         ),
-        // BottomNavigationBarItem(
-        //   backgroundColor: Colors.transparent,
-        //   icon: Icon(FontAwesomeIcons.brain,
-        //       color: _selectedIndex == 1
-        //           ? Theme.of(context).colorScheme.secondary
-        //           : isLightThenDark(context)),
-        //   label: 'Langames',
-        // ),
-        // BottomNavigationBarItem(
-        //   backgroundColor: Colors.transparent,
-        //   icon: Icon(FontAwesomeIcons.peopleCarry,
-        //       color: _selectedIndex == 2
-        //           ? Theme.of(context).colorScheme.secondary
-        //           : isLightThenDark(context)),
-        //   label: 'Interactions',
-        // ),
         BottomNavigationBarItem(
           backgroundColor: Colors.transparent,
-          icon: Icon(Icons.search_outlined,
-              color: _selectedIndex == 1
-                  ? Theme.of(context).colorScheme.secondary
-                  : isLightThenDark(context)),
+          icon: Icon(FontAwesomeIcons.peopleArrows,
+              color: getBlackAndWhite(context, 0)),
+          activeIcon: Icon(FontAwesomeIcons.peopleArrows,
+              color: Theme.of(context).colorScheme.secondary),
+          label: 'Face-to-face',
+        ),
+        BottomNavigationBarItem(
+          backgroundColor: Colors.transparent,
+          icon:
+              Icon(Icons.search_outlined, color: getBlackAndWhite(context, 0)),
+          activeIcon: Icon(Icons.search_outlined,
+              color: Theme.of(context).colorScheme.secondary),
           label: 'Search',
         ),
       ],

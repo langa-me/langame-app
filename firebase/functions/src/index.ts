@@ -3,15 +3,16 @@ admin.initializeApp();
 admin.firestore().settings({ignoreUndefinedProperties: true});
 import * as functions from "firebase-functions";
 import {newFeedback} from "./feedback";
-import {setLangamesDone} from "./scheduledFunctions";
 import {onDeleteAuthentication} from "./onDeleteAuthentication";
 import {subscribe} from "./subscribe";
 import {notifyPresence} from "./notifyPresence";
 import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
 import {confirmStripePayment} from "./stripe/confirmStripePayment";
 import {createStripeCustomer} from "./stripe/createStripeCustomer";
-import {kLangamesCollection,
-  kStripeCustomersCollection} from "./helpers";
+import {
+  kLangamesCollection,
+  kStripeCustomersCollection,
+} from "./helpers";
 import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
@@ -21,6 +22,10 @@ import {onCreateAuthentication} from "./onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
 import {langame} from "./langame/protobuf/langame";
 import {onCreateMeme} from "./memes/onCreateMeme";
+import {setLangamesDone} from "./setLangamesDone";
+import {setUserRecommendation} from "./setUserRecommendation";
+import {resetCredits} from "./users/resetCredits";
+import {getMemes} from "./memes/getMemes";
 
 /*
  admin.auth() // TODO: should kick everyone,
@@ -51,16 +56,31 @@ exports.versionCheck = functions
     .https
     .onCall(versionCheck);
 
+exports.getMemes = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .https
+    .onCall(getMemes);
+
 // exports.interactionsDecrement = functions
 //     .pubsub
 //     .schedule("1 * * * *")
 //     .onRun(interactionsDecrement);
+
+exports.userRecommendations = functions
+    .pubsub
+    .schedule("1 * * * *")
+    .onRun(setUserRecommendation);
 
 exports.setLangamesDone = functions
     .pubsub
     .schedule("1 * * * *")
     .onRun(setLangamesDone);
 
+exports.resetCredits = functions
+    .pubsub
+    .schedule("0 1 * * *") // 1 am every day
+    .onRun(resetCredits);
 
 exports.notifyPresence = functions
     .region(region)
@@ -83,6 +103,10 @@ exports.onFeedback = functions
     }
     );
 
+
+// exports.onUpdatePreference = functions.firestore
+//     .document(`${kPreferencesCollection}/{userId}`)
+//     .onUpdate(onUpdatePreference);
 
 // Stripe //
 const prodStripeConfig = {

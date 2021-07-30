@@ -1,15 +1,27 @@
 import {Change, EventContext} from "firebase-functions";
-import {kTagsCollection} from "../helpers";
+import {isDev, kTagsCollection} from "../helpers";
 import {docRefHandleError} from "../utils/firestore";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import {ImplAiApi} from "../aiApi/implAiApi";
 
 export const onWriteMemeTag = async (
     change: Change<admin.firestore.DocumentSnapshot>,
     ctx: EventContext) => {
-  // if (ctx.eventType === "google.firestore.document.create") {
-  //
-  // }
+  // On create new tag, add to algolia index
+  if (ctx.eventType === "google.firestore.document.create" &&
+      change.after.ref.parent.parent &&
+      change.after.data() &&
+      change.after.data()!.topic?.content) {
+    const api = new ImplAiApi();
+    await api.getIndex(isDev ? "dev_memes" : "prod_memes").partialUpdateObject({
+      "objectID": change.after.ref.parent.parent!.id,
+      "_tags": {
+        "_operation": "AddUnique",
+        "value": change.after.data()!.topic.content,
+      },
+    });
+  }
   // TODO: should also compute and set the prompt fitness
   // Basically if the change is a creation of feedback tag
   // or a feedback tag has been updated

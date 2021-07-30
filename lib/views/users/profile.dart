@@ -15,13 +15,19 @@ class Profile extends StatelessWidget {
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-      Text(
+      _user.hasPhotoUrl() ? Text(
         _user.tag,
         style: theme.textTheme.headline6,
         textAlign: TextAlign.center,
-      ),
-      buildCroppedRoundedNetworkImage(_user.photoUrl,
-          width: AppSize.blockSizeHorizontal * 20),
+      ) : SizedBox.shrink(),
+      _user.hasPhotoUrl()
+                                      ? CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              _user.photoUrl),
+                                        )
+                                      : CircleAvatar(
+                                          child: Text(_user.tag),
+                                        ),
     ]);
   }
 }

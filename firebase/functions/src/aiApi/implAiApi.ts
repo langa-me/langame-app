@@ -23,14 +23,17 @@ const huggingfaceEndpoint = "https://api-inference.huggingface.co/models";
 /**
  */
 export class ImplAiApi implements Api {
-    algolia: SearchClient;
-    indexes: Map<string, SearchIndex> = new Map();
+    private algolia: SearchClient;
+    private indexes: Map<string, SearchIndex> = new Map();
 
     /**
      * Initialize the AI API
      */
     constructor() {
       this.algolia = algoliasearch(algoliaId, algoliaKey);
+      this.indexes.set("dev_users", this.algolia.initIndex("dev_users"));
+      this.indexes.set("prod_users", this.algolia.initIndex("prod_users"));
+      this.indexes.set("dev_memes", this.algolia.initIndex("dev_memes"));
       this.indexes.set("prod_memes", this.algolia.initIndex("prod_memes"));
     }
 
@@ -51,6 +54,18 @@ export class ImplAiApi implements Api {
           objectID: e.id,
         };
       }));
+    }
+
+
+    /**
+     *
+     * @param{string} indexName
+     * @return{Promise}
+     */
+    getIndex(indexName: string): SearchIndex {
+      const i = this.indexes.get(indexName);
+      if (!i) throw new Error("invalid index");
+      return i;
     }
 
     /**

@@ -1,11 +1,12 @@
+import {SearchIndex} from "algoliasearch";
 import * as functions from "firebase-functions";
 export const openAiKey = functions.config().openai?.key;
 export const huggingfaceKey = functions.config().huggingface?.key;
-export const algoliaId = functions.config().algolia?.applicationId;
+export const algoliaId = functions.config().algolia?.application.id;
 export const algoliaKey = functions.config().algolia?.key;
-
 export interface Api {
   save(indexName: string, objects: {object: any, id: string}[]): Promise<any>;
+  getIndex(indexName: string): SearchIndex;
   completion(
     prompt: string,
     skipWhenFinishReasonIsLength: boolean,

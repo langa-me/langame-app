@@ -5,7 +5,7 @@ import * as admin from "firebase-admin";
 import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
 import {reportError} from "../errors";
-import {classifyTag} from "./utils";
+import {ImplAiApi} from "../aiApi/implAiApi";
 
 /**
  *
@@ -24,7 +24,15 @@ export const onCreateMeme = async (
       await reportError(new Error("empty meme"), {});
       return;
     }
-    await classifyTag(m);
+    const api = new ImplAiApi();
+    await api.getIndex(process.env.GCLOUD_PROJECT?.includes("dev") ?
+    "dev_memes" :
+    "prod_memes").saveObject({
+      content: m.data()!.content,
+      objectID: m.id,
+      tags: [],
+    });
+    // const tags = await classifyTag(m);
     // eslint-disable-next-line max-len
     // functions.logger.log(`new tags for meme ${m.id}:${tags.map((e) => e.id).join(",")}`);
     // TODO: sentence similarity -> delete

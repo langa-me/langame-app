@@ -1,23 +1,27 @@
 rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
+        function hasSpentCredits() {
+            let credit = get(/databases/$(database)/documents/credits/$(request.auth.uid)).data;
+            // Has reduced its own credit recently
+            return request.time - credit.lastChange < duration.value(20, 's');
+        }
         // TODO: overall prevent DDOSes by setting "last update" stuff
         match /users/{userId} {
             // TODO: Maybe more strict
             // TODO: how to prevent taking someone else tag?
-            allow update, delete, create: if request.auth != null && request.auth.uid == userId;
+            allow delete: if request.auth != null && request.auth.uid == userId;
+            allow update: if request.auth != null && request.auth.uid == userId &&
+                request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['tag', 'displayName', 'photoUrl', 'google', 'apple', 'devices', 'lastSignInTime']) &&
+                // If the user try to change lastSignInTime, it has to be within the 20 seconds obviously
+                request.time - request.resource.data.get('lastSignInTime', request.time)  < duration.value(20, 's');
             allow read: if request.auth != null;
         }
         match /preferences/{preferenceId} {
             // Only auth & self preferences
             allow read, update, delete: if request.auth != null && request.auth.uid == preferenceId;
             allow create: if request.auth != null;
-        }
-        match /memes/{memeId} {
-            allow read: if request.auth != null;
-            match /tags/{tagId} {
-                allow read: if request.auth != null;
-            }
         }
         match /{path=**}/tags/{tagId} {
             allow read: if request.auth != null;
@@ -33,7 +37,9 @@ service cloud.firestore {
             allow create: if request.auth != null &&
                              request.resource.data.keys()
                                 .hasOnly(['initiator', 'date', 'topics', 'reservedSpots']) &&
-                             request.resource.data.initiator == request.auth.uid;
+                             request.resource.data.initiator == request.auth.uid &&
+                             // Has enough credits?
+                             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.credits > 0;
             // Client can update "currentMeme"
             allow update: if (request.resource.data.diff(resource.data)
                 .affectedKeys()

@@ -35,11 +35,14 @@ class PreferenceProvider extends ChangeNotifier {
   UserPreference? get preference => _preference;
 
   addFavoriteTopic(String topic) {
+    _cap.sendClickTopic(topic);
     _preference?.favoriteTopics.add(topic);
     notifyListeners();
   }
 
   removeFavoriteTopic(String topic) {
+    // Removing can still be interesting event interaction.
+    _cap.sendClickTopic(topic);
     _preference?.favoriteTopics.remove(topic);
     notifyListeners();
   }
@@ -76,6 +79,7 @@ class PreferenceProvider extends ChangeNotifier {
   lg.User? _selectedUser;
   lg.User? get selectedUser => _selectedUser;
   set selectedUser(lg.User? v) {
+    _cap.sendUserInteraction(v!.uid);
     _selectedUser = v;
     notifyListeners();
   }
@@ -101,33 +105,7 @@ class PreferenceProvider extends ChangeNotifier {
         _preference = null;
       }
     });
-    // _preference =
-    //     _preference == null ? PreferenceService.defaultPreference : _preference;
-    // _api.tryFetchFromLocalStorage().then((p) {
-    //   if (p != null) {
-    //     _preference = p;
-    //     _preferenceStream.add(p);
-    //     notifyListeners();
-    //   }
-    // });
-    // notifyListeners();
-    // waitUntil(() => _ap.user != null).then((_) {
-    //   firebase.firestore!
-    //       .collection(AppConst.firestorePreferencesCollection)
-    //       .doc(_ap.user!.uid)
-    //       .withConverter<lg.UserPreference>(
-    //         fromFirestore: (s, _) => UserPreferenceExt.fromObject(s.data()!),
-    //         toFirestore: (s, _) => s.toMapStringDynamic(),
-    //       )
-    //       .get()
-    //       .then((p) {
-    //     _cap.log('first preference ${p.data()}');
-    //     if (p.data() == null) return;
-    //     _preference = p.data();
-    //     _preferenceStream.add(p.data()!);
-    //     notifyListeners();
-    //   });
-    // });
+
   }
 
   Future<LangameResponse> save() async {

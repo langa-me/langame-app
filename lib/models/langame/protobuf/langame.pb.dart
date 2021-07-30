@@ -15,12 +15,166 @@ import 'langame.pbenum.dart';
 
 export 'langame.pbenum.dart';
 
+class SeenMemes_Seen_Single extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SeenMemes.Seen.Single', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOM<$0.Timestamp>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'date', subBuilder: $0.Timestamp.create)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'meme')
+    ..hasRequiredFields = false
+  ;
+
+  SeenMemes_Seen_Single._() : super();
+  factory SeenMemes_Seen_Single({
+    $0.Timestamp? date,
+    $core.String? meme,
+  }) {
+    final _result = create();
+    if (date != null) {
+      _result.date = date;
+    }
+    if (meme != null) {
+      _result.meme = meme;
+    }
+    return _result;
+  }
+  factory SeenMemes_Seen_Single.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SeenMemes_Seen_Single.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  SeenMemes_Seen_Single clone() => SeenMemes_Seen_Single()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SeenMemes_Seen_Single copyWith(void Function(SeenMemes_Seen_Single) updates) => super.copyWith((message) => updates(message as SeenMemes_Seen_Single)) as SeenMemes_Seen_Single; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static SeenMemes_Seen_Single create() => SeenMemes_Seen_Single._();
+  SeenMemes_Seen_Single createEmptyInstance() => create();
+  static $pb.PbList<SeenMemes_Seen_Single> createRepeated() => $pb.PbList<SeenMemes_Seen_Single>();
+  @$core.pragma('dart2js:noInline')
+  static SeenMemes_Seen_Single getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SeenMemes_Seen_Single>(create);
+  static SeenMemes_Seen_Single? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $0.Timestamp get date => $_getN(0);
+  @$pb.TagNumber(1)
+  set date($0.Timestamp v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDate() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDate() => clearField(1);
+  @$pb.TagNumber(1)
+  $0.Timestamp ensureDate() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.String get meme => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set meme($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasMeme() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMeme() => clearField(2);
+}
+
+class SeenMemes_Seen extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SeenMemes.Seen', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..pc<SeenMemes_Seen_Single>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 's', $pb.PbFieldType.PM, subBuilder: SeenMemes_Seen_Single.create)
+    ..hasRequiredFields = false
+  ;
+
+  SeenMemes_Seen._() : super();
+  factory SeenMemes_Seen({
+    $core.Iterable<SeenMemes_Seen_Single>? s,
+  }) {
+    final _result = create();
+    if (s != null) {
+      _result.s.addAll(s);
+    }
+    return _result;
+  }
+  factory SeenMemes_Seen.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SeenMemes_Seen.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  SeenMemes_Seen clone() => SeenMemes_Seen()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SeenMemes_Seen copyWith(void Function(SeenMemes_Seen) updates) => super.copyWith((message) => updates(message as SeenMemes_Seen)) as SeenMemes_Seen; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static SeenMemes_Seen create() => SeenMemes_Seen._();
+  SeenMemes_Seen createEmptyInstance() => create();
+  static $pb.PbList<SeenMemes_Seen> createRepeated() => $pb.PbList<SeenMemes_Seen>();
+  @$core.pragma('dart2js:noInline')
+  static SeenMemes_Seen getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SeenMemes_Seen>(create);
+  static SeenMemes_Seen? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<SeenMemes_Seen_Single> get s => $_getList(0);
+}
+
+class SeenMemes extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SeenMemes', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOM<SeenMemes_Seen>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'seen', subBuilder: SeenMemes_Seen.create)
+    ..hasRequiredFields = false
+  ;
+
+  SeenMemes._() : super();
+  factory SeenMemes({
+    SeenMemes_Seen? seen,
+  }) {
+    final _result = create();
+    if (seen != null) {
+      _result.seen = seen;
+    }
+    return _result;
+  }
+  factory SeenMemes.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SeenMemes.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  SeenMemes clone() => SeenMemes()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SeenMemes copyWith(void Function(SeenMemes) updates) => super.copyWith((message) => updates(message as SeenMemes)) as SeenMemes; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static SeenMemes create() => SeenMemes._();
+  SeenMemes createEmptyInstance() => create();
+  static $pb.PbList<SeenMemes> createRepeated() => $pb.PbList<SeenMemes>();
+  @$core.pragma('dart2js:noInline')
+  static SeenMemes getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SeenMemes>(create);
+  static SeenMemes? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  SeenMemes_Seen get seen => $_getN(0);
+  @$pb.TagNumber(1)
+  set seen(SeenMemes_Seen v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasSeen() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSeen() => clearField(1);
+  @$pb.TagNumber(1)
+  SeenMemes_Seen ensureSeen() => $_ensure(0);
+}
+
 class Meme extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Meme', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOM<$0.Timestamp>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
     ..pc<Tag>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tags', $pb.PbFieldType.PM, subBuilder: Tag.create)
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'promptId')
+    ..m<$core.String, $core.String>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translated', entryClassName: 'Meme.TranslatedEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('langame.protobuf'))
     ..hasRequiredFields = false
   ;
 
@@ -30,6 +184,7 @@ class Meme extends $pb.GeneratedMessage {
     $core.String? content,
     $core.Iterable<Tag>? tags,
     $core.String? promptId,
+    $core.Map<$core.String, $core.String>? translated,
   }) {
     final _result = create();
     if (createdAt != null) {
@@ -43,6 +198,9 @@ class Meme extends $pb.GeneratedMessage {
     }
     if (promptId != null) {
       _result.promptId = promptId;
+    }
+    if (translated != null) {
+      _result.translated.addAll(translated);
     }
     return _result;
   }
@@ -98,6 +256,9 @@ class Meme extends $pb.GeneratedMessage {
   $core.bool hasPromptId() => $_has(3);
   @$pb.TagNumber(5)
   void clearPromptId() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.Map<$core.String, $core.String> get translated => $_getMap(4);
 }
 
 class Tag_Topic extends $pb.GeneratedMessage {
@@ -901,6 +1062,7 @@ class User extends $pb.GeneratedMessage {
     ..aOM<$0.Timestamp>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'creationTime', subBuilder: $0.Timestamp.create)
     ..aOB(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disabled')
     ..pc<User_Device>(19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'devices', $pb.PbFieldType.PM, subBuilder: User_Device.create)
+    ..a<$core.int>(20, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'credits', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -923,6 +1085,7 @@ class User extends $pb.GeneratedMessage {
     $0.Timestamp? creationTime,
     $core.bool? disabled,
     $core.Iterable<User_Device>? devices,
+    $core.int? credits,
   }) {
     final _result = create();
     if (uid != null) {
@@ -975,6 +1138,9 @@ class User extends $pb.GeneratedMessage {
     }
     if (devices != null) {
       _result.devices.addAll(devices);
+    }
+    if (credits != null) {
+      _result.credits = credits;
     }
     return _result;
   }
@@ -1133,6 +1299,15 @@ class User extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(19)
   $core.List<User_Device> get devices => $_getList(16);
+
+  @$pb.TagNumber(20)
+  $core.int get credits => $_getIZ(17);
+  @$pb.TagNumber(20)
+  set credits($core.int v) { $_setSignedInt32(17, v); }
+  @$pb.TagNumber(20)
+  $core.bool hasCredits() => $_has(17);
+  @$pb.TagNumber(20)
+  void clearCredits() => clearField(20);
 }
 
 class UserPreference extends $pb.GeneratedMessage {

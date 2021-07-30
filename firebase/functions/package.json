@@ -20,7 +20,7 @@
     "coverage": "codecov"
   },
   "engines": {
-    "node": "12"
+    "node": "14"
   },
   "main": "lib/index.js",
   "dependencies": {
@@ -34,6 +34,7 @@
     "mailchimp-api-v3": "^1.15.0",
     "node-fetch": "^2.6.1",
     "semver": "^7.3.5",
+    "string-similarity": "^4.0.4",
     "stripe": "^8.148.0"
   },
   "devDependencies": {

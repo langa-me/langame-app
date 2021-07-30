@@ -2,6 +2,7 @@
 // to understand how to use the FlexColorScheme package demonstrated in
 // the examples.
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 /// Layout constants and strings used in the example application
@@ -44,6 +45,7 @@ class AppConst {
       'https://apps.apple.com/us/app/langame/id1564745604';
   static const String googlePlayUrl =
       'https://play.google.com/store/apps/details?id=me.langa';
+  static bool isDev = Firebase.apps[0].options.projectId.contains('dev');
 }
 
 /// Fonts assets used in this application,

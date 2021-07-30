@@ -11,13 +11,19 @@ import 'package:provider/provider.dart';
 Widget buildUserTile(BuildContext context, NewLangameProvider lp, lg.User u,
         lg.InteractionLevel? l, void Function(int, {Curve? curve}) goToPage) =>
     ListTile(
-      subtitle:
-          l != null ? l.toFaIcon() : FaIcon(FontAwesomeIcons.questionCircle),
-      title: Text(
+      // subtitle:
+      //     l != null ? l.toFaIcon() : FaIcon(FontAwesomeIcons.questionCircle),
+      title: u.hasPhotoUrl() ? Text(
         '${u.tag}',
         style: Theme.of(context).textTheme.caption,
-      ),
-      leading: buildCroppedRoundedNetworkImage(u.photoUrl),
+      ) : SizedBox.shrink(),
+      leading: u.hasPhotoUrl()
+          ? CircleAvatar(
+              backgroundImage: NetworkImage(u.photoUrl),
+            )
+          : CircleAvatar(
+              child: Text(u.tag),
+            ),
       trailing: MaterialButton(
         // TODO: might use ToggleButton instead? (with icon)
         onPressed: lp.shoppingList.any((e) => e.uid == u.uid)

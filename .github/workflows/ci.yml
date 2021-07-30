@@ -16,7 +16,7 @@ jobs:
           java-version: 11.x
       - uses: subosito/flutter-action@v1
         with: # flutter --version
-          flutter-version: 2.2.0
+          flutter-version: 2.2.2
       - name: Decrypt Android keys
         run: sh ./android/decrypt.sh
         env:

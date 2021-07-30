@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart';
+import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/dynamic_links_provider.dart';
@@ -76,7 +77,7 @@ class _SendLangameState extends State<NewLangamePageView>
                       ? [
                           LangameButton(
                             FontAwesomeIcons.userPlus,
-                            onPressed: () => widget._goToPage(1),
+                            onPressed: () => widget._goToPage(2),
                             text: 'Add people',
                             layer: 1,
                             border: true,
@@ -177,6 +178,11 @@ class _SendLangameState extends State<NewLangamePageView>
       cp.showSnackBar('You must select at least one topics');
       return;
     }
+    var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+    if (ap.user!.credits == 0) {
+            cp.showSnackBar('You don\'t have any credits left 😥');
+      return;
+    }
     // var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
     // if (nlp.selectedTopics.length > 1) {
     //   cp.showSnackBar('For now, only 1 topic at once is supported');
@@ -220,65 +226,67 @@ class _SendLangameState extends State<NewLangamePageView>
     // We ignore the result and do not wait
     lp.addLink(createLangame.result!.id,
         dlp.getChannelNameFromLink(createDynamicLink.result!));
-    cp.showCustomDialog(stateless: [
-      Text(
-          'Copy this link and send it to people you want to meet with. '
-          'Be sure to save it so you can use it later, too.',
-          style: Theme.of(context).textTheme.caption),
-      Divider(),
-      ListTile(
-        onTap: () => FlutterClipboard.copy(createDynamicLink.result!).then(
-            (v) => cp.showSnackBar(
-                '${createDynamicLink.result!} copied to clipboard!')),
-        tileColor: getBlackAndWhite(context, 2, reverse: true),
-        title: Text(
-          createDynamicLink.result!.replaceAll('https://', ''),
-          style: Theme.of(context).textTheme.headline6,
-        ),
-        leading: IconButton(
-          icon: Icon(FontAwesomeIcons.shareAlt,
-              color: isLightThenDark(context, reverse: false)),
-          onPressed: () => Share.share(
-            'Join my Langame to talk about ${nlp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
-            subject:
-                'Join my Langame to talk about ${nlp.selectedTopics.join(',')}',
+    cp.showCustomDialog(
+        stateless: [
+          Text(
+              'Copy this link and send it to people you want to meet with. '
+              'Be sure to save it so you can use it later, too.',
+              style: Theme.of(context).textTheme.caption),
+          Divider(),
+          ListTile(
+            onTap: () => FlutterClipboard.copy(createDynamicLink.result!).then(
+                (v) => cp.showSnackBar(
+                    '${createDynamicLink.result!} copied to clipboard!')),
+            tileColor: getBlackAndWhite(context, 2, reverse: true),
+            title: Text(
+              createDynamicLink.result!.replaceAll('https://', ''),
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            leading: IconButton(
+              icon: Icon(FontAwesomeIcons.shareAlt,
+                  color: isLightThenDark(context, reverse: false)),
+              onPressed: () => Share.share(
+                'Join my Langame to talk about ${nlp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
+                subject:
+                    'Join my Langame to talk about ${nlp.selectedTopics.join(',')}',
+              ),
+            ),
+            trailing: Icon(FontAwesomeIcons.copy,
+                color: isLightThenDark(context, reverse: false)),
           ),
-        ),
-        trailing: Icon(FontAwesomeIcons.copy,
-            color: isLightThenDark(context, reverse: false)),
-      ),
-      LangameButton(
-        FontAwesomeIcons.calendarCheck,
-        onPressed: () {
-          cp.showSnackBar('Coming soon');
-          var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
-          cap.logNewFeatureClick('new_langame_add_to_calendar');
-        },
-        text: 'Add to calendar',
-        layer: 2,
-        // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 100),
-      ),
-      Divider(),
-      Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        // Any case, when 2 player are in, start.
-        LangameButton(FontAwesomeIcons.bell, onPressed: () {
-          // USE CASE: didn't select anybody, any date
-          // - a langame is created, anyone with the link can join anytime
-          // USE CASE: selected X, date Y
-          // - a langame is created, anyone with the link can join anytime,
-          // X is notified of date Y
-          cp.push(RunningLangamesView());
-        }, text: 'Join later', layer: 2),
-        LangameButton(FontAwesomeIcons.hourglass, onPressed: () {
-          // USE CASE: didn't select anybody, any date
-          // - a langame is created, anyone with the link can join anytime
-          // USE CASE: selected X, date Y
-          // - a langame is created, anyone with the link can join anytime,
-          // X is notified of date Y and of presence of self in lg
-          cp.pushReplacement(LangameView(snap.channelName, false));
-        }, text: 'Join now', highlighted: true),
-      ])
-    ],
+          LangameButton(
+            FontAwesomeIcons.calendarCheck,
+            onPressed: () {
+              cp.showSnackBar('Coming soon');
+              var cap =
+                  Provider.of<CrashAnalyticsProvider>(context, listen: false);
+              cap.logNewFeatureClick('new_langame_add_to_calendar');
+            },
+            text: 'Add to calendar',
+            layer: 2,
+            // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 100),
+          ),
+          Divider(),
+          Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            // Any case, when 2 player are in, start.
+            LangameButton(FontAwesomeIcons.bell, onPressed: () {
+              // USE CASE: didn't select anybody, any date
+              // - a langame is created, anyone with the link can join anytime
+              // USE CASE: selected X, date Y
+              // - a langame is created, anyone with the link can join anytime,
+              // X is notified of date Y
+              cp.push(RunningLangamesView());
+            }, text: 'Join later', layer: 2),
+            LangameButton(FontAwesomeIcons.hourglass, onPressed: () {
+              // USE CASE: didn't select anybody, any date
+              // - a langame is created, anyone with the link can join anytime
+              // USE CASE: selected X, date Y
+              // - a langame is created, anyone with the link can join anytime,
+              // X is notified of date Y and of presence of self in lg
+              cp.pushReplacement(LangameView(snap.channelName, false));
+            }, text: 'Join now', highlighted: true),
+          ])
+        ],
         canBack: true,
         title: Text('Here is the link for your Langame',
             style: Theme.of(context).textTheme.headline4));

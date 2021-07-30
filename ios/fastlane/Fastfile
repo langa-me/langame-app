@@ -69,13 +69,13 @@ platform :ios do
       notify_external_testers: true,
       ipa: "./Runner.ipa",
       changelog: "New:
-                  - Basic profile edition
-                  - Choose your favorite topics (will be used for user matching)
-
-                  Known issues:
-                  - Launching URL does not work on some Android phones
-                  - Sharing does not work on some iPads
-                  - Handling sleep / background in Langame is not implemented yet
+      - Face-to-face Langames!
+      
+      Known issues:
+      - Launching URL does not work on some Android phones
+      - Sharing does not work on some iPads
+      - Handling sleep / background in Langame is not implemented yet
+      
 ",
       distribute_external: true,
       groups: "Public",

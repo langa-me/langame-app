@@ -3,7 +3,7 @@ import {QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
 import {kUsersCollection, hashFnv32a} from "./helpers";
 import * as admin from "firebase-admin";
-import {offlineMemeSearch} from "./memes";
+import {offlineMemeSearch} from "./memes/memes";
 import * as functions from "firebase-functions";
 import {converter, db, handleError} from "./utils/firestore";
 import {langame} from "./langame/protobuf/langame";
@@ -76,21 +76,23 @@ export const onCreateLangame = async (
       );
       return;
     }
-    let memes: admin.firestore.DocumentSnapshot<langame.protobuf.Meme>[]
-    | undefined;
-    if (t.parameters.question_engine.defaultValue.value === "offline") {
-      memes = await offlineMemeSearch(lg.data()!.topics,
-          // @ts-ignore
-          // eslint-disable-next-line max-len
-          t.parameters.meme_count.defaultValue.value * 1, // Casting to number
-      );
-    } else if (t.parameters.question_engine.defaultValue.value === "online") {
-      throw Error("unimplemented");
-      // questions =
-      //         await onlineOpenAiCompletion(data.topics, t.parameters);
-    }
+    const memesSeenDoc =
+        await admin.firestore()
+            .collection("seenMemes")
+            .doc(snap.data().initiator)
+            .get();
+    let memesToFilter = memesSeenDoc.data() && memesSeenDoc.data()!.seen ?
+        memesSeenDoc.data()!.seen :
+        [];
 
-    if (!memes || memes.length === 0) {
+    const memes = await offlineMemeSearch(lg.data()!.topics,
+        // @ts-ignore
+        t.parameters.meme_count.defaultValue.value * 1, // Casting to number
+        memesToFilter.map((e: any) => e.meme),
+    );
+
+
+    if (memes.length === 0) {
       await Promise.all(
           handleError(
               snap,
@@ -101,12 +103,15 @@ export const onCreateLangame = async (
       return;
     }
 
+
     functions
         .logger
         .info("found memes for topics", lg.data()!.topics, memes);
 
     await snap.ref.set({
-      memes: memes.map((e) => e.id),
+      memes: memes.map((e) => e.content),
+      // Flattenned tags
+      tags: memes.map((e) => e.tags).reduce((acc, val) => acc.concat(val), []),
       channelName: channelName,
       currentMeme: 0,
       done: null,
@@ -128,15 +133,20 @@ export const onCreateLangame = async (
         ));
         continue;
       }
+      // eslint-disable-next-line max-len
+      let body = `${senderData.data()!.tag} invited you to play ${lg.data()!.topics.join(",")}`;
+      // @ts-ignore
+      if (lg.data()!.date && lg.data()!.date!.toDate === "function") {
+        // @ts-ignore
+        body += `at ${lg.data()!.date!.toDate().toLocaleDateString("en-US")}`;
+      }
       const messagingResponse = await admin.messaging().sendToDevice(
         player.data()!.tokens!,
         {
           data: {channelName: channelName},
           notification: {
             tag: channelName,
-            // TODO: date in notification?
-            // eslint-disable-next-line max-len
-            body: `${senderData.data()!.tag} invited you to play ${lg.data()!.topics.join(",")}`,
+            body: body,
             // eslint-disable-next-line max-len
             title: `Play ${lg.data()!.topics.join(",")} with ${senderData.data()!.tag}?`,
           },
@@ -167,6 +177,29 @@ export const onCreateLangame = async (
                     p));
         }
       });
+
+      const oneWeek = 7 * 24 * 1000 * 60 * 60;
+      const oneWeekAgo = new Date(Date.now() - oneWeek);
+      const newMemesSeen = memes.map((e) => {
+        return {
+          meme: e.objectID,
+          date: new Date(),
+        };
+      });
+      // Filter out memes already seen X time ago
+      // TODO: currently only support initiator
+      memesToFilter =
+          memesToFilter!
+              .filter((e: any) => e.date < oneWeekAgo).concat(newMemesSeen);
+      const promises = [
+        senderData.ref.update({
+          credits: admin.firestore.FieldValue.increment(-1),
+          lastSpent: admin.firestore.FieldValue.serverTimestamp(),
+        })];
+      promises.push(memesSeenDoc.ref.set({
+        seen: memesToFilter,
+      }, {merge: true}));
+      return Promise.all(promises);
     }
   } catch (e) {
     await Promise.all(

@@ -32,6 +32,7 @@ import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/payment_provider.dart';
+import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
@@ -99,8 +100,8 @@ void main() async {
   var funnyProvider = FunnyProvider();
   var contextProvider =
       ContextProvider(navigationKey, scaffoldMessengerKey, funnyProvider);
-  var crashAnalyticsProvider =
-      CrashAnalyticsProvider(firebase.crashlytics, firebase.analytics!);
+  var crashAnalyticsProvider = CrashAnalyticsProvider(
+      firebase.crashlytics, firebase.analytics!, remoteConfig, firebase);
   var authenticationApi = ImplAuthenticationApi(firebase);
   var authenticationProvider = AuthenticationProvider(
       firebase, authenticationApi, crashAnalyticsProvider);
@@ -159,7 +160,8 @@ void main() async {
             ChangeNotifierProvider(
                 create: (_) => TagProvider(firebase, crashAnalyticsProvider)),
             ChangeNotifierProvider(create: (_) => funnyProvider),
-            ChangeNotifierProvider(create: (_) => NewLangameProvider()),
+            ChangeNotifierProvider(
+                create: (_) => NewLangameProvider(crashAnalyticsProvider)),
 
             ///////////////////////////////////////////
             ////////// Dependent providers ////////////
@@ -227,6 +229,12 @@ void main() async {
                 AuthenticationProvider, LangameProvider>(
               update: (_, cap, ap, lp) => lp!,
               create: (_) => langameProvider,
+            ),
+            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
+                PhysicalLangameProvider>(
+              update: (_, cap, p) => p!,
+              create: (_) =>
+                  PhysicalLangameProvider(firebase, crashAnalyticsProvider),
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),

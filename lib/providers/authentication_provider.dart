@@ -42,6 +42,7 @@ class AuthenticationProvider extends ChangeNotifier {
   final AuthenticationApi _authenticationApi;
   late Stream<User?> _firebaseUserStream;
 
+  StreamSubscription<DocumentSnapshot<lg.User>>? _userSubscription;
   // ignore: close_sinks
   late StreamController<UserChange> _userStream;
 
@@ -77,7 +78,7 @@ class AuthenticationProvider extends ChangeNotifier {
         _user = null;
         _userStream.add(change);
         _cap.log('authentication_provider:${change.type}');
-
+        _userSubscription?.cancel();
         notifyListeners();
         return null;
       }
@@ -140,14 +141,22 @@ class AuthenticationProvider extends ChangeNotifier {
         ),
       );
     }
-    await firebase.firestore!
+    final ref = firebase.firestore!
         .collection(AppConst.firestoreUsersCollection)
         .doc(_user!.uid)
         .withConverter<lg.User>(
           fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
           toFirestore: (s, _) => s.toMapStringDynamic(),
-        )
-        .set(lg.User(devices: _user!.devices), SetOptions(merge: true));
+        );
+    await ref.set(lg.User(devices: _user!.devices), SetOptions(merge: true));
+
+    _userSubscription = ref.snapshots().listen((s) {
+      final change = UserChange(UserChangeType.ProfileEdition, _user, s.data());
+      _userStream.add(change);
+      _user = s.data();
+      notifyListeners();
+    });
+
     _cap.log('authentication_provider:updated devices');
   }
 
@@ -167,51 +176,19 @@ class AuthenticationProvider extends ChangeNotifier {
         return LangameResponse(LangameStatus.failed);
       }
       if (uc.user == null) throw LangameAuthException('null_user');
-      // Shouldn't update profile on new user at login
-      if (uc.additionalUserInfo != null && uc.additionalUserInfo!.isNewUser) {
-        firebase.analytics?.logLogin();
-        return LangameResponse(LangameStatus.succeed);
-      }
-      var userDoc = await firebase.firestore!
+      firebase.firestore!
           .collection(AppConst.firestoreUsersCollection)
           .doc(uc.user!.uid)
-          .get();
-      // TODO: Temporary hack because above if doesn't work
-      if (!userDoc.exists) return LangameResponse(LangameStatus.succeed);
-
-      // If it's an existing user and it has some new data from auth
-      // i.e. updated social profile maybe? Or simply
-      // authenticated with another social provider which has more data
-      // TODO: maybe should only change photo, name when it was empty,
-      // TODO: maybe the user want  different photo, name on social and langame
-      var newDisplayName = _user != null &&
-              _user!.displayName.isEmpty &&
-              uc.user!.displayName != null &&
-              uc.user!.displayName!.isNotEmpty
-          ? uc.user!.displayName
-          : null;
-      var newPhotoUrl = _user != null &&
-              _user!.photoUrl.isEmpty &&
-              uc.user!.photoURL != null &&
-              uc.user!.photoURL!.isNotEmpty
-          ? uc.user!.photoURL
-          : null;
-
-      var isGoogle = uc.credential!.providerId == 'google.com';
-      var isApple = uc.credential!.providerId == 'apple.com';
-      await userDoc.reference.update({
-        'displayName': newDisplayName,
-        'photoUrl': newPhotoUrl,
-        'google': isGoogle,
-        'apple': isApple,
+          .update({
+        'lastSignInTime': DateTime.now(),
       });
+      firebase.analytics?.logLogin();
+      return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
       _cap.log('failed to authentication_provider:loginWith');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
-    firebase.analytics?.logLogin();
-    return LangameResponse(LangameStatus.succeed);
   }
 
   Future<LangameResponse<void>> loginWithApple() async {
@@ -332,6 +309,7 @@ class AuthenticationProvider extends ChangeNotifier {
           .update({'tag': tag});
       _cap.log('updateTag');
       _user!.tag = tag;
+
       notifyListeners();
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {

@@ -107,7 +107,14 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
                 subtitle: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: snapshot.data!.result!
-                        .map((e) => buildCroppedRoundedNetworkImage(e.photoUrl))
+                        .map((e) => e.hasPhotoUrl()
+                                      ? CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              e.photoUrl),
+                                        )
+                                      : CircleAvatar(
+                                          child: Text(e.tag),
+                                        ))
                         .toList()),
                 trailing: Tooltip(
                     child: Icon(FontAwesomeIcons.clock),

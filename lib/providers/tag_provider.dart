@@ -33,26 +33,6 @@ class TagProvider extends ChangeNotifier {
         );
   }
 
-  Future<LangameResponse<lg.Meme>> getMeme(String memeId) async {
-    try {
-      var meme = await firebase.firestore!
-          .collection(AppConst.firestoreMemesCollection)
-          .doc(memeId)
-          .withConverter<lg.Meme>(
-            fromFirestore: (s, _) => MemeExt.fromObject(s.data()!),
-            toFirestore: (s, _) => s.toMapStringDynamic(),
-          )
-          .get();
-      if (meme.data() == null) return LangameResponse(LangameStatus.failed);
-      _cap.log('tag_provider:getMeme $memeId');
-      return LangameResponse(LangameStatus.succeed, result: meme.data());
-    } catch (e, s) {
-      _cap.log('failed to getMeme $memeId');
-      _cap.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
-  }
-
   Future<LangameResponse<List<lg.Tag>>> getMemeTags(String memeId) async {
     try {
       var tags = await firebase.firestore!
