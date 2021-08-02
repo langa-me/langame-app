@@ -1,0 +1,61 @@
+
+name: Flutter release CI/CD
+
+on:
+  push:
+    branches:
+      - dev*
+
+# TODO: should fail if commit is not of format "[version]+[versionCode]:"
+jobs:
+  # CD
+  deploy_android:
+    name: Deploy Firebase distribution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Wait for build to succeed
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-ci
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: ci
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Abort when failed CI
+        if: steps.wait-for-build.outputs.conclusion == 'failure'
+        run: |
+          echo ${{ steps.check.outputs.status }}
+          exit 1
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11.x
+      - name: Decrypt Android keys
+        run: sh ./android/decrypt.sh
+        env:
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      # Hack because somehow refuse building if not in root (works in debug though)
+      - run: cp android/app/src/main/google-services.json android/app
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: 2.2.0
+      - name: Install Flutter dependencies
+        run: flutter pub get
+      - run: flutter build apk --release --flavor prod
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.2'
+      - name: Run Fastlane
+        uses: maierj/fastlane-action@v2.0.1
+        with:
+          lane: firebase_distribution
+          subdirectory: android
+        env:
+          FIREBASE_CLI_TOKEN: '${{ secrets.FIREBASE_CLI_TOKEN }}'
+
+  

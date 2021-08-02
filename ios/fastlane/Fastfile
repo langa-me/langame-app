@@ -80,7 +80,7 @@ platform :ios do
       - Handling sleep / background in Langame is not implemented yet
       ",
       distribute_external: true,
-      groups: "Public",
+      groups: "public",
     )
 
     delete_temp_keychain(keychain_name)

@@ -1,11 +1,6 @@
 rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
-        function hasSpentCredits() {
-            let credit = get(/databases/$(database)/documents/credits/$(request.auth.uid)).data;
-            // Has reduced its own credit recently
-            return request.time - credit.lastChange < duration.value(20, 's');
-        }
         // TODO: overall prevent DDOSes by setting "last update" stuff
         match /users/{userId} {
             // TODO: Maybe more strict

@@ -11,24 +11,40 @@ platform :android do
         build_type: 'Release'
       )
       upload_to_play_store(
-        track: 'alpha',
+        track: 'beta',
         aab: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
         skip_upload_metadata: false,
         skip_upload_images: false,
         skip_upload_screenshots: false,
-        release_status: 'draft',
+        release_status: 'completed',
         version_code: flutter_version(
           pubspec_location: '../pubspec.yaml'
         )['version_code'],
       )
-      # firebase_app_distribution(
-      #   android_artifact_type: 'AAB',
-      #   android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
-      #   app: '1:909899959016:android:e74963d90d60a74cc0575d',
-      #   firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
-      #   groups: 'basic, internal',
-      #   release_notes: 'Add a feature upvote link'
-      # )
+      firebase_app_distribution(
+        android_artifact_type: 'AAB',
+        android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
+        app: '1:909899959016:android:e74963d90d60a74cc0575d',
+        firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
+        release_notes: ''
+      )
+    end
+  end
+  lane :firebase_distribution do
+    begin
+      gradle(task: 'clean')
+      gradle(
+        task: 'bundle',
+        flavor: 'prod',
+        build_type: 'Release'
+      )
+      firebase_app_distribution(
+        android_artifact_type: 'AAB',
+        android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
+        app: '1:909899959016:android:e74963d90d60a74cc0575d',
+        firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
+        release_notes: ''
+      )
     end
   end
 end
