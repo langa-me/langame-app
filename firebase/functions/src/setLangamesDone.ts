@@ -22,7 +22,7 @@ export const setLangamesDone =
 
         // TODO: filter done above instead
         for (const doc of langamesOlderThanOneHourAgo.docs
-            .filter((e) => e.data().done && "nanos" in e.data().done!)) {
+            .filter((e) => !e.data().done)) {
           t.update(doc.ref, {
             done: admin.firestore.FieldValue.serverTimestamp(),
           });

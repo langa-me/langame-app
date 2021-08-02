@@ -12,7 +12,7 @@ import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:share/share.dart';
 
 import 'colors/colors.dart';
 import 'images/image.dart';
@@ -95,12 +95,7 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
             var s = format.format(l.started.toDateTime().toLocal());
             var startedString = l.hasStarted() ? '\n\nstarted: $s' : '';
             return ExpansionTile(
-                backgroundColor: l.isLocked &&
-                        (!l.reservedSpots.contains(ap.user!.uid) ||
-                            // Obviously the initiator can always join
-                            ap.user!.uid != l.initiator)
-                    ? getBlackAndWhite(context, 1, reverse: true)
-                    : getBlackAndWhite(context, 0, reverse: true),
+                backgroundColor: getBlackAndWhite(context, 1, reverse: true),
                 title: Text(l.topics.join(','),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.caption),

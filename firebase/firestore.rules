@@ -12,11 +12,13 @@ service cloud.firestore {
             // TODO: how to prevent taking someone else tag?
             allow delete: if request.auth != null && request.auth.uid == userId;
             allow update: if request.auth != null && request.auth.uid == userId &&
-                request.resource.data.diff(resource.data).affectedKeys()
-                .hasOnly(['tag', 'displayName', 'photoUrl', 'google', 'apple', 'devices', 'lastSignInTime']) &&
+                (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits'])); // &&
                 // If the user try to change lastSignInTime, it has to be within the 20 seconds obviously
-                request.time - request.resource.data.get('lastSignInTime', request.time)  < duration.value(20, 's');
+                //request.time - request.resource.data.get('lastSignInTime', request.time)  < duration.value(20, 's');
             allow read: if request.auth != null;
+        }
+        match /recommendations/{recommendationId} {
+            allow read: if request.auth != null && request.auth.uid == recommendationId;
         }
         match /preferences/{preferenceId} {
             // Only auth & self preferences
@@ -85,10 +87,6 @@ service cloud.firestore {
         // @see https://firebase.google.com/docs/firestore/security/rules-query#secure_and_query_documents_based_on_collection_groups
         match /{path=**}/players/{uid} {
             allow read: if request.auth != null;
-        }
-        match /interactions/{interactionId} {
-            // TODO: allow only see self interactions?
-            allow read: if request.auth != null; // && request.auth.uid in resource.data.usersArray;
         }
 
         match /stripe_customers/{uid} {

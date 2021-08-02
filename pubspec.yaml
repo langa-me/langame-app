@@ -1,6 +1,6 @@
 name: langame
 description: Gamified conversations instrumented by AI
-version: 1.3.6+58
+version: 1.3.7+59
 authors:
   - Langame <contact@langa.me>
 
@@ -26,7 +26,8 @@ dependencies:
   shared_preferences: ^2.0.3
   json_annotation: ^4.0.1
   universal_platform: ^1.0.0+1
-  share_plus: ^2.1.4
+  # share_plus: ^2.1.4 # unless works on ipad
+  share: ^2.0.4
 
   # Firebase
 

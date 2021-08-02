@@ -69,14 +69,16 @@ platform :ios do
       notify_external_testers: true,
       ipa: "./Runner.ipa",
       changelog: "New:
-      - Face-to-face Langames!
+      - Early user recommendation feature!
+      
+      Fixed issues:
+      - Sharing does now work on iPads
+      - Light theme texts were invisible
       
       Known issues:
       - Launching URL does not work on some Android phones
-      - Sharing does not work on some iPads
       - Handling sleep / background in Langame is not implemented yet
-      
-",
+      ",
       distribute_external: true,
       groups: "Public",
     )

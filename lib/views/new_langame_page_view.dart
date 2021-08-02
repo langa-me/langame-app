@@ -15,13 +15,12 @@ import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
-import 'package:langame/providers/relation_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/langame.dart';
 import 'package:langame/views/running_langames_view.dart';
 import 'package:langame/views/topic_search.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:share/share.dart';
 
 import 'colors/colors.dart';
 import 'users/user_tile.dart';
@@ -55,11 +54,11 @@ class _SendLangameState extends State<NewLangamePageView>
           children: [
             // TextDivider('Topic'),
             Container(
-                width: AppSize.safeBlockHorizontal * 60,
+                width: AppSize.safeBlockHorizontal * 40,
                 child: LangameButton(FontAwesomeIcons.graduationCap,
                     onPressed: () => cp.push(TopicSearchView()),
                     text: nlp.selectedTopics.isEmpty
-                        ? 'Select a topic'
+                        ? ''
                         : nlp.selectedTopics.first.topic.content,
                     layer: 1,
                     border: true)),
@@ -68,9 +67,9 @@ class _SendLangameState extends State<NewLangamePageView>
             ),
 
             Container(
-              width: AppSize.safeBlockHorizontal * 80,
-              child: Consumer2<NewLangameProvider, RelationProvider>(
-                builder: (c, nlp, rp, child) => ListView(
+              width: AppSize.safeBlockHorizontal * 40,
+              child: Consumer<NewLangameProvider>(
+                builder: (c, nlp, child) => ListView(
                   physics: BouncingScrollPhysics(),
                   shrinkWrap: true,
                   children: nlp.shoppingList.isEmpty
@@ -78,7 +77,7 @@ class _SendLangameState extends State<NewLangamePageView>
                           LangameButton(
                             FontAwesomeIcons.userPlus,
                             onPressed: () => widget._goToPage(2),
-                            text: 'Add people',
+                            text: '',
                             layer: 1,
                             border: true,
                           ),
@@ -89,20 +88,12 @@ class _SendLangameState extends State<NewLangamePageView>
                         ]
                       : nlp.shoppingList
                           .map(
-                            (e) => FutureBuilder<
-                                LangameResponse<InteractionLevel?>>(
-                              future: rp.getInteraction(e.uid),
-                              builder: (ctx, s) => buildUserTile(
+                            (e) => buildUserTile(
                                 context,
                                 nlp,
                                 e,
-                                s.hasData &&
-                                        s.data != null &&
-                                        s.data!.result != null
-                                    ? s.data!.result
-                                    : null,
                                 widget._goToPage,
-                              ),
+                              
                             ),
                           )
                           .toList(),

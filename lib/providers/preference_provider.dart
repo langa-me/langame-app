@@ -79,7 +79,7 @@ class PreferenceProvider extends ChangeNotifier {
   lg.User? _selectedUser;
   lg.User? get selectedUser => _selectedUser;
   set selectedUser(lg.User? v) {
-    _cap.sendUserInteraction(v!.uid);
+    if(v != null) _cap.sendUserInteraction(v.uid);
     _selectedUser = v;
     notifyListeners();
   }
@@ -103,9 +103,9 @@ class PreferenceProvider extends ChangeNotifier {
         _stream = null;
         _streamSubscription = null;
         _preference = null;
+        notifyListeners();
       }
     });
-
   }
 
   Future<LangameResponse> save() async {

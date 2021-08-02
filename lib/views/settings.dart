@@ -154,33 +154,41 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             //             p.setShakeToFeedback(!p.preference!.shakeToFeedback)),
             //   ),
             // ),
-            // Consumer<PreferenceProvider>(
-            //   builder: (context, p, child) => ListTile(
-            //     onTap: () {
-            //       if (kReleaseMode) {
-            //         cp.showSnackBar('Coming soon!');
-            //         cap.logNewFeatureClick('settings_user_recommendations');
-            //         return;
-            //       }
-            //       p.setRecommendations(
-            //           !p.preference!.unknownPeopleRecommendations);
-            //     },
-            //     leading: Icon(Icons.recommend, color: isLightThenDark(context)),
-            //     title: Text('User recommendations',
-            //         style: Theme.of(context).textTheme.headline6),
-            //     trailing: Switch(
-            //         value: p.preference!.unknownPeopleRecommendations,
-            //         onChanged: (v) {
-            //           if (kReleaseMode) {
-            //             cp.showSnackBar('Coming soon!');
-            //             cap.logNewFeatureClick('settings_subscription');
-            //             return;
-            //           }
-            //           p.setRecommendations(
-            //               !p.preference!.unknownPeopleRecommendations);
-            //         }),
-            //   ),
-            // ),
+            Consumer<PreferenceProvider>(
+              builder: (context, p, child) => ListTile(
+                onTap: () {
+                  if (kReleaseMode) {
+                    cp.showSnackBar('Coming soon!');
+                    cap.logNewFeatureClick('settings_user_recommendations');
+                    return;
+                  }
+                  if (!p.preference!.unknownPeopleRecommendations) {
+                    cp.showSnackBar(
+                        'Understood! You will have recommendation in user search for example!');
+                  }
+                  p.setRecommendations(
+                      !p.preference!.unknownPeopleRecommendations);
+                },
+                leading: Icon(Icons.recommend, color: isLightThenDark(context)),
+                title: Text('User recommendations',
+                    style: Theme.of(context).textTheme.headline6),
+                trailing: Switch(
+                    value: p.preference!.unknownPeopleRecommendations,
+                    onChanged: (v) {
+                      if (kReleaseMode) {
+                        cp.showSnackBar('Coming soon!');
+                        cap.logNewFeatureClick('settings_user_recommendations');
+                        return;
+                      }
+                      if (!p.preference!.unknownPeopleRecommendations) {
+                        cp.showSnackBar(
+                            'Understood! You will have recommendation in user search for example!');
+                      }
+                      p.setRecommendations(
+                          !p.preference!.unknownPeopleRecommendations);
+                    }),
+              ),
+            ),
             Divider(),
             ListTile(
               onTap: () {

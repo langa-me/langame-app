@@ -23,6 +23,11 @@ class ImplLangameApi extends LangameApi {
       firebase.firestore!
           .collection(AppConst.firestoreLangamesCollection)
           .where('initiator', isEqualTo: firebase.auth!.currentUser!.uid)
+          .get(),
+      firebase.firestore!
+          .collection(AppConst.firestoreLangamesCollection)
+          .where('reservedSpots',
+              arrayContains: firebase.auth!.currentUser!.uid)
           .get()
     ]);
     var langamesParticipant = p[0]
@@ -30,7 +35,9 @@ class ImplLangameApi extends LangameApi {
         .where((e) => e.reference.parent.parent != null)
         .map((e) => e.reference.parent.parent!);
     var langamesInitiator = p[1].docs.map((e) => e.reference);
-    return [...langamesParticipant, ...langamesInitiator].map((e) => e
+    var langameReservedSpots = p[2].docs.map((e) => e.reference);
+    return [...langamesParticipant, ...langamesInitiator, ...langameReservedSpots]
+        .map((e) => e
         .withConverter<lg.Langame>(
           fromFirestore: (e, _) => LangameExt.fromObject(e.data()!),
           toFirestore: (e, _) => e.toMapStringDynamic(),

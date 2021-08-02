@@ -9,7 +9,7 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:share/share.dart';
 
 import 'colors/colors.dart';
 
@@ -99,7 +99,7 @@ class _State extends State<PhysicalLangamePageView>
             : SizedBox.shrink(),
         SizedBox(height: AppSize.safeBlockVertical * 5),
         plp.memes.length == 0
-            ? Image.asset('images/logo-colourless.png')
+            ? Image.asset('images/logo-colourless.png', height: AppSize.safeBlockVertical * 50)
             : Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -140,7 +140,7 @@ class _State extends State<PhysicalLangamePageView>
                   child: Tooltip(
                       message: 'You are given 5 credits a day',
                       child: Row(children: [
-                        Text('${ap.user != null ? ap.user!.credits : 0}'),
+                        Text('${ap.user != null ? ap.user!.credits : 0}', style: Theme.of(context).textTheme.caption),
                         Icon(FontAwesomeIcons.bitcoin,
                             color: ap.user!.credits == 0
                                 ? Colors.red
@@ -148,11 +148,12 @@ class _State extends State<PhysicalLangamePageView>
                       ]))),
               Align(
                   alignment: Alignment.center,
-                  child: LangameButton(
-                      false
+                  child: IconButton(
+                      icon: Icon(ap.user!.credits == 0
                           ? FontAwesomeIcons.stopCircle
                           : FontAwesomeIcons.syncAlt,
-                      disabled: ap.user!.credits == 0,
+                          color: getBlackAndWhite(context, 1)
+                          ),
                       onPressed: ap.user!.credits > 0
                           ? () {
                               _getMemes = plp.getMemes();

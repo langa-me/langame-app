@@ -5,7 +5,6 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/relation_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;

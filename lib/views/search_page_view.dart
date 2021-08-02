@@ -7,6 +7,7 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
+import 'package:langame/views/users/user_tile.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -212,21 +213,18 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     return Consumer2<PreferenceProvider, NewLangameProvider>(
         builder: (c, p, lp, _) {
       if (p.selectedUser == null) {
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.search,
-                size: 64,
-              ),
-              Text(
-                'Start searching',
-                style: Theme.of(context).textTheme.headline5,
+        return p.preference!.unknownPeopleRecommendations
+            ? Column(
+                children: [
+                  Text('Recommendations', style: Theme.of(context).textTheme.headline5),
+                  Expanded(child: ListView(
+                      children: lp.recommendations
+                          .map((e) =>
+                              buildUserTile(context, lp, e, widget._goToPage))
+                          .toList()))
+                ],
               )
-            ],
-          ),
-        );
+            : Image.asset('images/logo-colourless.png');
       }
 
       var cp = Provider.of<ContextProvider>(context, listen: false);

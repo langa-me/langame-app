@@ -36,7 +36,7 @@ export const onDeleteAuthentication = async (user: UserRecord,
   const userDocToDelete = db
       .collection(kUsersCollection)
       .doc(user.uid);
-
+  // TODO: update according to new user data model
   const batch = db.batch();
   // TODO: shouldn't we use transaction for read too?
   try {

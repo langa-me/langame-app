@@ -44,7 +44,6 @@ import 'package:langame/views/langame.dart';
 import 'package:langame/views/login.dart';
 import 'package:provider/provider.dart';
 
-import 'providers/relation_provider.dart';
 import 'services/http/firebase.dart';
 import 'services/http/impl_langame_api.dart';
 import 'services/http/impl_payment_api.dart';
@@ -121,8 +120,6 @@ void main() async {
         });
   var messageProvider = MessageProvider(firebase, messageApi,
       crashAnalyticsProvider, authenticationProvider, contextProvider);
-  var relationProvider = RelationProvider(
-      authenticationApi, crashAnalyticsProvider, authenticationProvider);
   var preferenceProvider = PreferenceProvider(
       firebase, crashAnalyticsProvider, authenticationProvider);
   var remoteConfigProvider =
@@ -137,12 +134,12 @@ void main() async {
   );
   var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
       authenticationProvider, ImplLangameApi(firebase));
-
-  await Future.delayed(Duration(milliseconds: 100));
+  var newLangameProvider = NewLangameProvider(
+      crashAnalyticsProvider, authenticationProvider, firebase);
   SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then(
-    (_) => runApp(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
+    runApp(
       BetterFeedback(
         child: MultiProvider(
           providers: [
@@ -160,8 +157,7 @@ void main() async {
             ChangeNotifierProvider(
                 create: (_) => TagProvider(firebase, crashAnalyticsProvider)),
             ChangeNotifierProvider(create: (_) => funnyProvider),
-            ChangeNotifierProvider(
-                create: (_) => NewLangameProvider(crashAnalyticsProvider)),
+            ChangeNotifierProvider(create: (_) => newLangameProvider),
 
             ///////////////////////////////////////////
             ////////// Dependent providers ////////////
@@ -193,11 +189,7 @@ void main() async {
               update: (_, cap, ap, mp) => mp!,
               create: (_) => messageProvider,
             ),
-            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
-                AuthenticationProvider, RelationProvider>(
-              update: (_, cap, ap, rp) => rp!,
-              create: (_) => relationProvider,
-            ),
+
             ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
                 ContextProvider, PreferenceProvider, FeedbackProvider>(
               update: (ctx, cap, cp, pp, fp) {
@@ -240,8 +232,9 @@ void main() async {
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),
         ),
       ),
-    ),
-  );
+    );
+    authenticationProvider.readyToInit = true;
+  });
 }
 
 class MyApp extends StatefulWidget {

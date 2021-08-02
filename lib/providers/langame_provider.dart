@@ -65,9 +65,8 @@ class LangameProvider extends ChangeNotifier {
         _finishedLangames.clear();
         _runningLangames.clear();
         _subs.add(stream.listen((snap) {
-          if (snap.data() == null) return;
-          // Seconds = 0 = null
-          if (snap.data()!.hasDone() && snap.data()?.done.seconds != 0) {
+          if (snap.data() == null || snap.data()!.date.toDateTime().isBefore(DateTime.now().subtract(Duration(hours: 24)))) return;
+          if (snap.data()!.hasDone() && snap.data()!.done.toDateTime().year == 1970) {
             _finishedLangames[snap.id] = snap.data()!;
           } else {
             _runningLangames[snap.id] = snap.data()!;

@@ -1,8 +1,6 @@
 // Replace the 3 values below with your own
 import {https} from "firebase-functions";
-import {FirebaseFunctionsResponse,
-  FirebaseFunctionsResponseStatusCode} from "./models";
-import {kBetasCollection, kInvalidRequest} from "./helpers";
+import {kBetasCollection} from "./helpers";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
@@ -21,37 +19,24 @@ const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
 
 export const subscribe = async (
     data: any, context: https.CallableContext) => {
-  if (!context.rawRequest.headers.origin) {
-    return new FirebaseFunctionsResponse(
-        500,
-        undefined,
-        undefined,
-    );
+  if (!context.rawRequest.ip) {
+    throw new functions.https.HttpsError("internal", "unknown error");
   }
-  const uidQualifier = "u_" + context.rawRequest.headers.origin;
+  const uidQualifier = "u_" + context.rawRequest.ip;
   const isQuotaExceeded =
   await perUserlimiter.isQuotaAlreadyExceeded(uidQualifier);
   if (isQuotaExceeded) {
-    return new FirebaseFunctionsResponse(
-        429,
-        undefined,
-        "too many requests",
-    );
+    throw new functions.https
+        .HttpsError("resource-exhausted", "too many requests");
   }
 
   if (!data) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        kInvalidRequest,
-    );
+    throw new functions.https
+        .HttpsError("invalid-argument", "you must provide an email");
   }
   if (!data.email) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        "you must provide a valid email",
-    );
+    throw new functions.https
+        .HttpsError("invalid-argument", "you must provide an email");
   }
 
   functions.logger.info("trying to register new beta user", data.email);
@@ -63,11 +48,8 @@ export const subscribe = async (
       .get();
 
   if (existing.docs.some((d) => d.exists)) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        "already subscribed",
-    );
+    throw new functions.https
+        .HttpsError("invalid-argument", "already subscribed");
   }
 
 
@@ -86,20 +68,13 @@ export const subscribe = async (
             data.email,
             JSON.stringify(res));
 
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.OK,
-            undefined,
-            undefined,
-        );
+        return;
       }).catch((e) => {
         functions.
             logger.
             error("failed to add new beta user", data.email, e);
 
-        return new FirebaseFunctionsResponse(
-            FirebaseFunctionsResponseStatusCode.INTERNAL,
-            undefined,
-            "failed to add beta email",
-        );
+        throw new functions.https
+            .HttpsError("internal", "unknown error");
       });
 };

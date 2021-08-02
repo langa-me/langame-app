@@ -23,7 +23,7 @@ import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:share/share.dart';
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
@@ -260,7 +260,7 @@ class _LangameViewState extends State<LangameView> {
                                 ? FontAwesomeIcons.lock
                                 : FontAwesomeIcons.lockOpen;
                             Color? iconColor;
-                            String txt = l.isLocked ? 'Unlock' : 'Lock';
+                            String txt = l.isLocked ? 'Unlocked the Langame, everyone can join using the link' : 'Locked the Langame, only invited people can join now';
                             return Column(children: [
                               Consumer<LangameProvider>(builder: (c, lp, _) {
                                 var onTap = () => !l.hasIsLocked()

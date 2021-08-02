@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/future.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
@@ -56,11 +57,14 @@ class AuthenticationProvider extends ChangeNotifier {
     return _user;
   }
 
+  bool readyToInit = false;
+
   /// Create an authentication provider, and
   AuthenticationProvider(this.firebase, this._authenticationApi, this._cap) {
     _firebaseUserStream = _authenticationApi.userChanges;
     _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
+      await waitUntil(() => readyToInit);
       if (data == null || firebase.auth!.currentUser == null) {
         // TODO: should go back to login automatically
         // If logged out, set logout time

@@ -13,6 +13,7 @@ import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/services/http/preference/preference_service.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/on_boarding.dart';
@@ -69,7 +70,7 @@ class _LoginViewState extends State<LoginView> {
         }
 
         var pp = Provider.of<PreferenceProvider>(context, listen: false);
-        pp.preferenceStream.first
+        await pp.preferenceStream.firstWhere((e) => e.userId == user.after!.uid)
             .timeout(Duration(milliseconds: 500))
             .catchError((_) => lg.UserPreference());
 
@@ -85,6 +86,7 @@ class _LoginViewState extends State<LoginView> {
           if (cp.route == LangameRoute.LoginView)
             cp.pushReplacement(MainView());
         } else {
+          cap.log('login_view:starting onboarding');
           // User previously authenticated but didn't do setup
           // User is not opening the app from a notification
           cp.pushReplacement(OnBoarding());
