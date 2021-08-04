@@ -100,8 +100,14 @@ describe("Random", async () => {
     }
   });
   it("rr", async () => {
-    const l = await admin.firestore().collection("langames").limit(1).get();
-    console.log(l);
+    const ts = await admin.firestore().collection("topics").get();
+    const api = new ImplAiApi();
+
+    for (const t of ts.docs) {
+      await api.getIndex("prod_topics").saveObject({
+        objectID: t.id,
+      });
+    }
   });
 });
 

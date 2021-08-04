@@ -99,6 +99,9 @@ service cloud.firestore {
         match /products/{productId} {
             allow read: if request.auth != null;
         }
+        match /topics/{topicId} {
+            allow read: if request.auth != null;
+        }
     }
 }
 

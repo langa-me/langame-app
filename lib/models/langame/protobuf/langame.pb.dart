@@ -1313,31 +1313,33 @@ class User extends $pb.GeneratedMessage {
 class UserPreference extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserPreference', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userId')
-    ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'unknownPeopleRecommendations')
+    ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userRecommendations')
     ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'themeIndex', $pb.PbFieldType.O3)
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'hasDoneOnBoarding')
-    ..pPS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'searchHistory')
+    ..pPS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userSearchHistory')
     ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'shakeToFeedback')
     ..pPS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'favoriteTopics')
+    ..pPS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topicSearchHistory')
     ..hasRequiredFields = false
   ;
 
   UserPreference._() : super();
   factory UserPreference({
     $core.String? userId,
-    $core.bool? unknownPeopleRecommendations,
+    $core.bool? userRecommendations,
     $core.int? themeIndex,
     $core.bool? hasDoneOnBoarding,
-    $core.Iterable<$core.String>? searchHistory,
+    $core.Iterable<$core.String>? userSearchHistory,
     $core.bool? shakeToFeedback,
     $core.Iterable<$core.String>? favoriteTopics,
+    $core.Iterable<$core.String>? topicSearchHistory,
   }) {
     final _result = create();
     if (userId != null) {
       _result.userId = userId;
     }
-    if (unknownPeopleRecommendations != null) {
-      _result.unknownPeopleRecommendations = unknownPeopleRecommendations;
+    if (userRecommendations != null) {
+      _result.userRecommendations = userRecommendations;
     }
     if (themeIndex != null) {
       _result.themeIndex = themeIndex;
@@ -1345,14 +1347,17 @@ class UserPreference extends $pb.GeneratedMessage {
     if (hasDoneOnBoarding != null) {
       _result.hasDoneOnBoarding = hasDoneOnBoarding;
     }
-    if (searchHistory != null) {
-      _result.searchHistory.addAll(searchHistory);
+    if (userSearchHistory != null) {
+      _result.userSearchHistory.addAll(userSearchHistory);
     }
     if (shakeToFeedback != null) {
       _result.shakeToFeedback = shakeToFeedback;
     }
     if (favoriteTopics != null) {
       _result.favoriteTopics.addAll(favoriteTopics);
+    }
+    if (topicSearchHistory != null) {
+      _result.topicSearchHistory.addAll(topicSearchHistory);
     }
     return _result;
   }
@@ -1387,13 +1392,13 @@ class UserPreference extends $pb.GeneratedMessage {
   void clearUserId() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.bool get unknownPeopleRecommendations => $_getBF(1);
+  $core.bool get userRecommendations => $_getBF(1);
   @$pb.TagNumber(3)
-  set unknownPeopleRecommendations($core.bool v) { $_setBool(1, v); }
+  set userRecommendations($core.bool v) { $_setBool(1, v); }
   @$pb.TagNumber(3)
-  $core.bool hasUnknownPeopleRecommendations() => $_has(1);
+  $core.bool hasUserRecommendations() => $_has(1);
   @$pb.TagNumber(3)
-  void clearUnknownPeopleRecommendations() => clearField(3);
+  void clearUserRecommendations() => clearField(3);
 
   @$pb.TagNumber(4)
   $core.int get themeIndex => $_getIZ(2);
@@ -1414,7 +1419,7 @@ class UserPreference extends $pb.GeneratedMessage {
   void clearHasDoneOnBoarding() => clearField(5);
 
   @$pb.TagNumber(6)
-  $core.List<$core.String> get searchHistory => $_getList(4);
+  $core.List<$core.String> get userSearchHistory => $_getList(4);
 
   @$pb.TagNumber(7)
   $core.bool get shakeToFeedback => $_getBF(5);
@@ -1427,6 +1432,9 @@ class UserPreference extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(8)
   $core.List<$core.String> get favoriteTopics => $_getList(6);
+
+  @$pb.TagNumber(9)
+  $core.List<$core.String> get topicSearchHistory => $_getList(7);
 }
 
 class Langame extends $pb.GeneratedMessage {

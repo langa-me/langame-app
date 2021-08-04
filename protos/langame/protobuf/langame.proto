@@ -143,13 +143,18 @@ enum InteractionLevel {
 message UserPreference {
   string user_id = 2;
   // Do I want to be recommended like-minded new people?
-  bool unknown_people_recommendations = 3;
+  bool user_recommendations = 3;
   int32 theme_index = 4;
   bool has_done_on_boarding = 5;
   // Searched user tags
-  repeated string search_history = 6;
+  repeated string user_search_history = 6;
   bool shake_to_feedback = 7;
   repeated string favorite_topics = 8;
+  repeated string topic_search_history = 9;
+  message Notification {
+    bool email = 1;
+    bool push = 2;
+  }
 }
 
 message Langame {

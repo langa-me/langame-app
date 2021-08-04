@@ -70,6 +70,7 @@ platform :ios do
       ipa: "./Runner.ipa",
       changelog: "New:
       - Early user recommendation feature!
+      - Better topic search capabilities, now Langames can have several topics
       
       Fixed issues:
       - Sharing does now work on iPads
@@ -77,7 +78,7 @@ platform :ios do
       
       Known issues:
       - Launching URL does not work on some Android phones
-      - Handling sleep / background in Langame is not implemented yet
+      - Handling sleep / background in Langame is not properly handled yet
       ",
       distribute_external: true,
       groups: "public",

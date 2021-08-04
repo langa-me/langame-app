@@ -55,8 +55,6 @@ class NewLangameProvider extends ChangeNotifier {
   List<lg.User> _recommendations = [];
   List<lg.User> get recommendations => _recommendations;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _subReco;
-  List<lg.Tag> _selectedTopics = [];
-  List<lg.Tag> get selectedTopics => _selectedTopics;
   DateTime? _selectedDate;
   DateTime? get selectedDate => _selectedDate;
   int _maximumPlayers = 5;
@@ -69,18 +67,6 @@ class NewLangameProvider extends ChangeNotifier {
 
   void removePlayer(lg.User player) {
     _shoppingList.removeWhere((e) => e.uid == player.uid);
-    notifyListeners();
-  }
-
-  void addTopic(lg.Tag topic) {
-    _cap.sendClickTopic(topic.topic.content);
-    _selectedTopics.add(topic);
-    notifyListeners();
-  }
-
-  void removeTopic(lg.Tag topic) {
-    _cap.sendClickTopic(topic.topic.content);
-    _selectedTopics.removeWhere((e) => e.topic.content == topic.topic.content);
     notifyListeners();
   }
 

@@ -10,6 +10,7 @@ import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
 import {confirmStripePayment} from "./stripe/confirmStripePayment";
 import {createStripeCustomer} from "./stripe/createStripeCustomer";
 import {
+  isDev,
   kLangamesCollection,
   kStripeCustomersCollection,
 } from "./helpers";
@@ -26,16 +27,7 @@ import {setLangamesDone} from "./setLangamesDone";
 import {setUserRecommendation} from "./setUserRecommendation";
 import {resetCredits} from "./users/resetCredits";
 import {getMemes} from "./memes/getMemes";
-
-/*
- admin.auth() // TODO: should kick everyone,
-            // notify clients update or change remoteconfig
-            // maybe FCM topic push version
-     .listUsers()
-     .then((r) => r.users.forEach((u) =>
-     functions.logger.info(u.displayName)
-     /* admin.auth().revokeRefreshTokens(u.uid)* /));
-*/
+import * as Sentry from "@sentry/node";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -43,6 +35,16 @@ const runtimeOpts = {
 };
 // TODO: somehow doesn't work then on client
 const region = "us-central1";
+
+Sentry.init({
+  dsn: "https://d871af5f23904bea86cddd740deaec48@o404046.ingest.sentry.io/5891479",
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+  environment: isDev ? "development" : "production",
+});
 
 exports.subscribe = functions
     .region(region)

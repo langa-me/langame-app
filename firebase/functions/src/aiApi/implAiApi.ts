@@ -35,6 +35,8 @@ export class ImplAiApi implements Api {
       this.indexes.set("prod_users", this.algolia.initIndex("prod_users"));
       this.indexes.set("dev_memes", this.algolia.initIndex("dev_memes"));
       this.indexes.set("prod_memes", this.algolia.initIndex("prod_memes"));
+      this.indexes.set("dev_topics", this.algolia.initIndex("dev_topics"));
+      this.indexes.set("prod_topics", this.algolia.initIndex("prod_topics"));
     }
 
     /**

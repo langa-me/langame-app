@@ -80,6 +80,7 @@ class LangameButton extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
   final bool disabled;
   final bool highlighted;
+  final Size? fixedSize;
 
   const LangameButton(this.icon,
       {Key? key,
@@ -89,7 +90,9 @@ class LangameButton extends StatefulWidget {
       this.border,
       this.padding,
       this.disabled = false,
-      this.highlighted = false})
+      this.highlighted = false,
+      this.fixedSize,
+      })
       : super(key: key);
   @override
   State<StatefulWidget> createState() =>
@@ -110,6 +113,7 @@ class _LangameButtonState extends State<LangameButton> {
     }
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
+        fixedSize: widget.fixedSize,
         primary: bg,
         // onSurface = disabled
         onSurface: getBlackAndWhite(context, widget.layer + 1, reverse: true),
@@ -126,11 +130,13 @@ class _LangameButtonState extends State<LangameButton> {
       onPressed: disabled ? null : widget.onPressed,
       icon: Icon(widget.icon, color: fg),
       label: widget.text != null
-          ? Text(
+          ? Flexible(child: Text(
               widget.text!,
               textAlign: TextAlign.center,
+              overflow: TextOverflow.fade,
+              maxLines: 2,
               style: TextStyle(color: fg),
-            )
+          ))
           : SizedBox.shrink(),
     );
   }

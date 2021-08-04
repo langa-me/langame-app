@@ -1,0 +1,11 @@
+New:
+- Early user recommendation feature!
+- Better topic search capabilities, now Langames can have several topics
+
+Fixed issues:
+- Sharing does now work on iPads
+- Light theme texts were invisible
+
+Known issues:
+- Launching URL does not work on some Android phones
+- Handling sleep / background in Langame is not properly handled yet

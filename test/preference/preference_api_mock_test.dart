@@ -1,4 +1,4 @@
-void main(){}
+void main() {}
 // import 'package:cloud_firestore_mocks/cloud_firestore_mocks.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
@@ -66,8 +66,8 @@ void main(){}
 //       var fetchedP = await preferenceService.tryFetchFromLocalStorage();
 //       debugPrint('fetched $fetchedP');
 //       expect(fetchedP, isNotNull);
-//       expect(fetchedP!.unknownPeopleRecommendations,
-//           equals(p.unknownPeopleRecommendations));
+//       expect(fetchedP!.userRecommendations,
+//           equals(p.userRecommendations));
 //       expect(fetchedP.themeIndex, equals(p.themeIndex));
 //       expect(fetchedP.hasDoneOnBoarding, equals(p.hasDoneOnBoarding));
 //       expect(fetchedP.shakeToFeedback, equals(p.shakeToFeedback));
@@ -88,8 +88,8 @@ void main(){}
 //       debugPrint('fetched ${fetchedP.data()}');
 //       expect(fetchedP.exists, isTrue);
 //       expect(fetchedP.data(), isNotNull);
-//       expect(fetchedP.data()['unknownPeopleRecommendations'],
-//           equals(p.unknownPeopleRecommendations));
+//       expect(fetchedP.data()['userRecommendations'],
+//           equals(p.userRecommendations));
 //       expect(fetchedP.data()['themeIndex'], equals(p.themeIndex));
 //       expect(fetchedP.data()['hasDoneOnBoarding'], equals(p.hasDoneOnBoarding));
 //       expect(fetchedP.data()['shakeToFeedback'], equals(p.shakeToFeedback));
@@ -108,8 +108,8 @@ void main(){}
 //         // Last-in first-out
 //         debugPrint('e $e');
 //         expect(e, isNotNull);
-//         expect(e.unknownPeopleRecommendations,
-//             equals(p.unknownPeopleRecommendations));
+//         expect(e.userRecommendations,
+//             equals(p.userRecommendations));
 //         expect(e.themeIndex, equals(p.themeIndex));
 //         expect(e.hasDoneOnBoarding, equals(p.hasDoneOnBoarding));
 //         expect(e.shakeToFeedback,

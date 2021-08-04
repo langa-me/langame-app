@@ -241,17 +241,18 @@ const UserPreference$json = const {
   '1': 'UserPreference',
   '2': const [
     const {'1': 'user_id', '3': 2, '4': 1, '5': 9, '10': 'userId'},
-    const {'1': 'unknown_people_recommendations', '3': 3, '4': 1, '5': 8, '10': 'unknownPeopleRecommendations'},
+    const {'1': 'user_recommendations', '3': 3, '4': 1, '5': 8, '10': 'userRecommendations'},
     const {'1': 'theme_index', '3': 4, '4': 1, '5': 5, '10': 'themeIndex'},
     const {'1': 'has_done_on_boarding', '3': 5, '4': 1, '5': 8, '10': 'hasDoneOnBoarding'},
-    const {'1': 'search_history', '3': 6, '4': 3, '5': 9, '10': 'searchHistory'},
+    const {'1': 'user_search_history', '3': 6, '4': 3, '5': 9, '10': 'userSearchHistory'},
     const {'1': 'shake_to_feedback', '3': 7, '4': 1, '5': 8, '10': 'shakeToFeedback'},
     const {'1': 'favorite_topics', '3': 8, '4': 3, '5': 9, '10': 'favoriteTopics'},
+    const {'1': 'topic_search_history', '3': 9, '4': 3, '5': 9, '10': 'topicSearchHistory'},
   ],
 };
 
 /// Descriptor for `UserPreference`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List userPreferenceDescriptor = $convert.base64Decode('Cg5Vc2VyUHJlZmVyZW5jZRIXCgd1c2VyX2lkGAIgASgJUgZ1c2VySWQSRAoedW5rbm93bl9wZW9wbGVfcmVjb21tZW5kYXRpb25zGAMgASgIUhx1bmtub3duUGVvcGxlUmVjb21tZW5kYXRpb25zEh8KC3RoZW1lX2luZGV4GAQgASgFUgp0aGVtZUluZGV4Ei8KFGhhc19kb25lX29uX2JvYXJkaW5nGAUgASgIUhFoYXNEb25lT25Cb2FyZGluZxIlCg5zZWFyY2hfaGlzdG9yeRgGIAMoCVINc2VhcmNoSGlzdG9yeRIqChFzaGFrZV90b19mZWVkYmFjaxgHIAEoCFIPc2hha2VUb0ZlZWRiYWNrEicKD2Zhdm9yaXRlX3RvcGljcxgIIAMoCVIOZmF2b3JpdGVUb3BpY3M=');
+final $typed_data.Uint8List userPreferenceDescriptor = $convert.base64Decode('Cg5Vc2VyUHJlZmVyZW5jZRIXCgd1c2VyX2lkGAIgASgJUgZ1c2VySWQSMQoUdXNlcl9yZWNvbW1lbmRhdGlvbnMYAyABKAhSE3VzZXJSZWNvbW1lbmRhdGlvbnMSHwoLdGhlbWVfaW5kZXgYBCABKAVSCnRoZW1lSW5kZXgSLwoUaGFzX2RvbmVfb25fYm9hcmRpbmcYBSABKAhSEWhhc0RvbmVPbkJvYXJkaW5nEi4KE3VzZXJfc2VhcmNoX2hpc3RvcnkYBiADKAlSEXVzZXJTZWFyY2hIaXN0b3J5EioKEXNoYWtlX3RvX2ZlZWRiYWNrGAcgASgIUg9zaGFrZVRvRmVlZGJhY2sSJwoPZmF2b3JpdGVfdG9waWNzGAggAygJUg5mYXZvcml0ZVRvcGljcxIwChR0b3BpY19zZWFyY2hfaGlzdG9yeRgJIAMoCVISdG9waWNTZWFyY2hIaXN0b3J5');
 @$core.Deprecated('Use langameDescriptor instead')
 const Langame$json = const {
   '1': 'Langame',

@@ -94,11 +94,11 @@ class UserPreferenceExt {
     var m = o as Map<String, dynamic>;
     return lg.UserPreference(
       userId: m['userId'],
-      unknownPeopleRecommendations: m['unknownPeopleRecommendations'],
+      userRecommendations: m['userRecommendations'],
       themeIndex: m['themeIndex'],
       hasDoneOnBoarding: m['hasDoneOnBoarding'],
-      searchHistory:
-          (m['searchHistory'] as List<dynamic>?)?.map((e) => e as String),
+      userSearchHistory:
+          (m['userSearchHistory'] as List<dynamic>?)?.map((e) => e as String),
       shakeToFeedback: m['shakeToFeedback'],
       favoriteTopics:
           (m['favoriteTopics'] as List<dynamic>?)?.map((e) => e as String),

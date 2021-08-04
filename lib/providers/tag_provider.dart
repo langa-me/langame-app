@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
@@ -7,82 +8,92 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
-import 'package:langame/services/http/impl_tag_api.dart';
-import 'package:langame/services/http/tag_api.dart';
 
 class TagProvider extends ChangeNotifier {
+  TagProvider(this.firebase, this._cap, this._algolia, this._pp);
   final FirebaseApi firebase;
   final CrashAnalyticsProvider _cap;
+  final Algolia? _algolia;
+  final PreferenceProvider _pp;
 
-  late TagApi _api;
-  final Map<String, lg.Tag> _topics = Map<String, lg.Tag>();
-  Map<String, lg.Tag> get topics => _topics;
+  void query(String value) async {
+    if (value.isEmpty) {
+      resetFilteredTopicSearchTagHistory();
+      return;
+    }
 
-  TagProvider(this.firebase, this._cap) {
-    _api = ImplTagApi(firebase);
-    _api.streamTopics().listen(
-          (snap) => snap.docs.forEach(
-            (t) {
-              if (t.data().hasTopic()) {
-                topics[t.data().topic.content] = t.data();
-                notifyListeners();
-              }
-            },
-          ),
-        );
+    final i = _algolia?.index('prod_topics');
+    final o = await i?.query('$value').getObjects();
+    filteredTopicSearchHistory = o?.hits
+        .map((e) => e.data['objectID'] as String)
+        .toList()
+        .reversed
+        .toList();
   }
 
-  Future<LangameResponse<List<lg.Tag>>> getMemeTags(String memeId) async {
-    try {
-      var tags = await firebase.firestore!
-          .collection(AppConst.firestoreMemesCollection)
-          .doc(memeId)
-          .collection(AppConst.firestoreTagsSubCollection)
-          .withConverter<lg.Tag>(
-            fromFirestore: (s, _) => TagExt.fromObject(s.data()!),
-            toFirestore: (s, _) => s.toMapStringDynamic(),
-          )
-          .get();
-
-      _cap.log('getMemeTags $memeId');
-
-      return LangameResponse(LangameStatus.succeed,
-          result: tags.docs.map((e) => e.data()).toList());
-    } catch (e, s) {
-      _cap.log('failed to getMemeTags $memeId');
-      _cap.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
-    }
+  List<String> _filteredTopicSearchHistory = [];
+  List<String> get filteredTopicSearchHistory => _filteredTopicSearchHistory;
+  set filteredTopicSearchHistory(v) {
+    _filteredTopicSearchHistory = v;
+    notifyListeners();
   }
 
-  Future<LangameResponse<List<DocumentSnapshot<lg.Meme>>>> getMemeOfTopics(
-      List<String> topics) async {
-    try {
-      // TODO: CURSOR!!!
-      // https://firebase.google.com/docs/firestore/query-data/query-cursors#node.js_3
-      var tags = await firebase.firestore!
-          .collectionGroup(AppConst.firestoreTagsSubCollection)
-          .where('topic.content', whereIn: topics)
-          .withConverter<lg.Tag>(
-            fromFirestore: (s, _) => TagExt.fromObject(s.data()!),
-            toFirestore: (s, _) => s.toMapStringDynamic(),
-          )
-          .get();
-      _cap.log('getMemeOfTopics $topics');
-      return LangameResponse(LangameStatus.succeed,
-          result: await Future.wait(tags.docs
-              .where((e) => e.reference.parent.parent != null)
-              .map((e) => e.reference.parent.parent!
-                  .withConverter<lg.Meme>(
-                    fromFirestore: (s, _) => MemeExt.fromObject(s.data()!),
-                    toFirestore: (s, _) => s.toMapStringDynamic(),
-                  )
-                  .get())));
-    } catch (e, s) {
-      _cap.log('failed to getMemeOfTopics $topics');
-      _cap.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
+  Set<String> _selectedTopics = {};
+  Set<String> get selectedTopics => _selectedTopics;
+  void addToSelectedTopic(String v) {
+    _cap.sendClickTopic(v);
+    _selectedTopics.add(v);
+    notifyListeners();
+  }
+
+  void removeFromSelectedTopic(String v) {
+    _cap.sendClickTopic(v);
+    _selectedTopics.remove(v);
+    notifyListeners();
+  }
+
+  static const _historyLength = 5;
+
+  void addTopicSearchHistory(String topic) {
+    _pp.preference!.topicSearchHistory.add(topic);
+    if (_pp.preference!.topicSearchHistory.length > _historyLength) {
+      for (var i = _pp.preference!.topicSearchHistory.length;
+          i > _historyLength;
+          i--) {
+        _pp.preference!.topicSearchHistory
+            .remove(_pp.preference!.topicSearchHistory.elementAt(i));
+      }
     }
+    _cap.log('tag_provider:addTopicSearchHistory');
+
+    notifyListeners();
+    firebase.analytics
+        ?.logEvent(name: 'add_topic_history', parameters: {'topic': topic});
+  }
+
+  void placeFirstTopicSearchHistory(String topic) {
+    _cap.log('tag_provider:placeFirstTopicSearchHistory');
+
+    _pp.preference!.topicSearchHistory.removeWhere((e) => e == topic);
+    _pp.preference!.topicSearchHistory.add(topic);
+  }
+
+  void deleteTopicSearchHistory(String tag) {
+    _cap.log('tag_provider:deleteTopicSearchHistory');
+
+    _pp.preference!.topicSearchHistory.removeWhere((e) => e == tag);
+    _filteredTopicSearchHistory.removeWhere((e) => e == tag);
+    notifyListeners();
+    firebase.analytics?.logEvent(
+        name: 'delete_topic_search_history', parameters: {'tag': tag});
+  }
+
+  void resetFilteredTopicSearchTagHistory() {
+    _cap.log('tag_provider:resetFilteredTopicSearchTagHistory');
+
+    _filteredTopicSearchHistory = _pp.preference!.topicSearchHistory;
+    notifyListeners();
   }
 }

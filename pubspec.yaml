@@ -1,6 +1,6 @@
 name: langame
 description: Gamified conversations instrumented by AI
-version: 1.3.7+59
+version: 1.3.8+60
 authors:
   - Langame <contact@langa.me>
 
@@ -28,6 +28,7 @@ dependencies:
   universal_platform: ^1.0.0+1
   # share_plus: ^2.1.4 # unless works on ipad
   share: ^2.0.4
+  sentry_flutter: ^5.1.0
 
   # Firebase
 

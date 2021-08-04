@@ -157,35 +157,23 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
                 onTap: () {
-                  if (kReleaseMode) {
-                    cp.showSnackBar('Coming soon!');
-                    cap.logNewFeatureClick('settings_user_recommendations');
-                    return;
-                  }
-                  if (!p.preference!.unknownPeopleRecommendations) {
+                  if (!p.preference!.userRecommendations) {
                     cp.showSnackBar(
                         'Understood! You will have recommendation in user search for example!');
                   }
-                  p.setRecommendations(
-                      !p.preference!.unknownPeopleRecommendations);
+                  p.setRecommendations(!p.preference!.userRecommendations);
                 },
                 leading: Icon(Icons.recommend, color: isLightThenDark(context)),
                 title: Text('User recommendations',
                     style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
-                    value: p.preference!.unknownPeopleRecommendations,
+                    value: p.preference!.userRecommendations,
                     onChanged: (v) {
-                      if (kReleaseMode) {
-                        cp.showSnackBar('Coming soon!');
-                        cap.logNewFeatureClick('settings_user_recommendations');
-                        return;
-                      }
-                      if (!p.preference!.unknownPeopleRecommendations) {
+                      if (!p.preference!.userRecommendations) {
                         cp.showSnackBar(
                             'Understood! You will have recommendation in user search for example!');
                       }
-                      p.setRecommendations(
-                          !p.preference!.unknownPeopleRecommendations);
+                      p.setRecommendations(!p.preference!.userRecommendations);
                     }),
               ),
             ),

@@ -46,38 +46,38 @@ class _State extends State<HackView> with AfterLayoutMixin<HackView> {
               setState(() {});
             },
           ),
-          Expanded(
-            child:
-                FutureBuilder<LangameResponse<List<DocumentSnapshot<lg.Meme>>>>(
-              future: tp.getMemeOfTopics([myController.text]),
-              builder: (ctx, s) {
-                if (s.data == null || s.data!.result == null) {
-                  return cp.buildLoadingWidget();
-                }
-                if (s.data!.result!.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image(
-                          width: AppSize.blockSizeHorizontal * 30,
-                          image: AssetImage('images/logo-colourless.png'),
-                        ),
-                        SizedBox(height: AppSize.safeBlockVertical * 10),
-                        Text('Nothing there!',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline4),
-                      ],
-                    ),
-                  );
-                }
-                return ListView.builder(
-                    itemCount: s.data!.result!.length,
-                    itemBuilder: (ctx, i) =>
-                        _buildTile([myController.text], s.data!.result![i].data()!));
-              },
-            ),
-          ),
+          // Expanded(
+          //   child:
+          //       FutureBuilder<LangameResponse<List<DocumentSnapshot<lg.Meme>>>>(
+          //     future: tp.getMemeOfTopics([myController.text]),
+          //     builder: (ctx, s) {
+          //       if (s.data == null || s.data!.result == null) {
+          //         return cp.buildLoadingWidget();
+          //       }
+          //       if (s.data!.result!.isEmpty) {
+          //         return Center(
+          //           child: Column(
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Image(
+          //                 width: AppSize.blockSizeHorizontal * 30,
+          //                 image: AssetImage('images/logo-colourless.png'),
+          //               ),
+          //               SizedBox(height: AppSize.safeBlockVertical * 10),
+          //               Text('Nothing there!',
+          //                   textAlign: TextAlign.center,
+          //                   style: Theme.of(context).textTheme.headline4),
+          //             ],
+          //           ),
+          //         );
+          //       }
+          //       return ListView.builder(
+          //           itemCount: s.data!.result!.length,
+          //           itemBuilder: (ctx, i) =>
+          //               _buildTile([myController.text], s.data!.result![i].data()!));
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );

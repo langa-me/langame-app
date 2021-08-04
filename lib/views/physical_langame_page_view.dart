@@ -2,15 +2,19 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/widget.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
+import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
+import 'package:langame/views/memes/topic_search_bar.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
-
+import 'package:langame/helpers/random.dart';
 import 'colors/colors.dart';
 
 class PhysicalLangamePageView extends StatefulWidget {
@@ -26,16 +30,19 @@ class _State extends State<PhysicalLangamePageView>
   Future<LangameResponse<void>>? _getMemes;
   List<bool> _languageSelected = [true, false, false, false];
   static const List<String> _languages = ['us', 'de', 'fr', 'es'];
+
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .setCurrentScreen('physical_langame_page_view');
+    postFrameCallback((_) => setState(() {}));
   }
 
   @override
   Widget build(BuildContext context) {
     var plp = Provider.of<PhysicalLangameProvider>(context);
     var ap = Provider.of<AuthenticationProvider>(context);
+    var tp = Provider.of<TagProvider>(context);
     if (_getMemes != null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -49,6 +56,28 @@ class _State extends State<PhysicalLangamePageView>
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
+        Stack(
+          children: [
+            Container(
+                height: AppSize.safeBlockVertical * 20,
+                child: TopicSearchWidget()),
+            Positioned(
+                top: 0,
+                                    right: AppSize.safeBlockHorizontal * 5,
+
+                child: Container(
+                    width: AppSize.safeBlockHorizontal * 30,
+                    
+                    child: Wrap(
+                      children: tp.selectedTopics
+                          .map((e) => LangameButton(FontAwesomeIcons.times,
+                              layer: 1,
+                              text: e,
+                              onPressed: () => tp.removeFromSelectedTopic(e)))
+                          .toList(),
+                    ))),
+          ],
+        ),
         plp.memes.length != 0
             ? Stack(children: [
                 Row(
@@ -99,7 +128,8 @@ class _State extends State<PhysicalLangamePageView>
             : SizedBox.shrink(),
         SizedBox(height: AppSize.safeBlockVertical * 5),
         plp.memes.length == 0
-            ? Image.asset('images/logo-colourless.png', height: AppSize.safeBlockVertical * 50)
+            ? Image.asset('images/logo-colourless.png',
+                height: AppSize.safeBlockVertical * 20)
             : Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -140,7 +170,8 @@ class _State extends State<PhysicalLangamePageView>
                   child: Tooltip(
                       message: 'You are given 5 credits a day',
                       child: Row(children: [
-                        Text('${ap.user != null ? ap.user!.credits : 0}', style: Theme.of(context).textTheme.caption),
+                        Text('${ap.user != null ? ap.user!.credits : 0}',
+                            style: Theme.of(context).textTheme.caption),
                         Icon(FontAwesomeIcons.bitcoin,
                             color: ap.user!.credits == 0
                                 ? Colors.red
@@ -149,14 +180,15 @@ class _State extends State<PhysicalLangamePageView>
               Align(
                   alignment: Alignment.center,
                   child: IconButton(
-                      icon: Icon(ap.user!.credits == 0
-                          ? FontAwesomeIcons.stopCircle
-                          : FontAwesomeIcons.syncAlt,
-                          color: getBlackAndWhite(context, 1)
-                          ),
+                      icon: Icon(
+                          ap.user!.credits == 0
+                              ? FontAwesomeIcons.stopCircle
+                              : FontAwesomeIcons.syncAlt,
+                          color: ap.user!.credits == 0 ? Colors.transparent : getBlackAndWhite(context, 1)),
                       onPressed: ap.user!.credits > 0
                           ? () {
-                              _getMemes = plp.getMemes();
+                              _getMemes = plp.getMemes(
+                                  topics: tp.selectedTopics.toList());
                               setState(() {});
                               _getMemes!.whenComplete(
                                   () => setState(() => _getMemes = null));

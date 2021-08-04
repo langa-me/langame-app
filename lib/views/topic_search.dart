@@ -53,11 +53,12 @@ class _TopicSearchViewState extends State<TopicSearchView>
               height: AppSize.safeBlockVertical * 70,
               child: Consumer2<NewLangameProvider, TagProvider>(
                   builder: (context, nlp, tp, child) {
-                var topicsSorted = tp.topics.values
-                    .where((tag) => tag.topic.content
-                        .toLowerCase()
-                        .startsWith(filter.toLowerCase()))
-                    .toList();
+                return Scaffold();
+                // var topicsSorted = tp.topics.values
+                //     .where((tag) => tag.topic.content
+                //         .toLowerCase()
+                //         .startsWith(filter.toLowerCase()))
+                //     .toList();
                 // if (sort) {
                 //   topicsSorted.sort((a, b) {
                 //     if (nlp.selectedTopics.contains(a)) return 1;
@@ -67,34 +68,34 @@ class _TopicSearchViewState extends State<TopicSearchView>
                 //   WidgetsBinding.instance!.addPostFrameCallback(
                 //       (_) => setState(() => sort = false));
                 // }
-                return ListView(
-                  children: topicsSorted
-                      .map((e) => Align(
-                            child: ToggleButton(
-                                width: AppSize.safeBlockHorizontal * 80,
-                                selected: nlp.selectedTopics.contains(e),
-                                onChange: (bool selected) {
-                                  setState(() {
-                                    if (selected)
-                                      nlp.addTopic(e);
-                                    else
-                                      nlp.removeTopic(e);
-                                  });
-                                  // if (nlp.selectedTopics.length > 1) {
-                                  //   var cp = Provider.of<ContextProvider>(
-                                  //       context,
-                                  //       listen: false);
-                                  //   cp.showSnackBar(
-                                  //       'Only one topic at a time is supported for now');
-                                  // }
-                                },
-                                textUnselected:
-                                    '${e.topic.emojis.join('')}\n${e.topic.content}',
-                                textSelected:
-                                    '${e.topic.emojis.join('')}\n${e.topic.content}'),
-                          ))
-                      .toList(),
-                );
+                // return ListView(
+                //   children: topicsSorted
+                //       .map((e) => Align(
+                //             child: ToggleButton(
+                //                 width: AppSize.safeBlockHorizontal * 80,
+                //                 selected: nlp.selectedTopics.contains(e),
+                //                 onChange: (bool selected) {
+                //                   setState(() {
+                //                     if (selected)
+                //                       nlp.addTopic(e);
+                //                     else
+                //                       nlp.removeTopic(e);
+                //                   });
+                //                   // if (nlp.selectedTopics.length > 1) {
+                //                   //   var cp = Provider.of<ContextProvider>(
+                //                   //       context,
+                //                   //       listen: false);
+                //                   //   cp.showSnackBar(
+                //                   //       'Only one topic at a time is supported for now');
+                //                   // }
+                //                 },
+                //                 textUnselected:
+                //                     '${e.topic.emojis.join('')}\n${e.topic.content}',
+                //                 textSelected:
+                //                     '${e.topic.emojis.join('')}\n${e.topic.content}'),
+                //           ))
+                //       .toList(),
+                // );
               }),
             ),
           ],

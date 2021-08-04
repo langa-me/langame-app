@@ -1,10 +1,13 @@
 
 name: Flutter release CI/CD
 
+
+# Only trigger, when the build workflow succeeded
 on:
-  push:
-    branches:
-      - dev*
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 
 # TODO: should fail if commit is not of format "[version]+[versionCode]:"
 jobs:
@@ -15,20 +18,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Wait for build to succeed
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        id: wait-for-ci
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: ci
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Abort when failed CI
-        if: steps.wait-for-build.outputs.conclusion == 'failure'
-        run: |
-          echo ${{ steps.check.outputs.status }}
-          exit 1
 
       - name: Setup Java
         uses: actions/setup-java@v1
