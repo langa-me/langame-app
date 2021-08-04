@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:connectivity/connectivity.dart';
@@ -43,7 +44,9 @@ import 'package:langame/services/http/preference/preference_service.dart';
 import 'package:langame/views/langame.dart';
 import 'package:langame/views/login.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'helpers/future.dart';
 import 'services/http/firebase.dart';
 import 'services/http/impl_langame_api.dart';
 import 'services/http/impl_payment_api.dart';
@@ -58,7 +61,7 @@ void main() async {
   FirebaseCrashlytics? crashlytics;
   RemoteConfig? remoteConfig;
   FirebaseDynamicLinks? dynamicLinks;
-
+  Algolia? algolia;
   // Crashlytics does not support web https://firebase.flutter.dev/
   if (!kIsWeb) {
     crashlytics = FirebaseCrashlytics.instance;
@@ -74,6 +77,21 @@ void main() async {
     }).sendPort);
     remoteConfig = RemoteConfig.instance;
     dynamicLinks = FirebaseDynamicLinks.instance;
+    await SentryFlutter.init(
+      (options) {
+        options.dsn =
+            'https://ce6ae27b22094db983af540d6ddb8010@o404046.ingest.sentry.io/5891492';
+        options.environment = AppConst.isDev ? 'development' : 'production';
+      },
+    );
+
+    remoteConfig.ensureInitialized().then((_) async {
+      await waitUntil(
+          () => remoteConfig!.getString('algolia_application_id').isNotEmpty);
+      algolia = Algolia.init(
+          applicationId: remoteConfig!.getString('algolia_application_id'),
+          apiKey: remoteConfig.getString('algolia_api_key'));
+    });
   }
   var analytics = FirebaseAnalytics();
   var useEmulator = false;
@@ -100,7 +118,7 @@ void main() async {
   var contextProvider =
       ContextProvider(navigationKey, scaffoldMessengerKey, funnyProvider);
   var crashAnalyticsProvider = CrashAnalyticsProvider(
-      firebase.crashlytics, firebase.analytics!, remoteConfig, firebase);
+      firebase.crashlytics, firebase.analytics!, remoteConfig, firebase, algolia);
   var authenticationApi = ImplAuthenticationApi(firebase);
   var authenticationProvider = AuthenticationProvider(
       firebase, authenticationApi, crashAnalyticsProvider);
@@ -155,7 +173,7 @@ void main() async {
               create: (_) => contextProvider,
             ),
             ChangeNotifierProvider(
-                create: (_) => TagProvider(firebase, crashAnalyticsProvider)),
+                create: (_) => TagProvider(firebase, crashAnalyticsProvider, algolia, preferenceProvider)),
             ChangeNotifierProvider(create: (_) => funnyProvider),
             ChangeNotifierProvider(create: (_) => newLangameProvider),
 
@@ -225,8 +243,8 @@ void main() async {
             ChangeNotifierProxyProvider<CrashAnalyticsProvider,
                 PhysicalLangameProvider>(
               update: (_, cap, p) => p!,
-              create: (_) =>
-                  PhysicalLangameProvider(firebase, crashAnalyticsProvider),
+              create: (_) => PhysicalLangameProvider(
+                  firebase, crashAnalyticsProvider, algolia),
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),

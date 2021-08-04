@@ -1648,8 +1648,8 @@ export namespace langame {
             /** UserPreference userId */
             userId?: (string|null);
 
-            /** UserPreference unknownPeopleRecommendations */
-            unknownPeopleRecommendations?: (boolean|null);
+            /** UserPreference userRecommendations */
+            userRecommendations?: (boolean|null);
 
             /** UserPreference themeIndex */
             themeIndex?: (number|null);
@@ -1657,14 +1657,17 @@ export namespace langame {
             /** UserPreference hasDoneOnBoarding */
             hasDoneOnBoarding?: (boolean|null);
 
-            /** UserPreference searchHistory */
-            searchHistory?: (string[]|null);
+            /** UserPreference userSearchHistory */
+            userSearchHistory?: (string[]|null);
 
             /** UserPreference shakeToFeedback */
             shakeToFeedback?: (boolean|null);
 
             /** UserPreference favoriteTopics */
             favoriteTopics?: (string[]|null);
+
+            /** UserPreference topicSearchHistory */
+            topicSearchHistory?: (string[]|null);
         }
 
         /** Represents a UserPreference. */
@@ -1679,8 +1682,8 @@ export namespace langame {
             /** UserPreference userId. */
             public userId: string;
 
-            /** UserPreference unknownPeopleRecommendations. */
-            public unknownPeopleRecommendations: boolean;
+            /** UserPreference userRecommendations. */
+            public userRecommendations: boolean;
 
             /** UserPreference themeIndex. */
             public themeIndex: number;
@@ -1688,14 +1691,17 @@ export namespace langame {
             /** UserPreference hasDoneOnBoarding. */
             public hasDoneOnBoarding: boolean;
 
-            /** UserPreference searchHistory. */
-            public searchHistory: string[];
+            /** UserPreference userSearchHistory. */
+            public userSearchHistory: string[];
 
             /** UserPreference shakeToFeedback. */
             public shakeToFeedback: boolean;
 
             /** UserPreference favoriteTopics. */
             public favoriteTopics: string[];
+
+            /** UserPreference topicSearchHistory. */
+            public topicSearchHistory: string[];
 
             /**
              * Creates a new UserPreference instance using the specified properties.

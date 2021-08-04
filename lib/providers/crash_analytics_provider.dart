@@ -12,23 +12,11 @@ import 'package:langame/services/http/firebase.dart';
 class CrashAnalyticsProvider extends ChangeNotifier {
   FirebaseCrashlytics? crashlytics;
   FirebaseAnalytics analytics;
-  Algolia? algolia;
+  Algolia? _algolia;
   RemoteConfig? _remoteConfig;
   FirebaseApi _firebase;
-  CrashAnalyticsProvider(
-      this.crashlytics, this.analytics, this._remoteConfig, this._firebase) {
-    if (_remoteConfig == null) {
-      log('algolia disabled');
-      return;
-    }
-    _remoteConfig!.ensureInitialized().then((_) async {
-      await waitUntil(
-          () => _remoteConfig!.getString('algolia_application_id').isNotEmpty);
-      algolia = Algolia.init(
-          applicationId: _remoteConfig!.getString('algolia_application_id'),
-          apiKey: _remoteConfig!.getString('algolia_api_key'));
-    });
-  }
+  CrashAnalyticsProvider(this.crashlytics, this.analytics, this._remoteConfig,
+      this._firebase, this._algolia);
 
   void log(String message,
       {String? analyticsMessage, Map<String, Object?>? analyticsParameters}) {

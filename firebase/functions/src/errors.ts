@@ -1,5 +1,7 @@
 import {Logging} from "@google-cloud/logging";
 import * as functions from "firebase-functions";
+import * as Sentry from "@sentry/node";
+
 const logging = process.env.GCLOUD_PROJECT ? new Logging({
   projectId: process.env.GCLOUD_PROJECT,
 }) : null;
@@ -35,6 +37,11 @@ export const reportError = (err: Error, context = {}): Promise<any> => {
     },
     context: context,
   };
+
+  Sentry.captureException(err, {
+    extra: context,
+    tags: metadata.resource.labels,
+  });
 
   // Write the error log entry
   return new Promise<void>((resolve, reject) => {

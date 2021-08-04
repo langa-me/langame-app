@@ -2,8 +2,6 @@ import {EventContext} from "firebase-functions";
 import {QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
 import * as admin from "firebase-admin";
-import {langame} from "../langame/protobuf/langame";
-import {converter} from "../utils/firestore";
 import {reportError} from "../errors";
 import {ImplAiApi} from "../aiApi/implAiApi";
 
@@ -16,20 +14,23 @@ export const onCreateMeme = async (
     snap: QueryDocumentSnapshot,
     _: EventContext
 ) => {
-  let m: admin.firestore.DocumentSnapshot<langame.protobuf.Meme>;
   try {
-    m =
-      await snap.ref.withConverter(converter<langame.protobuf.Meme>()).get();
-    if (!m.data()) {
-      await reportError(new Error("empty meme"), {});
-      return;
-    }
+    if (!snap.data()) return;
     const api = new ImplAiApi();
+
+    for (const t of snap.data().topics) {
+      admin.firestore().collection("topics").doc(t).set({});
+      await api.getIndex(process.env.GCLOUD_PROJECT?.includes("dev") ?
+      "dev_topics" :
+      "prod_topics").saveObject({
+        objectID: t,
+      });
+    }
     await api.getIndex(process.env.GCLOUD_PROJECT?.includes("dev") ?
     "dev_memes" :
     "prod_memes").saveObject({
-      content: m.data()!.content,
-      objectID: m.id,
+      content: snap.data()!.content,
+      objectID: snap.id,
       tags: [],
     });
     // const tags = await classifyTag(m);

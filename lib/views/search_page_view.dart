@@ -79,11 +79,11 @@ class _State extends State<SearchPageView>
               return;
             }
             ap.getLangameUsersStartingWithTag(query).then((v) =>
-                lsp.filteredTagSearchHistory =
+                lsp.filteredUserSearchHistory =
                     v.result?.map((e) => e.tag).toList());
           },
           onSubmitted: (query) {
-            lsp.addSearchHistory(query);
+            lsp.addUserSearchHistory(query);
             _searchBarController.close();
             ap.getLangameUsersStartingWithTag(query).then((users) {
               if (users.result?.length == 1) {
@@ -109,7 +109,7 @@ class _State extends State<SearchPageView>
         elevation: 4,
         child: Builder(builder: (context) {
           // Both query and history empty
-          if (lsp.filteredTagSearchHistory.isEmpty &&
+          if (lsp.filteredUserSearchHistory.isEmpty &&
               _searchBarController.query.isEmpty) {
             return Container(
               height: 56,
@@ -122,7 +122,7 @@ class _State extends State<SearchPageView>
                 style: TextStyle(color: Colors.black, fontSize: 20),
               ),
             );
-          } else if (lsp.filteredTagSearchHistory.isEmpty) {
+          } else if (lsp.filteredUserSearchHistory.isEmpty) {
             return ListTile(
               title: Text(_searchBarController.query,
                   style: Theme.of(context).textTheme.headline6),
@@ -131,7 +131,7 @@ class _State extends State<SearchPageView>
                 ap
                     .getLangameUsersStartingWithTag(_searchBarController.query)
                     .then((users) {
-                  lsp.addSearchHistory(_searchBarController.query);
+                  lsp.addUserSearchHistory(_searchBarController.query);
                   _searchBarController.close();
                   if (users.result?.length == 1) {
                     lsp.selectedTag = _searchBarController.query;
@@ -149,7 +149,7 @@ class _State extends State<SearchPageView>
             // What is shown in search result thing
             return Column(
               mainAxisSize: MainAxisSize.min,
-              children: lsp.filteredTagSearchHistory
+              children: lsp.filteredUserSearchHistory
                   .map(
                     (tag) => ListTile(
                       tileColor: Colors.white,
@@ -161,7 +161,7 @@ class _State extends State<SearchPageView>
                       trailing: IconButton(
                         icon: Icon(Icons.clear, color: Colors.black),
                         onPressed: () {
-                          lsp.deleteSearchHistory(tag);
+                          lsp.deleteUserSearchHistory(tag);
                         },
                       ),
                       onTap: () {
@@ -171,10 +171,10 @@ class _State extends State<SearchPageView>
                               users.result!.length == 1) {
                             lsp.selectedTag = users.result?.first.tag;
                             lsp.selectedUser = users.result?.first;
-                            lsp.addSearchHistory(users.result!.first.tag);
+                            lsp.addUserSearchHistory(users.result!.first.tag);
 
                             /// Place first
-                            lsp.placeFirstSearchHistory(
+                            lsp.placeFirstUserSearchHistory(
                                 users.result!.first.tag);
                           } else {
                             // TODO: should notify "no user found" or several found ...
@@ -213,15 +213,17 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     return Consumer2<PreferenceProvider, NewLangameProvider>(
         builder: (c, p, lp, _) {
       if (p.selectedUser == null) {
-        return p.preference!.unknownPeopleRecommendations
+        return p.preference!.userRecommendations
             ? Column(
                 children: [
-                  Text('Recommendations', style: Theme.of(context).textTheme.headline5),
-                  Expanded(child: ListView(
-                      children: lp.recommendations
-                          .map((e) =>
-                              buildUserTile(context, lp, e, widget._goToPage))
-                          .toList()))
+                  Text('Recommendations',
+                      style: Theme.of(context).textTheme.headline5),
+                  Expanded(
+                      child: ListView(
+                          children: lp.recommendations
+                              .map((e) => buildUserTile(
+                                  context, lp, e, widget._goToPage))
+                              .toList()))
                 ],
               )
             : Image.asset('images/logo-colourless.png');

@@ -1,5 +1,7 @@
+import 'package:algolia/algolia.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
@@ -8,8 +10,9 @@ import 'crash_analytics_provider.dart';
 
 class PhysicalLangameProvider extends ChangeNotifier {
   FirebaseApi _firebase;
+  Algolia? _algolia;
   CrashAnalyticsProvider _cap;
-  PhysicalLangameProvider(this._firebase, this._cap);
+  PhysicalLangameProvider(this._firebase, this._cap, this._algolia);
 
   List<Map<String, dynamic>> _memes = [];
   List<Map<String, dynamic>> get memes => _memes;
@@ -44,10 +47,30 @@ class PhysicalLangameProvider extends ChangeNotifier {
           .map((e) => Map<String, dynamic>.from(e))
           .toList();
       _currentMeme = 0;
+      _cap.log('getMemes ${topics?.join(',')} -> ${_memes.join(',')}');
+
       notifyListeners();
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
       _cap.log('failed to getMemes');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed);
+    }
+  }
+
+  Future<LangameResponse<List<String>>> topicSearch(String value) async {
+    try {
+      if (_algolia == null)
+        return LangameResponse(LangameStatus.succeed, result: []);
+      final objects = await _algolia!
+          .index(AppConst.isDev ? "dev_topics" : "prod_topics")
+          .query(value)
+          .getObjects();
+
+      return LangameResponse(LangameStatus.succeed,
+          result: objects.hits.map((e) => e.objectID).toList());
+    } catch (e, s) {
+      _cap.log('failed to topicSearch');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed);
     }

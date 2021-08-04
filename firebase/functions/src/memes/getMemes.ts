@@ -68,7 +68,7 @@ export const getMemes = async (data: any,
   // If the user does not provide topics, leave empty string
   // will find all memes
   const memes = await offlineMemeSearch(
-        (data.topics || data.topics.length === 0) ? [""] : data.topics,
+        (data.topics && data.topics.length === 0) ? [""] : data.topics,
         // @ts-ignore
         t.parameters.meme_count.defaultValue.value * 1, // Casting to number
       seenMemes!.map((e: any) => e.meme),

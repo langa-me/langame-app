@@ -140,49 +140,49 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   }
 
   List<PageViewModel> _buildPageModels() => [
-        PageViewModel(
-          titleWidget: Text('What are your interests?',
-              style: Theme.of(context).textTheme.headline5),
-          bodyWidget: Container(
-              height: AppSize.safeBlockVertical * 80,
-              width: AppSize.safeBlockHorizontal *
-                  45 *
-                  (AppSize.isLargeWidth ? 1 : 2),
-              child: Consumer2<PreferenceProvider, TagProvider>(
-                builder: (context, pp, tp, child) => Container(
-                    height: AppSize.safeBlockVertical * 80,
-                    width: AppSize.safeBlockHorizontal *
-                        45 *
-                        (AppSize.isLargeWidth ? 1 : 2),
-                    alignment: Alignment.center,
-                    child: ListView(
-                      physics: BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(20.0),
-                      children: tp.topics.values
-                          .map(
-                            (e) => ToggleButton(
-                                width: AppSize.safeBlockHorizontal *
-                                    45 *
-                                    (AppSize.isLargeWidth ? 1 : 2),
-                                selected: pp.preference != null &&
-                                    pp.preference!.favoriteTopics
-                                        .contains(e.topic.content),
-                                onChange: (bool selected) {
-                                  if (selected)
-                                    pp.addFavoriteTopic(e.topic.content);
-                                  else
-                                    pp.removeFavoriteTopic(e.topic.content);
-                                },
-                                textUnselected:
-                                    '${e.topic.emojis.join('')}\n${e.topic.content}',
-                                textSelected:
-                                    '${e.topic.emojis.join('')}\n${e.topic.content}'),
-                          )
-                          .toList(),
-                    )),
-              )),
-        ),
+        // PageViewModel(
+        //   titleWidget: Text('What are your interests?',
+        //       style: Theme.of(context).textTheme.headline5),
+        //   bodyWidget: Container(
+        //       height: AppSize.safeBlockVertical * 80,
+        //       width: AppSize.safeBlockHorizontal *
+        //           45 *
+        //           (AppSize.isLargeWidth ? 1 : 2),
+        //       child: Consumer2<PreferenceProvider, TagProvider>(
+        //         builder: (context, pp, tp, child) => Container(
+        //             height: AppSize.safeBlockVertical * 80,
+        //             width: AppSize.safeBlockHorizontal *
+        //                 45 *
+        //                 (AppSize.isLargeWidth ? 1 : 2),
+        //             alignment: Alignment.center,
+        //             child: ListView(
+        //               physics: BouncingScrollPhysics(),
+        //               shrinkWrap: true,
+        //               padding: const EdgeInsets.all(20.0),
+        //               children: tp.topics.values
+        //                   .map(
+        //                     (e) => ToggleButton(
+        //                         width: AppSize.safeBlockHorizontal *
+        //                             45 *
+        //                             (AppSize.isLargeWidth ? 1 : 2),
+        //                         selected: pp.preference != null &&
+        //                             pp.preference!.favoriteTopics
+        //                                 .contains(e.topic.content),
+        //                         onChange: (bool selected) {
+        //                           if (selected)
+        //                             pp.addFavoriteTopic(e.topic.content);
+        //                           else
+        //                             pp.removeFavoriteTopic(e.topic.content);
+        //                         },
+        //                         textUnselected:
+        //                             '${e.topic.emojis.join('')}\n${e.topic.content}',
+        //                         textSelected:
+        //                             '${e.topic.emojis.join('')}\n${e.topic.content}'),
+        //                   )
+        //                   .toList(),
+        //             )),
+        //       )),
+        // ),
         PageViewModel(
           titleWidget: Text('Send us a feedback anytime?',
               style: Theme.of(context).textTheme.headline5),
@@ -222,15 +222,15 @@ class _OnBoardingState extends State with AfterLayoutMixin {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ListTile(
-                  onTap: () => p.setRecommendations(
-                      !p.preference!.unknownPeopleRecommendations),
+                  onTap: () =>
+                      p.setRecommendations(!p.preference!.userRecommendations),
                   leading: Icon(Icons.recommend),
                   title: Text('Unknown user recommendations',
                       style: Theme.of(context).textTheme.headline6),
                   trailing: Switch(
-                    value: p.preference!.unknownPeopleRecommendations,
-                    onChanged: (v) => p.setRecommendations(
-                        !p.preference!.unknownPeopleRecommendations),
+                    value: p.preference!.userRecommendations,
+                    onChanged: (v) => p
+                        .setRecommendations(!p.preference!.userRecommendations),
                   ),
                 ),
                 !kIsWeb

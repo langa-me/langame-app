@@ -23,6 +23,8 @@
   "dependencies": {
     "@google-cloud/logging": "^9.2.3",
     "@octokit/rest": "^18.5.2",
+    "@sentry/node": "^6.10.0",
+    "@sentry/tracing": "^6.10.0",
     "agora-access-token": "^2.0.1",
     "algoliasearch": "^4.10.3",
     "firebase-admin": "^9.9.0",

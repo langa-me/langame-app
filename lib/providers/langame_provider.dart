@@ -85,13 +85,13 @@ class LangameProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse<DocumentSnapshot<lg.Langame>>> createLangame(
-      List<lg.User> players, List<lg.Tag> topics, DateTime date,
+      List<lg.User> players, List<String> topics, DateTime date,
       {bool instant = false}) async {
     try {
       // TODO: we'd likely send the whole  topic in the future (with classifications)
       var stream = await _langameApi.createLangame(
         players.map((e) => e.uid).toList(),
-        topics.map((e) => e.topic.content).toList(),
+        topics,
         date,
       );
       var snap = await stream.firstWhere((e) =>
@@ -102,7 +102,7 @@ class LangameProvider extends ChangeNotifier {
 
       initialize();
       _cap.log(
-          'created langame with topics ${topics.map((e) => e.topic.content).join(',')} and date $date');
+          'created langame with topics ${topics.join(',')} and date $date');
       return LangameResponse(LangameStatus.succeed, result: snap);
     } catch (e, s) {
       _cap.log(

@@ -15,8 +15,10 @@ import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
+import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/langame.dart';
+import 'package:langame/views/memes/topic_search_bar.dart';
 import 'package:langame/views/running_langames_view.dart';
 import 'package:langame/views/topic_search.dart';
 import 'package:provider/provider.dart';
@@ -47,23 +49,35 @@ class _SendLangameState extends State<NewLangamePageView>
   Widget build(BuildContext context) {
     var nlp = Provider.of<NewLangameProvider>(context);
     var cp = Provider.of<ContextProvider>(context);
-    return SingleChildScrollView(
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    var tp = Provider.of<TagProvider>(context);
+    var ap = Provider.of<AuthenticationProvider>(context);
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // TextDivider('Topic'),
-            Container(
-                width: AppSize.safeBlockHorizontal * 40,
-                child: LangameButton(FontAwesomeIcons.graduationCap,
-                    onPressed: () => cp.push(TopicSearchView()),
-                    text: nlp.selectedTopics.isEmpty
-                        ? ''
-                        : nlp.selectedTopics.first.topic.content,
-                    layer: 1,
-                    border: true)),
-            SizedBox(
-              height: AppSize.safeBlockVertical * 10,
+            Stack(
+              children: [
+                Container(
+                    height: AppSize.safeBlockVertical * 20,
+                    child: TopicSearchWidget()),
+                Positioned(
+                    top: 0,
+                    right: AppSize.safeBlockHorizontal * 5,
+                    child: Container(
+                        width: AppSize.safeBlockHorizontal * (isPortrait ? 40 : 20),
+                        child: Wrap(
+                          children: tp.selectedTopics
+                              .map((e) => LangameButton(FontAwesomeIcons.times,
+                              // fixedSize: Size(AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
+                                  layer: 1,
+                                  text: e,
+                                  onPressed: () =>
+                                      tp.removeFromSelectedTopic(e)))
+                              .toList(),
+                        ))),
+              ],
             ),
 
             Container(
@@ -89,20 +103,17 @@ class _SendLangameState extends State<NewLangamePageView>
                       : nlp.shoppingList
                           .map(
                             (e) => buildUserTile(
-                                context,
-                                nlp,
-                                e,
-                                widget._goToPage,
-                              
+                              context,
+                              nlp,
+                              e,
+                              widget._goToPage,
                             ),
                           )
                           .toList(),
                 ),
               ),
             ),
-            SizedBox(
-              height: AppSize.safeBlockVertical * 5,
-            ),
+
 
             DateTimePicker(
               timeFieldWidth: AppSize.safeBlockHorizontal * 50,
@@ -117,40 +128,7 @@ class _SendLangameState extends State<NewLangamePageView>
               timeLabelText: 'Hour',
               onChanged: (val) => nlp.setSelectedDate(DateTime.parse(val)),
             ),
-            SizedBox(
-              height: AppSize.safeBlockVertical * 5,
-            ),
 
-            // ExpansionTile(
-            //   title: Text(
-            //     'Advanced configuration',
-            //     style: Theme.of(context).textTheme.headline6,
-            //   ),
-            //   children: [
-            //     ListTile(
-            //       leading: Text(
-            //         'Maximum players',
-            //         textAlign: TextAlign.center,
-            //         style: Theme.of(context).textTheme.caption,
-            //       ),
-            //       trailing: Container(
-            //           width: AppSize.safeBlockHorizontal * 50,
-            //           child: Slider(
-            //             activeColor: isLightThenDark(context),
-            //             value: nlp.maximumPlayers.toDouble(),
-            //             min: 2,
-            //             max: 6,
-            //             divisions: 4,
-            //             label: nlp.maximumPlayers.toString(),
-            //             onChanged: (double value) =>
-            //                 nlp.setMaximumPlayers(value.toInt()),
-            //           )),
-            //     ),
-            //   ],
-            // ),
-            SizedBox(
-              height: AppSize.safeBlockVertical * 10,
-            ),
             LangameButton(
               FontAwesomeIcons.comments,
               onPressed: () => onPressedNewLangame(cp, nlp),
@@ -160,32 +138,22 @@ class _SendLangameState extends State<NewLangamePageView>
               padding: EdgeInsets.symmetric(
                   vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20),
             ),
-          ]),
-    );
+          ]);
   }
 
   void onPressedNewLangame(ContextProvider cp, NewLangameProvider nlp) async {
-    if (nlp.selectedTopics.isEmpty) {
-      cp.showSnackBar('You must select at least one topics');
-      return;
-    }
     var ap = Provider.of<AuthenticationProvider>(context, listen: false);
     if (ap.user!.credits == 0) {
-            cp.showSnackBar('You don\'t have any credits left 😥');
+      cp.showSnackBar('You don\'t have any credits left 😥');
       return;
     }
-    // var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
-    // if (nlp.selectedTopics.length > 1) {
-    //   cp.showSnackBar('For now, only 1 topic at once is supported');
-    //   cap.logNewFeatureClick('new_langame_multiple_topics');
-    //   return;
-    // }
 
     var lp = Provider.of<LangameProvider>(context, listen: false);
     var fp = Provider.of<FunnyProvider>(context, listen: false);
+    var tp = Provider.of<TagProvider>(context, listen: false);
     cp.showLoadingDialog();
     var createLangame = await lp.createLangame(nlp.shoppingList,
-        nlp.selectedTopics, nlp.selectedDate ?? DateTime.now());
+        tp.selectedTopics.toList(), nlp.selectedDate ?? DateTime.now());
     if (createLangame.error != null ||
         createLangame.result == null ||
         createLangame.result!.data() == null) {
@@ -237,9 +205,9 @@ class _SendLangameState extends State<NewLangamePageView>
               icon: Icon(FontAwesomeIcons.shareAlt,
                   color: isLightThenDark(context, reverse: false)),
               onPressed: () => Share.share(
-                'Join my Langame to talk about ${nlp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
+                'Join my Langame to talk about ${tp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
                 subject:
-                    'Join my Langame to talk about ${nlp.selectedTopics.join(',')}',
+                    'Join my Langame to talk about ${tp.selectedTopics.join(',')}',
               ),
             ),
             trailing: Icon(FontAwesomeIcons.copy,
