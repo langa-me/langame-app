@@ -1,5 +1,5 @@
 
-name: Flutter release CI/CD
+name: Flutter release CI/CD DEV
 
 
 # Only trigger, when the build workflow succeeded

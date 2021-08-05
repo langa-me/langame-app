@@ -49,23 +49,26 @@ class _State extends State<TopicSearchWidget>
   }
 
   Widget _buildFloatingSearchBar() {
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
     var tp = Provider.of<TagProvider>(context);
 
     return FloatingSearchBar(
       controller: _searchBarController,
       hint: 'Try $searchTopicExample...',
-      queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(color: getBlackAndWhite(context, 0))),
+      queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
+        decorationColor: getBlackAndWhite(context, 1, reverse: true),
+        backgroundColor: getBlackAndWhite(context, 1, reverse: true),
+        color: getBlackAndWhite(context, 0))),
       backdropColor: getBlackAndWhite(context, 0, reverse: true),
       backgroundColor: getBlackAndWhite(context, 1, reverse: true),
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      accentColor: getBlackAndWhite(context, 1, reverse: true),
+      shadowColor: getBlackAndWhite(context, 1, reverse: true),
       transitionDuration: const Duration(milliseconds: 400),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
       axisAlignment: -1.0,
-      openAxisAlignment: !isPortrait ? 0 : -1.0,
-      width: isPortrait ? AppSize.safeBlockHorizontal * 48 : AppSize.safeBlockHorizontal * 38,
+      openAxisAlignment: AppSize.isLargeWidth ? 0 : -1.0,
+      width: !AppSize.isLargeWidth ? AppSize.safeBlockHorizontal * 48 : AppSize.safeBlockHorizontal * 38,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
         // Call your model, bloc, controller here.

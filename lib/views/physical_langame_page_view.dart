@@ -1,5 +1,6 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/widget.dart';
@@ -63,11 +64,9 @@ class _State extends State<PhysicalLangamePageView>
                 child: TopicSearchWidget()),
             Positioned(
                 top: 0,
-                                    right: AppSize.safeBlockHorizontal * 5,
-
+                right: AppSize.safeBlockHorizontal * 5,
                 child: Container(
                     width: AppSize.safeBlockHorizontal * 30,
-                    
                     child: Wrap(
                       children: tp.selectedTopics
                           .map((e) => LangameButton(FontAwesomeIcons.times,
@@ -103,6 +102,35 @@ class _State extends State<PhysicalLangamePageView>
                     ),
                   ],
                 ),
+                plp.memes.length > 0
+                    ? Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: IconButton(
+                                onPressed: () async {
+                                  final tts = FlutterTts();
+                                  tts.stop();
+                                  final l = {
+                                    'us': "en-US",
+                                    'de': "de-DE",
+                                    'fr': "fr-FR",
+                                    'es': "es-ES",
+                                  };
+                                  final lang = _languages[_languageSelected
+                                      .indexWhere((e) => e == true)];
+                                  await tts.setLanguage(
+                                      lang != -1 ? l[lang]! : "en-US");
+                                  tts.speak(_languageSelected[0]
+                                      ? plp.memes[plp.currentMeme]['content']
+                                      : plp.memes[plp.currentMeme]['translated']
+                                          [lang]);
+                                },
+                                icon: Icon(
+                                  FontAwesomeIcons.headphonesAlt,
+                                  color: isLightThenDark(context),
+                                ))))
+                    : SizedBox.shrink(),
               ])
             : SizedBox.shrink(),
         plp.memes.length > 0 && plp.memes[plp.currentMeme]['translated'] != null
@@ -184,7 +212,9 @@ class _State extends State<PhysicalLangamePageView>
                           ap.user!.credits == 0
                               ? FontAwesomeIcons.stopCircle
                               : FontAwesomeIcons.syncAlt,
-                          color: ap.user!.credits == 0 ? Colors.transparent : getBlackAndWhite(context, 1)),
+                          color: ap.user!.credits == 0
+                              ? Colors.transparent
+                              : getBlackAndWhite(context, 1)),
                       onPressed: ap.user!.credits > 0
                           ? () {
                               _getMemes = plp.getMemes(

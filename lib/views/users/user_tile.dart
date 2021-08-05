@@ -11,10 +11,6 @@ import 'package:provider/provider.dart';
 Widget buildUserTile(BuildContext context, NewLangameProvider lp, lg.User u,
         void Function(int, {Curve? curve}) goToPage) =>
     ListTile(
-      title: u.hasPhotoUrl() ? Text(
-        '${u.tag}',
-        style: Theme.of(context).textTheme.caption,
-      ) : SizedBox.shrink(),
       leading: u.hasPhotoUrl()
           ? CircleAvatar(
               backgroundImage: NetworkImage(u.photoUrl),
