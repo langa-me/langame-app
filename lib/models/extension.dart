@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:core';
+import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
@@ -164,6 +166,9 @@ class LangameExt {
 
 gg.Timestamp? dynamicToProtobufTimestamp(dynamic something) {
   if (something == null) return null;
+  if (something is Map<Object?, Object?> && something['_seconds'] != null) {
+    return gg.Timestamp.getDefault();
+  }
 
   // Firestore Timestamp (i.e. when using thing.serverTimestamp()...)
   if (something is Timestamp)

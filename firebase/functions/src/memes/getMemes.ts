@@ -72,6 +72,7 @@ export const getMemes = async (data: any,
       // @ts-ignore
       t.parameters.meme_count.defaultValue.value * 1, // Casting to number
       seenMemes!.map((e: any) => e.meme),
+      false,
   );
 
   if (memes.length === 0) {
@@ -85,7 +86,6 @@ export const getMemes = async (data: any,
   const newMemesSeen = memes.map((e) => {
     return {
       meme: e.id,
-      // @ts-ignore
       date: new Date(),
     };
   });
