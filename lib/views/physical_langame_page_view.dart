@@ -1,4 +1,5 @@
 import 'package:after_layout/after_layout.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,6 +9,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
@@ -122,9 +124,9 @@ class _State extends State<PhysicalLangamePageView>
                                   await tts.setLanguage(
                                       lang != -1 ? l[lang]! : "en-US");
                                   tts.speak(_languageSelected[0]
-                                      ? plp.memes[plp.currentMeme]['content']
-                                      : plp.memes[plp.currentMeme]['translated']
-                                          [lang]);
+                                      ? plp.memes[plp.currentMeme].content
+                                      : plp.memes[plp.currentMeme].translated
+                                          [lang]!);
                                 },
                                 icon: Icon(
                                   FontAwesomeIcons.headphonesAlt,
@@ -133,7 +135,7 @@ class _State extends State<PhysicalLangamePageView>
                     : SizedBox.shrink(),
               ])
             : SizedBox.shrink(),
-        plp.memes.length > 0 && plp.memes[plp.currentMeme]['translated'] != null
+        plp.memes.length > 0 && plp.memes[plp.currentMeme].translated.isNotEmpty
             ? ToggleButtons(
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 fillColor: Theme.of(context).colorScheme.secondary,
@@ -154,7 +156,7 @@ class _State extends State<PhysicalLangamePageView>
                 isSelected: _languageSelected,
               )
             : SizedBox.shrink(),
-        SizedBox(height: AppSize.safeBlockVertical * 5),
+        // SizedBox(height: AppSize.safeBlockVertical * 5),
         plp.memes.length == 0
             ? Image.asset('images/logo-colourless.png',
                 height: AppSize.safeBlockVertical * 20)
@@ -163,9 +165,9 @@ class _State extends State<PhysicalLangamePageView>
                   scrollDirection: Axis.vertical,
                   child: Text(
                     _languageSelected[0]
-                        ? plp.memes[plp.currentMeme]['content']
-                        : plp.memes[plp.currentMeme]['translated'][_languages[
-                            _languageSelected.indexWhere((e) => e == true)]],
+                        ? plp.memes[plp.currentMeme].content
+                        : plp.memes[plp.currentMeme].translated[_languages[
+                            _languageSelected.indexWhere((e) => e == true)]]!,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline6!.merge(
                         TextStyle(
@@ -173,6 +175,24 @@ class _State extends State<PhysicalLangamePageView>
                   ),
                 ),
               ),
+        plp.memes.length > 0
+            ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                IconButton(
+                    onPressed: () =>
+                        Provider.of<FeedbackProvider>(context, listen: false)
+                            .sendMemeLike(
+                                plp.memes[plp.currentMeme].id, false),
+                    icon: Icon(FontAwesomeIcons.solidThumbsDown,
+                        color: getBlackAndWhite(context, 0))),
+                IconButton(
+                    onPressed: () =>
+                        Provider.of<FeedbackProvider>(context, listen: false)
+                            .sendMemeLike(
+                                plp.memes[plp.currentMeme].id, true),
+                    icon: Icon(FontAwesomeIcons.solidThumbsUp,
+                        color: getBlackAndWhite(context, 0))),
+              ])
+            : SizedBox.shrink(),
         Padding(
             padding: EdgeInsets.all(30),
             child: Stack(alignment: Alignment.center, children: [
@@ -182,11 +202,11 @@ class _State extends State<PhysicalLangamePageView>
                       child: IconButton(
                           onPressed: () => Share.share(
                               'I got into conversations on Langame:\n' +
-                                  plp.memes[plp.currentMeme]['content'] +
+                                  plp.memes[plp.currentMeme].content +
                                   '\n' +
                                   'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
                               subject:
-                                  '${plp.memes[plp.currentMeme]['content'].substring(0, 10)}...'),
+                                  '${plp.memes[plp.currentMeme].content.substring(0, 10)}...'),
                           icon: Icon(
                             FontAwesomeIcons.shareAlt,
                             color: isLightThenDark(context),
@@ -217,8 +237,17 @@ class _State extends State<PhysicalLangamePageView>
                               : getBlackAndWhite(context, 1)),
                       onPressed: ap.user!.credits > 0
                           ? () {
-                              _getMemes = plp.getMemes(
-                                  topics: tp.selectedTopics.toList());
+                              _getMemes = plp
+                                  .getMemes(topics: tp.selectedTopics.toList())
+                                  .then((ok) {
+                                if (ok.result != null && ok.result!) return ok;
+                                final cp = Provider.of<ContextProvider>(context,
+                                        listen: false);
+                                    cp.showFailureDialog(
+                                        'Could not find anything that you did not already see in this topics!');
+                                Future.delayed(Duration(seconds: 3), () => cp.dialogComplete());
+                                return ok;
+                              });
                               setState(() {});
                               _getMemes!.whenComplete(
                                   () => setState(() => _getMemes = null));

@@ -65,8 +65,15 @@ class LangameProvider extends ChangeNotifier {
         _finishedLangames.clear();
         _runningLangames.clear();
         _subs.add(stream.listen((snap) {
-          if (snap.data() == null || snap.data()!.date.toDateTime().isBefore(DateTime.now().subtract(Duration(hours: 24)))) return;
-          if (snap.data()!.hasDone() && snap.data()!.done.toDateTime().year == 1970) {
+          if (snap.data() == null ||
+              snap
+                  .data()!
+                  .date
+                  .toDateTime()
+                  .isBefore(DateTime.now().subtract(Duration(hours: 24))))
+            return;
+          if (snap.data()!.hasDone() &&
+              snap.data()!.done.toDateTime().year == 1970) {
             _finishedLangames[snap.id] = snap.data()!;
           } else {
             _runningLangames[snap.id] = snap.data()!;
@@ -94,12 +101,21 @@ class LangameProvider extends ChangeNotifier {
         topics,
         date,
       );
-      var snap = await stream.firstWhere((e) =>
+
+      final snap = await stream.firstWhere((e) =>
           e.exists &&
           e.data() != null &&
-          e.data()!.errors.isEmpty &&
-          e.data()!.channelName.isNotEmpty);
-
+          (e.data()!.memes.isNotEmpty || e.data()!.errors.isNotEmpty));
+      if (snap.data()!.errors.isNotEmpty) {
+        var errors = snap.data()!.errors;
+        errors.sort((a, b) =>
+            a.createdAt.toDateTime().compareTo(b.createdAt.toDateTime()));
+        var msg = errors.first.userMessage;
+        _cap.log(
+            'failed to create langame with topics ${topics.join(',')} and date $date - ${errors.first.developerMessage}');
+        return LangameResponse(LangameStatus.failed,
+            error: msg.isNotEmpty ? msg : null);
+      }
       initialize();
       _cap.log(
           'created langame with topics ${topics.join(',')} and date $date');

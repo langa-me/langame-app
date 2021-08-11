@@ -244,4 +244,31 @@ class FeedbackProvider extends ChangeNotifier {
     }
     return LangameResponse(LangameStatus.succeed);
   }
+
+  Future<LangameResponse<void>> sendMemeLike(String memeId, bool like) async {
+    try {
+      await firebase.firestore!
+          .collection('feedbacks')
+          .doc(firebase.auth!.currentUser!.uid)
+          .set(like
+              ? {
+                  'likes': FieldValue.arrayUnion([memeId]),
+                  'dislikes': FieldValue.arrayRemove([memeId]),
+                }
+              : {
+                  'dislikes': FieldValue.arrayUnion([memeId]),
+                  'likes': FieldValue.arrayRemove([memeId]),
+                }, SetOptions(merge: true));
+      // await firebase.firestore!
+      //     .collection("memes")
+      //     .doc(memeId)
+      //     .update({'userFeedback': FieldValue.increment(like ? 1 : -1)});
+      _cap.log('sendMemeLike $memeId $like');
+      return LangameResponse(LangameStatus.succeed);
+    } catch (e, s) {
+      _cap.log('failed to sendMemeLike $memeId');
+      _cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed, error: e);
+    }
+  }
 }

@@ -52,7 +52,15 @@ class _State extends State<SearchPageView>
   Widget _buildSearchPageView() =>
       Consumer2<PreferenceProvider, AuthenticationProvider>(
         builder: (context, lsp, ap, _) => FloatingSearchBar(
-          queryStyle: Theme.of(context).textTheme.headline6,
+          queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
+              decorationColor: getBlackAndWhite(context, 1, reverse: true),
+              backgroundColor: getBlackAndWhite(context, 1, reverse: true),
+              color: getBlackAndWhite(context, 0))),
+          backdropColor: getBlackAndWhite(context, 0, reverse: true),
+          backgroundColor: getBlackAndWhite(context, 1, reverse: true),
+          scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+          accentColor: getBlackAndWhite(context, 1, reverse: true),
+          shadowColor: getBlackAndWhite(context, 1, reverse: true),
           controller: _searchBarController,
           automaticallyImplyBackButton: false,
           body: FloatingSearchBarScrollNotifier(
@@ -69,9 +77,11 @@ class _State extends State<SearchPageView>
             lsp.selectedTag ?? 'Search for people',
             style: Theme.of(context).textTheme.headline6,
           ),
-          hint: 'Search and find out...',
+          hint: 'Search...',
           actions: [
-            FloatingSearchBarAction.searchToClear(),
+            FloatingSearchBarAction.searchToClear(
+              color: getBlackAndWhite(context, 0, reverse: false),
+            ),
           ],
           onQueryChanged: (query) async {
             if (query.isEmpty) {
@@ -105,7 +115,7 @@ class _State extends State<SearchPageView>
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Material(
-        color: Colors.white,
+        color: getBlackAndWhite(context, 1, reverse: true),
         elevation: 4,
         child: Builder(builder: (context) {
           // Both query and history empty
@@ -119,7 +129,7 @@ class _State extends State<SearchPageView>
                 'Start searching',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.black, fontSize: 20),
+                style: Theme.of(context).textTheme.headline6,
               ),
             );
           } else if (lsp.filteredUserSearchHistory.isEmpty) {

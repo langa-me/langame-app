@@ -21,7 +21,6 @@ import {onWriteMemeTag} from "./memes/onWriteMemeTag";
 import {onUpdateLangame} from "./onUpdateLangame";
 import {onCreateAuthentication} from "./onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
-import {langame} from "./langame/protobuf/langame";
 import {onCreateMeme} from "./memes/onCreateMeme";
 import {setLangamesDone} from "./setLangamesDone";
 import {setUserRecommendation} from "./setUserRecommendation";
@@ -157,13 +156,11 @@ exports.onCreateAuthentication =
 
 // Meme //
 
-// eslint-disable-next-line max-len
-const memesCollection = langame.protobuf.FirestoreCollection[langame.protobuf.FirestoreCollection.MEMES].toLowerCase();
 
 exports.onWriteMemeTag =
-    functions.firestore.document(`${memesCollection}/{memeId}/tags/{tagId}`)
+    functions.firestore.document("memes/{memeId}/tags/{tagId}")
         .onWrite(onWriteMemeTag);
 
 exports.onCreateMeme =
-    functions.firestore.document(`${memesCollection}/{memeId}`)
+    functions.firestore.document("memes/{memeId}")
         .onCreate(onCreateMeme);

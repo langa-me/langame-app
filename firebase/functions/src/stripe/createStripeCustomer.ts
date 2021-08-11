@@ -4,7 +4,7 @@ import * as admin from "firebase-admin";
 import {auth} from "firebase-admin/lib/auth";
 import UserRecord = auth.UserRecord;
 import {kStripeCustomersCollection} from "../helpers";
-import {reportError, userFacingMessage} from "../errors";
+import {reportError} from "../errors";
 
 /**
  * When a user is created, create a Stripe customer object for them.
@@ -28,7 +28,6 @@ export const createStripeCustomer =
           setup_secret: intent.client_secret,
         });
       } catch (e) {
-        await doc.set({error: userFacingMessage(e)}, {merge: true});
         await reportError(e, {user: context.params.userId});
       }
     };

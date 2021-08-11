@@ -67,6 +67,9 @@ class _LangameViewState extends State<LangameView> {
   bool _justChangedMeme = false;
   Timer? _justChangedMemeTimer;
 
+  List<bool> _languageSelected = [true, false, false, false];
+  static const List<String> _languages = ['us', 'de', 'fr', 'es'];
+
   @override
   void initState() {
     super.initState();
@@ -215,10 +218,10 @@ class _LangameViewState extends State<LangameView> {
               onWillPop: () => _onBackPressed(showFeedbackDialogOnLeave: false),
               // Start once two players joined
               child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-              child: cp.buildLoadingWidget(text: _loadingMessage))]));
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(child: cp.buildLoadingWidget(text: _loadingMessage))
+                  ]));
         },
         stream: langameStream);
   }
@@ -260,7 +263,9 @@ class _LangameViewState extends State<LangameView> {
                                 ? FontAwesomeIcons.lock
                                 : FontAwesomeIcons.lockOpen;
                             Color? iconColor;
-                            String txt = l.isLocked ? 'Unlocked the Langame, everyone can join using the link' : 'Locked the Langame, only invited people can join now';
+                            String txt = l.isLocked
+                                ? 'Unlocked the Langame, everyone can join using the link'
+                                : 'Locked the Langame, only invited people can join now';
                             return Column(children: [
                               Consumer<LangameProvider>(builder: (c, lp, _) {
                                 var onTap = () => !l.hasIsLocked()
@@ -545,16 +550,6 @@ class _LangameViewState extends State<LangameView> {
           padding: EdgeInsets.all(12),
           width: AppSize.blockSizeHorizontal * 85,
           height: AppSize.blockSizeVertical * 60,
-          decoration: BoxDecoration(
-            color: variantIsLightThenDark(context, reverse: true),
-            border: Border.all(
-              color: variantIsLightThenDark(context),
-              width: 5,
-            ),
-            borderRadius: const BorderRadius.all(
-              const Radius.circular(40.0),
-            ),
-          ),
           child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -636,6 +631,9 @@ class _LangameViewState extends State<LangameView> {
                         () => setState(() => _justChangedMeme = false)));
 
                 p.incrementCurrentMeme(l, -1);
+                setState(() {
+                  _languageSelected = [true, false, false, false];
+                });
               }, text: 'Previous', layer: 1),
               LangameButton(
                 cannotNext
@@ -649,6 +647,9 @@ class _LangameViewState extends State<LangameView> {
                       () => Future.delayed(Duration(milliseconds: 100),
                           () => setState(() => _justChangedMeme = false)));
                   p.incrementCurrentMeme(l, 1);
+                  setState(() {
+                    _languageSelected = [true, false, false, false];
+                  });
                 },
                 text: nm.isAfter(s.data!)
                     ? '${_printDuration(nm.difference(s.data!.toUtc()))}'
@@ -664,29 +665,69 @@ class _LangameViewState extends State<LangameView> {
     var theme = Theme.of(context);
     var tp = Provider.of<TagProvider>(context, listen: false);
     var cp = Provider.of<ContextProvider>(context, listen: false);
-
+    print(l.memes[l.currentMeme].translated);
     var memeWidget = Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        l.memes[l.currentMeme].translated.isNotEmpty
+            ? ToggleButtons(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                fillColor: Theme.of(context).colorScheme.secondary,
+                selectedBorderColor: getBlackAndWhite(context, 0),
+                children: [
+                  Text('🇺🇸'),
+                  Text('🇩🇪'),
+                  Text('🇫🇷'),
+                  Text('🇪🇸'),
+                ],
+                onPressed: (int index) {
+                  var n = _languageSelected.map((e) => false).toList();
+                  n[index] = true;
+                  setState(() {
+                    _languageSelected = n;
+                  });
+                },
+                isSelected: _languageSelected,
+              )
+            : SizedBox.shrink(),
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Text(
-              l.memes[l.currentMeme],
+              _languageSelected[0]
+                  ? l.memes[l.currentMeme].content
+                  : l.memes[l.currentMeme].translated[_languages[
+                          _languageSelected.indexWhere((e) => e == true)]] ??
+                      l.memes[l.currentMeme].content,
               textAlign: TextAlign.center,
               style: theme.textTheme.headline6!.merge(
                   TextStyle(color: isLightThenDark(context, reverse: false))),
             ),
           ),
         ),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          IconButton(
+              onPressed: () =>
+                  Provider.of<FeedbackProvider>(context, listen: false)
+                      .sendMemeLike(l.memes[l.currentMeme].id, false),
+              icon: Icon(FontAwesomeIcons.solidThumbsDown,
+                  color: getBlackAndWhite(context, 0))),
+          IconButton(
+              onPressed: () =>
+                  Provider.of<FeedbackProvider>(context, listen: false)
+                      .sendMemeLike(l.memes[l.currentMeme].id, true),
+              icon: Icon(FontAwesomeIcons.solidThumbsUp,
+                  color: getBlackAndWhite(context, 0))),
+        ]),
         Row(children: [
           IconButton(
             onPressed: () => Share.share(
                 'I got into conversations on Langame:\n' +
-                    l.memes[l.currentMeme] +
+                    l.memes[l.currentMeme].content +
                     '\n' +
                     'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
-                subject: '${l.memes[l.currentMeme].substring(0, 10)}...'),
+                subject:
+                    '${l.memes[l.currentMeme].content.substring(0, 10)}...'),
             icon: Icon(
               FontAwesomeIcons.shareAlt,
               color: isLightThenDark(context),
@@ -728,14 +769,14 @@ class _LangameViewState extends State<LangameView> {
     return Center(
       child: Container(
         padding: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-            border: Border.all(
-              color: variantBisIsLightThenDark(context),
-              width: 5,
-            ),
-            color: variantIsLightThenDark(context, reverse: true),
-            borderRadius: BorderRadius.all(Radius.circular(10.0))),
-        height: AppSize.blockSizeVertical * 40,
+        // decoration: BoxDecoration(
+        //     border: Border.all(
+        //       color: variantBisIsLightThenDark(context),
+        //       width: 5,
+        //     ),
+        //     color: variantIsLightThenDark(context, reverse: true),
+        //     borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        height: AppSize.blockSizeVertical * 60,
         width: AppSize.safeBlockHorizontal * 80,
         child: memeWidget,
       ),
@@ -820,7 +861,16 @@ class _LangameViewState extends State<LangameView> {
     );
   }
 
-
+  final _endtext = [
+    'Learnt anything interesting?',
+    'Had a great conversation?',
+    'Do you know them better now?',
+    'Have you increased your relationships?',
+    'Do you feel more in touch with others?',
+    'Are you more open to new ideas?',
+    'Are you more open to new people?',
+    'Do you feel more connected to the community?',
+  ];
   Future<void> _showEndDialog() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var currentLg = Provider.of<LangameProvider>(context, listen: false)
@@ -841,51 +891,12 @@ class _LangameViewState extends State<LangameView> {
                   ),
                   Center(
                       child: Text(
-                    'How relevant to the topic the conversation starter was?',
+                    _endtext.pickAny()!,
                     style: Theme.of(context).textTheme.headline6,
                     textAlign: TextAlign.center,
                   )),
-                  Center(
-                      child: ToggleButtons(
-                    children: <Widget>[
-                      Icon(FontAwesomeIcons.frown,
-                          color: isLightThenDark(context)),
-                      Icon(FontAwesomeIcons.meh,
-                          color: isLightThenDark(context)),
-                      Icon(FontAwesomeIcons.grinTongue,
-                          color: isLightThenDark(context)),
-                    ],
-                    onPressed: (int i) => s.feedbackMemeRelevanceScore = i,
-                    isSelected: s.feedbackMemeRelevanceSelected,
-                  )),
-                  Center(
-                      child: Text(
-                    'How would you rate the conversation starter?',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline6,
-                  )),
-                  Center(
-                      child: ToggleButtons(
-                    children: <Widget>[
-                      Icon(FontAwesomeIcons.frown,
-                          color: isLightThenDark(context)),
-                      Icon(FontAwesomeIcons.meh,
-                          color: isLightThenDark(context)),
-                      Icon(FontAwesomeIcons.grinTongue,
-                          color: isLightThenDark(context)),
-                    ],
-                    onPressed: (int i) => s.feedbackMemeGeneralScore = i,
-                    isSelected: s.feedbackMemeGeneralScoreSelected,
-                  )),
-                  LangameButton(FontAwesomeIcons.doorOpen, onPressed: () {
-                    // TODO: handle feedback per memes
-                    currentLg.memes.forEach((e) => s.sendMemeFeedback(e));
-                    // We don't wait, should not block user
-                    cp.showSnackBar('Thank you a lot 🥰');
-                    _goBackToMainMenu();
-                  }, text: 'Send', highlighted: true),
                   LangameButton(FontAwesomeIcons.forward,
-                      onPressed: _goBackToMainMenu, text: 'Skip', layer: 2),
+                      onPressed: _goBackToMainMenu, text: 'Leave', layer: 2),
                 ],
               ),
             ),

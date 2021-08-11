@@ -5,6 +5,114 @@ export namespace langame {
     /** Namespace protobuf. */
     namespace protobuf {
 
+        /** Properties of an Error. */
+        interface IError {
+
+            /** Error developerMessage */
+            developerMessage?: (string|null);
+
+            /** Error createdAt */
+            createdAt?: (google.protobuf.ITimestamp|null);
+
+            /** Error code */
+            code?: (string|null);
+
+            /** Error userMessage */
+            userMessage?: (string|null);
+        }
+
+        /** Represents an Error. */
+        class Error implements IError {
+
+            /**
+             * Constructs a new Error.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: langame.protobuf.IError);
+
+            /** Error developerMessage. */
+            public developerMessage: string;
+
+            /** Error createdAt. */
+            public createdAt?: (google.protobuf.ITimestamp|null);
+
+            /** Error code. */
+            public code: string;
+
+            /** Error userMessage. */
+            public userMessage: string;
+
+            /**
+             * Creates a new Error instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Error instance
+             */
+            public static create(properties?: langame.protobuf.IError): langame.protobuf.Error;
+
+            /**
+             * Encodes the specified Error message. Does not implicitly {@link langame.protobuf.Error.verify|verify} messages.
+             * @param message Error message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: langame.protobuf.IError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Error message, length delimited. Does not implicitly {@link langame.protobuf.Error.verify|verify} messages.
+             * @param message Error message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: langame.protobuf.IError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Error message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Error
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Error;
+
+            /**
+             * Decodes an Error message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Error
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Error;
+
+            /**
+             * Verifies an Error message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an Error message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Error
+             */
+            public static fromObject(object: { [k: string]: any }): langame.protobuf.Error;
+
+            /**
+             * Creates a plain object from an Error message. Also converts values to other types if specified.
+             * @param message Error
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: langame.protobuf.Error, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Error to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+
         /** Properties of a SeenMemes. */
         interface ISeenMemes {
 
@@ -296,14 +404,17 @@ export namespace langame {
             /** Meme content */
             content?: (string|null);
 
-            /** Meme tags */
-            tags?: (langame.protobuf.ITag[]|null);
+            /** Meme topics */
+            topics?: (string[]|null);
 
             /** Meme promptId */
             promptId?: (string|null);
 
             /** Meme translated */
             translated?: ({ [k: string]: string }|null);
+
+            /** Meme id */
+            id?: (string|null);
         }
 
         /** Represents a Meme. */
@@ -321,14 +432,17 @@ export namespace langame {
             /** Meme content. */
             public content: string;
 
-            /** Meme tags. */
-            public tags: langame.protobuf.ITag[];
+            /** Meme topics. */
+            public topics: string[];
 
             /** Meme promptId. */
             public promptId: string;
 
             /** Meme translated. */
             public translated: { [k: string]: string };
+
+            /** Meme id. */
+            public id: string;
 
             /**
              * Creates a new Meme instance using the specified properties.
@@ -1380,7 +1494,7 @@ export namespace langame {
             latestInteractions?: (string[]|null);
 
             /** User errors */
-            errors?: (string[]|null);
+            errors?: (langame.protobuf.IError[]|null);
 
             /** User lastLogin */
             lastLogin?: (google.protobuf.ITimestamp|null);
@@ -1399,6 +1513,9 @@ export namespace langame {
 
             /** User credits */
             credits?: (number|null);
+
+            /** User role */
+            role?: (string|null);
         }
 
         /** Represents a User. */
@@ -1444,7 +1561,7 @@ export namespace langame {
             public latestInteractions: string[];
 
             /** User errors. */
-            public errors: string[];
+            public errors: langame.protobuf.IError[];
 
             /** User lastLogin. */
             public lastLogin?: (google.protobuf.ITimestamp|null);
@@ -1463,6 +1580,9 @@ export namespace langame {
 
             /** User credits. */
             public credits: number;
+
+            /** User role. */
+            public role: string;
 
             /**
              * Creates a new User instance using the specified properties.
@@ -1668,6 +1788,9 @@ export namespace langame {
 
             /** UserPreference topicSearchHistory */
             topicSearchHistory?: (string[]|null);
+
+            /** UserPreference errors */
+            errors?: (langame.protobuf.IError[]|null);
         }
 
         /** Represents a UserPreference. */
@@ -1702,6 +1825,9 @@ export namespace langame {
 
             /** UserPreference topicSearchHistory. */
             public topicSearchHistory: string[];
+
+            /** UserPreference errors. */
+            public errors: langame.protobuf.IError[];
 
             /**
              * Creates a new UserPreference instance using the specified properties.
@@ -1774,6 +1900,105 @@ export namespace langame {
             public toJSON(): { [k: string]: any };
         }
 
+        namespace UserPreference {
+
+            /** Properties of a Notification. */
+            interface INotification {
+
+                /** Notification email */
+                email?: (boolean|null);
+
+                /** Notification push */
+                push?: (boolean|null);
+            }
+
+            /** Represents a Notification. */
+            class Notification implements INotification {
+
+                /**
+                 * Constructs a new Notification.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.UserPreference.INotification);
+
+                /** Notification email. */
+                public email: boolean;
+
+                /** Notification push. */
+                public push: boolean;
+
+                /**
+                 * Creates a new Notification instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Notification instance
+                 */
+                public static create(properties?: langame.protobuf.UserPreference.INotification): langame.protobuf.UserPreference.Notification;
+
+                /**
+                 * Encodes the specified Notification message. Does not implicitly {@link langame.protobuf.UserPreference.Notification.verify|verify} messages.
+                 * @param message Notification message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.UserPreference.INotification, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Notification message, length delimited. Does not implicitly {@link langame.protobuf.UserPreference.Notification.verify|verify} messages.
+                 * @param message Notification message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.UserPreference.INotification, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a Notification message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Notification
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.UserPreference.Notification;
+
+                /**
+                 * Decodes a Notification message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Notification
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.UserPreference.Notification;
+
+                /**
+                 * Verifies a Notification message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a Notification message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Notification
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.UserPreference.Notification;
+
+                /**
+                 * Creates a plain object from a Notification message. Also converts values to other types if specified.
+                 * @param message Notification
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.UserPreference.Notification, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Notification to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+        }
+
         /** Properties of a Langame. */
         interface ILangame {
 
@@ -1787,7 +2012,7 @@ export namespace langame {
             topics?: (string[]|null);
 
             /** Langame memes */
-            memes?: (string[]|null);
+            memes?: (langame.protobuf.IMeme[]|null);
 
             /** Langame initiator */
             initiator?: (string|null);
@@ -1802,7 +2027,7 @@ export namespace langame {
             date?: (google.protobuf.ITimestamp|null);
 
             /** Langame errors */
-            errors?: (string[]|null);
+            errors?: (langame.protobuf.IError[]|null);
 
             /** Langame started */
             started?: (google.protobuf.ITimestamp|null);
@@ -1845,7 +2070,7 @@ export namespace langame {
             public topics: string[];
 
             /** Langame memes. */
-            public memes: string[];
+            public memes: langame.protobuf.IMeme[];
 
             /** Langame initiator. */
             public initiator: string;
@@ -1860,7 +2085,7 @@ export namespace langame {
             public date?: (google.protobuf.ITimestamp|null);
 
             /** Langame errors. */
-            public errors: string[];
+            public errors: langame.protobuf.IError[];
 
             /** Langame started. */
             public started?: (google.protobuf.ITimestamp|null);
@@ -1974,6 +2199,9 @@ export namespace langame {
 
             /** Player audioToken */
             audioToken?: (string|null);
+
+            /** Player errors */
+            errors?: (langame.protobuf.IError[]|null);
         }
 
         /** Represents a Player. */
@@ -2002,6 +2230,9 @@ export namespace langame {
 
             /** Player audioToken. */
             public audioToken: string;
+
+            /** Player errors. */
+            public errors: langame.protobuf.IError[];
 
             /**
              * Creates a new Player instance using the specified properties.
@@ -2964,14 +3195,6 @@ export namespace langame {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
-        }
-
-        /** FirestoreCollection enum. */
-        enum FirestoreCollection {
-            USERS = 0,
-            MEMES = 1,
-            PROMPTS = 2,
-            LANGAMES = 3
         }
     }
 }

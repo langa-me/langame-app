@@ -1,3 +1,5 @@
+import 'dart:core';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/material.dart';
@@ -66,7 +68,10 @@ class UserExt {
       tokens: (m['tokens'] as List<dynamic>?)?.map((e) => e as String),
       latestInteractions:
           (m['latestInteractions'] as List<dynamic>?)?.map((e) => e as String),
-      errors: (m['errors'] as List<dynamic>?)?.map((e) => e as String),
+      errors: (m['errors'] as List<dynamic>?)?.map((e) =>
+          e is Map<String, dynamic>
+              ? ErrorExt.fromObject(e)
+              : lg.Error(developerMessage: e as String)),
       lastLogin: dynamicToProtobufTimestamp(m['lastLogin']),
       lastLogout: dynamicToProtobufTimestamp(m['lastLogout']),
       creationTime: dynamicToProtobufTimestamp(m['creationTime']),
@@ -74,6 +79,7 @@ class UserExt {
       devices:
           (m['devices'] as List<dynamic>?)?.map((e) => DeviceExt.fromObject(e)),
       credits: m['credits'],
+      role: m['role'],
     );
   }
 
@@ -135,13 +141,16 @@ class LangameExt {
       channelName: m['channelName'],
       players: (m['players'] as List<dynamic>?)?.map((e) => e as String),
       topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
-      memes: (m['memes'] as List<dynamic>?)?.map((e) => e as String),
+      memes: (m['memes'] as List<dynamic>?)?.map((e) => MemeExt.fromObject(e)),
       initiator: m['initiator'],
       done: dynamicToProtobufTimestamp(m['done']),
       currentMeme: m['currentMeme'],
       date: dynamicToProtobufTimestamp(m['date']),
       started: dynamicToProtobufTimestamp(m['started']),
-      errors: (m['errors'] as List<dynamic>?)?.map((e) => e as String),
+      errors: (m['errors'] as List<dynamic>?)?.map((e) =>
+          e is Map<String, dynamic>
+              ? ErrorExt.fromObject(e)
+              : lg.Error(developerMessage: e as String)),
       nextMeme: dynamicToProtobufTimestamp(m['nextMeme']),
       memesSeen: m['memesSeen'],
       memeChanged: dynamicToProtobufTimestamp(m['memeChanged']),
@@ -155,10 +164,17 @@ class LangameExt {
 
 gg.Timestamp? dynamicToProtobufTimestamp(dynamic something) {
   if (something == null) return null;
+
   // Firestore Timestamp (i.e. when using thing.serverTimestamp()...)
   if (something is Timestamp)
     return gg.Timestamp.fromDateTime(something.toDate());
   if (something is DateTime) return gg.Timestamp.fromDateTime(something);
+  if (something is double)
+    return gg.Timestamp.fromDateTime(
+        DateTime.fromMillisecondsSinceEpoch(something.toInt() * 1000));
+  if (something is int)
+    return gg.Timestamp.fromDateTime(
+        DateTime.fromMillisecondsSinceEpoch(something * 1000));
   // DateTime string (saved from date time field or whatever)
   try {
     var t = gg.Timestamp.fromDateTime(DateTime.parse(something));
@@ -177,6 +193,10 @@ class PlayerExt {
         timeOut: dynamicToProtobufTimestamp(m['timeOut']),
         audioId: m['audioId'],
         audioToken: m['audioToken'],
+        errors: (m['errors'] as List<dynamic>?)?.map((e) =>
+            e is Map<String, dynamic>
+                ? ErrorExt.fromObject(e)
+                : lg.Error(developerMessage: e as String)),
         notes:
             (m['notes'] as List<dynamic>?)?.map((e) => NoteExt.fromObject(e)));
   }
@@ -202,12 +222,13 @@ class NoteExt {
 
 class MemeExt {
   static lg.Meme fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
+    var m = o as Map<Object?, Object?>;
     return lg.Meme(
       createdAt: dynamicToProtobufTimestamp(m['createdAt']),
-      content: m['content'],
-      tags: (m['tags'] as List<dynamic>?)?.map((e) => TagExt.fromObject(e)),
-      translated: m['translated'],
+      content: m['content'] as String?,
+      topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
+      translated: (m['translated'] as Map<Object?, Object?>?)
+          ?.map((k, v) => MapEntry(k as String, v as String)),
     );
   }
 }
@@ -294,5 +315,16 @@ class TagContextExt {
           (e) => e.toString() == m['type'],
           orElse: () => lg.Tag_Context_Type.OPENAI),
     );
+  }
+}
+
+class ErrorExt {
+  static lg.Error fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Error(
+        code: m['code'],
+        developerMessage: m['developerMessage'],
+        userMessage: m['userMessage'],
+        createdAt: dynamicToProtobufTimestamp(m['createdAt']));
   }
 }

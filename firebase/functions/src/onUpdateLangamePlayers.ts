@@ -2,10 +2,11 @@ import {Change, EventContext} from "firebase-functions";
 import {DocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
 import {langame} from "./langame/protobuf/langame";
-import {converter, docRefHandleError} from "./utils/firestore";
+import {converter} from "./utils/firestore";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {generateAgoraRtcToken} from "./helpers";
+import {handleError} from "./errors";
 
 /**
  *
@@ -82,6 +83,7 @@ export const onUpdateLangamePlayers =
         }
       });
     } catch (e) {
-      await Promise.all(docRefHandleError(change.after.ref, e, "null"));
+      await Promise.all(handleError(change.after.ref,
+          {developerMessage: e, uid: "null"}));
     }
   };

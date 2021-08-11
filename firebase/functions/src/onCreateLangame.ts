@@ -5,8 +5,9 @@ import {kUsersCollection, hashFnv32a} from "./helpers";
 import * as admin from "firebase-admin";
 import {offlineMemeSearch} from "./memes/memes";
 import * as functions from "firebase-functions";
-import {converter, db, handleError} from "./utils/firestore";
+import {converter, db} from "./utils/firestore";
 import {langame} from "./langame/protobuf/langame";
+import {handleError} from "./errors";
 
 /**
  *
@@ -26,8 +27,10 @@ export const onCreateLangame = async (
       await Promise.all(
           handleError(
               snap,
-              "Langame is null",
-              "",
+              {
+                userMessage: "you did not provide any data",
+                code: "invalid-argument",
+              }
           )
       );
       return;
@@ -52,11 +55,11 @@ export const onCreateLangame = async (
     if (typeof channelName === "number") {
       await Promise.all(
           handleError(
-              snap,
+              snap, {
               // eslint-disable-next-line max-len
-              `failed to create channel name, requested by ${lg.data()!.initiator}`,
-          lg.data()!.initiator,
-          )
+                developerMessage: `failed to create channel name, requested by ${lg.data()!.initiator}`,
+                uid: lg.data()!.initiator,
+              })
       );
       return;
     }
@@ -69,10 +72,10 @@ export const onCreateLangame = async (
       !("value" in t.parameters.offline_use_generated.defaultValue)) {
       await Promise.all(
           handleError(
-              snap,
-              "invalid remote config",
-          lg.data()!.initiator,
-          )
+              snap, {
+                developerMessage: "invalid remote config",
+                uid: lg.data()!.initiator,
+              })
       );
       return;
     }
@@ -89,16 +92,20 @@ export const onCreateLangame = async (
         // @ts-ignore
         t.parameters.meme_count.defaultValue.value * 1, // Casting to number
         memesToFilter.map((e: any) => e.meme),
+        true,
     );
 
 
     if (memes.length === 0) {
       await Promise.all(
           handleError(
-              snap,
-              `failed to find meme for topics, ${lg.data()!.topics}`,
-          lg.data()!.initiator,
-          )
+              snap, {
+                // eslint-disable-next-line max-len
+                developerMessage: `failed to find meme for topics, ${lg.data()!.topics}`,
+                uid: lg.data()!.initiator,
+                // eslint-disable-next-line max-len
+                userMessage: "you have seen already everything in these topics!",
+              })
       );
       return;
     }
@@ -108,10 +115,13 @@ export const onCreateLangame = async (
         .logger
         .info("found memes for topics", lg.data()!.topics, memes);
 
+
     await snap.ref.set({
-      memes: memes.map((e) => e.content),
-      // Flattenned tags
-      tags: memes.map((e) => e.tags).reduce((acc, val) => acc.concat(val), []),
+      memes: memes
+          .filter((e) => e.data())
+          .map((e) => {
+            return {...e.data()!, id: e.id};
+          }),
       channelName: channelName,
       currentMeme: 0,
       done: null,
@@ -127,10 +137,10 @@ export const onCreateLangame = async (
       if (!player.data() || !player.data()!.tokens) {
         // Need to wait the promise to avoid concurrency issues on the db
         await Promise.all(handleError(
-            snap,
-            `${p}, has no devices`,
-            p,
-        ));
+            snap, {
+              developerMessage: `${p}, has no devices`,
+              uid: p,
+            }));
         continue;
       }
       // eslint-disable-next-line max-len
@@ -173,8 +183,9 @@ export const onCreateLangame = async (
                 tokens: admin.firestore.FieldValue.arrayRemove(t),
               }).then(() => functions.logger.info("removed invalid token", t))
               .catch(() =>
-                handleError(snap, "failed to remove invalid token",
-                    p));
+                handleError(snap, {
+                  developerMessage: "failed to remove invalid token",
+                  uid: p}));
         }
       });
 
@@ -182,7 +193,7 @@ export const onCreateLangame = async (
       const oneWeekAgo = new Date(Date.now() - oneWeek);
       const newMemesSeen = memes.map((e) => {
         return {
-          meme: e.objectID,
+          meme: e.id,
           date: new Date(),
         };
       });

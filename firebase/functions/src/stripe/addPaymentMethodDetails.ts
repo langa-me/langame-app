@@ -3,7 +3,7 @@ import {firestore} from "firebase-admin/lib/firestore";
 import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot;
 import {EventContext} from "firebase-functions";
 import Stripe from "stripe";
-import {reportError, userFacingMessage} from "../errors";
+import {reportError} from "../errors";
 
 
 /**
@@ -71,6 +71,5 @@ export const addPaymentMethodDetails =
         );
       } catch (e) {
         await reportError(e, {user: context.params.userId});
-        await snap.ref.set({error: userFacingMessage(e)}, {merge: true});
       }
     };

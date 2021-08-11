@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 
@@ -14,8 +15,8 @@ class PhysicalLangameProvider extends ChangeNotifier {
   CrashAnalyticsProvider _cap;
   PhysicalLangameProvider(this._firebase, this._cap, this._algolia);
 
-  List<Map<String, dynamic>> _memes = [];
-  List<Map<String, dynamic>> get memes => _memes;
+  List<lg.Meme> _memes = [];
+  List<lg.Meme> get memes => _memes;
   int _currentMeme = 0;
   int get currentMeme => _currentMeme;
   void previous() {
@@ -30,7 +31,7 @@ class PhysicalLangameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<LangameResponse<void>> getMemes({List<String>? topics}) async {
+  Future<LangameResponse<bool>> getMemes({List<String>? topics}) async {
     try {
       var memes = await _firebase.functions!
           .httpsCallable(
@@ -43,15 +44,19 @@ class PhysicalLangameProvider extends ChangeNotifier {
         'topics': topics ?? [],
       });
 
-      _memes = ((memes.data as Map<String, dynamic>)['memes'] as List<dynamic>)
-          .map((e) => Map<String, dynamic>.from(e))
-          .toList();
+      _memes = memes.data['memes']
+              .map<lg.Meme>((e) => MemeExt.fromObject(e))
+              .toList();
       _currentMeme = 0;
       _cap.log('getMemes ${topics?.join(',')} -> ${_memes.join(',')}');
 
       notifyListeners();
-      return LangameResponse(LangameStatus.succeed);
+      return LangameResponse(LangameStatus.succeed, result: true);
     } catch (e, s) {
+      if (e.toString().contains('could not find memes')) {
+        // No more memes in this topic
+        return LangameResponse(LangameStatus.succeed, result: false);
+      }
       _cap.log('failed to getMemes');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed);

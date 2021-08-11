@@ -68,9 +68,9 @@ export const getMemes = async (data: any,
   // If the user does not provide topics, leave empty string
   // will find all memes
   const memes = await offlineMemeSearch(
-        (data.topics && data.topics.length === 0) ? [""] : data.topics,
-        // @ts-ignore
-        t.parameters.meme_count.defaultValue.value * 1, // Casting to number
+      data.topics,
+      // @ts-ignore
+      t.parameters.meme_count.defaultValue.value * 1, // Casting to number
       seenMemes!.map((e: any) => e.meme),
   );
 
@@ -84,7 +84,7 @@ export const getMemes = async (data: any,
   const oneWeekAgo = new Date(Date.now() - oneWeek);
   const newMemesSeen = memes.map((e) => {
     return {
-      meme: e.objectID,
+      meme: e.id,
       // @ts-ignore
       date: new Date(),
     };
@@ -101,5 +101,11 @@ export const getMemes = async (data: any,
   seenMemesDoc.ref.set({
     seen: seenMemes,
   }, {merge: true});
-  return {memes: memes};
+  return {
+    memes: memes
+        .filter((e) => e.data())
+        .map((e) => {
+          return {...e.data()!, id: e.id};
+        }),
+  };
 };

@@ -5,7 +5,7 @@ export const huggingfaceKey = functions.config().huggingface?.key;
 export const algoliaId = functions.config().algolia?.application.id;
 export const algoliaKey = functions.config().algolia?.key;
 export interface Api {
-  save(indexName: string, objects: {object: any, id: string}[]): Promise<any>;
+  save(indexName: string, objects: { object: any, id: string }[]): Promise<any>;
   getIndex(indexName: string): SearchIndex;
   completion(
     prompt: string,
@@ -20,7 +20,11 @@ export interface Api {
     classes: Array<string>,
     multiLabel: boolean,
     ignoreBelowThreshold: number,
-    ): Promise<Array<string>>;
+  ): Promise<Array<string>>;
+  openAITopicClassify(
+    content: string,
+    parameters: any
+  ): Promise<string | undefined>;
   filter(content: string, parameters: any): Promise<ContentFilter>;
 }
 

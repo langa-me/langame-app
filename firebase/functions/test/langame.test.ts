@@ -17,6 +17,7 @@ admin.initializeApp({
 import {converter} from "../src/utils/firestore";
 import {internalSetUserRecommendation} from "../src/setUserRecommendation";
 import {ImplAiApi} from "../src/aiApi/implAiApi";
+import * as functions from "firebase-functions";
 
 describe("Langame stuff", async () => {
   before(() => {
@@ -100,13 +101,22 @@ describe("Random", async () => {
     }
   });
   it("rr", async () => {
-    const ts = await admin.firestore().collection("topics").get();
+    const memes = await admin.firestore().collection("memes").listDocuments();
     const api = new ImplAiApi();
-
-    for (const t of ts.docs) {
-      await api.getIndex("prod_topics").saveObject({
-        objectID: t.id,
+    for (const m of memes) {
+      const meme = await m.get();
+      let topics = meme.data()!.topics;
+      if (topics.includes("unknown")) {
+        topics = topics.filter((e: any) => e !== "unknown");
+      } else continue;
+      await meme.ref.update({
+        topics: topics,
       });
+      await api.getIndex("prod_memes").partialUpdateObject({
+        objectID: meme.id,
+        tags: topics,
+      });
+      functions.logger.log("fixed label for", meme.id);
     }
   });
 });

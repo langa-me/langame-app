@@ -70,11 +70,12 @@ platform :ios do
       ipa: "./Runner.ipa",
       changelog: "New:
       - Early user recommendation feature!
-      - Text to speech allows sharing your Langames loudly!
+      - Translations added to Langame audio
+      - Slight interface improvements
+      - You can now like or dislike a conversation starter, the AI will learn accordingly to adapt and improve its performance, please vote!
       
       Known issues:
       - Launching URL does not work on some Android phones
-      - Handling sleep / background in Langame is not properly handled yet
       ",
       distribute_external: true,
       groups: "public",

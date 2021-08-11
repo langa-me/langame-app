@@ -1,9 +1,9 @@
 import {Change, EventContext} from "firebase-functions";
 import {QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
-import {handleError} from "./utils/firestore";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import {handleError} from "./errors";
 
 /**
  *
@@ -53,6 +53,6 @@ export const onUpdateLangame =
         });
       }
     } catch (e) {
-      await Promise.all(handleError(change.after, e, "null"));
+      await Promise.all(handleError(change.after, {developerMessage: e}));
     }
   };

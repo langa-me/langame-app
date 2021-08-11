@@ -3,7 +3,7 @@ import {firestore} from "firebase-admin/lib/firestore";
 import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot;
 import {Change, EventContext} from "firebase-functions";
 import Stripe from "stripe";
-import {reportError, userFacingMessage} from "../errors";
+import {reportError} from "../errors";
 
 /**
  * When 3D Secure is performed, we need to reconfirm the payment
@@ -69,8 +69,6 @@ export const confirmStripePayment =
               Object.fromEntries(Object.entries(sub))
           );
     } catch (e) {
-      await change.after.ref.set({error: userFacingMessage(e)},
-          {merge: true});
       await reportError(e, {user: context.params.userId});
       return stripe.refunds!.create({
         payment_intent: change.after.id,

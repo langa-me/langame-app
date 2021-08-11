@@ -28,25 +28,6 @@ class InteractionLevel extends $pb.ProtobufEnum {
   const InteractionLevel._($core.int v, $core.String n) : super(v, n);
 }
 
-class FirestoreCollection extends $pb.ProtobufEnum {
-  static const FirestoreCollection USERS = FirestoreCollection._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'USERS');
-  static const FirestoreCollection MEMES = FirestoreCollection._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'MEMES');
-  static const FirestoreCollection PROMPTS = FirestoreCollection._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'PROMPTS');
-  static const FirestoreCollection LANGAMES = FirestoreCollection._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'LANGAMES');
-
-  static const $core.List<FirestoreCollection> values = <FirestoreCollection> [
-    USERS,
-    MEMES,
-    PROMPTS,
-    LANGAMES,
-  ];
-
-  static final $core.Map<$core.int, FirestoreCollection> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static FirestoreCollection? valueOf($core.int value) => _byValue[value];
-
-  const FirestoreCollection._($core.int v, $core.String n) : super(v, n);
-}
-
 class Tag_Context_Type extends $pb.ProtobufEnum {
   static const Tag_Context_Type WIKIPEDIA = Tag_Context_Type._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'WIKIPEDIA');
   static const Tag_Context_Type OPENAI = Tag_Context_Type._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OPENAI');

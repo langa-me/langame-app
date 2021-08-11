@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -133,27 +134,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title: Text('Notifications',
                   style: Theme.of(context).textTheme.headline6),
             ),
-
-            // Consumer<PreferenceProvider>(
-            //   builder: (context, p, child) => ListTile(
-            //     onTap: () {
-            //       if (kReleaseMode) {
-            //         cp.showSnackBar('Coming soon!');
-            //         cap.logNewFeatureClick('settings_shake_to_feedback');
-            //         return;
-            //       }
-            //       p.setShakeToFeedback(!p.preference!.shakeToFeedback);
-            //     },
-            //     leading: Icon(Icons.feedback_outlined,
-            //         color: isLightThenDark(context)),
-            //     title: Text('Shake-to-feedback',
-            //         style: Theme.of(context).textTheme.headline6),
-            //     trailing: Switch(
-            //         value: p.preference!.shakeToFeedback,
-            //         onChanged: (v) =>
-            //             p.setShakeToFeedback(!p.preference!.shakeToFeedback)),
-            //   ),
-            // ),
             Consumer<PreferenceProvider>(
               builder: (context, p, child) => ListTile(
                 onTap: () {
@@ -218,17 +198,11 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             ),
             ListTile(
               onTap: () async {
-                // Only safe in dev mode yet
-                if (kReleaseMode) {
-                  cp.showSnackBar('Coming soon!');
-                  cap.logNewFeatureClick('settings_log_out');
-                  return;
-                }
+                final ap =
+                    Provider.of<AuthenticationProvider>(context, listen: false);
                 cp.showLoadingDialog();
                 await writeOnlyPreferenceProvider?.save();
-                await Provider.of<AuthenticationProvider>(context,
-                        listen: false)
-                    .logout();
+                await ap.logout();
                 await Future.delayed(Duration(seconds: 1));
                 cp.dialogComplete();
                 cp.pushReplacement(LoginView());

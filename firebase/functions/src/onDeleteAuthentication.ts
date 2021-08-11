@@ -10,6 +10,7 @@ import UserRecord = auth.UserRecord;
 import Stripe from "stripe";
 import {reportError} from "./errors";
 import {html} from "./utils/html";
+import Mailchimp = require("mailchimp-api-v3");
 const stripe = new Stripe(functions.config().stripe.key, {
   apiVersion: "2020-08-27",
 });
@@ -86,7 +87,10 @@ export const onDeleteAuthentication = async (user: UserRecord,
       batch.delete(p.ref);
     }
 
-    functions.logger.info("preparing interactions, preferences, user deletion");
+    batch.delete(db.collection("recommendations").doc(user.uid));
+    batch.delete(db.collection("seenMemes").doc(user.uid));
+
+    functions.logger.info("preparing interactions, preferences, recommendations, seenMemes, user deletion");
 
     batch.delete(userDocToDelete).commit();
     return db.collection("mails").add({
@@ -97,6 +101,12 @@ export const onDeleteAuthentication = async (user: UserRecord,
           ${html(title, body, "Have a great day 😇.")}
         </code>`,
       },
+    }).then(() => {
+      const mailchimp = new Mailchimp(functions.config().mailchimp.key);
+      mailchimp.post(`/lists/${functions.config().mailchimp.list}/members`, {
+        email_address: user.email,
+        status: "unsubscribed",
+      });
     });
   } catch (e) {
     return reportError(e, {user: context.params.userId});

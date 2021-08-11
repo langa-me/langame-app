@@ -8,7 +8,6 @@ import {langame} from "../langame/protobuf/langame";
 import {FirebaseFunctionsResponse, FirebaseFunctionsResponseStatusCode}
   from "../models";
 import * as functions from "firebase-functions";
-import {reportError, userFacingMessage} from "../errors";
 
 // Make the helper types for updates:
 type PathImpl<T, K extends keyof T> =
@@ -118,33 +117,3 @@ export const getLangame = async (channelName: string):
   return queryResult.docs[0];
 };
 
-
-export const handleError = (
-    snap: QueryDocumentSnapshot,
-    msg: string,
-    uid: string,
-): Promise<any>[] => {
-  const e = Error(msg);
-  const p1 = snap.ref.set({
-    errors: admin.firestore
-        .FieldValue
-        .arrayUnion(userFacingMessage(e)),
-  }, {merge: true});
-  const p2 = reportError(e, {user: uid});
-  return [p1, p2];
-};
-
-export const docRefHandleError = (
-    snap: admin.firestore.DocumentReference | null,
-    msg: string,
-    uid: string,
-): Promise<any>[] => {
-  const e = Error(msg);
-  const p1 = snap ? snap.set({
-    errors: admin.firestore
-        .FieldValue
-        .arrayUnion(userFacingMessage(e)),
-  }, {merge: true}) : Promise.resolve();
-  const p2 = reportError(e, {user: uid});
-  return [p1, p2];
-};

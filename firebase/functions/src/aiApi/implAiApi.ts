@@ -17,6 +17,14 @@ export const defaultCompletionParameters = {
   stop: ["\n"],
 };
 
+
+export const openAIClassifierFiles = {
+  first: {
+    description: "classification-topic-endpoint-0.0.1.jsonl",
+    file: "file-rV9rZbiiziXLfjqc4MKLLChy",
+  },
+};
+
 const openAiEndpoint = "https://api.openai.com/v1/engines";
 const huggingfaceEndpoint = "https://api-inference.huggingface.co/models";
 
@@ -38,6 +46,7 @@ export class ImplAiApi implements Api {
       this.indexes.set("dev_topics", this.algolia.initIndex("dev_topics"));
       this.indexes.set("prod_topics", this.algolia.initIndex("prod_topics"));
     }
+
 
     /**
      *
@@ -210,5 +219,46 @@ export class ImplAiApi implements Api {
       return result.labels
           .filter((_: string, i: number) =>
             result.scores[i] > ignoreBelowThreshold);
+    }
+
+
+    /**
+     * @param{string} content
+     * @param{any} parameters
+     */
+    async openAITopicClassify(
+        content: string,
+        parameters: any
+    ): Promise<string | undefined> {
+      try {
+        const r =
+                await fetch("https://api.openai.com/v1/classifications", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    "file": openAIClassifierFiles.first.file,
+                    "query": content,
+                    "search_model": "ada",
+                    "model": parameters?.classificationModel ?? "curie",
+                    "max_examples": parameters?.maxExamples ?? 10,
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${openAiKey}`,
+                  },
+                });
+        const data = await r.json();
+        if (data.error &&
+                data.error.message
+                    // eslint-disable-next-line max-len
+                    ?.includes("No similar documents were found in file with ID")) {
+          return undefined;
+        }
+        if (data.error) return undefined;
+        if (data.label.toLowerCase() === "unknown") return undefined;
+        return data.label;
+      } catch (e) {
+        return undefined;
+      }
     }
 }

@@ -1,4 +1,4 @@
-import {reportError, userFacingMessage} from "../errors";
+import {reportError} from "../errors";
 import * as functions from "firebase-functions";
 import Stripe from "stripe";
 import {EventContext} from "firebase-functions";
@@ -54,7 +54,6 @@ export const createStripePayment = async (snap: QueryDocumentSnapshot,
     // If the result is successful, write it back to the database.
     await snap.ref.set(payment);
   } catch (e) {
-    await snap.ref.set({error: userFacingMessage(e)}, {merge: true});
     await reportError(e, {user: context.params.userId});
   }
 };

@@ -1,15 +1,12 @@
 import * as functions from "firebase-functions";
 import {shuffle} from "../utils/array";
 import {ImplAiApi} from "../aiApi/implAiApi";
+import {langame} from "../langame/protobuf/langame";
+import * as admin from "firebase-admin";
+import {converter} from "../utils/firestore";
 
 export const openAiKey = functions.config().openai.key;
 
-export interface AlgoliaMeme {
-    objectID: string;
-    content: string;
-    tags: string[];
-    translated: any;
-}
 
 /**
  * offlineMemeSearch Find memes in topic ordered by score, filtering
@@ -17,20 +14,22 @@ export interface AlgoliaMeme {
  * @param{Array<string>} topics
  * @param{number} limit number of questions
  * @param{string[]} objectIDsFilteredOut
+ * @param{boolean} useRandomIfEmpty
  */
 export const offlineMemeSearch =
     async (
         topics: Array<string>,
         limit: number,
         objectIDsFilteredOut: string[],
+        useRandomIfEmpty: boolean = false
     ):
-        Promise<AlgoliaMeme[]> => {
+        Promise<admin.firestore.DocumentSnapshot<langame.protobuf.Meme>[]> => {
       topics = topics.map((t) => t.toLowerCase());
+      if (topics.length === 0) topics = [""];
       // eslint-disable-next-line max-len
       functions.logger.log(`searching meme ${topics.join(",")}, limit: ${limit}, filters:${objectIDsFilteredOut}`);
 
       const api = new ImplAiApi();
-      const res: AlgoliaMeme[] = [];
       const reqOptions = {
         filters: "",
         length: limit,
@@ -41,20 +40,23 @@ export const offlineMemeSearch =
             .map((e) => `NOT objectID:${e}`)
             .join(" AND ");
       }
-      for (const topic of topics) {
+      const call = async () => await Promise.all(topics.map(async (e) => {
         const r = await api.getIndex("prod_memes")
-            .search(topic, reqOptions);
-        r.hits.forEach((e) => {
-          // @ts-ignore
-          res.push({content: e.content,
-            // @ts-ignore
-            tags: e.tags,
-            objectID:
-            e.objectID,
-            // @ts-ignore
-            translated: e.translated});
-        });
+            .search(e, reqOptions);
+        return Promise.all(r.hits.map(async (e) =>
+          admin.firestore().collection("memes")
+              .doc(e.objectID)
+              .withConverter(converter<langame.protobuf.Meme>())
+              .get()
+        ));
+      }));
+      let memes = await call();
+      if (useRandomIfEmpty && memes.length === 0) {
+        topics = [""];
+        memes = await call();
       }
-      return shuffle(res).slice(0, limit);
+
+      // flatten array
+      return shuffle(memes.reduce((p, c) => p.concat(c))).slice(0, limit);
     };
 

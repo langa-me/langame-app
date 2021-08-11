@@ -1,6 +1,10 @@
 import {Logging} from "@google-cloud/logging";
 import * as functions from "firebase-functions";
 import * as Sentry from "@sentry/node";
+import * as admin from "firebase-admin";
+import {QueryDocumentSnapshot}
+  from "firebase-functions/lib/providers/firestore";
+
 
 const logging = process.env.GCLOUD_PROJECT ? new Logging({
   projectId: process.env.GCLOUD_PROJECT,
@@ -57,14 +61,33 @@ export const reportError = (err: Error, context = {}): Promise<any> => {
 
 // [END reportError]
 
-/**
- * Sanitize the error message for the user.
- * @param{Error | null} error
- * @return{String}
- */
-export const userFacingMessage = (error: Error | null) => {
-  // @ts-ignore
-  return error && error.type ?
-        error.message :
-        "An error occurred, developers have been alerted";
+
+interface ErrorOptions {
+    developerMessage?: string,
+    userMessage?: string,
+    code?: functions.https.FunctionsErrorCode,
+    uid?: string,
+}
+
+export const handleError = (
+    snap: admin.firestore.DocumentReference | null | QueryDocumentSnapshot,
+    options: ErrorOptions
+): Promise<any>[] => {
+  const e = Error(options.developerMessage);
+  const p1 = snap ?
+  (
+    snap instanceof admin.firestore.DocumentReference ?
+    snap :
+    snap.ref
+  ).set({
+    errors: admin.firestore.FieldValue.arrayUnion({
+      developerMessage: e.toString(),
+      createdAt: Date.now(),
+      code: options.code ?? "internal",
+      userMessage: options.userMessage ??
+        "An error occurred, developers have been alerted",
+    }),
+  }, {merge: true}) : Promise.resolve();
+  const p2 = reportError(e, options.uid ? {user: options.uid} : undefined);
+  return [p1, p2];
 };

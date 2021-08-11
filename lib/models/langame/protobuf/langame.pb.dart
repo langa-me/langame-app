@@ -15,6 +15,97 @@ import 'langame.pbenum.dart';
 
 export 'langame.pbenum.dart';
 
+class Error extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Error', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'developerMessage', protoName: 'developerMessage')
+    ..aOM<$0.Timestamp>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', protoName: 'createdAt', subBuilder: $0.Timestamp.create)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'code')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userMessage', protoName: 'userMessage')
+    ..hasRequiredFields = false
+  ;
+
+  Error._() : super();
+  factory Error({
+    $core.String? developerMessage,
+    $0.Timestamp? createdAt,
+    $core.String? code,
+    $core.String? userMessage,
+  }) {
+    final _result = create();
+    if (developerMessage != null) {
+      _result.developerMessage = developerMessage;
+    }
+    if (createdAt != null) {
+      _result.createdAt = createdAt;
+    }
+    if (code != null) {
+      _result.code = code;
+    }
+    if (userMessage != null) {
+      _result.userMessage = userMessage;
+    }
+    return _result;
+  }
+  factory Error.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Error.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Error clone() => Error()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Error copyWith(void Function(Error) updates) => super.copyWith((message) => updates(message as Error)) as Error; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Error create() => Error._();
+  Error createEmptyInstance() => create();
+  static $pb.PbList<Error> createRepeated() => $pb.PbList<Error>();
+  @$core.pragma('dart2js:noInline')
+  static Error getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Error>(create);
+  static Error? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get developerMessage => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set developerMessage($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDeveloperMessage() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeveloperMessage() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $0.Timestamp get createdAt => $_getN(1);
+  @$pb.TagNumber(2)
+  set createdAt($0.Timestamp v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasCreatedAt() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCreatedAt() => clearField(2);
+  @$pb.TagNumber(2)
+  $0.Timestamp ensureCreatedAt() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  $core.String get code => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set code($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasCode() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCode() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get userMessage => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set userMessage($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasUserMessage() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearUserMessage() => clearField(4);
+}
+
 class SeenMemes_Seen_Single extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SeenMemes.Seen.Single', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOM<$0.Timestamp>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'date', subBuilder: $0.Timestamp.create)
@@ -172,9 +263,10 @@ class Meme extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Meme', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOM<$0.Timestamp>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
-    ..pc<Tag>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tags', $pb.PbFieldType.PM, subBuilder: Tag.create)
+    ..pPS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topics')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'promptId')
     ..m<$core.String, $core.String>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translated', entryClassName: 'Meme.TranslatedEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('langame.protobuf'))
+    ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
     ..hasRequiredFields = false
   ;
 
@@ -182,9 +274,10 @@ class Meme extends $pb.GeneratedMessage {
   factory Meme({
     $0.Timestamp? createdAt,
     $core.String? content,
-    $core.Iterable<Tag>? tags,
+    $core.Iterable<$core.String>? topics,
     $core.String? promptId,
     $core.Map<$core.String, $core.String>? translated,
+    $core.String? id,
   }) {
     final _result = create();
     if (createdAt != null) {
@@ -193,14 +286,17 @@ class Meme extends $pb.GeneratedMessage {
     if (content != null) {
       _result.content = content;
     }
-    if (tags != null) {
-      _result.tags.addAll(tags);
+    if (topics != null) {
+      _result.topics.addAll(topics);
     }
     if (promptId != null) {
       _result.promptId = promptId;
     }
     if (translated != null) {
       _result.translated.addAll(translated);
+    }
+    if (id != null) {
+      _result.id = id;
     }
     return _result;
   }
@@ -246,7 +342,7 @@ class Meme extends $pb.GeneratedMessage {
   void clearContent() => clearField(2);
 
   @$pb.TagNumber(4)
-  $core.List<Tag> get tags => $_getList(2);
+  $core.List<$core.String> get topics => $_getList(2);
 
   @$pb.TagNumber(5)
   $core.String get promptId => $_getSZ(3);
@@ -259,6 +355,15 @@ class Meme extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(6)
   $core.Map<$core.String, $core.String> get translated => $_getMap(4);
+
+  @$pb.TagNumber(7)
+  $core.String get id => $_getSZ(5);
+  @$pb.TagNumber(7)
+  set id($core.String v) { $_setString(5, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasId() => $_has(5);
+  @$pb.TagNumber(7)
+  void clearId() => clearField(7);
 }
 
 class Tag_Topic extends $pb.GeneratedMessage {
@@ -1056,13 +1161,14 @@ class User extends $pb.GeneratedMessage {
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tag')
     ..pPS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tokens')
     ..pPS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'latestInteractions')
-    ..pPS(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors')
+    ..pc<Error>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors', $pb.PbFieldType.PM, subBuilder: Error.create)
     ..aOM<$0.Timestamp>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'lastLogin', subBuilder: $0.Timestamp.create)
     ..aOM<$0.Timestamp>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'lastLogout', subBuilder: $0.Timestamp.create)
     ..aOM<$0.Timestamp>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'creationTime', subBuilder: $0.Timestamp.create)
     ..aOB(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disabled')
     ..pc<User_Device>(19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'devices', $pb.PbFieldType.PM, subBuilder: User_Device.create)
     ..a<$core.int>(20, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'credits', $pb.PbFieldType.O3)
+    ..aOS(21, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'role')
     ..hasRequiredFields = false
   ;
 
@@ -1079,13 +1185,14 @@ class User extends $pb.GeneratedMessage {
     $core.String? tag,
     $core.Iterable<$core.String>? tokens,
     $core.Iterable<$core.String>? latestInteractions,
-    $core.Iterable<$core.String>? errors,
+    $core.Iterable<Error>? errors,
     $0.Timestamp? lastLogin,
     $0.Timestamp? lastLogout,
     $0.Timestamp? creationTime,
     $core.bool? disabled,
     $core.Iterable<User_Device>? devices,
     $core.int? credits,
+    $core.String? role,
   }) {
     final _result = create();
     if (uid != null) {
@@ -1141,6 +1248,9 @@ class User extends $pb.GeneratedMessage {
     }
     if (credits != null) {
       _result.credits = credits;
+    }
+    if (role != null) {
+      _result.role = role;
     }
     return _result;
   }
@@ -1253,7 +1363,7 @@ class User extends $pb.GeneratedMessage {
   $core.List<$core.String> get latestInteractions => $_getList(10);
 
   @$pb.TagNumber(14)
-  $core.List<$core.String> get errors => $_getList(11);
+  $core.List<Error> get errors => $_getList(11);
 
   @$pb.TagNumber(15)
   $0.Timestamp get lastLogin => $_getN(12);
@@ -1308,6 +1418,76 @@ class User extends $pb.GeneratedMessage {
   $core.bool hasCredits() => $_has(17);
   @$pb.TagNumber(20)
   void clearCredits() => clearField(20);
+
+  @$pb.TagNumber(21)
+  $core.String get role => $_getSZ(18);
+  @$pb.TagNumber(21)
+  set role($core.String v) { $_setString(18, v); }
+  @$pb.TagNumber(21)
+  $core.bool hasRole() => $_has(18);
+  @$pb.TagNumber(21)
+  void clearRole() => clearField(21);
+}
+
+class UserPreference_Notification extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserPreference.Notification', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'email')
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'push')
+    ..hasRequiredFields = false
+  ;
+
+  UserPreference_Notification._() : super();
+  factory UserPreference_Notification({
+    $core.bool? email,
+    $core.bool? push,
+  }) {
+    final _result = create();
+    if (email != null) {
+      _result.email = email;
+    }
+    if (push != null) {
+      _result.push = push;
+    }
+    return _result;
+  }
+  factory UserPreference_Notification.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory UserPreference_Notification.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  UserPreference_Notification clone() => UserPreference_Notification()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  UserPreference_Notification copyWith(void Function(UserPreference_Notification) updates) => super.copyWith((message) => updates(message as UserPreference_Notification)) as UserPreference_Notification; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static UserPreference_Notification create() => UserPreference_Notification._();
+  UserPreference_Notification createEmptyInstance() => create();
+  static $pb.PbList<UserPreference_Notification> createRepeated() => $pb.PbList<UserPreference_Notification>();
+  @$core.pragma('dart2js:noInline')
+  static UserPreference_Notification getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UserPreference_Notification>(create);
+  static UserPreference_Notification? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get email => $_getBF(0);
+  @$pb.TagNumber(1)
+  set email($core.bool v) { $_setBool(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasEmail() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearEmail() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get push => $_getBF(1);
+  @$pb.TagNumber(2)
+  set push($core.bool v) { $_setBool(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasPush() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPush() => clearField(2);
 }
 
 class UserPreference extends $pb.GeneratedMessage {
@@ -1320,6 +1500,7 @@ class UserPreference extends $pb.GeneratedMessage {
     ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'shakeToFeedback')
     ..pPS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'favoriteTopics')
     ..pPS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topicSearchHistory')
+    ..pc<Error>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors', $pb.PbFieldType.PM, subBuilder: Error.create)
     ..hasRequiredFields = false
   ;
 
@@ -1333,6 +1514,7 @@ class UserPreference extends $pb.GeneratedMessage {
     $core.bool? shakeToFeedback,
     $core.Iterable<$core.String>? favoriteTopics,
     $core.Iterable<$core.String>? topicSearchHistory,
+    $core.Iterable<Error>? errors,
   }) {
     final _result = create();
     if (userId != null) {
@@ -1358,6 +1540,9 @@ class UserPreference extends $pb.GeneratedMessage {
     }
     if (topicSearchHistory != null) {
       _result.topicSearchHistory.addAll(topicSearchHistory);
+    }
+    if (errors != null) {
+      _result.errors.addAll(errors);
     }
     return _result;
   }
@@ -1435,6 +1620,9 @@ class UserPreference extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(9)
   $core.List<$core.String> get topicSearchHistory => $_getList(7);
+
+  @$pb.TagNumber(10)
+  $core.List<Error> get errors => $_getList(8);
 }
 
 class Langame extends $pb.GeneratedMessage {
@@ -1442,12 +1630,12 @@ class Langame extends $pb.GeneratedMessage {
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'channelName')
     ..pPS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'players')
     ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topics')
-    ..pPS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memes')
+    ..pc<Meme>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memes', $pb.PbFieldType.PM, subBuilder: Meme.create)
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'initiator')
     ..aOM<$0.Timestamp>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'done', subBuilder: $0.Timestamp.create)
     ..a<$core.int>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentMeme', $pb.PbFieldType.O3)
     ..aOM<$0.Timestamp>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'date', subBuilder: $0.Timestamp.create)
-    ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors')
+    ..pc<Error>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors', $pb.PbFieldType.PM, subBuilder: Error.create)
     ..aOM<$0.Timestamp>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'started', subBuilder: $0.Timestamp.create)
     ..aOM<$0.Timestamp>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'nextMeme', subBuilder: $0.Timestamp.create)
     ..a<$core.int>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memesSeen', $pb.PbFieldType.O3)
@@ -1463,12 +1651,12 @@ class Langame extends $pb.GeneratedMessage {
     $core.String? channelName,
     $core.Iterable<$core.String>? players,
     $core.Iterable<$core.String>? topics,
-    $core.Iterable<$core.String>? memes,
+    $core.Iterable<Meme>? memes,
     $core.String? initiator,
     $0.Timestamp? done,
     $core.int? currentMeme,
     $0.Timestamp? date,
-    $core.Iterable<$core.String>? errors,
+    $core.Iterable<Error>? errors,
     $0.Timestamp? started,
     $0.Timestamp? nextMeme,
     $core.int? memesSeen,
@@ -1565,7 +1753,7 @@ class Langame extends $pb.GeneratedMessage {
   $core.List<$core.String> get topics => $_getList(2);
 
   @$pb.TagNumber(4)
-  $core.List<$core.String> get memes => $_getList(3);
+  $core.List<Meme> get memes => $_getList(3);
 
   @$pb.TagNumber(5)
   $core.String get initiator => $_getSZ(4);
@@ -1608,7 +1796,7 @@ class Langame extends $pb.GeneratedMessage {
   $0.Timestamp ensureDate() => $_ensure(7);
 
   @$pb.TagNumber(10)
-  $core.List<$core.String> get errors => $_getList(8);
+  $core.List<Error> get errors => $_getList(8);
 
   @$pb.TagNumber(11)
   $0.Timestamp get started => $_getN(9);
@@ -1682,6 +1870,7 @@ class Player extends $pb.GeneratedMessage {
     ..pc<Note>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'notes', $pb.PbFieldType.PM, subBuilder: Note.create)
     ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'audioId', $pb.PbFieldType.O3)
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'audioToken')
+    ..pc<Error>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors', $pb.PbFieldType.PM, subBuilder: Error.create)
     ..hasRequiredFields = false
   ;
 
@@ -1693,6 +1882,7 @@ class Player extends $pb.GeneratedMessage {
     $core.Iterable<Note>? notes,
     $core.int? audioId,
     $core.String? audioToken,
+    $core.Iterable<Error>? errors,
   }) {
     final _result = create();
     if (userId != null) {
@@ -1712,6 +1902,9 @@ class Player extends $pb.GeneratedMessage {
     }
     if (audioToken != null) {
       _result.audioToken = audioToken;
+    }
+    if (errors != null) {
+      _result.errors.addAll(errors);
     }
     return _result;
   }
@@ -1787,6 +1980,9 @@ class Player extends $pb.GeneratedMessage {
   $core.bool hasAudioToken() => $_has(5);
   @$pb.TagNumber(6)
   void clearAudioToken() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.List<Error> get errors => $_getList(6);
 }
 
 class Note_Generic extends $pb.GeneratedMessage {

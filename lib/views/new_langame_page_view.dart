@@ -54,91 +54,87 @@ class _SendLangameState extends State<NewLangamePageView>
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Stack(
-              children: [
-                Container(
-                    height: AppSize.safeBlockVertical * 20,
-                    child: TopicSearchWidget()),
-                Positioned(
-                    top: 0,
-                    right: AppSize.safeBlockHorizontal * 5,
-                    child: Container(
-                        width: AppSize.safeBlockHorizontal * (isPortrait ? 40 : 20),
-                        child: Wrap(
-                          children: tp.selectedTopics
-                              .map((e) => LangameButton(FontAwesomeIcons.times,
-                              // fixedSize: Size(AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
-                                  layer: 1,
-                                  text: e,
-                                  onPressed: () =>
-                                      tp.removeFromSelectedTopic(e)))
-                              .toList(),
-                        ))),
-              ],
-            ),
-
-            Container(
-              width: AppSize.safeBlockHorizontal * 40,
-              child: Consumer<NewLangameProvider>(
-                builder: (c, nlp, child) => ListView(
-                  physics: BouncingScrollPhysics(),
-                  shrinkWrap: true,
-                  children: nlp.shoppingList.isEmpty
-                      ? [
-                          LangameButton(
-                            FontAwesomeIcons.userPlus,
-                            onPressed: () => widget._goToPage(2),
-                            text: '',
-                            layer: 1,
-                            border: true,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Stack(
+            children: [
+              Container(
+                  height: AppSize.safeBlockVertical * 20,
+                  child: TopicSearchWidget()),
+              Positioned(
+                  top: 0,
+                  right: AppSize.safeBlockHorizontal * 5,
+                  child: Container(
+                      width:
+                          AppSize.safeBlockHorizontal * (isPortrait ? 40 : 20),
+                      child: Wrap(
+                        children: tp.selectedTopics
+                            .map((e) => LangameButton(FontAwesomeIcons.times,
+                                // fixedSize: Size(AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
+                                layer: 1,
+                                text: e,
+                                onPressed: () => tp.removeFromSelectedTopic(e)))
+                            .toList(),
+                      ))),
+            ],
+          ),
+          Container(
+            width: AppSize.safeBlockHorizontal * 40,
+            child: Consumer<NewLangameProvider>(
+              builder: (c, nlp, child) => ListView(
+                physics: BouncingScrollPhysics(),
+                shrinkWrap: true,
+                children: nlp.shoppingList.isEmpty
+                    ? [
+                        LangameButton(
+                          FontAwesomeIcons.userPlus,
+                          onPressed: () => widget._goToPage(2),
+                          text: '',
+                          layer: 1,
+                          border: true,
+                        ),
+                        Text(
+                            'Your friends can also join later using a link for example',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.caption!),
+                      ]
+                    : nlp.shoppingList
+                        .map(
+                          (e) => buildUserTile(
+                            context,
+                            nlp,
+                            e,
+                            widget._goToPage,
                           ),
-                          Text(
-                              'Your friends can also join later using a link for example',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.caption!),
-                        ]
-                      : nlp.shoppingList
-                          .map(
-                            (e) => buildUserTile(
-                              context,
-                              nlp,
-                              e,
-                              widget._goToPage,
-                            ),
-                          )
-                          .toList(),
-                ),
+                        )
+                        .toList(),
               ),
             ),
-
-
-            DateTimePicker(
-              timeFieldWidth: AppSize.safeBlockHorizontal * 50,
-              type: DateTimePickerType.dateTimeSeparate,
-              dateMask: 'd MMM, yyyy',
-              initialValue: DateTime.now().toString(),
-              firstDate: DateTime(2021),
-              lastDate: DateTime(2022),
-              icon: Icon(Icons.event),
-              dateLabelText: 'Date',
-              style: Theme.of(context).textTheme.headline6,
-              timeLabelText: 'Hour',
-              onChanged: (val) => nlp.setSelectedDate(DateTime.parse(val)),
-            ),
-
-            LangameButton(
-              FontAwesomeIcons.comments,
-              onPressed: () => onPressedNewLangame(cp, nlp),
-              text: 'New Langame',
-              highlighted: true,
-              layer: 1,
-              padding: EdgeInsets.symmetric(
-                  vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20),
-            ),
-          ]);
+          ),
+          DateTimePicker(
+            timeFieldWidth: AppSize.safeBlockHorizontal * 50,
+            type: DateTimePickerType.dateTimeSeparate,
+            dateMask: 'd MMM, yyyy',
+            initialValue: DateTime.now().toString(),
+            firstDate: DateTime(2021),
+            lastDate: DateTime(2022),
+            icon: Icon(Icons.event),
+            dateLabelText: 'Date',
+            style: Theme.of(context).textTheme.headline6,
+            timeLabelText: 'Hour',
+            onChanged: (val) => nlp.setSelectedDate(DateTime.parse(val)),
+          ),
+          LangameButton(
+            FontAwesomeIcons.comments,
+            onPressed: () => onPressedNewLangame(cp, nlp),
+            text: 'New Langame',
+            highlighted: true,
+            layer: 1,
+            padding: EdgeInsets.symmetric(
+                vertical: 10, horizontal: AppSize.safeBlockHorizontal * 20),
+          ),
+        ]);
   }
 
   void onPressedNewLangame(ContextProvider cp, NewLangameProvider nlp) async {
@@ -156,23 +152,22 @@ class _SendLangameState extends State<NewLangamePageView>
         tp.selectedTopics.toList(), nlp.selectedDate ?? DateTime.now());
     if (createLangame.error != null ||
         createLangame.result == null ||
-        createLangame.result!.data() == null) {
+        createLangame.result!.data() == null ||
+        !createLangame.result!.data()!.hasChannelName()) {
       cp.dialogComplete();
-      cp.showFailureDialog('${fp.getFailingRandom()}, please retry later');
+      var msg = '${fp.getFailingRandom()}, please retry later';
+      cp.showFailureDialog(createLangame.error != null ? 
+      createLangame.error is LangameException ? (createLangame.error as LangameException).cause :
+      createLangame.error.toString() 
+    
+      : msg);
       await Future.delayed(Duration(seconds: 2));
       cp.dialogComplete();
       return;
     }
 
     var snap = createLangame.result!.data()!;
-    // TODO: somehow has error? but it should be filtered just above
-    if (!snap.hasChannelName()) {
-      cp.dialogComplete();
-      cp.showFailureDialog('${fp.getFailingRandom()}, please retry later');
-      await Future.delayed(Duration(seconds: 2));
-      cp.dialogComplete();
-      return;
-    }
+
     var dlp = Provider.of<DynamicLinksProvider>(context, listen: false);
     var createDynamicLink = await dlp.createDynamicLink(snap.channelName, true);
     cp.dialogComplete();

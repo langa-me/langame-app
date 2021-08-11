@@ -1,9 +1,9 @@
 import {Change, EventContext} from "firebase-functions";
 import {isDev, kTagsCollection} from "../helpers";
-import {docRefHandleError} from "../utils/firestore";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {ImplAiApi} from "../aiApi/implAiApi";
+import {handleError} from "../errors";
 
 export const onWriteMemeTag = async (
     change: Change<admin.firestore.DocumentSnapshot>,
@@ -95,8 +95,8 @@ export const onWriteMemeTag = async (
         return Promise.all(promises);
       });
     } catch (e) {
-      await Promise.all(docRefHandleError(
-          change.after.ref.parent.parent, e, "null"));
+      await Promise.all(handleError(
+          change.after.ref.parent.parent, {developerMessage: e}));
     }
   }
 };
