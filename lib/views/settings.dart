@@ -57,6 +57,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         iconTheme: IconThemeData(
           color: isLightThenDark(context), //change your color here
@@ -83,14 +84,8 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               }),
             ),
             Consumer<AuthenticationProvider>(
-                builder: (ctx, p, c) => [
-                      'antoine.descamps2001@gmail.com',
-                      'albertoschillaci30@gmail.com',
-                      'romain.rom1@gmail.com',
-                      'louis.beaumont@gmail.com',
-                      'sonlight03@gmail.com'
-                    ].contains(p.user?.email)
-                        ? ListTile(
+                builder: (ctx, p, c) => p.user!.role == 'admin' ?
+                        ListTile(
                             onTap: () {
                               cp.push(HackView());
                             },
@@ -160,12 +155,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             Divider(),
             ListTile(
               onTap: () {
-                // Only safe in dev mode yet
-                if (kReleaseMode) {
-                  cp.showSnackBar('Coming soon!');
-                  cap.logNewFeatureClick('settings_delete_account');
-                  return;
-                }
                 cp.showCustomDialog(stateless: [
                   Center(
                     child: Column(children: [
@@ -196,22 +185,22 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title: Text('Delete my account and all my data',
                   style: Theme.of(context).textTheme.headline6),
             ),
-            ListTile(
-              onTap: () async {
-                final ap =
-                    Provider.of<AuthenticationProvider>(context, listen: false);
-                cp.showLoadingDialog();
-                await writeOnlyPreferenceProvider?.save();
-                await ap.logout();
-                await Future.delayed(Duration(seconds: 1));
-                cp.dialogComplete();
-                cp.pushReplacement(LoginView());
-              },
-              leading:
-                  Icon(Icons.login_outlined, color: isLightThenDark(context)),
-              title:
-                  Text('Log out', style: Theme.of(context).textTheme.headline6),
-            ),
+            // ListTile(
+            //   onTap: () async {
+            //     final ap =
+            //         Provider.of<AuthenticationProvider>(context, listen: false);
+            //     cp.showLoadingDialog();
+            //     await writeOnlyPreferenceProvider?.save();
+            //     await ap.logout();
+            //     await Future.delayed(Duration(seconds: 1));
+            //     cp.dialogComplete();
+            //     cp.pushReplacement(LoginView());
+            //   },
+            //   leading:
+            //       Icon(Icons.login_outlined, color: isLightThenDark(context)),
+            //   title:
+            //       Text('Log out', style: Theme.of(context).textTheme.headline6),
+            // ),
           ],
         ),
       ),

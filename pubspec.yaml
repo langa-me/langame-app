@@ -1,6 +1,6 @@
 name: langame
 description: Gamified conversations instrumented by AI
-version: 1.4.0+63
+version: 1.4.1+64
 authors:
   - Langame <contact@langa.me>
 
@@ -94,7 +94,7 @@ dependencies:
     #   ref: insights
   # international stuff
   intl: ^0.17.0
-
+  flutter_svg: ^0.22.0
   flutter:
     sdk: flutter
 

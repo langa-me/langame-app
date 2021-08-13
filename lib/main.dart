@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/providers/admin_provider.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
@@ -117,8 +118,8 @@ void main() async {
   var funnyProvider = FunnyProvider();
   var contextProvider =
       ContextProvider(navigationKey, scaffoldMessengerKey, funnyProvider);
-  var crashAnalyticsProvider = CrashAnalyticsProvider(
-      firebase.crashlytics, firebase.analytics!, remoteConfig, firebase, algolia);
+  var crashAnalyticsProvider = CrashAnalyticsProvider(firebase.crashlytics,
+      firebase.analytics!, remoteConfig, firebase, algolia);
   var authenticationApi = ImplAuthenticationApi(firebase);
   var authenticationProvider = AuthenticationProvider(
       firebase, authenticationApi, crashAnalyticsProvider);
@@ -173,7 +174,8 @@ void main() async {
               create: (_) => contextProvider,
             ),
             ChangeNotifierProvider(
-                create: (_) => TagProvider(firebase, crashAnalyticsProvider, algolia, preferenceProvider)),
+                create: (_) => TagProvider(firebase, crashAnalyticsProvider,
+                    algolia, preferenceProvider)),
             ChangeNotifierProvider(create: (_) => funnyProvider),
             ChangeNotifierProvider(create: (_) => newLangameProvider),
 
@@ -245,6 +247,11 @@ void main() async {
               update: (_, cap, p) => p!,
               create: (_) => PhysicalLangameProvider(
                   firebase, crashAnalyticsProvider, algolia),
+            ),
+            ChangeNotifierProxyProvider<CrashAnalyticsProvider, AdminProvider>(
+              update: (_, cap, p) => p!,
+              create: (_) =>
+                  AdminProvider(firebase, crashAnalyticsProvider, algolia),
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),

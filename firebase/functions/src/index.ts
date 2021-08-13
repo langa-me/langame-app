@@ -27,6 +27,10 @@ import {setUserRecommendation} from "./setUserRecommendation";
 import {resetCredits} from "./users/resetCredits";
 import {getMemes} from "./memes/getMemes";
 import * as Sentry from "@sentry/node";
+import {createMemes} from "./memes/createMemes";
+import {onUpdateMeme} from "./memes/onUpdateMeme";
+import {onDeleteMeme} from "./memes/onDeleteMeme";
+import {onWriteTopic} from "./memes/onWriteTopic";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -57,11 +61,6 @@ exports.versionCheck = functions
     .https
     .onCall(versionCheck);
 
-exports.getMemes = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(getMemes);
 
 // exports.interactionsDecrement = functions
 //     .pubsub
@@ -161,6 +160,35 @@ exports.onWriteMemeTag =
     functions.firestore.document("memes/{memeId}/tags/{tagId}")
         .onWrite(onWriteMemeTag);
 
-exports.onCreateMeme =
-    functions.firestore.document("memes/{memeId}")
-        .onCreate(onCreateMeme);
+
+exports.getMemes = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .https
+    .onCall(getMemes);
+
+exports.createMemes = functions
+    .region(region)
+    .runWith({
+      timeoutSeconds: 300,
+      ...runtimeOpts,
+    })
+    .https
+    .onCall(createMemes);
+
+
+exports.onCreateMeme = functions
+    .firestore.document("memes/{memeId}")
+    .onCreate(onCreateMeme);
+
+exports.onDeleteMeme = functions
+    .firestore.document("memes/{memeId}")
+    .onDelete(onDeleteMeme);
+
+exports.onUpdateMeme = functions
+    .firestore.document("memes/{memeId}")
+    .onUpdate(onUpdateMeme);
+
+exports.onWriteTopic = functions
+    .firestore.document("topics/{topicId}")
+    .onWrite(onWriteTopic);

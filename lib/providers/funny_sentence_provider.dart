@@ -18,7 +18,6 @@ class FunnyProvider extends ChangeNotifier {
     'Computing the secret to life, the universe, and everything.',
     'Simulating traveling salesman...',
     'Proving P=NP...',
-    'Trying to sort in O(n)...',
     'Looking for sense of humour, please hold on.',
     'Please wait while the intern refills his coffee.',
     'Kindly hold on as we convert this bug to a feature...',

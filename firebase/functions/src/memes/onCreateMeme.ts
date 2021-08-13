@@ -25,28 +25,15 @@ export const onCreateMeme = async (
       topics.push(label);
       // Unique topics
       topics = Array.from(new Set(topics));
+      if (topics === snap.data()!.topics) return;
       await snap.ref.update({
         topics: topics,
       });
       functions.logger.log("new label detected for", snap.id, label);
     }
-    for (const t of topics) {
-      await admin.firestore().collection("topics").doc(t).set({});
-      await api.getIndex(process.env.GCLOUD_PROJECT?.includes("dev") ?
-      "dev_topics" :
-      "prod_topics").partialUpdateObject({
-        objectID: t,
-      }, {
-        createIfNotExists: true,
-      });
-    }
-    await api.getIndex(process.env.GCLOUD_PROJECT?.includes("dev") ?
-    "dev_memes" :
-    "prod_memes").saveObject({
-      content: snap.data()!.content,
-      objectID: snap.id,
-      tags: topics,
-    });
+    // TODO: only update if it's new
+    await Promise.all(topics.map((t: string) =>
+      admin.firestore().collection("topics").doc(t).set({})));
 
     // TODO: sentence similarity -> delete
   } catch (e) {

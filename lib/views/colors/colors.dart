@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+bool isLight(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.light;
+
 Color isLightThenDark(BuildContext context, {bool reverse = false}) =>
-    Theme.of(context).brightness == Brightness.light
+    isLight(context)
         ? reverse
             ? Colors.white
             : Colors.black
@@ -11,7 +14,7 @@ Color isLightThenDark(BuildContext context, {bool reverse = false}) =>
 
 Color getBlackAndWhite(BuildContext context, int layer,
     {bool reverse = false}) {
-  if (Theme.of(context).brightness == Brightness.light) {
+  if (isLight(context)) {
     if (reverse) {
       switch (layer) {
         case 0:
@@ -64,7 +67,7 @@ Color getBlackAndWhite(BuildContext context, int layer,
 }
 
 Color variantIsLightThenDark(BuildContext context, {bool reverse = false}) =>
-    Theme.of(context).brightness == Brightness.light
+    isLight(context)
         ? reverse
             ? Colors.grey.shade100
             : Colors.grey.shade900
@@ -73,7 +76,7 @@ Color variantIsLightThenDark(BuildContext context, {bool reverse = false}) =>
             : Colors.grey.shade100;
 
 Color variantBisIsLightThenDark(BuildContext context, {bool reverse = false}) =>
-    Theme.of(context).brightness == Brightness.light
+    isLight(context)
         ? reverse
             ? Colors.grey.shade300
             : Colors.grey.shade700

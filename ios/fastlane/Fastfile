@@ -76,7 +76,8 @@ platform :ios do
       
       Known issues:
       - Launching URL does not work on some Android phones
-      ",
+      
+      Vote, vote, vote https://productific.com/@Langame :)",
       distribute_external: true,
       groups: "public",
     )

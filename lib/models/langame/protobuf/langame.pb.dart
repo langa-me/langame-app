@@ -267,6 +267,7 @@ class Meme extends $pb.GeneratedMessage {
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'promptId')
     ..m<$core.String, $core.String>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translated', entryClassName: 'Meme.TranslatedEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('langame.protobuf'))
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+    ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disabled')
     ..hasRequiredFields = false
   ;
 
@@ -278,6 +279,7 @@ class Meme extends $pb.GeneratedMessage {
     $core.String? promptId,
     $core.Map<$core.String, $core.String>? translated,
     $core.String? id,
+    $core.bool? disabled,
   }) {
     final _result = create();
     if (createdAt != null) {
@@ -297,6 +299,9 @@ class Meme extends $pb.GeneratedMessage {
     }
     if (id != null) {
       _result.id = id;
+    }
+    if (disabled != null) {
+      _result.disabled = disabled;
     }
     return _result;
   }
@@ -364,6 +369,15 @@ class Meme extends $pb.GeneratedMessage {
   $core.bool hasId() => $_has(5);
   @$pb.TagNumber(7)
   void clearId() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.bool get disabled => $_getBF(6);
+  @$pb.TagNumber(8)
+  set disabled($core.bool v) { $_setBool(6, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasDisabled() => $_has(6);
+  @$pb.TagNumber(8)
+  void clearDisabled() => clearField(8);
 }
 
 class Tag_Topic extends $pb.GeneratedMessage {
@@ -2506,6 +2520,7 @@ class Prompt extends $pb.GeneratedMessage {
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'template')
     ..pc<Tag>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tags', $pb.PbFieldType.PM, subBuilder: Tag.create)
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
     ..hasRequiredFields = false
   ;
 
@@ -2514,6 +2529,7 @@ class Prompt extends $pb.GeneratedMessage {
     $core.String? type,
     $core.String? template,
     $core.Iterable<Tag>? tags,
+    $core.String? id,
   }) {
     final _result = create();
     if (type != null) {
@@ -2524,6 +2540,9 @@ class Prompt extends $pb.GeneratedMessage {
     }
     if (tags != null) {
       _result.tags.addAll(tags);
+    }
+    if (id != null) {
+      _result.id = id;
     }
     return _result;
   }
@@ -2568,5 +2587,14 @@ class Prompt extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(3)
   $core.List<Tag> get tags => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.String get id => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set id($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasId() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearId() => clearField(4);
 }
 

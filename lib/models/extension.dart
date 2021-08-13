@@ -333,3 +333,15 @@ class ErrorExt {
         createdAt: dynamicToProtobufTimestamp(m['createdAt']));
   }
 }
+
+class PromptExt {
+  static lg.Prompt fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Prompt(
+      type: m['type'],
+      template: m['template'],
+      tags: (m['tags'] as List<dynamic>?)?.map((e) => TagExt.fromObject(e)),
+      id: m['id'],
+    );
+  }
+}

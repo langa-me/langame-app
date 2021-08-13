@@ -73,6 +73,7 @@ const Meme$json = const {
     const {'1': 'prompt_id', '3': 5, '4': 1, '5': 9, '10': 'promptId'},
     const {'1': 'translated', '3': 6, '4': 3, '5': 11, '6': '.langame.protobuf.Meme.TranslatedEntry', '10': 'translated'},
     const {'1': 'id', '3': 7, '4': 1, '5': 9, '10': 'id'},
+    const {'1': 'disabled', '3': 8, '4': 1, '5': 8, '10': 'disabled'},
   ],
   '3': const [Meme_TranslatedEntry$json],
 };
@@ -88,7 +89,7 @@ const Meme_TranslatedEntry$json = const {
 };
 
 /// Descriptor for `Meme`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List memeDescriptor = $convert.base64Decode('CgRNZW1lEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZ0b3BpY3MYBCADKAlSBnRvcGljcxIbCglwcm9tcHRfaWQYBSABKAlSCHByb21wdElkEkYKCnRyYW5zbGF0ZWQYBiADKAsyJi5sYW5nYW1lLnByb3RvYnVmLk1lbWUuVHJhbnNsYXRlZEVudHJ5Ugp0cmFuc2xhdGVkEg4KAmlkGAcgASgJUgJpZBo9Cg9UcmFuc2xhdGVkRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4AQ==');
+final $typed_data.Uint8List memeDescriptor = $convert.base64Decode('CgRNZW1lEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZ0b3BpY3MYBCADKAlSBnRvcGljcxIbCglwcm9tcHRfaWQYBSABKAlSCHByb21wdElkEkYKCnRyYW5zbGF0ZWQYBiADKAsyJi5sYW5nYW1lLnByb3RvYnVmLk1lbWUuVHJhbnNsYXRlZEVudHJ5Ugp0cmFuc2xhdGVkEg4KAmlkGAcgASgJUgJpZBIaCghkaXNhYmxlZBgIIAEoCFIIZGlzYWJsZWQaPQoPVHJhbnNsYXRlZEVudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
 @$core.Deprecated('Use tagDescriptor instead')
 const Tag$json = const {
   '1': 'Tag',
@@ -413,8 +414,9 @@ const Prompt$json = const {
     const {'1': 'type', '3': 1, '4': 1, '5': 9, '10': 'type'},
     const {'1': 'template', '3': 2, '4': 1, '5': 9, '10': 'template'},
     const {'1': 'tags', '3': 3, '4': 3, '5': 11, '6': '.langame.protobuf.Tag', '10': 'tags'},
+    const {'1': 'id', '3': 4, '4': 1, '5': 9, '10': 'id'},
   ],
 };
 
 /// Descriptor for `Prompt`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List promptDescriptor = $convert.base64Decode('CgZQcm9tcHQSEgoEdHlwZRgBIAEoCVIEdHlwZRIaCgh0ZW1wbGF0ZRgCIAEoCVIIdGVtcGxhdGUSKQoEdGFncxgDIAMoCzIVLmxhbmdhbWUucHJvdG9idWYuVGFnUgR0YWdz');
+final $typed_data.Uint8List promptDescriptor = $convert.base64Decode('CgZQcm9tcHQSEgoEdHlwZRgBIAEoCVIEdHlwZRIaCgh0ZW1wbGF0ZRgCIAEoCVIIdGVtcGxhdGUSKQoEdGFncxgDIAMoCzIVLmxhbmdhbWUucHJvdG9idWYuVGFnUgR0YWdzEg4KAmlkGAQgASgJUgJpZA==');

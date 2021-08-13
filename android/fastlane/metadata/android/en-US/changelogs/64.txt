@@ -1,0 +1,10 @@
+New:
+- Early user recommendation feature!
+- Translations added to Langame audio
+- Slight interface improvements
+- You can now like or dislike a conversation starter, the AI will learn accordingly to adapt and improve its performance, please vote!
+
+Known issues:
+- Launching URL does not work on some Android phones
+
+Vote, vote, vote https://productific.com/@Langame :)

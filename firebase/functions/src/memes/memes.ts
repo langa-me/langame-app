@@ -39,6 +39,9 @@ export const offlineMemeSearch =
         reqOptions.filters = objectIDsFilteredOut
             .map((e) => `NOT objectID:${e}`)
             .join(" AND ");
+        // reqOptions.filters += "AND NOT disabled:true"; // TODO: TESTTTTTTTTT
+      } else {
+        // reqOptions.filters = "NOT disabled:true";
       }
       const call = async () => await Promise.all(topics.map(async (e) => {
         const r = await api.getIndex("prod_memes")
@@ -55,8 +58,11 @@ export const offlineMemeSearch =
         topics = [""];
         memes = await call();
       }
+      const flattennedAndEnabled = memes.reduce((p, c) => p.concat(c))
+          .filter((e) => !e.data()!.disabled);
+
 
       // flatten array
-      return shuffle(memes.reduce((p, c) => p.concat(c))).slice(0, limit);
+      return shuffle(flattennedAndEnabled).slice(0, limit);
     };
 

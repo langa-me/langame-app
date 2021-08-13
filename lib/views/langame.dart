@@ -96,7 +96,9 @@ class _LangameViewState extends State<LangameView> {
       crash.analytics.logEvent(name: 'offline', parameters: {
         'view': 'langame_view',
       });
-      return Center(child: cp.buildLoadingWidget(text: 'Offline'));
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [cp.buildLoadingWidget(text: 'Offline')]);
     }
 
     if (langameStream == null) {

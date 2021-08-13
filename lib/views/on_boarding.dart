@@ -184,37 +184,6 @@ class _OnBoardingState extends State with AfterLayoutMixin {
         //       )),
         // ),
         PageViewModel(
-          titleWidget: Text('Send us a feedback anytime?',
-              style: Theme.of(context).textTheme.headline5),
-          bodyWidget: Consumer<PreferenceProvider>(
-            builder: (context, p, child) => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ListTile(
-                  onTap: () =>
-                      p.setShakeToFeedback(!p.preference!.shakeToFeedback),
-                  leading: Icon(Icons.feedback_outlined),
-                  title: Text('Shake-to-feedback',
-                      style: Theme.of(context).textTheme.headline6),
-                  trailing: Switch(
-                    value: p.preference!.shakeToFeedback,
-                    onChanged: (v) =>
-                        p.setShakeToFeedback(!p.preference!.shakeToFeedback),
-                  ),
-                ),
-                !kIsWeb
-                    ? Lottie.asset(
-                        'animations/feedback.json',
-                        height: AppSize.safeBlockVertical * 70,
-                        width: AppSize.safeBlockHorizontal * 70,
-                        alignment: Alignment.center,
-                      )
-                    : SizedBox.shrink(),
-              ],
-            ),
-          ),
-        ),
-        PageViewModel(
           titleWidget: Text('Get user recommendations?',
               style: Theme.of(context).textTheme.headline5),
           bodyWidget: Consumer<PreferenceProvider>(
@@ -225,7 +194,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   onTap: () =>
                       p.setRecommendations(!p.preference!.userRecommendations),
                   leading: Icon(Icons.recommend),
-                  title: Text('Unknown user recommendations',
+                  title: Text('User recommendations',
                       style: Theme.of(context).textTheme.headline6),
                   trailing: Switch(
                     value: p.preference!.userRecommendations,

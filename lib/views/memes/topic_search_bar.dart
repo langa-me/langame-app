@@ -1,5 +1,6 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/widget.dart';
 import 'package:langame/providers/context_provider.dart';
@@ -55,9 +56,9 @@ class _State extends State<TopicSearchWidget>
       controller: _searchBarController,
       hint: 'Try $searchTopicExample...',
       queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
-        decorationColor: getBlackAndWhite(context, 1, reverse: true),
-        backgroundColor: getBlackAndWhite(context, 1, reverse: true),
-        color: getBlackAndWhite(context, 0))),
+          decorationColor: getBlackAndWhite(context, 1, reverse: true),
+          backgroundColor: getBlackAndWhite(context, 1, reverse: true),
+          color: getBlackAndWhite(context, 0))),
       backdropColor: getBlackAndWhite(context, 0, reverse: true),
       backgroundColor: getBlackAndWhite(context, 1, reverse: true),
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
@@ -66,9 +67,11 @@ class _State extends State<TopicSearchWidget>
       transitionDuration: const Duration(milliseconds: 400),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
-      axisAlignment: -1.0,
-      openAxisAlignment: AppSize.isLargeWidth ? 0 : -1.0,
-      width: !AppSize.isLargeWidth ? AppSize.safeBlockHorizontal * 48 : AppSize.safeBlockHorizontal * 38,
+      axisAlignment: tp.selectedTopics.isEmpty ? 0.0 : -1.0,
+      openAxisAlignment: tp.selectedTopics.isEmpty ? 0 : -1.0,
+      width: !AppSize.isLargeWidth
+          ? AppSize.safeBlockHorizontal * 48
+          : AppSize.safeBlockHorizontal * 38,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
         // Call your model, bloc, controller here.
@@ -103,20 +106,21 @@ class _State extends State<TopicSearchWidget>
               height: 56,
               width: double.infinity,
               alignment: Alignment.center,
-              child: Text(
-                'Start searching',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.headline6,
-              ),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SvgPicture.asset(
+                        isLight(context) ? 'images/search-by-algolia-light-background.svg': 'images/search-by-algolia-dark-background.svg',
+                        width: AppSize.safeBlockHorizontal * 5,
+                        height: AppSize.safeBlockHorizontal * 5),
+                  ]),
             );
           } else if (tp.filteredTopicSearchHistory.isEmpty) {
             return ListTile(
               title: Text(_searchBarController.query,
                   style: Theme.of(context).textTheme.headline6),
               leading: const Icon(Icons.search),
-              onTap: () {
-              },
+              onTap: () {},
             );
           } else {
             // What is shown in search result thing

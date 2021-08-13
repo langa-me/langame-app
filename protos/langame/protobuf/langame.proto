@@ -31,6 +31,7 @@ message Meme {
   string prompt_id = 5;
   map<string, string> translated = 6;
   string id = 7;
+  bool disabled = 8;
 }
 
 // Tag associated to a question, for example, representing a meaning, "philosophy"
@@ -266,4 +267,5 @@ message Prompt {
   // i.e. "This is a conversation starter on [TOPIC]"
   string template = 2;
   repeated Tag tags = 3;
+  string id = 4;
 }

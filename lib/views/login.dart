@@ -185,8 +185,9 @@ class _LoginViewState extends State<LoginView> {
 
       return Scaffold(
           backgroundColor: getBlackAndWhite(context, 0, reverse: true),
-          body: Center(
-              child: cp.buildLoadingWidget(text: 'Offline', last: true)));
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+              children: [cp.buildLoadingWidget(text: 'Offline', last: true)]));
     }
 
     if (!_isVersionCheckOk) {

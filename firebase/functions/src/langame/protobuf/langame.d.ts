@@ -415,6 +415,9 @@ export namespace langame {
 
             /** Meme id */
             id?: (string|null);
+
+            /** Meme disabled */
+            disabled?: (boolean|null);
         }
 
         /** Represents a Meme. */
@@ -443,6 +446,9 @@ export namespace langame {
 
             /** Meme id. */
             public id: string;
+
+            /** Meme disabled. */
+            public disabled: boolean;
 
             /**
              * Creates a new Meme instance using the specified properties.
@@ -3106,6 +3112,9 @@ export namespace langame {
 
             /** Prompt tags */
             tags?: (langame.protobuf.ITag[]|null);
+
+            /** Prompt id */
+            id?: (string|null);
         }
 
         /** Represents a Prompt. */
@@ -3125,6 +3134,9 @@ export namespace langame {
 
             /** Prompt tags. */
             public tags: langame.protobuf.ITag[];
+
+            /** Prompt id. */
+            public id: string;
 
             /**
              * Creates a new Prompt instance using the specified properties.
