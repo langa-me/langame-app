@@ -1,8 +1,8 @@
 PODS:
-  - agora_rtc_engine (4.0.1):
-    - AgoraRtcEngine_iOS (= 3.4.2)
+  - agora_rtc_engine (4.0.6):
+    - AgoraRtcEngine_iOS (= 3.4.6)
     - Flutter
-  - AgoraRtcEngine_iOS (3.4.2)
+  - AgoraRtcEngine_iOS (3.4.6)
   - AppAuth (1.4.0):
     - AppAuth/Core (= 1.4.0)
     - AppAuth/ExternalUserAgent (= 1.4.0)
@@ -402,8 +402,8 @@ CHECKOUT OPTIONS:
     :tag: 8.0.0
 
 SPEC CHECKSUMS:
-  agora_rtc_engine: c8614d106bde012b8f482c088d88812ec983fc70
-  AgoraRtcEngine_iOS: 3a4d64f2866ffc122e090a693153bb673021f6fe
+  agora_rtc_engine: d3178bd63d453a2d0111bd45475f17ce1fcc754d
+  AgoraRtcEngine_iOS: 8aa4a8e46bd81963607857b1d46703b93e4de156
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
   cloud_firestore: 0e708a57ee3e13a56cf6a6fdaf085d5edb1e7e0f
   cloud_functions: 76c1a4e38a1b11e657a10d2edbcc214869e52003
@@ -463,4 +463,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 79ba3dc7af7165b0195a705121166fe61106a7d2
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.10.2

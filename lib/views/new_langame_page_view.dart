@@ -139,14 +139,20 @@ class _SendLangameState extends State<NewLangamePageView>
 
   void onPressedNewLangame(ContextProvider cp, NewLangameProvider nlp) async {
     var ap = Provider.of<AuthenticationProvider>(context, listen: false);
+    var tp = Provider.of<TagProvider>(context, listen: false);
+
     if (ap.user!.credits == 0) {
       cp.showSnackBar('You don\'t have any credits left 😥');
       return;
     }
 
+    if (tp.selectedTopics.isEmpty) {
+      cp.showSnackBar('Please select at least one topic 😃');
+      return;
+    }
+
     var lp = Provider.of<LangameProvider>(context, listen: false);
     var fp = Provider.of<FunnyProvider>(context, listen: false);
-    var tp = Provider.of<TagProvider>(context, listen: false);
     cp.showLoadingDialog();
     var createLangame = await lp.createLangame(nlp.shoppingList,
         tp.selectedTopics.toList(), nlp.selectedDate ?? DateTime.now());
