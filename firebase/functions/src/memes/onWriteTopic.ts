@@ -16,11 +16,8 @@ export const onWriteTopic = async (
       return;
     }
 
-    await api.getIndex("prod_topics").partialUpdateObject(
+    await api.getIndex("prod_topics").saveObject(
         {objectID: change.after.id},
-        {
-          createIfNotExists: true,
-        }
     );
   } catch (e) {
     await Promise.all(handleError(

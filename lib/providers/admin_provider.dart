@@ -52,7 +52,7 @@ class AdminProvider extends ChangeNotifier {
       var data = <String, dynamic>{
         'topic': topic,
       };
-      if (prompt != null) data['prompt'] = prompt;
+      if (prompt != null) data['promptType'] = prompt;
       if (amount != null) data['amount'] = amount;
       var res = await firebase.functions!
           .httpsCallable(
@@ -98,11 +98,11 @@ class AdminProvider extends ChangeNotifier {
       String memeId, String content, List<String> topics) async {
     // TODO: transaction?
     try {
-      firebase.firestore!.collection('memes').doc(memeId).set({
+      firebase.firestore!.collection('memes').doc(memeId).update({
         'disabled': false,
         'content': content,
         'topics': topics,
-      }, SetOptions(merge: true));
+      });
       cap.log('confirmed $memeId');
       return true;
     } catch (e, s) {

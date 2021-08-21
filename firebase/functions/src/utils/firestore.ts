@@ -1,13 +1,14 @@
 import * as admin from "firebase-admin";
 import {QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
-import {kLangamesCollection,
+import {
   kUserDoesNotExist,
   kUsersCollection} from "../helpers";
 import {langame} from "../langame/protobuf/langame";
 import {FirebaseFunctionsResponse, FirebaseFunctionsResponseStatusCode}
   from "../models";
 import * as functions from "firebase-functions";
+import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
 
 // Make the helper types for updates:
 type PathImpl<T, K extends keyof T> =
@@ -38,14 +39,6 @@ export const converter = <T>() => ({
   fromFirestore: (snap: QueryDocumentSnapshot) =>
   snap.data() as T,
 });
-const dataPoint = <T>(collectionPath: string) =>
-  admin.firestore().collection(collectionPath).withConverter(converter<T>());
-const db = {
-  // list your collections here
-  users: dataPoint<langame.protobuf.User>(kUsersCollection),
-  langames: dataPoint<langame.protobuf.Langame>(kLangamesCollection),
-};
-export {db};
 
 
 export const getUserData = async (id: string):
@@ -99,21 +92,11 @@ admin.firestore.DocumentSnapshot<langame.protobuf.User>> => {
 };
 
 
-export const getLangame = async (channelName: string):
-    Promise<FirebaseFunctionsResponse |
-    admin.firestore.QueryDocumentSnapshot<langame.protobuf.Langame>> => {
-  const queryResult = await admin.firestore()
-      .collection(kLangamesCollection)
-      .where("channelName", "==", channelName)
-      .withConverter(converter<langame.protobuf.Langame>())
-      .get();
-  if (queryResult.empty) {
-    return new FirebaseFunctionsResponse(
-        FirebaseFunctionsResponseStatusCode.BAD_REQUEST,
-        undefined,
-        "could not find this channel",
-    );
-  }
-  return queryResult.docs[0];
-};
-
+export const getPerUserlimiter = () =>
+  FirebaseFunctionsRateLimiter.withFirestoreBackend({
+    name: "per_user_limiter",
+    maxCalls: 2,
+    periodSeconds: 15,
+  },
+  admin.firestore(),
+  );

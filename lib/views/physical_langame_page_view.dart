@@ -164,7 +164,7 @@ class _State extends State<PhysicalLangamePageView>
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Text(
-                    _languageSelected[0]
+                    _languageSelected[0] || plp.memes[plp.currentMeme].translated.isEmpty
                         ? plp.memes[plp.currentMeme].content
                         : plp.memes[plp.currentMeme].translated[_languages[
                             _languageSelected.indexWhere((e) => e == true)]]!,

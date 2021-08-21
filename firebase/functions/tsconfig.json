@@ -10,6 +10,7 @@
     "target": "es2017",
     "allowJs": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "types": [
       "node",
       "mocha",
@@ -21,6 +22,6 @@
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "src/**/*.ts",
   ]
 }

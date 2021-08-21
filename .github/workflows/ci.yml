@@ -58,13 +58,13 @@ jobs:
           project: 1
           # column: To Do
       # Backend checks
-      - name: Decrypt service account key
-        env:
-          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
-        run: |
-          cd firebase/functions
-          gpg --quiet --batch --yes --decrypt --passphrase="$RELEASE_SECRET_PASSPHRASE" \
-          --output service-account.zip service-account.zip.gpg && unzip service-account.zip
+      # - name: Decrypt service account key
+      #   env:
+      #     RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      #   run: |
+      #     cd firebase/functions
+      #     gpg --quiet --batch --yes --decrypt --passphrase="$RELEASE_SECRET_PASSPHRASE" \
+      #     --output service-account.zip service-account.zip.gpg && unzip service-account.zip
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
@@ -76,7 +76,7 @@ jobs:
           npm run lint
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - uses: actions/upload-artifact@v2
-        with:
-          name: firestore-rules-tests
-          path: firestore-rules-tests.json
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: firestore-rules-tests
+      #     path: firestore-rules-tests.json

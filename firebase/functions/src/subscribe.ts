@@ -3,18 +3,8 @@ import {https} from "firebase-functions";
 import {kBetasCollection} from "./helpers";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
+import {getPerUserlimiter} from "./utils/firestore";
 const Mailchimp = require("mailchimp-api-v3");
-const mailchimpKey = functions.config().mailchimp.key;
-const listId = functions.config().mailchimp.list;
-const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
-    {
-      name: "per_user_limiter",
-      maxCalls: 2,
-      periodSeconds: 15,
-    },
-    admin.firestore(),
-);
 
 
 export const subscribe = async (
@@ -24,7 +14,7 @@ export const subscribe = async (
   }
   const uidQualifier = "u_" + context.rawRequest.ip;
   const isQuotaExceeded =
-  await perUserlimiter.isQuotaAlreadyExceeded(uidQualifier);
+  await getPerUserlimiter().isQuotaAlreadyExceeded(uidQualifier);
   if (isQuotaExceeded) {
     throw new functions.https
         .HttpsError("resource-exhausted", "too many requests");
@@ -51,7 +41,8 @@ export const subscribe = async (
     throw new functions.https
         .HttpsError("invalid-argument", "already subscribed");
   }
-
+  const mailchimpKey = functions.config().mailchimp.key;
+  const listId = functions.config().mailchimp.list;
 
   return admin
       .firestore()

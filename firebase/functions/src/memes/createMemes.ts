@@ -1,19 +1,10 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
 import {https} from "firebase-functions";
-import {db} from "../utils/firestore";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {reportError} from "../errors";
+import {getPerUserlimiter} from "../utils/firestore";
 
-const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
-    {
-      name: "per_user_limiter",
-      maxCalls: 2,
-      periodSeconds: 15,
-    },
-    admin.firestore(),
-);
 
 export const createMemes = async (data: any,
     context: functions.https.CallableContext) => {
@@ -26,7 +17,7 @@ export const createMemes = async (data: any,
 
   const uidQualifier = "u_" + context.auth.uid;
   const isQuotaExceeded =
-    await perUserlimiter.isQuotaAlreadyExceeded(uidQualifier);
+    await getPerUserlimiter().isQuotaAlreadyExceeded(uidQualifier);
   if (isQuotaExceeded) {
     throw new https.HttpsError(
         "resource-exhausted",
@@ -52,7 +43,8 @@ export const createMemes = async (data: any,
         "maximum 10 memes at a time",
     );
   }
-  const user = await db.users.doc(context.auth.uid).get();
+  const user = await admin.firestore().collection("users")
+      .doc(context.auth.uid).get();
   if (!user.exists || !user.data() || user.data()!.role !== "admin") {
     throw new https.HttpsError(
         "permission-denied",

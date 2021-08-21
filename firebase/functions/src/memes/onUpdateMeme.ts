@@ -4,6 +4,7 @@ import {QueryDocumentSnapshot}
 import {reportError} from "../errors";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import * as admin from "firebase-admin";
+import * as functions from "firebase-functions";
 
 /**
  *
@@ -22,18 +23,19 @@ export const onUpdateMeme = async (
 
     const api = new ImplAiApi();
 
-    await api.getIndex("prod_memes").partialUpdateObject({
-      "objectID": change.after.id,
-      "disabled": change.after.data().disabled,
-      "tags": doc.data()!.topics,
-    },
-    {
-      createIfNotExists: true,
+    await api.getIndex("prod_memes").saveObject({
+      objectID: change.after.id,
+      disabled: change.after.data().disabled,
+      content: change.after.data().content,
+      createdAt: change.after.data().createdAt,
+      _tags: doc.data()!.topics,
     });
     // TODO: only update if it's new
     await Promise.all(doc.data()!.topics.map((t: string) =>
       admin.firestore().collection("topics").doc(t).set({})));
 
+    functions.logger.log(`Updated meme ${change.after.id}`,
+        change.after.data());
 
     // TODO: sentence similarity -> delete
   } catch (e) {

@@ -4,31 +4,19 @@ import {
 } from "./models";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import FirebaseFunctionsRateLimiter from "firebase-functions-rate-limiter";
 import {langame} from "./langame/protobuf/langame";
+import {getPerUserlimiter} from "./utils/firestore";
 const satisfies = require("semver/functions/satisfies");
-const perUserlimiter = FirebaseFunctionsRateLimiter.withFirestoreBackend(
-    {
-      name: "per_user_limiter",
-      maxCalls: 5,
-      periodSeconds: 15,
-    },
-    admin.firestore(),
-);
 
 
 export const versionCheck = async (
     data: any, context: https.CallableContext) => {
-  // if (!context.app) {
-  //   throw new LangameFunctionsError("internal", "");
-  // }
   if (!context.rawRequest.ip) {
     throw new LangameFunctionsError("internal", "");
   }
-  // const uidQualifier = "u_" + context.app;
   const uidQualifier = "u_" + context.rawRequest.ip;
   const isQuotaExceeded =
-        await perUserlimiter.isQuotaAlreadyExceeded(uidQualifier);
+        await getPerUserlimiter().isQuotaAlreadyExceeded(uidQualifier);
   if (isQuotaExceeded) {
     const m = "too many requests";
     throw new LangameFunctionsError("resource-exhausted", m, m);

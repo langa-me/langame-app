@@ -27,6 +27,12 @@ export const openAIClassifierFiles = {
 
 const openAiEndpoint = "https://api.openai.com/v1/engines";
 const huggingfaceEndpoint = "https://api-inference.huggingface.co/models";
+const openAiHeaders = {
+  "Content-Type": "application/json",
+  "Accept": "application/json",
+  "Authorization": `Bearer ${openAiKey}`,
+  "OpenAI-Organization": "org-KwcHNgfGe4pqdKDLQIJt99UZ",
+};
 
 /**
  */
@@ -101,11 +107,7 @@ export class ImplAiApi implements Api {
               "stop": parameters.stop,
               "stream": false,
             }),
-            headers: {
-              "Content-Type": "application/json",
-              "Accept": "application/json",
-              "Authorization": `Bearer ${openAiKey}`,
-            },
+            headers: openAiHeaders,
           });
       const data = await r.json();
       if (data.error) throw new Error(data.error);
@@ -136,11 +138,7 @@ export class ImplAiApi implements Api {
               "stop": parameters.stop,
               "stream": true,
             }),
-            headers: {
-              "Content-Type": "application/json",
-              "Accept": "application/json",
-              "Authorization": `Bearer ${openAiKey}`,
-            },
+            headers: openAiHeaders,
           });
       for await (const chunk of r.body) {
         if (chunk.toString().includes("DONE")) return;
@@ -176,10 +174,7 @@ export class ImplAiApi implements Api {
                 "presence_penalty": parameters.presencePenalty ?? 0,
                 "logprobs": 10,
               }),
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${openAiKey}`,
-              },
+              headers: openAiHeaders,
             });
       const data = await r.json();
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -241,11 +236,7 @@ export class ImplAiApi implements Api {
                     "model": parameters?.classificationModel ?? "curie",
                     "max_examples": parameters?.maxExamples ?? 10,
                   }),
-                  headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                    "Authorization": `Bearer ${openAiKey}`,
-                  },
+                  headers: openAiHeaders,
                 });
         const data = await r.json();
         if (data.error &&

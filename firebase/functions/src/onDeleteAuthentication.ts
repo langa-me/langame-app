@@ -11,9 +11,7 @@ import Stripe from "stripe";
 import {reportError} from "./errors";
 import {html} from "./utils/html";
 import Mailchimp = require("mailchimp-api-v3");
-const stripe = new Stripe(functions.config().stripe.key, {
-  apiVersion: "2020-08-27",
-});
+
 
 const title = "Farewell from Langame 😥";
 /* eslint-disable max-len */
@@ -30,6 +28,9 @@ Please do not hesitate to give us feedback <a href="https://help.langa.me/feedba
  */
 export const onDeleteAuthentication = async (user: UserRecord,
     context: functions.EventContext) => {
+  const stripe = new Stripe(functions.config().stripe.key, {
+    apiVersion: "2020-08-27",
+  });
   const db = admin.firestore();
   const customerCollection = db.collection("stripe_customers");
   const customerDoc = customerCollection.doc(user.uid);

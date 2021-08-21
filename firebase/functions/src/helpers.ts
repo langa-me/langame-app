@@ -6,10 +6,6 @@ import {
   FirebaseFunctionsResponseStatusCode,
 } from "./models";
 
-// Agora config
-// Fill the appID and appCertificate key given by Agora.io
-export const appID = functions.config().agora.id;
-export const appCertificate = functions.config().agora.certificate;
 
 export const role = RtcRole.PUBLISHER;
 
@@ -101,6 +97,11 @@ export const handleSendToDevice = (recipientData: any,
 
 export const generateAgoraRtcToken = (channelName: string,
     uid: number, expirationTimeInSeconds: number = 3600): string => {
+  // Agora config
+  // Fill the appID and appCertificate key given by Agora.io
+  const appID = functions.config().agora.id;
+  const appCertificate = functions.config().agora.certificate;
+
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 

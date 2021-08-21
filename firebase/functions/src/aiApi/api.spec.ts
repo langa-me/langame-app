@@ -1,9 +1,8 @@
-import {newFeedback} from "../src/feedback";
-import * as admin from "firebase-admin";
+import {newFeedback} from "../feedback";
 import "mocha";
 import {expect} from "chai";
-import {ImplAiApi} from "../src/aiApi/implAiApi";
-import {offlineMemeSearch} from "../src/memes/memes";
+import {ImplAiApi} from "./implAiApi";
+import {offlineMemeSearch} from "../memes/memes";
 
 
 before(() => {
@@ -44,14 +43,6 @@ it.skip("create Github issue", async () => {
 //   expect(response![0].content.length).to.be.greaterThan(0);
 // });
 
-it("", async () => {
-  const t = await admin.remoteConfig().getTemplate();
-  console.log(JSON.stringify(t.parameters));
-  // @ts-ignore
-  console.log(t.parameters.offline_use_generated
-      .defaultValue["value"] === "true");
-});
-
 
 it.skip("zero shot classification", async () => {
   const api = new ImplAiApi();
@@ -88,17 +79,17 @@ it.skip("insert algolia", async () => {
   await api.save("dev_users", [{object: {foo: "bar"}, id: "foo"}]);
 });
 
-it("search algolia", async () => {
+it.skip("search algolia", async () => {
   const out = ["KRSKDgI2rsscN8U38v5V", "kGApNE1CNmEzb5uzFPw7"];
   let r = await offlineMemeSearch(["biology"], 5, out);
-  expect(r.map((e) => e.objectId).filter((e) => out.includes(e)).length)
+  expect(r.map((e) => e.id).filter((e) => out.includes(e)).length)
       .to.be.equal(0);
   r = await offlineMemeSearch(["biology"], 3,
       []);
   expect(r.length).to.be.equal(3);
 });
 
-it("search algolia low level", async () => {
+it.skip("search algolia low level", async () => {
   const api = new ImplAiApi();
   const r = await api.getIndex("prod_memes")
       .search("", {

@@ -1,13 +1,9 @@
 import * as functions from "firebase-functions";
-import {shuffle} from "../utils/array";
+import * as admin from "firebase-admin";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {langame} from "../langame/protobuf/langame";
-import * as admin from "firebase-admin";
 import {converter} from "../utils/firestore";
-
-export const openAiKey = functions.config().openai.key;
-
-
+import {shuffle} from "../utils/array";
 /**
  * offlineMemeSearch Find memes in topic ordered by score, filtering
  * low scores
@@ -35,17 +31,25 @@ export const offlineMemeSearch =
         length: limit,
         offset: 0,
       };
-      if (objectIDsFilteredOut.length > 0) {
-        reqOptions.filters = objectIDsFilteredOut
-            .map((e) => `NOT objectID:${e}`)
-            .join(" AND ");
-        // reqOptions.filters += "AND NOT disabled:true"; // TODO: TESTTTTTTTTT
-      } else {
-        // reqOptions.filters = "NOT disabled:true";
-      }
+
+
       const call = async () => await Promise.all(topics.map(async (e) => {
+        reqOptions.filters = e.length > 0 ? `_tags:'${e}'` : "";
+        reqOptions.filters += reqOptions.filters.length > 0 ?
+          // Yes could do disabled:false but
+          // just in case we don't have disabled property
+          " AND NOT disabled:true" :
+          "NOT disabled:true";
+        if (objectIDsFilteredOut.length > 0) {
+          reqOptions.filters +=
+          (reqOptions.filters.length > 0 ? " AND " : "") +
+              objectIDsFilteredOut
+                  .map((e) => `NOT objectID:${e}`)
+                  .join(" AND ");
+        }
+        functions.logger.log("searching topic", reqOptions);
         const r = await api.getIndex("prod_memes")
-            .search(e, reqOptions);
+            .search("", reqOptions);
         return Promise.all(r.hits.map(async (e) =>
           admin.firestore().collection("memes")
               .doc(e.objectID)

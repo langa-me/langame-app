@@ -5,7 +5,7 @@ import {kUsersCollection, hashFnv32a} from "./helpers";
 import * as admin from "firebase-admin";
 import {offlineMemeSearch} from "./memes/memes";
 import * as functions from "firebase-functions";
-import {converter, db} from "./utils/firestore";
+import {converter} from "./utils/firestore";
 import {langame} from "./langame/protobuf/langame";
 import {handleError} from "./errors";
 
@@ -35,9 +35,10 @@ export const onCreateLangame = async (
       );
       return;
     }
+    const db = admin.firestore();
     // TODO: maximum firestore rule check filters on the created langame
     // const db = admin.firestore();
-    const senderData = await db.users
+    const senderData = await db.collection("users")
     // Firestore rules should already filter non-auth
         .doc(snap.data().initiator)
         .get();
@@ -131,7 +132,7 @@ export const onCreateLangame = async (
     const toNotify = lg.data()!.reservedSpots;
     for (const p of toNotify) {
       const player = await db
-          .users
+          .collection("users")
           .doc(p)
           .get();
       if (!player.data() || !player.data()!.tokens) {

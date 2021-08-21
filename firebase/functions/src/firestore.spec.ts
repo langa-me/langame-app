@@ -21,7 +21,7 @@ describe("Firestore rules", async () => {
   before(async () => {
     await firebase.loadFirestoreRules({
       projectId: "langame-dev",
-      rules: fs.readFileSync("../firestore.rules", "utf8"),
+      rules: fs.readFileSync("./firebase/firestore.rules", "utf8"),
     });
   });
   after(async () => {

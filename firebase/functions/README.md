@@ -30,21 +30,6 @@ firebase functions:config:get > .runtimeconfig.json
 
 Then you need to re-deploy your functions
 
-#### Service account dev
-
-
-```bash
-zip service-account.zip langame-dev-8ac76897c7bc.json
-gpg --symmetric --cipher-algo AES256 service-account.zip
-rm -rf service-account.zip
-```
-
-
-```bash
-gpg --output release.zip --decrypt release.zip.gpg && unzip release.zip && rm -rf release.zip
-```
-
-
 
 ## Usage
 
@@ -69,4 +54,24 @@ firebase deploy --only functions:addMessage,functions:makeUppercase
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS="path/to/key.json"
+npm run compile
+```
+
+<https://github.com/stripe/stripe-mock>
+
+```bash
+go get -u github.com/stripe/stripe-mock
+```
+
+```bash
+# Mock Stripe
+stripe-mock
+# Mock Firebase
+npm run serve
+```
+
+```bash
+export FIREBASE_AUTH_EMULATOR_HOST="localhost:9099"
+export FIRESTORE_EMULATOR_HOST="localhost:8080"
+export FIREBASE_STORAGE_EMULATOR_HOST="localhost:9199"
 ```

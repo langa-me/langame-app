@@ -1,23 +1,18 @@
 import * as admin from "firebase-admin";
-admin.initializeApp();
-admin.firestore().settings({ignoreUndefinedProperties: true});
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+  admin.firestore().settings({ignoreUndefinedProperties: true});
+}
 import * as functions from "firebase-functions";
 import {newFeedback} from "./feedback";
 import {onDeleteAuthentication} from "./onDeleteAuthentication";
 import {subscribe} from "./subscribe";
-import {notifyPresence} from "./notifyPresence";
-import {addPaymentMethodDetails} from "./stripe/addPaymentMethodDetails";
-import {confirmStripePayment} from "./stripe/confirmStripePayment";
-import {createStripeCustomer} from "./stripe/createStripeCustomer";
 import {
   isDev,
   kLangamesCollection,
-  kStripeCustomersCollection,
 } from "./helpers";
-import {createStripePayment} from "./stripe/createStripePayment";
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
-import {onWriteMemeTag} from "./memes/onWriteMemeTag";
 import {onUpdateLangame} from "./onUpdateLangame";
 import {onCreateAuthentication} from "./onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
@@ -48,6 +43,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
   environment: isDev ? "development" : "production",
 });
+
 
 exports.subscribe = functions
     .region(region)
@@ -82,12 +78,6 @@ exports.resetCredits = functions
     .schedule("0 1 * * *") // 1 am every day
     .onRun(resetCredits);
 
-exports.notifyPresence = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(notifyPresence);
-
 // https://firebase.google.com/docs/functions/gcp-storage-events
 exports.onFeedback = functions
     .region(region)
@@ -103,32 +93,6 @@ exports.onFeedback = functions
     }
     );
 
-
-// exports.onUpdatePreference = functions.firestore
-//     .document(`${kPreferencesCollection}/{userId}`)
-//     .onUpdate(onUpdatePreference);
-
-// Stripe //
-const prodStripeConfig = {
-  apiVersion: "2020-08-27",
-};
-exports.createStripeCustomer =
-    functions.auth.user().onCreate((u, ctx) =>
-      createStripeCustomer(u, ctx, prodStripeConfig));
-
-exports.addPaymentMethodDetails = functions.firestore
-    // eslint-disable-next-line max-len
-    .document(`${kStripeCustomersCollection}/{userId}/payment_methods/{pushId}`)
-    .onCreate((s, c) => addPaymentMethodDetails(s, c, prodStripeConfig));
-
-exports.createStripePayment = functions.firestore
-    .document(`${kStripeCustomersCollection}/{userId}/payments/{pushId}`)
-    .onCreate((s, c) => createStripePayment(s, c, prodStripeConfig));
-
-exports.confirmStripePayment = functions.firestore
-    .document(`${kStripeCustomersCollection}/{userId}/payments/{pushId}`)
-    .onUpdate((ch, c) =>
-      confirmStripePayment(ch, c, prodStripeConfig));
 
 // Langame //
 
@@ -154,11 +118,6 @@ exports.onCreateAuthentication =
 
 
 // Meme //
-
-
-exports.onWriteMemeTag =
-    functions.firestore.document("memes/{memeId}/tags/{tagId}")
-        .onWrite(onWriteMemeTag);
 
 
 exports.getMemes = functions

@@ -35,7 +35,7 @@ export const setLangamesDone =
             "prod_users";
           // eslint-disable-next-line max-len
           // TODO: should only add recent interactions up to 10 days or something
-          return api.getIndex(index).partialUpdateObjects(players.map((e) => {
+          return api.getIndex(index).saveObjects(players.map((e) => {
             return {
               recentInteractions: {
                 _operation: "AddUnique",
