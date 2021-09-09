@@ -52,25 +52,13 @@ export const createMemes = async (data: any,
     );
   }
 
-  const prompts = [];
-  const promptType = data.promptType || "TopicGeneralist";
+  const promptType = data.promptType;
   functions.logger.log("attempting to search prompts of type", promptType);
   const promptDocs = await admin.firestore()
       .collection("prompts")
       .where("type", "==", promptType).get();
 
-  for (const doc of promptDocs.docs) {
-    const tagDocs = await doc.ref.collection("tags").where(
-        "engine.parameters.maxTokens", ">=", 0).get();
-    for (const t of tagDocs.docs) {
-      prompts.push({
-        id: doc.id,
-        prompt: doc.data()!.template.replace("[TOPIC]", data.topic),
-        parameters: t.data()!.engine.parameters,
-      });
-    }
-  }
-  if (!prompts.length) {
+  if (promptDocs.size === 0) {
     const e = new https.HttpsError(
         "invalid-argument",
         "could not get any prompt",
@@ -78,7 +66,8 @@ export const createMemes = async (data: any,
     reportError(e);
     throw e;
   }
-  const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+  const randomPrompt =
+    promptDocs.docs[Math.floor(Math.random() * promptDocs.size)];
   const api = new ImplAiApi();
   const amount = data.amount || 1;
   functions.logger.log("going to generate", amount,
@@ -86,10 +75,17 @@ export const createMemes = async (data: any,
   return {
     memesId: await Promise.all([...Array(amount)].map(async () => {
       functions.logger.log("calling openai with prompt", randomPrompt);
-      const meme =
-        await api.completion(randomPrompt.prompt,
-            true,
-            randomPrompt.parameters);
+      let meme: string | undefined;
+      try {
+        meme =
+        await api.completion(
+            randomPrompt.data().template.replace("[TOPIC]", data.topic),
+            randomPrompt.data().parameters
+        );
+      } catch (e: any) {
+        reportError(e);
+        throw e;
+      }
       if (!meme) {
         const e = new https.HttpsError(
             "internal",

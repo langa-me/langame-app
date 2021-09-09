@@ -1,6 +1,6 @@
 name: langame
 description: Gamified conversations instrumented by AI
-version: 1.4.2+66
+version: 1.4.3+67
 authors:
   - Langame <contact@langa.me>
 
@@ -59,6 +59,7 @@ dependencies:
   # Others
 
   flutter_tts: ^3.2.2
+  speech_to_text: ^5.0.0
   table_calendar: ^3.0.0
   date_time_picker: ^2.0.0
   clipboard: ^0.1.3

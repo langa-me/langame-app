@@ -16,7 +16,6 @@ import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
 import {onUpdateLangame} from "./onUpdateLangame";
 import {onCreateAuthentication} from "./onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
-import {onCreateMeme} from "./memes/onCreateMeme";
 import {setLangamesDone} from "./setLangamesDone";
 import {setUserRecommendation} from "./setUserRecommendation";
 import {resetCredits} from "./users/resetCredits";
@@ -136,9 +135,9 @@ exports.createMemes = functions
     .onCall(createMemes);
 
 
-exports.onCreateMeme = functions
-    .firestore.document("memes/{memeId}")
-    .onCreate(onCreateMeme);
+// exports.onCreateMeme = functions
+//     .firestore.document("memes/{memeId}")
+//     .onCreate(onCreateMeme);
 
 exports.onDeleteMeme = functions
     .firestore.document("memes/{memeId}")

@@ -1,0 +1,10 @@
+New:
+- Beta: record yourself directly to text while in face-to-face, you can export you thoughts anywhere then
+- Beta: user recommendation feature!
+- Translations added to Langame audio
+- You can now like or dislike a conversation starter, the AI will learn accordingly to adapt and improve its performance, please vote!
+
+Known issues:
+- Launching URL does not work on some Android phones
+
+Vote, vote, vote https://productific.com/@Langame :)

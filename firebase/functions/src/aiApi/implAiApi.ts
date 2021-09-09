@@ -3,6 +3,7 @@ import {
   huggingfaceKey, openAiKey,
 } from "./aiApi";
 import algoliasearch, {SearchClient, SearchIndex} from "algoliasearch";
+import {sleep} from "../utils/time";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require("node-fetch");
@@ -25,14 +26,11 @@ export const openAIClassifierFiles = {
   },
 };
 
-const openAiEndpoint = "https://api.openai.com/v1/engines";
+const openAiEndpoint = "https://api.openai.com/v1";
 const huggingfaceEndpoint = "https://api-inference.huggingface.co/models";
-const openAiHeaders = {
-  "Content-Type": "application/json",
-  "Accept": "application/json",
-  "Authorization": `Bearer ${openAiKey}`,
-  "OpenAI-Organization": "org-KwcHNgfGe4pqdKDLQIJt99UZ",
-};
+const isFineTunedModel =
+  (model: string) => !["babbage", "ada", "curie", "davinci"].includes(model);
+
 
 /**
  */
@@ -44,7 +42,7 @@ export class ImplAiApi implements Api {
      * Initialize the AI API
      */
     constructor() {
-      this.algolia = algoliasearch(algoliaId, algoliaKey);
+      this.algolia = algoliasearch(algoliaId(), algoliaKey());
       this.indexes.set("dev_users", this.algolia.initIndex("dev_users"));
       this.indexes.set("prod_users", this.algolia.initIndex("prod_users"));
       this.indexes.set("dev_memes", this.algolia.initIndex("dev_memes"));
@@ -88,63 +86,71 @@ export class ImplAiApi implements Api {
     /**
      * Async completion
      * @param{string} prompt
-     * @param{boolean} skipWhenFinishReasonIsLength
      * @param{any} parameters
      */
     async completion(prompt: string,
-        skipWhenFinishReasonIsLength: boolean,
         parameters: any): Promise<string | undefined> {
+      let url = `${openAiEndpoint}/engines/${parameters.model}/completions`;
+      const body: any = {
+        prompt: prompt,
+        temperature: parameters.temperature,
+        max_tokens: parameters.maxTokens,
+        top_p: parameters.topP,
+        frequency_penalty: parameters.frequencyPenalty,
+        presence_penalty: parameters.presencePenalty,
+        stream: false,
+      };
+      // OpenAI API does not like [] for stop
+      if (parameters.stop) {
+        body.stop = parameters.stop;
+      }
+      if (isFineTunedModel(parameters.model!)) {
+        body.model = parameters.model;
+        url = `${openAiEndpoint}/completions`;
+      }
       const r =
-          await fetch(`${openAiEndpoint}/${parameters.model}/completions`, {
+          await fetch(url, {
             method: "POST",
-            body: JSON.stringify({
-              "prompt": prompt.trim(),
-              "temperature": parameters.temperature,
-              "max_tokens": parameters.maxTokens,
-              "top_p": parameters.topP,
-              "frequency_penalty": parameters.frequencyPenalty,
-              "presence_penalty": parameters.presencePenalty,
-              "stop": parameters.stop,
-              "stream": false,
-            }),
-            headers: openAiHeaders,
+            body: JSON.stringify(body),
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "Authorization": `Bearer ${openAiKey()}`,
+              "OpenAI-Organization": "org-KwcHNgfGe4pqdKDLQIJt99UZ",
+            },
           });
       const data = await r.json();
-      if (data.error) throw new Error(data.error);
-      if (!data.choices ||
-          data.choices.length === 0 ||
-          (skipWhenFinishReasonIsLength &&
-          data.choices[0].finish_reason === "length")) return undefined;
-      return data.choices[0].text;
-    }
-
-    /**
-     * Stream OpenAI completion
-     * @param{string} prompt
-     * @param{any} parameters
-     */
-    async* streamCompletion(prompt: string,
-        parameters: any): any {
-      const r =
-          await fetch(`${openAiEndpoint}/${parameters.model}/completions`, {
-            method: "POST",
-            body: JSON.stringify({
-              "prompt": prompt,
-              "temperature": parameters.temperature,
-              "max_tokens": parameters.maxTokens,
-              "top_p": parameters.topP,
-              "frequency_penalty": parameters.frequencyPenalty,
-              "presence_penalty": parameters.presencePenalty,
-              "stop": parameters.stop,
-              "stream": true,
-            }),
-            headers: openAiHeaders,
-          });
-      for await (const chunk of r.body) {
-        if (chunk.toString().includes("DONE")) return;
-        yield JSON.parse(chunk.toString()
-            .replace("data: ", "")).choices[0].text;
+      if (data.error &&
+            // Fine-tuned models have a cold start
+            // {"code":null,"message":"That model is still being loaded.
+            // Please try again shortly.","param":null,"type":"server_error"}
+            // And no proper code so need to do ugly string checking
+            JSON.stringify(data.error)
+                .includes("That model is still being loaded.") &&
+            parameters.maxRetriesOnColdStart! > 0
+      ) {
+        parameters.maxRetriesOnColdStart = parameters.maxRetriesOnColdStart!-1;
+        await sleep(1000);
+        // When it's cold start, retry using recursion,
+        // The exit condition using the maxRetriesOnColdStart
+        // argument for compactness
+        return await this.completion(prompt, parameters);
+        // Unexpected error, propagate to higher levels
+      } else if (data.error) {
+        throw new Error(JSON.stringify(data.error.message));
       }
+      if (!data.choices ||
+            data.choices.length === 0 ||
+            // OpenAI API returns "finish_reason": "length"
+            // When hitting a max length, which typically means
+            // shit output.
+            // A smarter logic could possibly re-complete from that
+            // But it would add a lot of complexity.
+            (parameters.skipWhenFinishReasonIsLength &&
+              data.choices[0].finish_reason === "length")) return undefined;
+      // We trim the output by default, especially for fine-tuned models
+      // which are trained to return trailing space on completion
+      return data.choices[0].text.trim();
     }
 
     /**
@@ -174,7 +180,12 @@ export class ImplAiApi implements Api {
                 "presence_penalty": parameters.presencePenalty ?? 0,
                 "logprobs": 10,
               }),
-              headers: openAiHeaders,
+              headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${openAiKey()}`,
+                "OpenAI-Organization": "org-KwcHNgfGe4pqdKDLQIJt99UZ",
+              },
             });
       const data = await r.json();
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -197,7 +208,7 @@ export class ImplAiApi implements Api {
       const response = await fetch(
           `${huggingfaceEndpoint}/facebook/bart-large-mnli`,
           {
-            headers: {Authorization: `Bearer ${huggingfaceKey}`},
+            headers: {Authorization: `Bearer ${huggingfaceKey()}`},
             method: "POST",
             body: JSON.stringify({
               inputs: [content],
@@ -236,7 +247,12 @@ export class ImplAiApi implements Api {
                     "model": parameters?.classificationModel ?? "curie",
                     "max_examples": parameters?.maxExamples ?? 10,
                   }),
-                  headers: openAiHeaders,
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${openAiKey()}`,
+                    "OpenAI-Organization": "org-KwcHNgfGe4pqdKDLQIJt99UZ",
+                  },
                 });
         const data = await r.json();
         if (data.error &&

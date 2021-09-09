@@ -39,23 +39,24 @@ jobs:
           echo 'OUTDATED_DEPENDENCIES<<EOF' >> $GITHUB_ENV
           flutter pub outdated >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
-      - name: New Flutter outdated issue
-        uses: imjohnbo/issue-bot@v3
-        with:
-          assignees: "louis030195"
-          labels: "medium priority"
-          title: Flutter outdated packages
-          body: |-
-            :wave: Hi, {{#each assignees}}@{{this}}{{#unless @last}}, {{/unless}}{{/each}}!
-            ## These packages are outdated
+      # TODO: BROKEN
+      # - name: New Flutter outdated issue
+      #   uses: imjohnbo/issue-bot@v3.3.1
+      #   with:
+      #     assignees: "louis030195"
+      #     labels: "medium priority"
+      #     title: Flutter outdated packages
+      #     body: |-
+      #       :wave: Hi, {{#each assignees}}@{{this}}{{#unless @last}}, {{/unless}}{{/each}}!
+      #       ## These packages are outdated
 
-            ```
-            ${{ env.OUTDATED_DEPENDENCIES }}
-            ```
-          pinned: true
-          close-previous: true
-          linked-comments: true
-          project: 1
+      #       ```
+      #       ${{ env.OUTDATED_DEPENDENCIES }}
+      #       ```
+      #     pinned: true
+      #     close-previous: true
+      #     linked-comments: true
+      #     project: 1
           # column: To Do
       # Backend checks
       # - name: Decrypt service account key

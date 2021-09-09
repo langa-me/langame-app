@@ -54,3 +54,5 @@ doc
 
 # Tests
 coverage
+
+.runtimeconfig.json

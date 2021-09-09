@@ -5,9 +5,11 @@
             "changeProcessCWD": true
         }
     ],
-    "eslint.format.enable": true,
+    "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+      "source.fixAll": true,
+      "source.organizeImports": true,
+      "source.sortMembers": true
     },
     "protoc": {
         "options": [

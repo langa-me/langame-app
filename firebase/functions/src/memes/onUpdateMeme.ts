@@ -5,6 +5,7 @@ import {reportError} from "../errors";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import TwitterApi from "twitter-api-v2";
 
 /**
  *
@@ -19,7 +20,6 @@ export const onUpdateMeme = async (
   try {
     if (!change.after.data() ||
       e.eventType === "google.firestore.document.delete") return;
-    const doc = await change.after.ref.get();
 
     const api = new ImplAiApi();
 
@@ -28,14 +28,29 @@ export const onUpdateMeme = async (
       disabled: change.after.data().disabled,
       content: change.after.data().content,
       createdAt: change.after.data().createdAt,
-      _tags: doc.data()!.topics,
+      _tags: change.after.data()!.topics,
     });
     // TODO: only update if it's new
-    await Promise.all(doc.data()!.topics.map((t: string) =>
+    await Promise.all(change.after.data()!.topics.map((t: string) =>
       admin.firestore().collection("topics").doc(t).set({})));
 
     functions.logger.log(`Updated meme ${change.after.id}`,
         change.after.data());
+
+    // When enabling a meme, tweet randomly
+    if (change.before.data()!.disabled === true &&
+        change.after.data()!.disabled === false) {
+      const twitterClient = new TwitterApi({
+        accessToken: functions.config().twitter.access_token,
+        appKey: functions.config().twitter.app_key,
+        appSecret: functions.config().twitter.app_secret,
+        accessSecret: functions.config().twitter.access_secret,
+      });
+      // eslint-disable-next-line max-len
+      const tweet = `${change.after.data().content} ${change.after.data()!.topics.map((e: string) => "#"+e.replace(/\s/g, "")).join(" ")}`;
+      await twitterClient.v1.tweet(tweet);
+      functions.logger.log("tweeted", tweet);
+    }
 
     // TODO: sentence similarity -> delete
   } catch (e) {

@@ -11,6 +11,8 @@ import 'package:langame/models/google/protobuf/timestamp.pb.dart' as gg;
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:protobuf/protobuf.dart';
 
+import 'google/protobuf/any.pb.dart';
+
 extension interactionExtensions on lg.InteractionLevel {
   Color toColor() {
     switch (this) {
@@ -342,6 +344,20 @@ class PromptExt {
       template: m['template'],
       tags: (m['tags'] as List<dynamic>?)?.map((e) => TagExt.fromObject(e)),
       id: m['id'],
+    );
+  }
+}
+
+
+class RecordingExt {
+  static lg.Recording fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Recording(
+      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
+      text: m['text'],
+      userId: m['userId'],
+      metadata: Map<String, String>.from(m['metadata']),
+      note: m['note'] ?? '',
     );
   }
 }

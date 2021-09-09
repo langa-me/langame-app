@@ -5,43 +5,9 @@ import {ImplAiApi} from "./implAiApi";
 import {offlineMemeSearch} from "../memes/memes";
 
 
-before(() => {
-
-});
-
-// it.skip("check that we can find some questions", async () => {
-//   // Generated ones
-//   let questions = await offlineMemeSearch(["biology"], 5);
-//   console.log(JSON.stringify(questions));
-//   questions = await offlineMemeSearch(["health"], 5);
-//   console.log(JSON.stringify(questions));
-//   questions = await offlineMemeSearch(["philosophy"], 5);
-//   console.log(JSON.stringify(questions));
-//   after(() => setTimeout(()=>{}, 1000));
-// });
-
-// it.skip("check", async () => {
-//   // Generated ones
-//   const questions = await offlineMemeSearch(["death"], 1);
-//   console.log(JSON.stringify(questions));
-//   after(() => setTimeout(()=>{}, 1000));
-// });
-
-
 it.skip("create Github issue", async () => {
   await newFeedback("https://foo.bar.com", "foo: bar");
 });
-//
-// it.skip("generate openai question", async () => {
-//   const t = await admin.remoteConfig().getTemplate();
-//   const response = await onlineOpenAiCompletion(CompletionType.Question,
-//       "politics",
-//       t.parameters);
-//   console.log(JSON.stringify(response));
-//   expect(response !== undefined).to.be.true;
-//   expect(response!.length).to.be.greaterThan(0);
-//   expect(response![0].content.length).to.be.greaterThan(0);
-// });
 
 
 it.skip("zero shot classification", async () => {
@@ -61,7 +27,6 @@ it.skip("emojis inference", async () => {
   const api = new ImplAiApi();
   const inferredEmojis =
       await api.completion("philosophy:🤔🧠💭📚📖\nice breaker:😜\nphysics:",
-          true,
           {
             model: "davinci",
             temperature: 0.8,
@@ -100,3 +65,19 @@ it.skip("search algolia low level", async () => {
   console.log(r);
 });
 
+it("completion", async () => {
+  const api = new ImplAiApi();
+  const completion =
+      await api.completion("",
+          {
+            model: "curie:ft-louis-personal-2021-08-27-16-57-14",
+            temperature: 0.8,
+            maxTokens: 60,
+            topP: 1,
+            frequencyPenalty: 0.1,
+            presencePenalty: 0.1,
+            stop: ["\n###\n", "###"],
+          });
+  console.log(completion);
+  expect(completion).to.not.be.undefined;
+});

@@ -260,6 +260,9 @@ PODS:
     - Flutter
   - sign_in_with_apple (0.0.1):
     - Flutter
+  - speech_to_text (0.0.1):
+    - Flutter
+    - Try
   - Stripe (21.5.1):
     - Stripe/Stripe3DS2 (= 21.5.1)
   - Stripe/Stripe3DS2 (21.5.1)
@@ -267,6 +270,7 @@ PODS:
     - Flutter
     - Stripe (~> 21.5.1)
   - Toast (4.0.0)
+  - Try (2.1.1)
   - url_launcher (0.0.1):
     - Flutter
 
@@ -299,6 +303,7 @@ DEPENDENCIES:
   - share (from `.symlinks/plugins/share/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
+  - speech_to_text (from `.symlinks/plugins/speech_to_text/ios`)
   - stripe_ios (from `.symlinks/plugins/stripe_ios/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
@@ -332,6 +337,7 @@ SPEC REPOS:
     - Sentry
     - Stripe
     - Toast
+    - Try
 
 EXTERNAL SOURCES:
   agora_rtc_engine:
@@ -391,6 +397,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences/ios"
   sign_in_with_apple:
     :path: ".symlinks/plugins/sign_in_with_apple/ios"
+  speech_to_text:
+    :path: ".symlinks/plugins/speech_to_text/ios"
   stripe_ios:
     :path: ".symlinks/plugins/stripe_ios/ios"
   url_launcher:
@@ -456,9 +464,11 @@ SPEC CHECKSUMS:
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sign_in_with_apple: 34f3f5456a45fd7ac5fb42905e2ad31dae061b4a
+  speech_to_text: b43a7d99aef037bd758ed8e45d79bbac035d2dfe
   Stripe: 515db5536fd659b5d79a0898ce1b882b61ab597e
   stripe_ios: ce035050135b58a5a838e0d410d53b26f1dc026a
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
+  Try: 5ef669ae832617b3cee58cb2c6f99fb767a4ff96
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
 
 PODFILE CHECKSUM: 79ba3dc7af7165b0195a705121166fe61106a7d2

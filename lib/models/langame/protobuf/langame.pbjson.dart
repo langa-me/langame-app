@@ -420,3 +420,28 @@ const Prompt$json = const {
 
 /// Descriptor for `Prompt`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List promptDescriptor = $convert.base64Decode('CgZQcm9tcHQSEgoEdHlwZRgBIAEoCVIEdHlwZRIaCgh0ZW1wbGF0ZRgCIAEoCVIIdGVtcGxhdGUSKQoEdGFncxgDIAMoCzIVLmxhbmdhbWUucHJvdG9idWYuVGFnUgR0YWdzEg4KAmlkGAQgASgJUgJpZA==');
+@$core.Deprecated('Use recordingDescriptor instead')
+const Recording$json = const {
+  '1': 'Recording',
+  '2': const [
+    const {'1': 'created_at', '3': 1, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'createdAt'},
+    const {'1': 'text', '3': 2, '4': 1, '5': 9, '10': 'text'},
+    const {'1': 'user_id', '3': 3, '4': 1, '5': 9, '10': 'userId'},
+    const {'1': 'metadata', '3': 4, '4': 3, '5': 11, '6': '.langame.protobuf.Recording.MetadataEntry', '10': 'metadata'},
+    const {'1': 'note', '3': 5, '4': 1, '5': 9, '10': 'note'},
+  ],
+  '3': const [Recording_MetadataEntry$json],
+};
+
+@$core.Deprecated('Use recordingDescriptor instead')
+const Recording_MetadataEntry$json = const {
+  '1': 'MetadataEntry',
+  '2': const [
+    const {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    const {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+  '7': const {'7': true},
+};
+
+/// Descriptor for `Recording`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List recordingDescriptor = $convert.base64Decode('CglSZWNvcmRpbmcSOQoKY3JlYXRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdBISCgR0ZXh0GAIgASgJUgR0ZXh0EhcKB3VzZXJfaWQYAyABKAlSBnVzZXJJZBJFCghtZXRhZGF0YRgEIAMoCzIpLmxhbmdhbWUucHJvdG9idWYuUmVjb3JkaW5nLk1ldGFkYXRhRW50cnlSCG1ldGFkYXRhEhIKBG5vdGUYBSABKAlSBG5vdGUaOwoNTWV0YWRhdGFFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoCVIFdmFsdWU6AjgB');

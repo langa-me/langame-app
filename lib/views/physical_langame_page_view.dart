@@ -11,6 +11,7 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
+import 'package:langame/providers/recording_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/memes/topic_search_bar.dart';
@@ -19,6 +20,7 @@ import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:langame/helpers/random.dart';
 import 'colors/colors.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class PhysicalLangamePageView extends StatefulWidget {
   final void Function(int, {Curve? curve}) _goToPage;
@@ -31,8 +33,14 @@ class PhysicalLangamePageView extends StatefulWidget {
 class _State extends State<PhysicalLangamePageView>
     with AfterLayoutMixin<PhysicalLangamePageView> {
   Future<LangameResponse<void>>? _getMemes;
-  List<bool> _languageSelected = [true, false, false, false];
-  static const List<String> _languages = ['us', 'de', 'fr', 'es'];
+  String _languageSelected = 'us';
+  final _languages = {
+    'us': {'code': "en-US", 'flag': '🇺🇸'},
+    'de': {'code': "de-DE", 'flag': '🇩🇪'},
+    'fr': {'code': "fr-FR", 'flag': '🇫🇷'},
+    'es': {'code': "es-ES", 'flag': '🇪🇸'},
+  };
+  bool _isRecording = false;
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -41,11 +49,22 @@ class _State extends State<PhysicalLangamePageView>
     postFrameCallback((_) => setState(() {}));
   }
 
+  String getMeme(PhysicalLangameProvider plp) {
+    var memeText = plp.memes[plp.currentMeme].content;
+    if (_languageSelected != 'us') {
+      memeText = plp.memes[plp.currentMeme].translated[_languageSelected]!;
+    }
+    return memeText;
+  }
+
   @override
   Widget build(BuildContext context) {
     var plp = Provider.of<PhysicalLangameProvider>(context);
     var ap = Provider.of<AuthenticationProvider>(context);
     var tp = Provider.of<TagProvider>(context);
+    var rp = Provider.of<RecordingProvider>(context);
+    var cp = Provider.of<ContextProvider>(context);
+
     if (_getMemes != null) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +108,7 @@ class _State extends State<PhysicalLangamePageView>
                       onPressed: () {
                         plp.previous();
                         setState(() {
-                          _languageSelected = [true, false, false, false];
+                          _languageSelected = 'us';
                         });
                       },
                     ),
@@ -98,7 +117,7 @@ class _State extends State<PhysicalLangamePageView>
                       onPressed: () {
                         plp.next();
                         setState(() {
-                          _languageSelected = [true, false, false, false];
+                          _languageSelected = 'us';
                         });
                       },
                     ),
@@ -113,49 +132,45 @@ class _State extends State<PhysicalLangamePageView>
                                 onPressed: () async {
                                   final tts = FlutterTts();
                                   tts.stop();
-                                  final l = {
-                                    'us': "en-US",
-                                    'de': "de-DE",
-                                    'fr': "fr-FR",
-                                    'es': "es-ES",
-                                  };
-                                  final lang = _languages[_languageSelected
-                                      .indexWhere((e) => e == true)];
+                                  var memeText = getMeme(plp);
                                   await tts.setLanguage(
-                                      lang != -1 ? l[lang]! : "en-US");
-                                  tts.speak(_languageSelected[0]
-                                      ? plp.memes[plp.currentMeme].content
-                                      : plp.memes[plp.currentMeme].translated
-                                          [lang]!);
+                                      _languages[_languageSelected]!['code']!);
+                                  tts.speak(memeText);
                                 },
                                 icon: Icon(
                                   FontAwesomeIcons.headphonesAlt,
                                   color: isLightThenDark(context),
                                 ))))
                     : SizedBox.shrink(),
+                plp.memes.length > 0 &&
+                        plp.memes[plp.currentMeme].translated.isNotEmpty
+                    ? Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: DropdownButton(
+                                dropdownColor: getBlackAndWhite(context, 1, reverse: true),
+                                underline: SizedBox.shrink(),
+                                icon: Icon(FontAwesomeIcons.arrowDown,
+                                color: getBlackAndWhite(context, 1),
+                                  size: AppSize.safeBlockHorizontal * 3,
+                                ),
+                                onChanged: (e) => setState(
+                                    () => _languageSelected = e as String),
+                                value: _languageSelected,
+                                items: _languages.
+                                    values.map((v) {
+                                      return 
+                                          DropdownMenuItem(
+                                              // Hack because mapping dict is annoying
+                                              value: v['code']!.split('-')[1].toLowerCase(),
+                                              child: Text(v['flag']!));
+                                    })
+                                    .toList())))
+                    : SizedBox.shrink(),
               ])
             : SizedBox.shrink(),
-        plp.memes.length > 0 && plp.memes[plp.currentMeme].translated.isNotEmpty
-            ? ToggleButtons(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                fillColor: Theme.of(context).colorScheme.secondary,
-                selectedBorderColor: getBlackAndWhite(context, 0),
-                children: [
-                  Text('🇺🇸'),
-                  Text('🇩🇪'),
-                  Text('🇫🇷'),
-                  Text('🇪🇸'),
-                ],
-                onPressed: (int index) {
-                  var n = _languageSelected.map((e) => false).toList();
-                  n[index] = true;
-                  setState(() {
-                    _languageSelected = n;
-                  });
-                },
-                isSelected: _languageSelected,
-              )
-            : SizedBox.shrink(),
+
         // SizedBox(height: AppSize.safeBlockVertical * 5),
         plp.memes.length == 0
             ? Image.asset('images/logo-colourless.png',
@@ -164,10 +179,7 @@ class _State extends State<PhysicalLangamePageView>
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Text(
-                    _languageSelected[0] || plp.memes[plp.currentMeme].translated.isEmpty
-                        ? plp.memes[plp.currentMeme].content
-                        : plp.memes[plp.currentMeme].translated[_languages[
-                            _languageSelected.indexWhere((e) => e == true)]]!,
+                    getMeme(plp),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline6!.merge(
                         TextStyle(
@@ -176,19 +188,53 @@ class _State extends State<PhysicalLangamePageView>
                 ),
               ),
         plp.memes.length > 0
+            ? IconButton(
+                color: _isRecording ? Colors.red : null,
+                onPressed: () async {
+                  setState(() {
+                    _isRecording = !_isRecording;
+                  });
+                  if (_isRecording) {
+                    var r = await rp.start();
+                    if (r.status == LangameStatus.failed) {
+                      cp.showFailureDialog(null);
+                      Future.delayed(Duration(seconds: 2))
+                          .whenComplete(() => cp.dialogComplete());
+                      setState(() {
+                        _isRecording = false;
+                      });
+                    } else if (r.status == LangameStatus.cancelled) {
+                      cp.showFailureDialog(
+                          'you need to allow recording audio!');
+                      Future.delayed(Duration(seconds: 2))
+                          .whenComplete(() => cp.dialogComplete());
+                      setState(() {
+                        _isRecording = false;
+                      });
+                    }
+                  } else {
+                    rp.stop(metadata: {
+                      'meme': getMeme(plp),
+                      'context': 'face-to-face',
+                      'language': _languageSelected,
+                    });
+                    cp.showSnackBar('Recorded 😇');
+                  }
+                },
+                icon: Icon(FontAwesomeIcons.microphoneAlt))
+            : SizedBox.shrink(),
+        plp.memes.length > 0
             ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 IconButton(
                     onPressed: () =>
                         Provider.of<FeedbackProvider>(context, listen: false)
-                            .sendMemeLike(
-                                plp.memes[plp.currentMeme].id, false),
+                            .sendMemeLike(plp.memes[plp.currentMeme].id, false),
                     icon: Icon(FontAwesomeIcons.solidThumbsDown,
                         color: getBlackAndWhite(context, 0))),
                 IconButton(
                     onPressed: () =>
                         Provider.of<FeedbackProvider>(context, listen: false)
-                            .sendMemeLike(
-                                plp.memes[plp.currentMeme].id, true),
+                            .sendMemeLike(plp.memes[plp.currentMeme].id, true),
                     icon: Icon(FontAwesomeIcons.solidThumbsUp,
                         color: getBlackAndWhite(context, 0))),
               ])
@@ -242,10 +288,11 @@ class _State extends State<PhysicalLangamePageView>
                                   .then((ok) {
                                 if (ok.result != null && ok.result!) return ok;
                                 final cp = Provider.of<ContextProvider>(context,
-                                        listen: false);
-                                    cp.showFailureDialog(
-                                        'Could not find anything that you did not already see in this topics!');
-                                Future.delayed(Duration(seconds: 3), () => cp.dialogComplete());
+                                    listen: false);
+                                cp.showFailureDialog(
+                                    'Could not find anything that you did not already see in this topics!');
+                                Future.delayed(Duration(seconds: 3),
+                                    () => cp.dialogComplete());
                                 return ok;
                               });
                               setState(() {});

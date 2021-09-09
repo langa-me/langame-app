@@ -6,14 +6,15 @@ import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
-import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/views/new_langame_page_view.dart';
 import 'package:langame/views/physical_langame_page_view.dart';
+import 'package:langame/views/recording_page_view.dart';
 import 'package:langame/views/settings.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
+import 'feature_preview/beta.dart';
 import 'running_langames_view.dart';
 import 'search_page_view.dart';
 
@@ -56,28 +57,13 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     super.dispose();
   }
 
-  Future<bool> _onBackPressed() {
-    var cp = Provider.of<ContextProvider>(context, listen: false);
-    return cp.showCustomDialog<bool>(
-      stateless: [
-        Padding(
-            padding: EdgeInsets.all(20),
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(
-                'Exit Langame?',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headline4,
-              ),
-              LangameButton(Icons.cancel_outlined,
-                  onPressed: cp.dialogComplete, text: 'Cancel', layer: 1),
-              LangameButton(Icons.exit_to_app_rounded,
-                  onPressed: cp.pop, text: 'Yes', layer: 1),
-            ])),
-      ],
-      canBack: true,
-    );
-  }
+  void goToPage(int i, {Curve? curve}) => setState(() {
+        _selectedIndex = i;
+        curve != null
+            ? _pageController.animateToPage(i,
+                duration: Duration(milliseconds: 500), curve: curve)
+            : _pageController.jumpToPage(i);
+      });
 
   PreferredSizeWidget? _buildAppBar() {
     var cp = Provider.of<ContextProvider>(context, listen: false);
@@ -114,48 +100,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     );
   }
 
-  Widget _buildPageView() {
-    return PageView(
-      onPageChanged: (i) => setState(() {
-        _selectedIndex = i;
-      }),
-      controller: _pageController,
-      children: [
-        NewLangamePageView(goToPage),
-        // OldLangamePageView(goToPage),
-        // InteractionsPageView(goToPage),
-        PhysicalLangamePageView(goToPage),
-        SearchPageView(goToPage),
-      ],
-    );
-  }
-
-  void _onBottomBarItemTapped(int i) => goToPage(i);
-
-  void goToPage(int i, {Curve? curve}) => setState(() {
-        _selectedIndex = i;
-        curve != null
-            ? _pageController.animateToPage(i,
-                duration: Duration(milliseconds: 500), curve: curve)
-            : _pageController.jumpToPage(i);
-      });
-
-  Widget _buildStartIcon(Color color) => Consumer<NewLangameProvider>(
-      builder: (b, nlp, c) => Badge(
-            elevation: 0,
-            badgeColor: Colors.transparent,
-            badgeContent: Text(
-              '${nlp.shoppingList.length}',
-              style: TextStyle(
-                color: isLightThenDark(context),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            child: Icon(FontAwesomeIcons.plus, color: color),
-            padding: const EdgeInsets.all(3.0),
-            position: BadgePosition.topStart(top: -20, start: 4),
-          ));
-
   Widget _buildBottomNavigationBar() {
     final theme = Theme.of(context);
     return BottomNavigationBar(
@@ -166,9 +110,19 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           backgroundColor: Colors.transparent,
-          icon: _buildStartIcon(Theme.of(context).iconTheme.color!),
-          activeIcon: _buildStartIcon(Theme.of(context).colorScheme.secondary),
-          label: 'Start',
+          icon: Beta(Icon(FontAwesomeIcons.phoneAlt,
+              color: Theme.of(context).iconTheme.color)),
+          activeIcon: Beta(Icon(FontAwesomeIcons.phoneAlt,
+              color: Theme.of(context).colorScheme.secondary)),
+          label: 'Audio',
+        ),
+        BottomNavigationBarItem(
+          backgroundColor: Colors.transparent,
+          icon:
+              Icon(Icons.search_outlined, color: getBlackAndWhite(context, 0)),
+          activeIcon: Icon(Icons.search_outlined,
+              color: Theme.of(context).colorScheme.secondary),
+          label: 'Search',
         ),
         BottomNavigationBarItem(
           backgroundColor: Colors.transparent,
@@ -180,15 +134,57 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
         ),
         BottomNavigationBarItem(
           backgroundColor: Colors.transparent,
-          icon:
-              Icon(Icons.search_outlined, color: getBlackAndWhite(context, 0)),
-          activeIcon: Icon(Icons.search_outlined,
-              color: Theme.of(context).colorScheme.secondary),
-          label: 'Search',
+          icon: Beta(Icon(FontAwesomeIcons.brain,
+              color: Theme.of(context).iconTheme.color)),
+          activeIcon: Beta(Icon(FontAwesomeIcons.brain,
+              color: Theme.of(context).colorScheme.secondary)),
+          label: 'Meme',
         ),
       ],
       currentIndex: _selectedIndex,
       onTap: _onBottomBarItemTapped,
     );
   }
+
+  Widget _buildPageView() {
+    return PageView(
+      onPageChanged: (i) => setState(() {
+        _selectedIndex = i;
+      }),
+      controller: _pageController,
+      children: [
+        NewLangamePageView(goToPage),
+        // OldLangamePageView(goToPage),
+        // InteractionsPageView(goToPage),
+        SearchPageView(goToPage),
+        PhysicalLangamePageView(goToPage),
+        RecordingPageView(goToPage),
+      ],
+    );
+  }
+
+  Future<bool> _onBackPressed() {
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    return cp.showCustomDialog<bool>(
+      stateless: [
+        Padding(
+            padding: EdgeInsets.all(20),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(
+                'Exit Langame?',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              LangameButton(Icons.cancel_outlined,
+                  onPressed: cp.dialogComplete, text: 'Cancel', layer: 1),
+              LangameButton(Icons.exit_to_app_rounded,
+                  onPressed: cp.pop, text: 'Yes', layer: 1),
+            ])),
+      ],
+      canBack: true,
+    );
+  }
+
+  void _onBottomBarItemTapped(int i) => goToPage(i);
 }

@@ -36,6 +36,7 @@ import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/payment_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/providers/recording_provider.dart';
 import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/services/http/fake_message_api.dart';
@@ -82,7 +83,8 @@ void main() async {
       (options) {
         options.dsn =
             'https://ce6ae27b22094db983af540d6ddb8010@o404046.ingest.sentry.io/5891492';
-        options.environment = AppConst.isDev ? 'development' : 'production';
+        options.environment =
+            AppConst.isDev || kDebugMode ? 'development' : 'production';
       },
     );
 
@@ -153,9 +155,11 @@ void main() async {
   );
   var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
       authenticationProvider, ImplLangameApi(firebase));
+  final recordingProvider = RecordingProvider(
+      firebase, crashAnalyticsProvider, authenticationProvider, algolia);
   var newLangameProvider = NewLangameProvider(
       crashAnalyticsProvider, authenticationProvider, firebase);
-  SystemChrome.setEnabledSystemUIOverlays([]);
+  // SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(
@@ -252,6 +256,11 @@ void main() async {
               update: (_, cap, p) => p!,
               create: (_) =>
                   AdminProvider(firebase, crashAnalyticsProvider, algolia),
+            ),
+            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
+                RecordingProvider>(
+              update: (_, cap, p) => p!,
+              create: (_) => recordingProvider,
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),
