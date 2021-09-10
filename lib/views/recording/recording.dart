@@ -76,6 +76,44 @@ class _State extends State<Recording> with AfterLayoutMixin<Recording> {
           iconTheme: IconThemeData(
             color: isLightThenDark(context), //change your color here
           ),
+          actions: [
+            IconButton(
+                icon: Icon(FontAwesomeIcons.trashAlt),
+                onPressed: () {
+                  cp.showCustomDialog(
+                    stateless: [
+                      Spacer(),
+                      Text(
+                        'Are you sure you want to delete this recording?',
+                        style: Theme.of(context).textTheme.headline6,
+                        textAlign: TextAlign.center,
+                      ),
+                      Spacer(),
+                      LangameButton(
+                        FontAwesomeIcons.trashAlt,
+                        text: 'Delete',
+                        highlighted: true,
+                        onPressed: () async {
+                          var r = await rp.deleteRecording(widget._recordingId);
+                          cp.dialogComplete();
+                          if (r.error != null)
+                            cp.showFailureDialog(null);
+                          else
+                            cp.showSnackBar('Recording deleted');
+                          await Future.delayed(Duration(milliseconds: 100));
+                          cp.pop();
+                        },
+                      )
+                    ],
+                    canBack: true,
+                    title: Text(
+                      'Delete Recording',
+                      style: Theme.of(context).textTheme.headline4,
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }),
+          ],
           backgroundColor: Colors.transparent,
         ),
         body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -90,7 +128,6 @@ class _State extends State<Recording> with AfterLayoutMixin<Recording> {
             maxLines: 3,
             textAlign: TextAlign.center,
             textAlignVertical: TextAlignVertical.center,
-            
             style: Theme.of(context)
                 .textTheme
                 .headline6!

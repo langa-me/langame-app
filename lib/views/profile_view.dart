@@ -6,8 +6,6 @@ import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
-import 'package:langame/providers/preference_provider.dart';
-import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:provider/provider.dart';
 

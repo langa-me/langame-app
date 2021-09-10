@@ -17,9 +17,9 @@ class _State extends State<Beta> {
     return Badge(
       badgeColor: getBlackAndWhite(context, 2, reverse: true),
       child: widget.child,
-      position: BadgePosition.topEnd(top: -20, end: -20),
+      position: BadgePosition.topEnd(top: -20, end: -30),
       badgeContent: Text(
-        'beta',
+        'Preview',
         style: Theme.of(context)
             .textTheme
             .caption!

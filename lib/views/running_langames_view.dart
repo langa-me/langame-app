@@ -15,7 +15,6 @@ import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
 import 'colors/colors.dart';
-import 'images/image.dart';
 import 'langame.dart';
 
 class RunningLangamesView extends StatefulWidget {
@@ -60,7 +59,7 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headline4),
                   SizedBox(height: AppSize.safeBlockVertical * 5),
-                  Text('Invite your friends for a great conversation',
+                  Text('After participating to an audio Langame, you will see it here',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.caption),
                 ],

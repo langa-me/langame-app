@@ -15,7 +15,6 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:quiver/async.dart';
 import 'package:retry/retry.dart';
 
 /// [AudioProvider] handles logic for audio communication

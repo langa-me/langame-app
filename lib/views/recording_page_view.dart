@@ -65,7 +65,10 @@ class _State extends State<RecordingPageView>
                       color: isLightThenDark(context, reverse: false)),
                   onPressed: () => Share.share(
                       'Question: ${rp.recordings!.docs[i].data().metadata["meme"]!}' +
-                          '\nAnswer: ${rp.recordings!.docs[i].data().text}',
+                          '\nAnswer: ${rp.recordings!.docs[i].data().text}' +
+                          (rp.recordings!.docs[i].data().hasNote()
+                              ? '\nNote: ${rp.recordings!.docs[i].data().note}'
+                              : ''),
                       subject: 'Langame memes'),
                 ),
                 shape: RoundedRectangleBorder(

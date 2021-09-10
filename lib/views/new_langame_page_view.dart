@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -20,7 +19,6 @@ import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/langame.dart';
 import 'package:langame/views/memes/topic_search_bar.dart';
 import 'package:langame/views/running_langames_view.dart';
-import 'package:langame/views/topic_search.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
@@ -89,7 +87,7 @@ class _SendLangameState extends State<NewLangamePageView>
                     ? [
                         LangameButton(
                           FontAwesomeIcons.userPlus,
-                          onPressed: () => widget._goToPage(2),
+                          onPressed: () => widget._goToPage(1),
                           text: '',
                           layer: 1,
                           border: true,

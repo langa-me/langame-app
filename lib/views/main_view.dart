@@ -1,5 +1,6 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:badges/badges.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/providers/audio_provider.dart';
@@ -102,28 +103,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
 
   Widget _buildBottomNavigationBar() {
     final theme = Theme.of(context);
-    return BottomNavigationBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      type: BottomNavigationBarType.shifting,
-      selectedItemColor: theme.colorScheme.secondary,
-      items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          backgroundColor: Colors.transparent,
-          icon: Beta(Icon(FontAwesomeIcons.phoneAlt,
-              color: Theme.of(context).iconTheme.color)),
-          activeIcon: Beta(Icon(FontAwesomeIcons.phoneAlt,
-              color: Theme.of(context).colorScheme.secondary)),
-          label: 'Audio',
-        ),
-        BottomNavigationBarItem(
-          backgroundColor: Colors.transparent,
-          icon:
-              Icon(Icons.search_outlined, color: getBlackAndWhite(context, 0)),
-          activeIcon: Icon(Icons.search_outlined,
-              color: Theme.of(context).colorScheme.secondary),
-          label: 'Search',
-        ),
+    var navBarItems = <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           backgroundColor: Colors.transparent,
           icon: Icon(FontAwesomeIcons.peopleArrows,
@@ -140,7 +120,32 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
               color: Theme.of(context).colorScheme.secondary)),
           label: 'Meme',
         ),
-      ],
+      ];
+      if (!kIsWeb) {
+        navBarItems.insertAll(0, [BottomNavigationBarItem(
+          backgroundColor: Colors.transparent,
+          icon: Beta(Icon(FontAwesomeIcons.phoneAlt,
+              color: Theme.of(context).iconTheme.color)),
+          activeIcon: Beta(Icon(FontAwesomeIcons.phoneAlt,
+              color: Theme.of(context).colorScheme.secondary)),
+          label: 'Audio',
+        ),
+        BottomNavigationBarItem(
+          backgroundColor: Colors.transparent,
+          icon:
+              Icon(Icons.search_outlined, color: getBlackAndWhite(context, 0)),
+          activeIcon: Icon(Icons.search_outlined,
+              color: Theme.of(context).colorScheme.secondary),
+          label: 'Search',
+        )
+        ]);
+      }
+    return BottomNavigationBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      type: BottomNavigationBarType.shifting,
+      selectedItemColor: theme.colorScheme.secondary,
+      items: navBarItems,
       currentIndex: _selectedIndex,
       onTap: _onBottomBarItemTapped,
     );
@@ -153,10 +158,8 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       }),
       controller: _pageController,
       children: [
-        NewLangamePageView(goToPage),
-        // OldLangamePageView(goToPage),
-        // InteractionsPageView(goToPage),
-        SearchPageView(goToPage),
+        !kIsWeb ? NewLangamePageView(goToPage) : SizedBox.shrink(),
+        !kIsWeb ?  SearchPageView(goToPage) : SizedBox.shrink(),
         PhysicalLangamePageView(goToPage),
         RecordingPageView(goToPage),
       ],

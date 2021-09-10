@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
-
-import '../images/image.dart';
 
 class Profile extends StatelessWidget {
   final lg.User _user;

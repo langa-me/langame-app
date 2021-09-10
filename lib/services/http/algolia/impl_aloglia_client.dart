@@ -1,17 +1,9 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:langame/helpers/constants.dart';
+import 'package:http/http.dart' as http;
 import 'package:langame/models/errors.dart';
-import 'package:langame/models/extension.dart';
-import 'package:langame/models/firebase_functions_protocol.dart';
-import 'package:langame/models/google/protobuf/timestamp.pbserver.dart' as gg;
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/algolia/algolia_client.dart';
 import 'package:langame/services/http/firebase.dart';
-import 'package:langame/services/http/langame_api.dart';
-import 'package:http/http.dart' as http;
 
 class ImplAlgoliaClient extends AlgoliaClient {
   ImplAlgoliaClient(FirebaseApi firebase) : super(firebase);

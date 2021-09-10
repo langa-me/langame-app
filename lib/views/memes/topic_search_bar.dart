@@ -2,13 +2,12 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/random.dart';
 import 'package:langame/helpers/widget.dart';
 import 'package:langame/providers/context_provider.dart';
-import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:langame/helpers/random.dart';
 import 'package:provider/provider.dart';
 
 class TopicSearchWidget extends StatefulWidget {

@@ -724,10 +724,9 @@ class _LangameViewState extends State<LangameView> {
         Row(children: [
           IconButton(
             onPressed: () => Share.share(
-                'I got into conversations on Langame:\n' +
                     l.memes[l.currentMeme].content +
                     '\n' +
-                    'If you don\'t have Langame you can join us for incredible conversations here ${AppConst.mainUrl}',
+                    'Straight from ${AppConst.mainUrl}',
                 subject:
                     '${l.memes[l.currentMeme].content.substring(0, 10)}...'),
             icon: Icon(

@@ -5,11 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/message_api.dart';
 import 'package:langame/views/langame.dart';
-import 'package:langame/views/main_view.dart';
 
 import 'authentication_provider.dart';
 

@@ -47,7 +47,7 @@ class _State extends State<OldLangamePageView>
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headline4),
                   SizedBox(height: AppSize.safeBlockVertical * 5),
-                  Text('Invite your friends for a great conversation',
+                  Text('After participating to an audio Langame, you will see it here',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.caption),
                 ],

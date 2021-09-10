@@ -74,7 +74,9 @@ export const createMemes = async (data: any,
       "memes using prompt", randomPrompt.id);
   return {
     memesId: await Promise.all([...Array(amount)].map(async () => {
-      functions.logger.log("calling openai with prompt", randomPrompt);
+      functions.logger.log("calling openai with prompt",
+          randomPrompt.data().template
+      );
       let meme: string | undefined;
       try {
         meme =

@@ -3,18 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/models/errors.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/admin_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/colors/colors.dart';
-import 'package:langame/views/topic_search.dart';
 import 'package:provider/provider.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'buttons/button.dart';
-import 'memes/topic_search_bar.dart';
 
 class HackView extends StatefulWidget {
   @override

@@ -2,16 +2,13 @@ import 'dart:core';
 
 import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/future.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -28,11 +25,15 @@ class RecordingProvider extends ChangeNotifier {
             )
             .snapshots()
             .listen((e) {
+          // No clue why need 2 notifyListeners, but works
+          notifyListeners();
           _recordings = e;
+          notifyListeners();
         });
         cap.log('recording_provider: listening for snapshots');
       } else if (e.type == UserChangeType.Disconnection) {
         _recordings = null;
+        notifyListeners();
       }
     });
   }
@@ -42,7 +43,6 @@ class RecordingProvider extends ChangeNotifier {
   final Algolia? algolia;
   stt.SpeechToText _speech = stt.SpeechToText();
   String _textRecorded = '';
-  bool _gotFinalResult = false;
 
   QuerySnapshot<lg.Recording>? _recordings;
 
@@ -58,14 +58,13 @@ class RecordingProvider extends ChangeNotifier {
               'status': e,
             });
       }, onError: (e) {
-        print('stt error: ' + e.toString());
+        cap.log('stt error: ' + e.toString());
       });
       if (available) {
         _speech.listen(onResult: (e) {
-          print(e.toJson());
           if (e.finalResult) {
             _textRecorded = e.recognizedWords;
-            _gotFinalResult = true;
+            print(e);
           }
         });
       } else {
@@ -86,15 +85,11 @@ class RecordingProvider extends ChangeNotifier {
 
   /// Stops recording and save the text recorded to Firestore.
   /// Optionally can give metadata (such as topic...) to the recording.
-  Future<LangameResponse<bool>> stop({Map<dynamic, dynamic>? metadata}) async {
+  Future<LangameResponse<String>> stop(
+      {Map<dynamic, dynamic>? metadata}) async {
     try {
       await _speech.stop();
-      await waitUntil(() => _gotFinalResult, maxIterations: 200);
-      _gotFinalResult = false;
-      if (_textRecorded == '') {
-        cap.log('stopped recording, empty text, not saving');
-        return LangameResponse(LangameStatus.succeed);
-      }
+      await waitUntil(() => _textRecorded != '', maxIterations: 500);
       var d = {
         'createdAt': FieldValue.serverTimestamp(),
         'text': _textRecorded,
@@ -103,24 +98,44 @@ class RecordingProvider extends ChangeNotifier {
       };
       var doc = await firebase.firestore!.collection('recordings').add(d);
       cap.log('stopped recording, doc: ' + doc.id);
+      var t = _textRecorded;
       _textRecorded = '';
-      return LangameResponse(LangameStatus.succeed);
+      return LangameResponse(LangameStatus.succeed, result: t);
     } catch (e, s) {
       cap.log('failed to stop recording');
       cap.recordError(e, s);
-      return LangameResponse(LangameStatus.failed);
+      return LangameResponse(LangameStatus.failed, result: '');
     }
   }
 
-  Future<LangameResponse<bool>> updateNote(String recordingId, String note) async {
+  Future<LangameResponse<bool>> updateNote(
+      String recordingId, String note) async {
     try {
-      await firebase.firestore!.collection('recordings').doc(recordingId).update({
+      await firebase.firestore!
+          .collection('recordings')
+          .doc(recordingId)
+          .update({
         'note': note,
       });
       cap.log('updated note to recording ' + recordingId);
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
       cap.log('failed to add note to recording');
+      cap.recordError(e, s);
+      return LangameResponse(LangameStatus.failed);
+    }
+  }
+
+  Future<LangameResponse<bool>> deleteRecording(String recordingId) async {
+    try {
+      await firebase.firestore!
+          .collection('recordings')
+          .doc(recordingId)
+          .delete();
+      cap.log('deleted recording ' + recordingId);
+      return LangameResponse(LangameStatus.succeed);
+    } catch (e, s) {
+      cap.log('failed to delete recording');
       cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed);
     }

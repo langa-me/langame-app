@@ -81,19 +81,21 @@ class LangameButton extends StatefulWidget {
   final bool disabled;
   final bool highlighted;
   final Size? fixedSize;
+  final int? disableForFewMs;
 
-  const LangameButton(this.icon,
-      {Key? key,
-      this.text,
-      this.onPressed,
-      this.layer = 0,
-      this.border,
-      this.padding,
-      this.disabled = false,
-      this.highlighted = false,
-      this.fixedSize,
-      })
-      : super(key: key);
+  const LangameButton(
+    this.icon, {
+    Key? key,
+    this.text,
+    this.onPressed,
+    this.layer = 0,
+    this.border,
+    this.padding,
+    this.disabled = false,
+    this.highlighted = false,
+    this.fixedSize,
+    this.disableForFewMs,
+  }) : super(key: key);
   @override
   State<StatefulWidget> createState() =>
       _LangameButtonState(disabled: this.disabled);
@@ -102,6 +104,7 @@ class LangameButton extends StatefulWidget {
 class _LangameButtonState extends State<LangameButton> {
   bool disabled = false;
   _LangameButtonState({this.disabled = false});
+
   @override
   Widget build(BuildContext context) {
     var bg = getBlackAndWhite(context, widget.layer, reverse: true);
@@ -117,7 +120,7 @@ class _LangameButtonState extends State<LangameButton> {
         primary: bg,
         // onSurface = disabled
         onSurface: getBlackAndWhite(context, widget.layer + 1, reverse: true),
-        elevation: 5,
+        elevation: 0,
         shadowColor: variantIsLightThenDark(context, reverse: true),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
@@ -125,18 +128,38 @@ class _LangameButtonState extends State<LangameButton> {
         side: widget.border != null && widget.border!
             ? BorderSide(width: 0.5, color: averageGrey())
             : null,
-        padding: widget.padding ?? widget.padding,
+        padding: widget.text == null
+            ? EdgeInsets.fromLTRB(10, 0, 0, 0)
+            : widget.padding,
       ),
-      onPressed: disabled ? null : widget.onPressed,
+      onPressed: () async {
+        if (disabled) return;
+        if (widget.onPressed != null) {
+          widget.onPressed!();
+          if (widget.disableForFewMs != null) {
+            setState(() {
+              disabled = true;
+            });
+            await Future.delayed(
+                Duration(milliseconds: widget.disableForFewMs!));
+            // Skip if widget is disposed
+            if (!mounted) return;
+            setState(() {
+              disabled = false;
+            });
+          }
+        }
+      },
       icon: Icon(widget.icon, color: fg),
       label: widget.text != null
-          ? Flexible(child: Text(
+          ? Flexible(
+              child: Text(
               widget.text!,
               textAlign: TextAlign.center,
               overflow: TextOverflow.fade,
               maxLines: 2,
               style: TextStyle(color: fg),
-          ))
+            ))
           : SizedBox.shrink(),
     );
   }

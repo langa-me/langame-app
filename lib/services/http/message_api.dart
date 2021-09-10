@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:langame/models/errors.dart';
 import 'package:langame/services/http/firebase.dart';
 
 /// Handle message listening, sending,

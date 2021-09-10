@@ -1,4 +1,3 @@
-import 'package:langame/models/errors.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/message_api.dart';
 

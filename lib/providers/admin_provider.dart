@@ -4,12 +4,9 @@ import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/helpers/constants.dart';
-import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 
 class AdminProvider extends ChangeNotifier {
