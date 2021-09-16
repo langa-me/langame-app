@@ -1515,6 +1515,8 @@ class UserPreference extends $pb.GeneratedMessage {
     ..pPS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'favoriteTopics')
     ..pPS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topicSearchHistory')
     ..pc<Error>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'errors', $pb.PbFieldType.PM, subBuilder: Error.create)
+    ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'speechToTextLocale')
+    ..aOB(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sawWhatsNew')
     ..hasRequiredFields = false
   ;
 
@@ -1529,6 +1531,8 @@ class UserPreference extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? favoriteTopics,
     $core.Iterable<$core.String>? topicSearchHistory,
     $core.Iterable<Error>? errors,
+    $core.String? speechToTextLocale,
+    $core.bool? sawWhatsNew,
   }) {
     final _result = create();
     if (userId != null) {
@@ -1557,6 +1561,12 @@ class UserPreference extends $pb.GeneratedMessage {
     }
     if (errors != null) {
       _result.errors.addAll(errors);
+    }
+    if (speechToTextLocale != null) {
+      _result.speechToTextLocale = speechToTextLocale;
+    }
+    if (sawWhatsNew != null) {
+      _result.sawWhatsNew = sawWhatsNew;
     }
     return _result;
   }
@@ -1637,6 +1647,24 @@ class UserPreference extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(10)
   $core.List<Error> get errors => $_getList(8);
+
+  @$pb.TagNumber(11)
+  $core.String get speechToTextLocale => $_getSZ(9);
+  @$pb.TagNumber(11)
+  set speechToTextLocale($core.String v) { $_setString(9, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasSpeechToTextLocale() => $_has(9);
+  @$pb.TagNumber(11)
+  void clearSpeechToTextLocale() => clearField(11);
+
+  @$pb.TagNumber(13)
+  $core.bool get sawWhatsNew => $_getBF(10);
+  @$pb.TagNumber(13)
+  set sawWhatsNew($core.bool v) { $_setBool(10, v); }
+  @$pb.TagNumber(13)
+  $core.bool hasSawWhatsNew() => $_has(10);
+  @$pb.TagNumber(13)
+  void clearSawWhatsNew() => clearField(13);
 }
 
 class Langame extends $pb.GeneratedMessage {

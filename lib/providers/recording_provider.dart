@@ -9,11 +9,13 @@ import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:speech_to_text/speech_to_text.dart';
 
 class RecordingProvider extends ChangeNotifier {
-  RecordingProvider(this.firebase, this.cap, this.ap, this.algolia) {
+  RecordingProvider(this.firebase, this.cap, this.ap, this.pp, this.algolia) {
     ap.userStream.listen((e) {
       if (e.type == UserChangeType.NewAuthentication) {
         firebase.firestore!
@@ -28,11 +30,15 @@ class RecordingProvider extends ChangeNotifier {
           // No clue why need 2 notifyListeners, but works
           notifyListeners();
           _recordings = e;
+          _recordingsSorted = e.docs.map((e) => e.data()).toList();
+          _recordingsSorted!.sort(
+              (a, b) => b.createdAt.seconds.compareTo(a.createdAt.seconds));
           notifyListeners();
         });
         cap.log('recording_provider: listening for snapshots');
       } else if (e.type == UserChangeType.Disconnection) {
         _recordings = null;
+        _recordingsSorted = null;
         notifyListeners();
       }
     });
@@ -40,44 +46,83 @@ class RecordingProvider extends ChangeNotifier {
   final FirebaseApi firebase;
   final CrashAnalyticsProvider cap;
   final AuthenticationProvider ap;
+  final PreferenceProvider pp;
   final Algolia? algolia;
   stt.SpeechToText _speech = stt.SpeechToText();
   String _textRecorded = '';
 
   QuerySnapshot<lg.Recording>? _recordings;
-
   QuerySnapshot<lg.Recording>? get recordings => _recordings;
+  List<lg.Recording>? _recordingsSorted;
+  List<lg.Recording>? get recordingsSorted => _recordingsSorted;
 
-  Future<LangameResponse<void>> start() async {
-    try {
-      _textRecorded = '';
-      bool available = await _speech.initialize(onStatus: (e) {
-        cap.log('stt status: ' + e,
+  List<LocaleName> _locales = [];
+  List<LocaleName> get locales => _locales;
+  String get selectedSpeechToTextLocaleId => pp.preference!.speechToTextLocale;
+  void set selectedSpeechToTextLocaleId(String id) {
+    pp.preference!.speechToTextLocale = id;
+    notifyListeners();
+  }
+
+  Future<bool> _init() => _speech.initialize(onStatus: (e) {
+        cap.log('recording_provider: stt status: ' + e,
             analyticsMessage: 'stt_status',
             analyticsParameters: {
               'status': e,
             });
       }, onError: (e) {
-        cap.log('stt error: ' + e.toString());
+        cap.log('recording_provider: stt error: ' + e.toString());
       });
+
+  Future<LangameResponse<void>> getLocales() async {
+    try {
+      cap.log('recording_provider: start getLocales');
+
+      bool available = await _init();
       if (available) {
-        _speech.listen(onResult: (e) {
-          if (e.finalResult) {
-            _textRecorded = e.recognizedWords;
-            print(e);
-          }
-        });
+        _locales = await _speech.locales();
+        notifyListeners();
+        return LangameResponse.succeed();
       } else {
         cap.log(
-          "The user has denied the use of speech recognition.",
+          "recording_provider: The user has denied the use of speech recognition.",
+          analyticsMessage: 'stt_permission_denied',
+        );
+        return LangameResponse.cancelled();
+      }
+    } catch (e, s) {
+      cap.log('recording_provider: failed to getLocales');
+      cap.recordError(e, s);
+      return LangameResponse.failed();
+    }
+  }
+
+  Future<LangameResponse<void>> start() async {
+    try {
+      _textRecorded = '';
+      bool available = await _init();
+      if (available) {
+        _speech.listen(
+            localeId: pp.preference!.hasSpeechToTextLocale()
+                ? pp.preference!.speechToTextLocale
+                : null,
+            onResult: (e) {
+              if (e.finalResult) {
+                _textRecorded = e.recognizedWords;
+                print(e);
+              }
+            });
+      } else {
+        cap.log(
+          "recording_provider: The user has denied the use of speech recognition.",
           analyticsMessage: 'stt_permission_denied',
         );
         return LangameResponse(LangameStatus.cancelled);
       }
-      cap.log('start recording');
+      cap.log('recording_provider: start recording');
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
-      cap.log('failed to start recording');
+      cap.log('recording_provider: failed to start recording');
       cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed);
     }

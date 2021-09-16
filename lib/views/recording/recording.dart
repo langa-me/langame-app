@@ -12,6 +12,7 @@ import 'package:langame/providers/recording_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
 // The above but as a list of string in Dart trying to make the user
 // think hard about the conversation he had at that time
@@ -77,6 +78,15 @@ class _State extends State<Recording> with AfterLayoutMixin<Recording> {
             color: isLightThenDark(context), //change your color here
           ),
           actions: [
+            IconButton(
+                icon: Icon(FontAwesomeIcons.shareAlt),
+                onPressed: () => Share.share(
+                    'Question: ${widget._recording.metadata["meme"]!}' +
+                        '\nAnswer: ${widget._recording.text}' +
+                        (widget._recording.hasNote()
+                            ? '\nNote: ${widget._recording.note}'
+                            : ''),
+                    subject: 'Langame memes')),
             IconButton(
                 icon: Icon(FontAwesomeIcons.trashAlt),
                 onPressed: () {

@@ -92,11 +92,23 @@ const String kFailedToUpdateProfile = 'failed_to_update_profile';
 
 /// Front-end level responses
 class LangameResponse<T> {
-  final LangameStatus status;
-  final T? result;
-  final Object? error;
+  late LangameStatus status;
+  late T? result;
+  Object? error;
 
   LangameResponse(this.status, {this.result, this.error});
+  LangameResponse.succeed({this.result}) {
+    status = LangameStatus.succeed;
+    error = null;
+  }
+  LangameResponse.failed({this.error}) {
+    result = null;
+    status = LangameStatus.failed;
+  }
+  LangameResponse.cancelled({this.error}) {
+    result = null;
+    status = LangameStatus.cancelled;
+  }
 }
 
 enum LangameStatus { cancelled, failed, succeed }

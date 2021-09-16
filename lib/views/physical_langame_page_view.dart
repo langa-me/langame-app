@@ -177,7 +177,7 @@ class _State extends State<PhysicalLangamePageView>
                                 icon: Icon(
                                   FontAwesomeIcons.arrowDown,
                                   color: getBlackAndWhite(context, 1),
-                                  size: AppSize.safeBlockHorizontal * 3,
+                                  size: AppSize.safeBlockVertical * 3,
                                 ),
                                 onChanged: (e) => setState(
                                     () => _languageSelected = e as String),

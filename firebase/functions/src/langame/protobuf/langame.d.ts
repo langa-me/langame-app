@@ -1797,6 +1797,12 @@ export namespace langame {
 
             /** UserPreference errors */
             errors?: (langame.protobuf.IError[]|null);
+
+            /** UserPreference speechToTextLocale */
+            speechToTextLocale?: (string|null);
+
+            /** UserPreference sawWhatsNew */
+            sawWhatsNew?: (boolean|null);
         }
 
         /** Represents a UserPreference. */
@@ -1834,6 +1840,12 @@ export namespace langame {
 
             /** UserPreference errors. */
             public errors: langame.protobuf.IError[];
+
+            /** UserPreference speechToTextLocale. */
+            public speechToTextLocale: string;
+
+            /** UserPreference sawWhatsNew. */
+            public sawWhatsNew: boolean;
 
             /**
              * Creates a new UserPreference instance using the specified properties.

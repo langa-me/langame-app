@@ -8,11 +8,14 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/hack.dart';
+import 'package:langame/views/integrations/readwise/readwise_settings.dart';
+import 'package:langame/views/language/language_settings.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
+import 'feature_preview/beta.dart';
 import 'login.dart';
 import 'profile_view.dart';
 
@@ -82,40 +85,35 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               }),
             ),
             Consumer<AuthenticationProvider>(
-                builder: (ctx, p, c) => p.user!.role == 'admin' ?
-                        ListTile(
-                            onTap: () {
-                              cp.push(HackView());
-                            },
-                            leading: Icon(FontAwesomeIcons.dharmachakra,
-                                color: isLightThenDark(context)),
-                            title: Text('Hack',
-                                style: Theme.of(context).textTheme.headline6),
-                          )
-                        : SizedBox.shrink()),
-            // ListTile(
-            //   onTap: () {
-            //     // Only safe in dev mode yet
-            //     if (kReleaseMode) {
-            //       cp.showSnackBar('Coming soon!');
-            //       cap.logNewFeatureClick('settings_subscription');
-            //       return;
-            //     }
-            //     cp.push(PaymentView());
-            //   },
-            //   leading: Icon(Icons.subscriptions_rounded,
-            //       color: isLightThenDark(context)),
-            //   title: Text('Subscription',
-            //       style: Theme.of(context).textTheme.headline6),
-            // ),
+                builder: (ctx, p, c) => p.user!.role == 'admin'
+                    ? ListTile(
+                        onTap: () {
+                          cp.push(HackView());
+                        },
+                        leading: Icon(FontAwesomeIcons.dharmachakra,
+                            color: isLightThenDark(context)),
+                        title: Text('Hack',
+                            style: Theme.of(context).textTheme.headline6),
+                      )
+                    : SizedBox.shrink()),
+
             ListTile(
               onTap: () {
                 cp.push(ProfileView());
               },
-              leading: Icon(Icons.account_circle_outlined,
-                  color: isLightThenDark(context)),
+              leading: Icon(FontAwesomeIcons.userCircle,
+                  color: getBlackAndWhite(context, 0)),
               title:
                   Text('Profile', style: Theme.of(context).textTheme.headline6),
+            ),
+            ListTile(
+              onTap: () {
+                cp.push(LanguageSettingsView());
+              },
+              leading: Icon(FontAwesomeIcons.language,
+                  color: isLightThenDark(context)),
+              title: Text('Language',
+                  style: Theme.of(context).textTheme.headline6),
             ),
             ListTile(
               onTap: () {
@@ -124,7 +122,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               },
               leading: Icon(Icons.notifications_outlined,
                   color: isLightThenDark(context)),
-              title: Text('Notifications',
+              title: Text('Notification',
                   style: Theme.of(context).textTheme.headline6),
             ),
             Consumer<PreferenceProvider>(
@@ -136,8 +134,9 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   }
                   p.setRecommendations(!p.preference!.userRecommendations);
                 },
-                leading: Icon(Icons.recommend, color: isLightThenDark(context)),
-                title: Text('User recommendations',
+                leading: Beta(
+                    Icon(Icons.recommend, color: isLightThenDark(context))),
+                title: Text('User Recommendation',
                     style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
                     value: p.preference!.userRecommendations,
@@ -150,39 +149,68 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                     }),
               ),
             ),
-            Divider(),
-            ListTile(
-              onTap: () {
-                cp.showCustomDialog(stateless: [
-                  Center(
-                    child: Column(children: [
-                      Lottie.asset(
-                        'animations/sad2.json',
-                        width: AppSize.safeBlockHorizontal * 20,
-                        repeat: false,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'Are you sure to leave us?',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                      LangameButton(Icons.delete_forever_outlined,
-                          onPressed: () {
-                        cp.dialogComplete();
-                        _delete();
-                      }, text: 'Delete my account', layer: 2)
-                    ]),
+            ExpansionTile(
+                leading: Beta(
+                    Icon(FontAwesomeIcons.brain,
+                        color: isLightThenDark(context)),
+                    type: BetaType.SOON),
+                title: Text('Integration',
+                    style: Theme.of(context).textTheme.headline6),
+                children: !AppConst.isDev ? [] : [
+                  ListTile(
+                    onTap: () {
+                      if (!AppConst.isDev) return;
+                      cp.push(ReadwiseView());
+                    },
+                    leading: Icon(FontAwesomeIcons.bookOpen,
+                        color: isLightThenDark(context)),
+                    title: Text('Readwise',
+                        style: Theme.of(context).textTheme.headline6),
                   )
-                ], canBack: true);
-              },
-              leading: Icon(Icons.whatshot_outlined,
-                  color: isLightThenDark(context)),
-              title: Text('Delete my account and all my data',
-                  style: Theme.of(context).textTheme.headline6),
-            ),
+                ]),
+            Divider(),
+            ExpansionTile(
+                leading:
+                    Icon(FontAwesomeIcons.skullCrossbones, color: Colors.red),
+                title: Text('Danger Zone',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline6!
+                        .merge(TextStyle(color: Colors.red))),
+                children: [
+                  ListTile(
+                    onTap: () {
+                      cp.showCustomDialog(stateless: [
+                        Center(
+                          child: Column(children: [
+                            Lottie.asset(
+                              'animations/sad2.json',
+                              width: AppSize.safeBlockHorizontal * 20,
+                              repeat: false,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              'Are you sure to leave us?',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                            LangameButton(Icons.delete_forever_outlined,
+                                onPressed: () {
+                              cp.dialogComplete();
+                              _delete();
+                            }, text: 'Delete my account', layer: 2)
+                          ]),
+                        )
+                      ], canBack: true);
+                    },
+                    leading: Icon(Icons.whatshot_outlined,
+                        color: isLightThenDark(context)),
+                    title: Text('Delete my account and all my data',
+                        style: Theme.of(context).textTheme.headline6),
+                  ),
+                ]),
             // ListTile(
             //   onTap: () async {
             //     final ap =

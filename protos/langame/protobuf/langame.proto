@@ -2,7 +2,6 @@ syntax = "proto3";
 package langame.protobuf;
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/any.proto";
 
 // Note: models ids are usually not stored in Firestore since it already use id to index them
 // it is mostly used within the logic of the front-end / services
@@ -164,6 +163,8 @@ message UserPreference {
   repeated string favorite_topics = 8;
   repeated string topic_search_history = 9;
   repeated Error errors = 10;
+  string speech_to_text_locale = 11;
+  bool saw_whats_new = 13;
   message Notification {
     bool email = 1;
     bool push = 2;

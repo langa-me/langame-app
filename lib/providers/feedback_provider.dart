@@ -89,8 +89,8 @@ class FeedbackProvider extends ChangeNotifier {
 
   Null show({bool fromShaking = true}) {
     // TODO: isn't this hack dangerous?
-    BetterFeedback.of(_contextProvider.navigationKey.currentContext!)!
-        .show((feedback, feedbackScreenshot) async {
+    BetterFeedback.of(_contextProvider.navigationKey.currentContext!)
+        .show((feedback) async {
       final String uid = Uuid().v4();
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -111,11 +111,11 @@ class FeedbackProvider extends ChangeNotifier {
             firebase.storage!.ref('/feedbacks').child('$uid.png');
 
         final UploadTask uploadTask = storageReference.putData(
-          feedbackScreenshot!,
+          feedback.screenshot,
           SettableMetadata(
             contentType: 'image/png',
             customMetadata: {
-              'feedback': feedback,
+              'feedback': feedback.text,
               'uid': uid,
               'user': firebase.auth!.currentUser!.displayName!,
               'deviceInfo': deviceInfo,

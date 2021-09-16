@@ -22,7 +22,6 @@ List<Widget Function(Color)> _loaders = [
   (Color c) => SpinKitChasingDots(color: c),
   (Color c) => SpinKitDualRing(color: c),
   (Color c) => SpinKitWanderingCubes(color: c),
-  (Color c) => SpinKitPouringHourglass(color: c),
   (Color c) => SpinKitFoldingCube(color: c),
   (Color c) => SpinKitDoubleBounce(color: c),
   (Color c) => SpinKitCubeGrid(color: c),

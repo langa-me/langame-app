@@ -28,7 +28,7 @@ import {onWriteTopic} from "./memes/onWriteTopic";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
-  maxInstances: 10, // TODO: remoteconfig
+  maxInstances: 40, // TODO: remoteconfig
 };
 // TODO: somehow doesn't work then on client
 const region = "us-central1";

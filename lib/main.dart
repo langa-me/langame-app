@@ -36,6 +36,7 @@ import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/payment_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/providers/readwise_provider.dart';
 import 'package:langame/providers/recording_provider.dart';
 import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
@@ -155,8 +156,10 @@ void main() async {
   );
   var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
       authenticationProvider, ImplLangameApi(firebase));
-  final recordingProvider = RecordingProvider(
-      firebase, crashAnalyticsProvider, authenticationProvider, algolia);
+  final recordingProvider = RecordingProvider(firebase, crashAnalyticsProvider,
+      authenticationProvider, preferenceProvider, algolia);
+  final readwiseProvider = ReadwiseProvider(
+      firebase, crashAnalyticsProvider, authenticationProvider);
   var newLangameProvider = NewLangameProvider(
       crashAnalyticsProvider, authenticationProvider, firebase);
   // SystemChrome.setEnabledSystemUIOverlays([]);
@@ -257,10 +260,15 @@ void main() async {
               create: (_) =>
                   AdminProvider(firebase, crashAnalyticsProvider, algolia),
             ),
-            ChangeNotifierProxyProvider<CrashAnalyticsProvider,
-                RecordingProvider>(
-              update: (_, cap, p) => p!,
+            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
+                AuthenticationProvider, PreferenceProvider, RecordingProvider>(
+              update: (_, cap, ap, pp, p) => p!,
               create: (_) => recordingProvider,
+            ),
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider, AuthenticationProvider,
+                ReadwiseProvider>(
+              update: (_, cap, ap, p) => p!,
+              create: (_) => readwiseProvider,
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),

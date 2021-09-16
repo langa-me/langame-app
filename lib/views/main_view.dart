@@ -7,10 +7,11 @@ import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
+import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/new_langame_page_view.dart';
 import 'package:langame/views/physical_langame_page_view.dart';
 import 'package:langame/views/recording_page_view.dart';
-import 'package:langame/views/settings.dart';
+import 'package:langame/views/settings_view.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
@@ -18,6 +19,7 @@ import 'colors/colors.dart';
 import 'feature_preview/beta.dart';
 import 'running_langames_view.dart';
 import 'search_page_view.dart';
+import 'whats_new/whats_new.dart';
 
 class MainView extends StatefulWidget {
   @override
@@ -35,7 +37,22 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .setCurrentScreen('main_view');
+    // TODO: ????
     Provider.of<AudioProvider>(context, listen: false).leaveChannel();
+    var pp = Provider.of<PreferenceProvider>(context, listen: false);
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    if (!pp.preference!.sawWhatsNew) {
+      pp.preference!.sawWhatsNew = true;
+      pp.save();
+      cp.showCustomDialog(
+          stateless: [whatsNew(context)],
+          canBack: true,
+          title: Text(
+            'Latest Updates to Langame 😛',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headline4,
+          ));
+    }
   }
 
   @override
@@ -104,25 +121,26 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   Widget _buildBottomNavigationBar() {
     final theme = Theme.of(context);
     var navBarItems = <BottomNavigationBarItem>[
+      BottomNavigationBarItem(
+        backgroundColor: Colors.transparent,
+        icon: Icon(FontAwesomeIcons.peopleArrows,
+            color: getBlackAndWhite(context, 0)),
+        activeIcon: Icon(FontAwesomeIcons.peopleArrows,
+            color: Theme.of(context).colorScheme.secondary),
+        label: 'Face-to-face',
+      ),
+      BottomNavigationBarItem(
+        backgroundColor: Colors.transparent,
+        icon: Beta(Icon(FontAwesomeIcons.brain,
+            color: Theme.of(context).iconTheme.color)),
+        activeIcon: Beta(Icon(FontAwesomeIcons.brain,
+            color: Theme.of(context).colorScheme.secondary)),
+        label: 'Meme',
+      ),
+    ];
+    if (!kIsWeb) {
+      navBarItems.insertAll(0, [
         BottomNavigationBarItem(
-          backgroundColor: Colors.transparent,
-          icon: Icon(FontAwesomeIcons.peopleArrows,
-              color: getBlackAndWhite(context, 0)),
-          activeIcon: Icon(FontAwesomeIcons.peopleArrows,
-              color: Theme.of(context).colorScheme.secondary),
-          label: 'Face-to-face',
-        ),
-        BottomNavigationBarItem(
-          backgroundColor: Colors.transparent,
-          icon: Beta(Icon(FontAwesomeIcons.brain,
-              color: Theme.of(context).iconTheme.color)),
-          activeIcon: Beta(Icon(FontAwesomeIcons.brain,
-              color: Theme.of(context).colorScheme.secondary)),
-          label: 'Meme',
-        ),
-      ];
-      if (!kIsWeb) {
-        navBarItems.insertAll(0, [BottomNavigationBarItem(
           backgroundColor: Colors.transparent,
           icon: Beta(Icon(FontAwesomeIcons.phoneAlt,
               color: Theme.of(context).iconTheme.color)),
@@ -138,8 +156,8 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
               color: Theme.of(context).colorScheme.secondary),
           label: 'Search',
         )
-        ]);
-      }
+      ]);
+    }
     return BottomNavigationBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
@@ -159,7 +177,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       controller: _pageController,
       children: [
         !kIsWeb ? NewLangamePageView(goToPage) : SizedBox.shrink(),
-        !kIsWeb ?  SearchPageView(goToPage) : SizedBox.shrink(),
+        !kIsWeb ? SearchPageView(goToPage) : SizedBox.shrink(),
         PhysicalLangamePageView(goToPage),
         RecordingPageView(goToPage),
       ],

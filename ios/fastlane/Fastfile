@@ -69,13 +69,12 @@ platform :ios do
       notify_external_testers: true,
       ipa: "./Runner.ipa",
       changelog: "New:
-      - Preview: record yourself directly to text while in face-to-face, you can export you thoughts anywhere then
+      - Language for speech to text is now available in settings
+      - Preview: Record yourself in conversation, you can then export you thoughts anywhere
       - Preview: user recommendation feature!
-      - Translations added to Langame audio
-      - You can now like or dislike a conversation starter, the AI will learn accordingly to adapt and improve its performance, please vote!
       
-      Known issues:
-      - Launching URL does not work on some Android phones
+      Fixed:
+      - Memes would not list by time of creation
       
       Vote, vote, vote https://productific.com/@Langame :)",
       distribute_external: true,

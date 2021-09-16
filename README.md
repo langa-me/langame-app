@@ -53,7 +53,7 @@ stripe prices create \
 -d "recurring[interval]"=month
 ```
 
-#### Proto gen
+### Proto gen
 
 ```bash
 npm install protobufjs -g
@@ -70,6 +70,13 @@ openapi2proto -spec ../openapi/openapi/spec3.json -out protos/stripe.proto
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto -P protos/google/protobuf
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/timestamp.proto -P protos/google/protobuf
 make proto
+```
+
+### Upgrades
+
+```bash
+flutter upgrade
+flutter pub global activate protoc_plugin
 ```
 
 ### How to release

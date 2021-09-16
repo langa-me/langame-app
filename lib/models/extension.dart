@@ -109,6 +109,8 @@ class UserPreferenceExt {
       shakeToFeedback: m['shakeToFeedback'],
       favoriteTopics:
           (m['favoriteTopics'] as List<dynamic>?)?.map((e) => e as String),
+      speechToTextLocale: m['speechToTextLocale'],
+      sawWhatsNew: m['sawWhatsNew'],
     );
   }
 }

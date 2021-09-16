@@ -4,9 +4,24 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/views/colors/colors.dart';
 
+enum BetaType {
+  BETA,
+  PREVIEW,
+  SOON,
+  NEW,
+}
+
+final _betaTypeToString = {
+  BetaType.BETA: 'Beta',
+  BetaType.PREVIEW: 'Preview',
+  BetaType.SOON: 'Soon',
+  BetaType.NEW: 'New',
+};
+
 class Beta extends StatefulWidget {
-  final Widget child;
-  Beta(this.child);
+  final Widget? child;
+  final BetaType? type;
+  Beta(this.child, {this.type = BetaType.PREVIEW});
   @override
   _State createState() => _State();
 }
@@ -19,7 +34,7 @@ class _State extends State<Beta> {
       child: widget.child,
       position: BadgePosition.topEnd(top: -20, end: -30),
       badgeContent: Text(
-        'Preview',
+        _betaTypeToString[widget.type]!,
         style: Theme.of(context)
             .textTheme
             .caption!

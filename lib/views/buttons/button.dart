@@ -152,14 +152,13 @@ class _LangameButtonState extends State<LangameButton> {
       },
       icon: Icon(widget.icon, color: fg),
       label: widget.text != null
-          ? Flexible(
-              child: Text(
+          ? Text(
               widget.text!,
               textAlign: TextAlign.center,
               overflow: TextOverflow.fade,
               maxLines: 2,
               style: TextStyle(color: fg),
-            ))
+            )
           : SizedBox.shrink(),
     );
   }

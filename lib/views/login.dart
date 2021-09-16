@@ -140,7 +140,7 @@ class _LoginViewState extends State<LoginView> {
                               ? AppConst.testFlightUrl
                               : null;
                       if (await canLaunch(url!)) {
-                        await launch(url);
+                        await launch(url,);
                       }
                     },
                     highlighted: true,

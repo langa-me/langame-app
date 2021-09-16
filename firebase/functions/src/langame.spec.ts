@@ -21,6 +21,7 @@ it("meme to algolia", async () => {
       _tags: e.data()!.topics,
       content: e.data()!.content,
       createdAt: e.data()!.createdAt,
+      disabled: e.data()!.disabled,
     };
   }));
 });

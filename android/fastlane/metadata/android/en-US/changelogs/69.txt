@@ -1,0 +1,10 @@
+New:
+- Language for speech to text is now available in settings
+- Preview: Record yourself in conversation, you can then export you thoughts anywhere
+- Preview: user recommendation feature!
+
+Fixed:
+- Memes would not list by time of creation
+- Launching URL on some Androids
+
+Vote, vote, vote https://productific.com/@Langame :)

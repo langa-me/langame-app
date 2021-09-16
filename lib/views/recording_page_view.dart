@@ -2,12 +2,9 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/recording_provider.dart';
-import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:langame/views/recording/recording.dart';
 import 'package:provider/provider.dart';
@@ -31,13 +28,10 @@ class _State extends State<RecordingPageView>
 
   @override
   Widget build(BuildContext context) {
-    final plp = Provider.of<PhysicalLangameProvider>(context);
-    final ap = Provider.of<AuthenticationProvider>(context);
-    final tp = Provider.of<TagProvider>(context);
     final rp = Provider.of<RecordingProvider>(context);
     final cp = Provider.of<ContextProvider>(context);
 
-    return rp.recordings == null || rp.recordings!.size == 0
+    return rp.recordingsSorted == null || rp.recordingsSorted!.length == 0
         ? Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -64,10 +58,10 @@ class _State extends State<RecordingPageView>
                   icon: Icon(FontAwesomeIcons.shareAlt,
                       color: isLightThenDark(context, reverse: false)),
                   onPressed: () => Share.share(
-                      'Question: ${rp.recordings!.docs[i].data().metadata["meme"]!}' +
-                          '\nAnswer: ${rp.recordings!.docs[i].data().text}' +
-                          (rp.recordings!.docs[i].data().hasNote()
-                              ? '\nNote: ${rp.recordings!.docs[i].data().note}'
+                      'Question: ${rp.recordingsSorted![i].metadata["meme"]!}' +
+                          '\nAnswer: ${rp.recordingsSorted![i].text}' +
+                          (rp.recordingsSorted![i].hasNote()
+                              ? '\nNote: ${rp.recordingsSorted![i].note}'
                               : ''),
                       subject: 'Langame memes'),
                 ),
@@ -75,10 +69,13 @@ class _State extends State<RecordingPageView>
                   borderRadius: BorderRadius.circular(12), // <-- Radius
                 ),
                 tileColor: getBlackAndWhite(context, 1, reverse: true),
-                onTap: () => cp.push(Recording(
-                    rp.recordings!.docs[i].id, rp.recordings!.docs[i].data())),
+                onTap: () {
+                  var doc = rp.recordings!.docs.firstWhere((e) =>
+                      e.data().createdAt == rp.recordingsSorted![i].createdAt);
+                  cp.push(Recording(doc.id, rp.recordingsSorted![i]));
+                },
                 subtitle: Text(
-                  rp.recordings!.docs[i].data().text,
+                  rp.recordingsSorted![i].text,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context)
@@ -87,7 +84,7 @@ class _State extends State<RecordingPageView>
                       .merge(TextStyle(color: getBlackAndWhite(context, 0))),
                 ),
                 title: Text(
-                  rp.recordings!.docs[i].data().metadata['meme']!,
+                  rp.recordingsSorted![i].metadata['meme']!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context)
@@ -95,7 +92,8 @@ class _State extends State<RecordingPageView>
                       .headline6!
                       .merge(TextStyle(color: getBlackAndWhite(context, 0))),
                 )),
-            itemCount: rp.recordings != null ? rp.recordings!.size : 0,
+            itemCount:
+                rp.recordingsSorted != null ? rp.recordingsSorted!.length : 0,
             separatorBuilder: (_, int i) => Divider(),
           );
   }

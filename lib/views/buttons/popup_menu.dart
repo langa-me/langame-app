@@ -18,14 +18,16 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
             dense: true,
             minVerticalPadding: 2,
             onTap: () async {
-              // if (await canLaunch(AppConst.helpUrl)) {
-              await launch(AppConst.helpUrl);
-              // } else {
-              //   Provider.of<ContextProvider>(context, listen: false)
-              //       .showSnackBar(
-              //           Provider.of<FunnyProvider>(context, listen: false)
-              //               .getFailingRandom());
-              // }
+              if (await canLaunch(AppConst.helpUrl)) {
+              await launch(
+                AppConst.helpUrl,
+              );
+              } else {
+                Provider.of<ContextProvider>(context, listen: false)
+                    .showSnackBar(
+                        Provider.of<FunnyProvider>(context, listen: false)
+                            .getFailingRandom());
+              }
             },
             leading: Icon(Icons.help_center_outlined,
                 color: isLightThenDark(context)),
@@ -50,7 +52,9 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
             minVerticalPadding: 2,
             onTap: () async {
               if (await canLaunch(AppConst.productificUrl)) {
-                await launch(AppConst.productificUrl);
+                await launch(
+                  AppConst.productificUrl,
+                );
               } else {
                 Provider.of<ContextProvider>(context, listen: false)
                     .showSnackBar(

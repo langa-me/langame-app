@@ -5,6 +5,7 @@ import * as admin from "firebase-admin";
 import {reportError} from "../errors";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import * as functions from "firebase-functions";
+import {isDev} from "../helpers";
 
 /**
  *
@@ -16,6 +17,7 @@ export const onCreateMeme = async (
     _: EventContext
 ) => {
   try {
+    if (isDev) return;
     if (!snap.data()) return;
     const api = new ImplAiApi();
     let topics = snap.data().topics;
@@ -36,7 +38,7 @@ export const onCreateMeme = async (
       admin.firestore().collection("topics").doc(t).set({})));
 
     // TODO: sentence similarity -> delete
-  } catch (e) {
+  } catch (e: any) {
     await reportError(e, {});
   }
 };

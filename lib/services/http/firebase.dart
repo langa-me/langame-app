@@ -44,8 +44,8 @@ class FirebaseApi {
     /// Warning: change local IP accordingly i.e. `ip a`
     /// then from mobile `telnet IP PORT`
     const myIp = 'http://192.168.43.41';
-    auth?.useEmulator('$myIp:9099');
-    functions?.useFunctionsEmulator(origin: '$myIp:5001');
+    auth?.useAuthEmulator(myIp, 9099);
+    functions?.useFunctionsEmulator(myIp, 5001);
     firestore?.settings = Settings(
       host: '$myIp:8080',
       sslEnabled: false,

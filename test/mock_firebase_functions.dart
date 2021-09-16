@@ -27,12 +27,7 @@ class MockFirebaseFunctions extends Mock implements FirebaseFunctions {
   final Map<String, dynamic> _expectedResponses;
 
   @override
-  // TODO: implement app
   FirebaseApp get app => throw UnimplementedError();
-
-  // @override
-  // // TODO: implement delegate
-  // FirebaseFunctionsPlatform get delegate => throw UnimplementedError();
 
   @override
   HttpsCallable httpsCallable(String name, {HttpsCallableOptions? options}) {
@@ -40,11 +35,6 @@ class MockFirebaseFunctions extends Mock implements FirebaseFunctions {
   }
 
   @override
-  // TODO: implement pluginConstants
   Map get pluginConstants => throw UnimplementedError();
 
-  @override
-  void useFunctionsEmulator({required String origin}) {
-    // TODO: implement useFunctionsEmulator
-  }
 }

@@ -6,6 +6,7 @@ import {ImplAiApi} from "../aiApi/implAiApi";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import TwitterApi from "twitter-api-v2";
+import {isDev} from "../helpers";
 
 /**
  *
@@ -18,6 +19,7 @@ export const onUpdateMeme = async (
 ) => {
   // TODO: should translate etc only when meme is enabled
   try {
+    if (isDev) return;
     if (!change.after.data() ||
       e.eventType === "google.firestore.document.delete") return;
 
@@ -53,7 +55,7 @@ export const onUpdateMeme = async (
     }
 
     // TODO: sentence similarity -> delete
-  } catch (e) {
+  } catch (e: any) {
     await reportError(e, {});
   }
 };
