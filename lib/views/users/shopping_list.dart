@@ -9,7 +9,7 @@ void Function() onAddToShoppingList(
     var msg = 'The Langame is full!';
     if (lp.shoppingList.length < 4) {
       lp.addPlayer(u);
-      msg = '${u.displayName} has been added to current Langame';
+      msg = '${u.tag} has been added to current Langame 😛';
     }
     cp.showSnackBar(msg);
   };
@@ -19,6 +19,6 @@ void Function() onRemoveFromShoppingList(
     User u, NewLangameProvider lp, ContextProvider cp, void Function(int, {Curve? curve}) goToPage) {
   return () {
     lp.removePlayer(u);
-    cp.showSnackBar('${u.displayName} has been removed from current Langame');
+    cp.showSnackBar('${u.tag} has been removed from current Langame 😛');
   };
 }

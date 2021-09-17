@@ -4,6 +4,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/readwise_provider.dart';
+import 'package:langame/views/app_bars/app_bars.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/colors/colors.dart';
@@ -35,16 +36,7 @@ class _State extends State<ReadwiseView> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text('Readwise Settings'),
-        iconTheme: IconThemeData(
-          color: isLightThenDark(context), //change your color here
-        ),
-        backgroundColor: Colors.transparent,
-        actions: [
-          buildPopupMenuWithHelpAndFeedback(context),
-        ],
-      ),
+      appBar: buildAppBar(context, 'Readwise Settings'),
       body: Container(
           child: ListView(children: <Widget>[
         SizedBox(height: AppSize.safeBlockVertical * 5),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:langame/providers/recording_provider.dart';
+import 'package:langame/views/app_bars/app_bars.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:provider/provider.dart';
@@ -16,16 +17,7 @@ class _State extends State<LanguageSettingsView> {
     var rp = Provider.of<RecordingProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text('Language Settings'),
-        iconTheme: IconThemeData(
-          color: getBlackAndWhite(context, 0), //change your color here
-        ),
-        backgroundColor: Colors.transparent,
-        actions: [
-          buildPopupMenuWithHelpAndFeedback(context),
-        ],
-      ),
+      appBar: buildAppBar(context, 'Language Settings'),
       body: Container(
           child: ListView(children: <Widget>[
         ExpansionTile(

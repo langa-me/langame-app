@@ -11,6 +11,7 @@ import 'package:langame/views/users/user_tile.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
+import 'app_bars/app_bars.dart';
 import 'colors/colors.dart';
 import 'users/profile.dart';
 import 'users/shopping_list.dart';
@@ -50,7 +51,9 @@ class _State extends State<SearchPageView>
   }
 
   Widget _buildSearchPageView() =>
-      Consumer2<PreferenceProvider, AuthenticationProvider>(
+      Scaffold(
+        appBar: buildAppBar(context, 'Search people'),
+        body: Consumer2<PreferenceProvider, AuthenticationProvider>(
         builder: (context, lsp, ap, _) => FloatingSearchBar(
           queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
               decorationColor: getBlackAndWhite(context, 1, reverse: true),
@@ -108,7 +111,7 @@ class _State extends State<SearchPageView>
           },
           builder: (context, transition) => _buildExpandableBody(lsp, ap),
         ),
-      );
+      ));
 
   Widget _buildExpandableBody(
       PreferenceProvider lsp, AuthenticationProvider ap) {

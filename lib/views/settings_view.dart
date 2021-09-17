@@ -117,11 +117,12 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             ),
             ListTile(
               onTap: () {
-                cp.showSnackBar('Coming soon!');
                 cap.logNewFeatureClick('settings_notifications');
               },
-              leading: Icon(Icons.notifications_outlined,
-                  color: isLightThenDark(context)),
+              leading: Beta(
+                  Icon(Icons.notifications_outlined,
+                      color: isLightThenDark(context)),
+                  type: BetaType.SOON),
               title: Text('Notification',
                   style: Theme.of(context).textTheme.headline6),
             ),
@@ -150,24 +151,29 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               ),
             ),
             ExpansionTile(
+                onExpansionChanged: (_) {
+                  cap.logNewFeatureClick('settings_integration');
+                },
                 leading: Beta(
                     Icon(FontAwesomeIcons.brain,
                         color: isLightThenDark(context)),
                     type: BetaType.SOON),
                 title: Text('Integration',
                     style: Theme.of(context).textTheme.headline6),
-                children: !AppConst.isDev ? [] : [
-                  ListTile(
-                    onTap: () {
-                      if (!AppConst.isDev) return;
-                      cp.push(ReadwiseView());
-                    },
-                    leading: Icon(FontAwesomeIcons.bookOpen,
-                        color: isLightThenDark(context)),
-                    title: Text('Readwise',
-                        style: Theme.of(context).textTheme.headline6),
-                  )
-                ]),
+                children: !AppConst.isDev
+                    ? []
+                    : [
+                        ListTile(
+                          onTap: () {
+                            if (!AppConst.isDev) return;
+                            cp.push(ReadwiseView());
+                          },
+                          leading: Icon(FontAwesomeIcons.bookOpen,
+                              color: isLightThenDark(context)),
+                          title: Text('Readwise',
+                              style: Theme.of(context).textTheme.headline6),
+                        )
+                      ]),
             Divider(),
             ExpansionTile(
                 leading:

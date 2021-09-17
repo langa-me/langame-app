@@ -18,7 +18,6 @@ import 'buttons/button.dart';
 import 'colors/colors.dart';
 import 'feature_preview/beta.dart';
 import 'running_langames_view.dart';
-import 'search_page_view.dart';
 import 'whats_new/whats_new.dart';
 
 class MainView extends StatefulWidget {
@@ -28,9 +27,9 @@ class MainView extends StatefulWidget {
 
 /// Main page of Langame (temporary name...)
 class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   PageController _pageController = PageController(
-    initialPage: 0,
+    initialPage: 1,
   );
 
   @override
@@ -148,14 +147,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
               color: Theme.of(context).colorScheme.secondary)),
           label: 'Audio',
         ),
-        BottomNavigationBarItem(
-          backgroundColor: Colors.transparent,
-          icon:
-              Icon(Icons.search_outlined, color: getBlackAndWhite(context, 0)),
-          activeIcon: Icon(Icons.search_outlined,
-              color: Theme.of(context).colorScheme.secondary),
-          label: 'Search',
-        )
       ]);
     }
     return BottomNavigationBar(
@@ -177,7 +168,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       controller: _pageController,
       children: [
         !kIsWeb ? NewLangamePageView(goToPage) : SizedBox.shrink(),
-        !kIsWeb ? SearchPageView(goToPage) : SizedBox.shrink(),
         PhysicalLangamePageView(goToPage),
         RecordingPageView(goToPage),
       ],

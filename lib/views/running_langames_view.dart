@@ -9,6 +9,7 @@ import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
+import 'package:langame/views/app_bars/app_bars.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:provider/provider.dart';
@@ -33,16 +34,7 @@ class _RunningLangamesViewState extends State<RunningLangamesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: isLightThenDark(context), //change your color here
-        ),
-        title: Text('Live Langames'),
-        backgroundColor: Colors.transparent,
-        actions: [
-          buildPopupMenuWithHelpAndFeedback(context),
-        ],
-      ),
+      appBar: buildAppBar(context, 'Langames'),
       body: Consumer<LangameProvider>(
         builder: (BuildContext context, p, c) {
           if (p.runningLangames.length == 0) {

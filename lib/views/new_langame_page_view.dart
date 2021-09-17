@@ -19,6 +19,7 @@ import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/langame.dart';
 import 'package:langame/views/memes/topic_search_bar.dart';
 import 'package:langame/views/running_langames_view.dart';
+import 'package:langame/views/search_page_view.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
@@ -87,7 +88,7 @@ class _SendLangameState extends State<NewLangamePageView>
                     ? [
                         LangameButton(
                           FontAwesomeIcons.userPlus,
-                          onPressed: () => widget._goToPage(1),
+                          onPressed: () => cp.push(SearchPageView(widget._goToPage)),
                           text: '',
                           layer: 1,
                           border: true,
