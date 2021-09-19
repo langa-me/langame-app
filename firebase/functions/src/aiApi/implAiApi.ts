@@ -4,6 +4,7 @@ import {
 } from "./aiApi";
 import algoliasearch, {SearchClient, SearchIndex} from "algoliasearch";
 import {sleep} from "../utils/time";
+import {Translate} from "@google-cloud/translate/build/src/v2";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require("node-fetch");
@@ -37,11 +38,15 @@ const isFineTunedModel =
 export class ImplAiApi implements Api {
     private algolia: SearchClient;
     private indexes: Map<string, SearchIndex> = new Map();
+    private readonly keyFileName?: string;
+    private translateClient: Translate;
 
     /**
      * Initialize the AI API
+     * @param{string | undefined} keyFileName set a keyFileName,
+     * necessary if using authenticated calls such as detectLanguage
      */
-    constructor() {
+    constructor(keyFileName?: string) {
       this.algolia = algoliasearch(algoliaId(), algoliaKey());
       this.indexes.set("dev_users", this.algolia.initIndex("dev_users"));
       this.indexes.set("prod_users", this.algolia.initIndex("prod_users"));
@@ -49,6 +54,9 @@ export class ImplAiApi implements Api {
       this.indexes.set("prod_memes", this.algolia.initIndex("prod_memes"));
       this.indexes.set("dev_topics", this.algolia.initIndex("dev_topics"));
       this.indexes.set("prod_topics", this.algolia.initIndex("prod_topics"));
+      this.translateClient = this.keyFileName ?
+        new Translate({keyFilename: this.keyFileName}) :
+        new Translate();
     }
 
 
@@ -267,5 +275,22 @@ export class ImplAiApi implements Api {
       } catch (e) {
         return undefined;
       }
+    }
+
+    /**
+   * TODO
+   * @param{string} content
+   * @param{string} targetLanguageCode
+   * @return{Promise<string | undefined>}
+   */
+    async translate(
+        content: string,
+        targetLanguageCode: string
+    ): Promise<string | undefined> {
+      const [translation] = await this.translateClient.translate(
+          content,
+          targetLanguageCode,
+      );
+      return translation;
     }
 }

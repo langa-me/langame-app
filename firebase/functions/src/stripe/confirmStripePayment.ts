@@ -68,7 +68,7 @@ export const confirmStripePayment =
           .set(
               Object.fromEntries(Object.entries(sub))
           );
-    } catch (e) {
+    } catch (e: any) {
       await reportError(e, {user: context.params.userId});
       return stripe.refunds!.create({
         payment_intent: change.after.id,

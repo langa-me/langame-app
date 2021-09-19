@@ -65,7 +65,7 @@ it.skip("search algolia low level", async () => {
   console.log(r);
 });
 
-it("completion", async () => {
+it.skip("completion", async () => {
   const api = new ImplAiApi();
   const completion =
       await api.completion("",
@@ -80,4 +80,15 @@ it("completion", async () => {
           });
   console.log(completion);
   expect(completion).to.not.be.undefined;
+});
+
+describe("translation", async () => {
+  it("translation", async () => {
+    const api = new ImplAiApi();
+    const t = await api.translate("Ceci est un chat",
+        "en",
+    );
+    console.log(t);
+    expect(t).to.contain("cat");
+  });
 });

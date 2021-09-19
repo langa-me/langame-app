@@ -21,7 +21,7 @@ export const onDeleteMeme = async (s: admin.firestore.QueryDocumentSnapshot,
     );
     // TODO: delete topic if disappeared
     functions.logger.log("deleted", s.id);
-  } catch (e) {
+  } catch (e: any) {
     return reportError(e, {user: context.params.userId});
   }
 };

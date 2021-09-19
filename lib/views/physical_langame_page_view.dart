@@ -242,6 +242,7 @@ class _State extends State<PhysicalLangamePageView>
                       'meme': getMeme(plp),
                       'context': 'face-to-face',
                       'language': _languageSelected,
+                      'topics': plp.memes[plp.currentMeme].topics.map((e) => '#$e').join(' '),
                     });
                     if (txt.result == '') {
                       cp.showSnackBar(_couldNotHear.pickAny()!);

@@ -21,6 +21,10 @@ export interface Api {
     parameters: any
   ): Promise<string | undefined>;
   filter(content: string, parameters: any): Promise<ContentFilter>;
+  translate(
+    content: string,
+    targetLanguageCode: string
+  ): Promise<string | undefined>;
 }
 
 // TODO: protobuf

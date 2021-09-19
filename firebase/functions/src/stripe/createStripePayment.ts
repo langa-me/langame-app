@@ -53,7 +53,7 @@ export const createStripePayment = async (snap: QueryDocumentSnapshot,
     );
     // If the result is successful, write it back to the database.
     await snap.ref.set(payment);
-  } catch (e) {
+  } catch (e: any) {
     await reportError(e, {user: context.params.userId});
   }
 };

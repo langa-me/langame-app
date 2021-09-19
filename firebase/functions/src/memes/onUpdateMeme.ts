@@ -40,8 +40,9 @@ export const onUpdateMeme = async (
         change.after.data());
 
     // When enabling a meme, tweet randomly
-    if (change.before.data()!.disabled === true &&
-        change.after.data()!.disabled === false) {
+    if (!(change.before.data()!.tweet ||
+          change.before.data()!.tweet === false) &&
+        change.after.data()!.tweet === true) {
       const twitterClient = new TwitterApi({
         accessToken: functions.config().twitter.access_token,
         appKey: functions.config().twitter.app_key,

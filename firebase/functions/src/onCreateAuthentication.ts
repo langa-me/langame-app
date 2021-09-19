@@ -58,7 +58,7 @@ export const onCreateAuthentication = async (user: UserRecord,
         </code>`,
       },
     });
-  } catch (e) {
+  } catch (e: any) {
     return reportError(e, {user: context.params.userId});
   }
 };

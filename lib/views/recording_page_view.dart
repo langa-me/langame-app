@@ -8,7 +8,6 @@ import 'package:langame/providers/recording_provider.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:langame/views/recording/recording.dart';
 import 'package:provider/provider.dart';
-import 'package:share/share.dart';
 
 class RecordingPageView extends StatefulWidget {
   final void Function(int, {Curve? curve}) _goToPage;
@@ -57,13 +56,7 @@ class _State extends State<RecordingPageView>
                 trailing: IconButton(
                   icon: Icon(FontAwesomeIcons.shareAlt,
                       color: isLightThenDark(context, reverse: false)),
-                  onPressed: () => Share.share(
-                      'Question: ${rp.recordingsSorted![i].metadata["meme"]!}' +
-                          '\nAnswer: ${rp.recordingsSorted![i].text}' +
-                          (rp.recordingsSorted![i].hasNote()
-                              ? '\nNote: ${rp.recordingsSorted![i].note}'
-                              : ''),
-                      subject: 'Langame memes'),
+                  onPressed: () => shareRecording(rp.recordingsSorted![i]),
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12), // <-- Radius

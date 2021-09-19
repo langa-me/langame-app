@@ -6,7 +6,6 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/readwise_provider.dart';
 import 'package:langame/views/app_bars/app_bars.dart';
 import 'package:langame/views/buttons/button.dart';
-import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';

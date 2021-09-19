@@ -68,15 +68,7 @@ platform :ios do
       skip_submission: false,
       notify_external_testers: true,
       ipa: "./Runner.ipa",
-      changelog: "New:
-      - Language for speech to text is now available in settings
-      - Preview: Record yourself in conversation, you can then export you thoughts anywhere
-      - Preview: user recommendation feature!
-      
-      Fixed:
-      - Memes would not list by time of creation
-      
-      Vote, vote, vote https://productific.com/@Langame :)",
+      changelog: "Topics are now added to meme recordings. Exporting them therefore display them as tags.",
       distribute_external: true,
       groups: "public",
     )

@@ -1,0 +1,1 @@
+Topics are now added to meme recordings. Exporting them therefore display them as tags.

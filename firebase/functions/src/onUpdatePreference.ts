@@ -23,7 +23,7 @@ export const onUpdatePreference =
           },
           id: change.after.id,
         }]);
-      } catch (e) {
+      } catch (e: any) {
         await reportError(e, {user: change.after.id});
       }
     };

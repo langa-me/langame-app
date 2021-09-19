@@ -69,7 +69,7 @@ export const addPaymentMethodDetails =
             ", ",
             intent
         );
-      } catch (e) {
+      } catch (e: any) {
         await reportError(e, {user: context.params.userId});
       }
     };

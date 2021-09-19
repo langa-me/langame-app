@@ -27,7 +27,7 @@ export const createStripeCustomer =
           customer_id: customer.id,
           setup_secret: intent.client_secret,
         });
-      } catch (e) {
+      } catch (e: any) {
         await reportError(e, {user: context.params.userId});
       }
     };

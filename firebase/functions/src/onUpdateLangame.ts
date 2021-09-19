@@ -52,7 +52,7 @@ export const onUpdateLangame =
           });
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       await Promise.all(handleError(change.after, {developerMessage: e}));
     }
   };

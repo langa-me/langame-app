@@ -82,7 +82,7 @@ export const onUpdateLangamePlayers =
           functions.logger.log("Langame started, updated start date");
         }
       });
-    } catch (e) {
+    } catch (e: any) {
       await Promise.all(handleError(change.after.ref,
           {developerMessage: e, uid: "null"}));
     }

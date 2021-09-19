@@ -7,7 +7,7 @@ import {ImplAiApi} from "./aiApi/implAiApi";
 import {initFirebaseTest} from "./utils/firestore.spec";
 
 
-it("meme to algolia", async () => {
+it.skip("meme to algolia", async () => {
   initFirebaseTest({isDev: false});
 
   const api = new ImplAiApi();
@@ -25,7 +25,7 @@ it("meme to algolia", async () => {
     };
   }));
 });
-it("rr", async () => {
+it.skip("rr", async () => {
   initFirebaseTest({isDev: true});
   const d = await admin.firestore().collection("users").limit(1).get();
   console.log("yolo", d.docs[0].data());

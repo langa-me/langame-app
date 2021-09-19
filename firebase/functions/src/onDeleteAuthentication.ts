@@ -109,7 +109,7 @@ export const onDeleteAuthentication = async (user: UserRecord,
         status: "unsubscribed",
       });
     });
-  } catch (e) {
+  } catch (e: any) {
     return reportError(e, {user: context.params.userId});
   }
 };

@@ -7,7 +7,7 @@ export const setUserRecommendation =
       const db = admin.firestore();
       try {
         return internalSetUserRecommendation(db);
-      } catch (e) {
+      } catch (e: any) {
         return reportError(e);
       }
     };

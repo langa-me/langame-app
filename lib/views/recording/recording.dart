@@ -47,6 +47,13 @@ var _questions = [
   'Did you like this conversation?',
 ];
 
+void shareRecording(lg.Recording r) => Share.share(
+    'Topic(s): ${r.metadata["topics"]}' +
+        '\nLangame: ${r.metadata["meme"]!}' +
+        '\nMe: ${r.text}' +
+        (r.note.isNotEmpty ? '\nNote: ${r.note}' : ''),
+    subject: 'Langame memes');
+
 class Recording extends StatefulWidget {
   String _q = _questions.pickAny()!;
   String _recordingId;
@@ -80,13 +87,7 @@ class _State extends State<Recording> with AfterLayoutMixin<Recording> {
           actions: [
             IconButton(
                 icon: Icon(FontAwesomeIcons.shareAlt),
-                onPressed: () => Share.share(
-                    'Question: ${widget._recording.metadata["meme"]!}' +
-                        '\nAnswer: ${widget._recording.text}' +
-                        (widget._recording.hasNote()
-                            ? '\nNote: ${widget._recording.note}'
-                            : ''),
-                    subject: 'Langame memes')),
+                onPressed: () => shareRecording(widget._recording)),
             IconButton(
                 icon: Icon(FontAwesomeIcons.trashAlt),
                 onPressed: () {
@@ -171,47 +172,37 @@ class _State extends State<Recording> with AfterLayoutMixin<Recording> {
             }),
           ),
           Spacer(),
-          ListTile(
-            trailing: Tooltip(
-                child: Icon(
-                  FontAwesomeIcons.questionCircle,
-                  color: getBlackAndWhite(context, 0),
+          Container(
+              height: AppSize.safeBlockVertical * 30,
+              child: ListView(
+                physics: BouncingScrollPhysics(),
+                children: [
+                ListTile(
+                  title: Text('Langame context',
+                      style: Theme.of(context).textTheme.headline6),
+                  tileColor: getBlackAndWhite(context, 1, reverse: true),
+                  subtitle: Text(
+                    widget._recording.metadata['meme']!,
+                    textAlign: TextAlign.left,
+                    style: Theme.of(context)
+                        .textTheme
+                        .caption,
+                  ),
                 ),
-                message: 'Question asked'),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12), // <-- Radius
-            ),
-            tileColor: getBlackAndWhite(context, 1, reverse: true),
-            title: Text(
-              widget._recording.metadata['meme']!,
-              textAlign: TextAlign.left,
-              style: Theme.of(context)
-                  .textTheme
-                  .headline6!
-                  .merge(TextStyle(color: getBlackAndWhite(context, 0))),
-            ),
-          ),
-          ListTile(
-            trailing: Tooltip(
-                child: Icon(
-                  FontAwesomeIcons.questionCircle,
-                  color: getBlackAndWhite(context, 0),
+                Divider(),
+                ListTile(
+                  title: Text('What I said',
+                      style: Theme.of(context).textTheme.headline6),
+                  tileColor: getBlackAndWhite(context, 1, reverse: true),
+                  subtitle: Text(
+                    widget._recording.text,
+                    textAlign: TextAlign.left,
+                    style: Theme.of(context)
+                        .textTheme
+                        .caption,
+                  ),
                 ),
-                message: 'Answer given'),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12), // <-- Radius
-            ),
-            tileColor: getBlackAndWhite(context, 1, reverse: true),
-            title: Text(
-              widget._recording.text,
-              textAlign: TextAlign.left,
-              style: Theme.of(context)
-                  .textTheme
-                  .headline6!
-                  .merge(TextStyle(color: getBlackAndWhite(context, 0))),
-            ),
-          ),
-          SizedBox(height: AppSize.safeBlockVertical * 10),
+              ])),
         ]));
   }
 }

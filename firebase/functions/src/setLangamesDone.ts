@@ -47,7 +47,7 @@ export const setLangamesDone =
         }
         return Promise.resolve();
       });
-    } catch (e) {
+    } catch (e: any) {
       return reportError(e);
     }
   };

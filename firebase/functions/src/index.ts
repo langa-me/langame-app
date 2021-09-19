@@ -25,6 +25,7 @@ import {createMemes} from "./memes/createMemes";
 import {onUpdateMeme} from "./memes/onUpdateMeme";
 import {onDeleteMeme} from "./memes/onDeleteMeme";
 import {onWriteTopic} from "./memes/onWriteTopic";
+import {onCreateMeme} from "./memes/onCreateMeme";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -57,22 +58,23 @@ exports.versionCheck = functions
     .onCall(versionCheck);
 
 
-// exports.interactionsDecrement = functions
-//     .pubsub
-//     .schedule("1 * * * *")
-//     .onRun(interactionsDecrement);
-
 exports.userRecommendations = functions
+    .region(region)
+    .runWith(runtimeOpts)
     .pubsub
     .schedule("1 * * * *")
     .onRun(setUserRecommendation);
 
 exports.setLangamesDone = functions
+    .region(region)
+    .runWith(runtimeOpts)
     .pubsub
     .schedule("1 * * * *")
     .onRun(setLangamesDone);
 
 exports.resetCredits = functions
+    .region(region)
+    .runWith(runtimeOpts)
     .pubsub
     .schedule("0 1 * * *") // 1 am every day
     .onRun(resetCredits);
@@ -80,6 +82,7 @@ exports.resetCredits = functions
 // https://firebase.google.com/docs/functions/gcp-storage-events
 exports.onFeedback = functions
     .region(region)
+    .runWith({maxInstances: 3})
     .storage.object()
     .onFinalize(async (object) => {
       if (!object.name?.startsWith("feedbacks") ||
@@ -95,25 +98,42 @@ exports.onFeedback = functions
 
 // Langame //
 
-exports.onCreateLangame = functions.firestore
+exports.onCreateLangame = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
     .document(`${kLangamesCollection}/{pushId}`)
     .onCreate(onCreateLangame);
 
-exports.onUpdateLangame = functions.firestore
+exports.onUpdateLangame = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
     .document(`${kLangamesCollection}/{langameId}`)
     .onUpdate(onUpdateLangame);
 
-exports.onUpdateLangamePlayers = functions.firestore
+exports.onUpdateLangamePlayers = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
     .document(`${kLangamesCollection}/{langameId}/players/{playerId}`)
     .onWrite(onUpdateLangamePlayers);
 
 // Authentication //
 
-exports.onDeleteAuthentication =
-    functions.auth.user().onDelete(onDeleteAuthentication);
+exports.onDeleteAuthentication = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .auth
+    .user()
+    .onDelete(onDeleteAuthentication);
 
-exports.onCreateAuthentication =
-    functions.auth.user().onCreate(onCreateAuthentication);
+exports.onCreateAuthentication = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .auth
+    .user()
+    .onCreate(onCreateAuthentication);
 
 
 // Meme //
@@ -135,18 +155,26 @@ exports.createMemes = functions
     .onCall(createMemes);
 
 
-// exports.onCreateMeme = functions
-//     .firestore.document("memes/{memeId}")
-//     .onCreate(onCreateMeme);
+exports.onCreateMeme = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore.document("memes/{memeId}")
+    .onCreate(onCreateMeme);
 
 exports.onDeleteMeme = functions
+    .region(region)
+    .runWith(runtimeOpts)
     .firestore.document("memes/{memeId}")
     .onDelete(onDeleteMeme);
 
 exports.onUpdateMeme = functions
+    .region(region)
+    .runWith(runtimeOpts)
     .firestore.document("memes/{memeId}")
     .onUpdate(onUpdateMeme);
 
 exports.onWriteTopic = functions
+    .region(region)
+    .runWith(runtimeOpts)
     .firestore.document("topics/{topicId}")
     .onWrite(onWriteTopic);

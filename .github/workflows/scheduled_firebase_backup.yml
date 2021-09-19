@@ -27,5 +27,5 @@ jobs:
 
       - name: Export all Firebase authentication users
         run: |
-          firebase --token ${{ secrets.FIREBASE_CLI_TOKEN }} auth:export "./firebase-auth-$(date '+%F-%T').json" --format=JSON
+          firebase --token ${{ secrets.FIREBASE_CLI_TOKEN }} auth:export "./firebase-auth-$(date '+%F-%T').json" --format=JSON --project langame-86ac4
           gsutil cp ./firebase-auth-*.json gs://langame-backup/
