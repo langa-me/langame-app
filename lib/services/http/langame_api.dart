@@ -16,8 +16,7 @@ abstract class LangameApi {
   Future<void> addNoteToLangame(String channelName, String note, lg.Note_Type type);
 
   /// Get [Langame] which current user is part of
-  Future<Iterable<Stream<DocumentSnapshot<lg.Langame>>>> getLangames(
-      {bool unDoneOnly = false});
+  Stream<lg.Langame> getLangames();
 
   /// Add self to [Langame] ins
   Future<Stream<DocumentSnapshot<lg.Langame>>> joinLangame(String channelName);

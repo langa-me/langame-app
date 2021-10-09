@@ -1,9 +1,7 @@
-import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/random.dart';
-import 'package:langame/helpers/widget.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/colors/colors.dart';
@@ -17,26 +15,10 @@ class TopicSearchWidget extends StatefulWidget {
   _State createState() => _State();
 }
 
-class _State extends State<TopicSearchWidget>
-    with AfterLayoutMixin<TopicSearchWidget> {
+class _State extends State<TopicSearchWidget> {
   final FloatingSearchBarController _searchBarController =
       FloatingSearchBarController();
   String searchTopicExample = '';
-  static const _topicExamples = [
-    'transhumanism',
-    'artificial intelligence',
-    'biology',
-    'philosophy',
-    'politic',
-    'mind',
-    'book',
-    'ice breaker'
-  ];
-  @override
-  void afterFirstLayout(BuildContext context) {
-    searchTopicExample = _topicExamples.pickAny()!;
-    postFrameCallback((_) => setState(() {}));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +32,9 @@ class _State extends State<TopicSearchWidget>
 
   Widget _buildFloatingSearchBar() {
     var tp = Provider.of<TagProvider>(context);
+    if (searchTopicExample.isEmpty && tp.availableTopics.length > 0) {
+      searchTopicExample = tp.availableTopics.pickAny()!;
+    }
 
     return FloatingSearchBar(
       controller: _searchBarController,
@@ -60,7 +45,7 @@ class _State extends State<TopicSearchWidget>
           color: getBlackAndWhite(context, 0))),
       backdropColor: getBlackAndWhite(context, 0, reverse: true),
       backgroundColor: getBlackAndWhite(context, 1, reverse: true),
-      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      scrollPadding: const EdgeInsets.only(top: 8, bottom: 32),
       accentColor: getBlackAndWhite(context, 1, reverse: true),
       shadowColor: getBlackAndWhite(context, 1, reverse: true),
       transitionDuration: const Duration(milliseconds: 400),
@@ -102,16 +87,19 @@ class _State extends State<TopicSearchWidget>
           if (tp.filteredTopicSearchHistory.isEmpty &&
               _searchBarController.query.isEmpty) {
             return Container(
-              height: 56,
+              height: AppSize.safeBlockVertical * 10,
               width: double.infinity,
               alignment: Alignment.center,
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SvgPicture.asset(
-                        isLight(context) ? 'images/search-by-algolia-light-background.svg': 'images/search-by-algolia-dark-background.svg',
-                        width: AppSize.safeBlockHorizontal * 5,
-                        height: AppSize.safeBlockHorizontal * 5),
+                        isLight(context)
+                            ? 'images/search-by-algolia-light-background.svg'
+                            : 'images/search-by-algolia-dark-background.svg',
+                        width: AppSize.safeBlockHorizontal * 10,
+                        height: AppSize.safeBlockVertical * 3,
+                        ),
                   ]),
             );
           } else if (tp.filteredTopicSearchHistory.isEmpty) {

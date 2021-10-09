@@ -11,9 +11,9 @@ import 'crash_analytics_provider.dart';
 
 class PhysicalLangameProvider extends ChangeNotifier {
   FirebaseApi _firebase;
-  Algolia? _algolia;
+  Algolia? algolia;
   CrashAnalyticsProvider _cap;
-  PhysicalLangameProvider(this._firebase, this._cap, this._algolia);
+  PhysicalLangameProvider(this._firebase, this._cap, this.algolia);
 
   List<lg.Meme> _memes = [];
   List<lg.Meme> get memes => _memes;
@@ -65,9 +65,9 @@ class PhysicalLangameProvider extends ChangeNotifier {
 
   Future<LangameResponse<List<String>>> topicSearch(String value) async {
     try {
-      if (_algolia == null)
+      if (algolia == null)
         return LangameResponse(LangameStatus.succeed, result: []);
-      final objects = await _algolia!
+      final objects = await algolia!
           .index(AppConst.isDev ? "dev_topics" : "prod_topics")
           .query(value)
           .getObjects();

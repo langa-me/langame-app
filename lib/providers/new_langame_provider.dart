@@ -22,7 +22,7 @@ class NewLangameProvider extends ChangeNotifier {
             .listen((e) async {
           if (e.exists && e.data() != null) {
             _cap.log('new_langame_provider:stream recommendations');
-            _recommendations = await Future.wait(
+            _recommendations = (await Future.wait(
                 // TODO: null check
                 (e.data()!['users'] as List<dynamic>)
                     .map((e) async => (await _firebase.firestore!
@@ -34,7 +34,7 @@ class NewLangameProvider extends ChangeNotifier {
                               toFirestore: (s, _) => s.toMapStringDynamic(),
                             )
                             .get())
-                        .data()!));
+                        .data()))).where((e) => e != null).map((e) => e!).toList();
             notifyListeners();
           }
         });

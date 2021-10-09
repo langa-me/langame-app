@@ -12,7 +12,7 @@ import 'package:langame/services/context/dialog_service.dart';
 import 'package:langame/services/context/navigation_service.dart';
 import 'package:langame/services/context/snack_bar_service.dart';
 import 'package:langame/views/colors/colors.dart';
-import 'package:langame/views/langame.dart';
+import 'package:langame/views/langames/langame_audio.dart';
 import 'package:langame/views/login.dart';
 import 'package:lottie/lottie.dart';
 
@@ -94,7 +94,7 @@ class ContextProvider extends ChangeNotifier {
   void dialogComplete() => _dialogService.dialogComplete();
 
   _updateRoute(Widget route) {
-    if (Widget is LangameView) {
+    if (Widget is LangameAudioView) {
       _route = LangameRoute.LangameView;
     } else if (Widget is LoginView) {
       _route = LangameRoute.LoginView;
@@ -218,7 +218,8 @@ class ContextProvider extends ChangeNotifier {
         ),
       ]);
 
-  Future<void> showFailureDialog(String? text) => showCustomDialog(stateless: [
+  Future<void> showFailureDialog(String? text, {List<Widget>? actions}) =>
+      showCustomDialog(stateless: [
         Lottie.asset(
           'animations/sad.json',
           width: AppSize.safeBlockHorizontal * 30,
@@ -230,7 +231,13 @@ class ContextProvider extends ChangeNotifier {
           text ?? _funny.getFailingRandom(),
           textAlign: TextAlign.center,
           style: Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
-        )
+        ),
+        actions != null
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: actions,
+              )
+            : SizedBox.shrink()
       ]);
 
   void handleLangameResponse(LangameResponse res,

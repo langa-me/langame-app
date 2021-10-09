@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/future.dart';
 import 'package:langame/providers/admin_provider.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -44,12 +45,13 @@ import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
 import 'package:langame/services/http/preference/preference_service.dart';
-import 'package:langame/views/langame.dart';
+import 'package:langame/views/langames/langame_audio.dart';
+import 'package:langame/views/langames/langame_text.dart';
 import 'package:langame/views/login.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
-import 'helpers/future.dart';
 import 'services/http/firebase.dart';
 import 'services/http/impl_langame_api.dart';
 import 'services/http/impl_payment_api.dart';
@@ -58,13 +60,12 @@ import 'views/colors/colors.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // if (kReleaseMode) {
-  FirebaseAppCheck.instance.activate();
-  // }
+  if (!kIsWeb) {
+    FirebaseAppCheck.instance.activate();
+  }
   FirebaseCrashlytics? crashlytics;
   RemoteConfig? remoteConfig;
   FirebaseDynamicLinks? dynamicLinks;
-  Algolia? algolia;
   // Crashlytics does not support web https://firebase.flutter.dev/
   if (!kIsWeb) {
     crashlytics = FirebaseCrashlytics.instance;
@@ -88,14 +89,6 @@ void main() async {
             AppConst.isDev || kDebugMode ? 'development' : 'production';
       },
     );
-
-    remoteConfig.ensureInitialized().then((_) async {
-      await waitUntil(
-          () => remoteConfig!.getString('algolia_application_id').isNotEmpty);
-      algolia = Algolia.init(
-          applicationId: remoteConfig!.getString('algolia_application_id'),
-          apiKey: remoteConfig.getString('algolia_api_key'));
-    });
   }
   var analytics = FirebaseAnalytics();
   var useEmulator = false;
@@ -121,11 +114,11 @@ void main() async {
   var funnyProvider = FunnyProvider();
   var contextProvider =
       ContextProvider(navigationKey, scaffoldMessengerKey, funnyProvider);
-  var crashAnalyticsProvider = CrashAnalyticsProvider(firebase.crashlytics,
-      firebase.analytics!, remoteConfig, firebase, algolia);
+  var crashAnalyticsProvider = CrashAnalyticsProvider(
+      firebase.crashlytics, firebase.analytics!, remoteConfig, firebase);
   var authenticationApi = ImplAuthenticationApi(firebase);
   var authenticationProvider = AuthenticationProvider(
-      firebase, authenticationApi, crashAnalyticsProvider);
+      firebase, authenticationApi, crashAnalyticsProvider, null);
   // Cloud messaging is fucked-up with emulator
   // (something with, messaging stuff have to happen on Google infra)
   // So using fake api when using emulator
@@ -133,10 +126,14 @@ void main() async {
           kIsWeb // TODO: web unimplemented https://firebase.flutter.dev/docs/messaging/usage#web-tokens
       ? FakeMessageApi(firebase, (_) {})
       : ImplMessageApi(firebase, (n) {
-          debugPrint('opening $n');
-          if (n?['channelName'] != null) {
+          print('opening $n');
+          if (n.type == lg.Message_Type.INVITE) {
             contextProvider.pushReplacement(
-              LangameView(n!['channelName'], false),
+              LangameAudioView(n.channelName, false),
+            );
+          } else {
+            contextProvider.pushReplacement(
+              LangameTextView(n.channelName),
             );
           }
         });
@@ -157,11 +154,33 @@ void main() async {
   var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
       authenticationProvider, ImplLangameApi(firebase));
   final recordingProvider = RecordingProvider(firebase, crashAnalyticsProvider,
-      authenticationProvider, preferenceProvider, algolia);
+      authenticationProvider, preferenceProvider, null);
   final readwiseProvider = ReadwiseProvider(
       firebase, crashAnalyticsProvider, authenticationProvider);
   var newLangameProvider = NewLangameProvider(
       crashAnalyticsProvider, authenticationProvider, firebase);
+  var tagProvider =
+      TagProvider(firebase, crashAnalyticsProvider, null, preferenceProvider);
+  var physicalLangameProvider =
+      PhysicalLangameProvider(firebase, crashAnalyticsProvider, null);
+  var adminProvider = AdminProvider(firebase, crashAnalyticsProvider, null);
+  remoteConfig?.ensureInitialized().then((_) async {
+    await waitUntil(
+      // TODO
+            () => remoteConfig!.getString('algolia_application_id').isNotEmpty,
+            maxIterations: 1000)
+        .catchError((error, stackTrace) =>
+            // ignore: invalid_return_type_for_catch_error
+            SystemChannels.platform.invokeMethod('SystemNavigator.pop'));
+    var algolia = Algolia.init(
+        applicationId: remoteConfig!.getString('algolia_application_id'),
+        apiKey: remoteConfig.getString('algolia_api_key'));
+    recordingProvider.algolia = algolia;
+    authenticationProvider.algolia = algolia;
+    tagProvider.algolia = algolia;
+    physicalLangameProvider.algolia = algolia;
+    adminProvider.algolia = algolia;
+  });
   // SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
@@ -180,9 +199,7 @@ void main() async {
             ChangeNotifierProvider(
               create: (_) => contextProvider,
             ),
-            ChangeNotifierProvider(
-                create: (_) => TagProvider(firebase, crashAnalyticsProvider,
-                    algolia, preferenceProvider)),
+            ChangeNotifierProvider(create: (_) => tagProvider),
             ChangeNotifierProvider(create: (_) => funnyProvider),
             ChangeNotifierProvider(create: (_) => newLangameProvider),
 
@@ -252,21 +269,19 @@ void main() async {
             ChangeNotifierProxyProvider<CrashAnalyticsProvider,
                 PhysicalLangameProvider>(
               update: (_, cap, p) => p!,
-              create: (_) => PhysicalLangameProvider(
-                  firebase, crashAnalyticsProvider, algolia),
+              create: (_) => physicalLangameProvider,
             ),
             ChangeNotifierProxyProvider<CrashAnalyticsProvider, AdminProvider>(
               update: (_, cap, p) => p!,
-              create: (_) =>
-                  AdminProvider(firebase, crashAnalyticsProvider, algolia),
+              create: (_) => adminProvider,
             ),
             ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
                 AuthenticationProvider, PreferenceProvider, RecordingProvider>(
               update: (_, cap, ap, pp, p) => p!,
               create: (_) => recordingProvider,
             ),
-            ChangeNotifierProxyProvider2<CrashAnalyticsProvider, AuthenticationProvider,
-                ReadwiseProvider>(
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
+                AuthenticationProvider, ReadwiseProvider>(
               update: (_, cap, ap, p) => p!,
               create: (_) => readwiseProvider,
             ),
@@ -290,7 +305,6 @@ class MyApp extends StatefulWidget {
       this.analytics, this.navigationKey, this.scaffoldMessengerKey);
 }
 
-// TODO: https://github.com/rydmike/flex_color_scheme/blob/master/example/lib/example5/main.dart
 class _MyAppState extends State<MyApp> {
   final FirebaseAnalytics analytics;
   final GlobalKey<NavigatorState> navigationKey;

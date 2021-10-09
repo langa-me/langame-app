@@ -5,7 +5,7 @@ import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/views/langame.dart';
+import 'package:langame/views/langames/langame_audio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class DynamicLinksProvider extends ChangeNotifier {
@@ -120,7 +120,7 @@ class DynamicLinksProvider extends ChangeNotifier {
       // Opened a Langame link that opened the app
       // i.e. https://DOMAIN/CHANNEL_NAME
       // path starts with "/" thats why the substring
-      _cp.pushReplacement(LangameView(channel, false));
+      _cp.pushReplacement(LangameAudioView(channel, false));
     }
   }
 }

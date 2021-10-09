@@ -28,19 +28,23 @@ class InteractionLevel extends $pb.ProtobufEnum {
   const InteractionLevel._($core.int v, $core.String n) : super(v, n);
 }
 
-class Tag_Context_Type extends $pb.ProtobufEnum {
-  static const Tag_Context_Type WIKIPEDIA = Tag_Context_Type._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'WIKIPEDIA');
-  static const Tag_Context_Type OPENAI = Tag_Context_Type._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OPENAI');
+class UserPreference_RecommendationType extends $pb.ProtobufEnum {
+  static const UserPreference_RecommendationType NONE = UserPreference_RecommendationType._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'NONE');
+  static const UserPreference_RecommendationType NEW = UserPreference_RecommendationType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'NEW');
+  static const UserPreference_RecommendationType COMPOUND = UserPreference_RecommendationType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'COMPOUND');
+  static const UserPreference_RecommendationType ALL = UserPreference_RecommendationType._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ALL');
 
-  static const $core.List<Tag_Context_Type> values = <Tag_Context_Type> [
-    WIKIPEDIA,
-    OPENAI,
+  static const $core.List<UserPreference_RecommendationType> values = <UserPreference_RecommendationType> [
+    NONE,
+    NEW,
+    COMPOUND,
+    ALL,
   ];
 
-  static final $core.Map<$core.int, Tag_Context_Type> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static Tag_Context_Type? valueOf($core.int value) => _byValue[value];
+  static final $core.Map<$core.int, UserPreference_RecommendationType> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static UserPreference_RecommendationType? valueOf($core.int value) => _byValue[value];
 
-  const Tag_Context_Type._($core.int v, $core.String n) : super(v, n);
+  const UserPreference_RecommendationType._($core.int v, $core.String n) : super(v, n);
 }
 
 class FunctionResponse_VersionCheck_UpdateRequired extends $pb.ProtobufEnum {
@@ -58,5 +62,20 @@ class FunctionResponse_VersionCheck_UpdateRequired extends $pb.ProtobufEnum {
   static FunctionResponse_VersionCheck_UpdateRequired? valueOf($core.int value) => _byValue[value];
 
   const FunctionResponse_VersionCheck_UpdateRequired._($core.int v, $core.String n) : super(v, n);
+}
+
+class Message_Type extends $pb.ProtobufEnum {
+  static const Message_Type INVITE = Message_Type._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'INVITE');
+  static const Message_Type MESSAGE = Message_Type._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'MESSAGE');
+
+  static const $core.List<Message_Type> values = <Message_Type> [
+    INVITE,
+    MESSAGE,
+  ];
+
+  static final $core.Map<$core.int, Message_Type> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static Message_Type? valueOf($core.int value) => _byValue[value];
+
+  const Message_Type._($core.int v, $core.String n) : super(v, n);
 }
 

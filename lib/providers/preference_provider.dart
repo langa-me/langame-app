@@ -64,7 +64,7 @@ class PreferenceProvider extends ChangeNotifier {
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
         'shakeToFeedback': preference!.shakeToFeedback,
         'hasDoneOnBoarding': preference!.hasDoneOnBoarding,
-        'userRecommendations': preference!.userRecommendations,
+        'userRecommendations': preference!.userRecommendations.value,
         'themeIndex': preference!.themeIndex,
       });
       _cap.log('save preference');
@@ -89,24 +89,26 @@ class PreferenceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  setTheme(ThemeMode t) {
+  void setTheme(ThemeMode t) {
     _preference?.themeIndex = t.index;
     notifyListeners();
   }
 
-  setShakeToFeedback(bool value) {
+  void setShakeToFeedback(bool value) {
     _preference?.shakeToFeedback = value;
     notifyListeners();
   }
 
-  setRecommendations(bool v) {
+  void setRecommendations(lg.UserPreference_RecommendationType v) {
     _preference?.userRecommendations = v;
     notifyListeners();
   }
 
+  void refresh() => notifyListeners();
+
   List<String> _filteredUserSearchHistory = [];
   List<String> get filteredUserSearchHistory => _filteredUserSearchHistory;
-  set filteredUserSearchHistory(v) {
+  set filteredUserSearchHistory(List<String> v) {
     _filteredUserSearchHistory = v;
     notifyListeners();
   }
@@ -129,7 +131,9 @@ class PreferenceProvider extends ChangeNotifier {
   void addUserSearchHistory(String tag) {
     _preference!.userSearchHistory.add(tag);
     if (_preference!.userSearchHistory.length > _historyLength) {
-      for (var i = _preference!.userSearchHistory.length; i > _historyLength; i--) {
+      for (var i = _preference!.userSearchHistory.length;
+          i > _historyLength;
+          i--) {
         _preference!.userSearchHistory
             .remove(_preference!.userSearchHistory.elementAt(i));
       }
@@ -154,8 +158,8 @@ class PreferenceProvider extends ChangeNotifier {
     _preference!.userSearchHistory.removeWhere((e) => e == tag);
     _filteredUserSearchHistory.removeWhere((e) => e == tag);
     notifyListeners();
-    firebase.analytics
-        ?.logEvent(name: 'delete_user_search_history', parameters: {'tag': tag});
+    firebase.analytics?.logEvent(
+        name: 'delete_user_search_history', parameters: {'tag': tag});
   }
 
   void resetFilteredSearchTagHistory() {

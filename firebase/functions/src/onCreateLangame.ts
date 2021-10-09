@@ -1,7 +1,7 @@
 import {EventContext} from "firebase-functions";
 import {QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
-import {kUsersCollection, hashFnv32a} from "./helpers";
+import {hashFnv32a} from "./helpers";
 import * as admin from "firebase-admin";
 import {offlineMemeSearch} from "./memes/memes";
 import * as functions from "firebase-functions";
@@ -26,8 +26,7 @@ export const onCreateLangame = async (
     if (!lg.data()) {
       await Promise.all(
           handleError(
-              snap,
-              {
+              snap, {
                 userMessage: "you did not provide any data",
                 code: "invalid-argument",
               }
@@ -36,10 +35,7 @@ export const onCreateLangame = async (
       return;
     }
     const db = admin.firestore();
-    // TODO: maximum firestore rule check filters on the created langame
-    // const db = admin.firestore();
     const senderData = await db.collection("users")
-    // Firestore rules should already filter non-auth
         .doc(snap.data().initiator)
         .get();
     // TODO: is it really 100% atomic?
@@ -130,94 +126,51 @@ export const onCreateLangame = async (
     }, {merge: true});
 
     const toNotify = lg.data()!.reservedSpots;
+    const title =
+    // eslint-disable-next-line max-len
+    `${senderData.data()!.tag} invited you to play ${snap.data().isText === true? "a text" : "an audio"} Langame`;
     for (const p of toNotify) {
-      const player = await db
-          .collection("users")
-          .doc(p)
-          .get();
-      if (!player.data() || !player.data()!.tokens) {
-        // Need to wait the promise to avoid concurrency issues on the db
-        await Promise.all(handleError(
-            snap, {
-              developerMessage: `${p}, has no devices`,
-              uid: p,
-            }));
-        continue;
-      }
-      // eslint-disable-next-line max-len
-      let body = `${senderData.data()!.tag} invited you to play ${lg.data()!.topics.join(",")}`;
-      // @ts-ignore
-      if (lg.data()!.date && lg.data()!.date!.toDate === "function") {
-        // @ts-ignore
-        body += `at ${lg.data()!.date!.toDate().toLocaleDateString("en-US")}`;
-      }
-      const messagingResponse = await admin.messaging().sendToDevice(
-        player.data()!.tokens!,
-        {
-          data: {channelName: channelName},
-          notification: {
-            tag: channelName,
-            body: body,
-            // eslint-disable-next-line max-len
-            title: `Play ${lg.data()!.topics.join(",")} with ${senderData.data()!.tag}?`,
-          },
-        },
-        {
-          // Required for background data-only messages on iOS
-          contentAvailable: true,
-          // Required for background data-only messages on Android
-          priority: "high",
-        }
-      );
-      messagingResponse.results.forEach((messagingResult, i) => {
-        const t = player.data()!.tokens![i];
-        // Invalid token, remove it
-        if (messagingResult.error &&
-          messagingResult.error.code ===
-          "messaging/registration-token-not-registered" &&
-          t) {
-          admin
-              .firestore()
-              .collection(kUsersCollection)
-              .doc(p)
-              .update({
-                tokens: admin.firestore.FieldValue.arrayRemove(t),
-              }).then(() => functions.logger.info("removed invalid token", t))
-              .catch(() =>
-                handleError(snap, {
-                  developerMessage: "failed to remove invalid token",
-                  uid: p}));
-        }
+      admin.firestore().collection("messages").add({
+        fromUid: snap.data().initiator,
+        toUid: p,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        channelName: channelName,
+        type: langame.protobuf.Message.Type.INVITE,
+        title: title,
+        // eslint-disable-next-line max-len
+        body: `Topics:${memes[0].data()!.topics.join(", ")}\n${memes[0].data()!.content}`,
       });
+    }
 
-      const oneWeek = 7 * 24 * 1000 * 60 * 60;
-      const oneWeekAgo = new Date(Date.now() - oneWeek);
-      const newMemesSeen = memes.map((e) => {
-        return {
-          meme: e.id,
-          date: new Date(),
-        };
-      });
+
+    const oneWeek = 7 * 24 * 1000 * 60 * 60;
+    const oneWeekAgo = new Date(Date.now() - oneWeek);
+    const newMemesSeen = memes.map((e) => {
+      return {
+        meme: e.id,
+        date: new Date(),
+      };
+    });
       // Filter out memes already seen X time ago
       // TODO: currently only support initiator
-      memesToFilter =
+    memesToFilter =
           memesToFilter!
               .filter((e: any) => e.date < oneWeekAgo).concat(newMemesSeen);
-      const promises = [
-        senderData.ref.update({
-          credits: admin.firestore.FieldValue.increment(-1),
-          lastSpent: admin.firestore.FieldValue.serverTimestamp(),
-        })];
-      promises.push(memesSeenDoc.ref.set({
-        seen: memesToFilter,
-      }, {merge: true}));
-      return Promise.all(promises);
-    }
-  } catch (e) {
+    const promises = [
+      senderData.ref.update({
+        credits: admin.firestore.FieldValue.increment(-1),
+        lastSpent: admin.firestore.FieldValue.serverTimestamp(),
+      })];
+    promises.push(memesSeenDoc.ref.set({
+      seen: memesToFilter,
+    }, {merge: true}));
+    return Promise.all(promises);
+  } catch (e: any) {
     await Promise.all(
         // @ts-ignore
         handleError(snap, e, typeof lg !== "undefined" ?
         lg!.data()!.initiator :
         "null"));
+    return Promise.reject(e);
   }
 };

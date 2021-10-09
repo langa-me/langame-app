@@ -2,15 +2,14 @@ import {
   kInteractionsCollection,
   kPreferencesCollection,
   kUsersCollection,
-} from "./helpers";
+} from "../helpers";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {auth} from "firebase-admin/lib/auth";
 import UserRecord = auth.UserRecord;
 import Stripe from "stripe";
-import {reportError} from "./errors";
-import {html} from "./utils/html";
-import Mailchimp = require("mailchimp-api-v3");
+import {reportError} from "../errors";
+import {html} from "../utils/html";
 
 
 const title = "Farewell from Langame 😥";
@@ -102,12 +101,6 @@ export const onDeleteAuthentication = async (user: UserRecord,
           ${html(title, body, "Have a great day 😇.")}
         </code>`,
       },
-    }).then(() => {
-      const mailchimp = new Mailchimp(functions.config().mailchimp.key);
-      mailchimp.post(`/lists/${functions.config().mailchimp.list}/members`, {
-        email_address: user.email,
-        status: "unsubscribed",
-      });
     });
   } catch (e: any) {
     return reportError(e, {user: context.params.userId});

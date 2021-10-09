@@ -47,7 +47,7 @@ class RecordingProvider extends ChangeNotifier {
   final CrashAnalyticsProvider cap;
   final AuthenticationProvider ap;
   final PreferenceProvider pp;
-  final Algolia? algolia;
+  Algolia? algolia;
   stt.SpeechToText _speech = stt.SpeechToText();
   String _textRecorded = '';
 

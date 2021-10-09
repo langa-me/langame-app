@@ -1,5 +1,6 @@
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/message_api.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 class FakeMessageApi extends MessageApi {
   FakeMessageApi(FirebaseApi firebase,
@@ -8,28 +9,21 @@ class FakeMessageApi extends MessageApi {
 
   @override
   Future<void> cancel() async {
-    // TODO: implement cancel
   }
 
 
   @override
-  Future<Map<String, String>?> getInitialMessage() async {
-    // TODO: implement getInitialMessage
-    // throw UnimplementedError();
+  Future<lg.Message?> getInitialMessage() async {
   }
 
 
 
   @override
   Future<void> initializePermissions() async {
-    // TODO: implement initializePermissions
-    // throw UnimplementedError();
   }
 
   @override
-  Future<void> listen(Function(dynamic)? add) async {
-    // TODO: implement listen
-    // throw UnimplementedError();
+  Future<void> listen(Function(lg.Message)? add) async {
   }
 
 }

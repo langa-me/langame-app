@@ -70,7 +70,7 @@ dependencies:
   material_floating_search_bar: ^0.3.3
   flutter_app_badger: ^1.2.0
   flutter_spinkit: ^5.0.0
-  ordered_set: ^3.0.0
+  ordered_set: ^4.0.0
   fluttertoast: ^8.0.6
   grouped_list: ^4.0.0
   feedback: ^2.0.0
@@ -84,7 +84,7 @@ dependencies:
   introduction_screen: ^2.1.0
   fab_circular_menu: ^1.0.2
   touchable: ^1.0.0
-  sortedmap: ^0.5.0
+  sortedmap: ^0.5.1
   holding_gesture: ^1.1.0
   algolia: ^1.0.1
       # git:

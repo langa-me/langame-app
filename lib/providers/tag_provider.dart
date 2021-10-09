@@ -7,11 +7,27 @@ import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 
 class TagProvider extends ChangeNotifier {
-  TagProvider(this.firebase, this._cap, this._algolia, this._pp);
+  TagProvider(this.firebase, this._cap, this.algolia, this._pp) {
+    this.firebase.auth!.authStateChanges().listen((user) {
+      if (user == null) {
+        _availableTopics = [];
+        notifyListeners();
+      } else {
+        firebase.firestore!.collection('topics').get().then((value) {
+          _availableTopics = value.docs.map((doc) => doc.id).toList();
+          _cap.log(
+              'tag_provider: detected authentication change, updated available topics: $_availableTopics');
+          notifyListeners();
+        });
+      }
+    });
+  }
   final FirebaseApi firebase;
   final CrashAnalyticsProvider _cap;
-  final Algolia? _algolia;
+  Algolia? algolia;
   final PreferenceProvider _pp;
+  List<String> _availableTopics = [];
+  List<String> get availableTopics => _availableTopics;
 
   void query(String value) async {
     if (value.isEmpty) {
@@ -19,7 +35,7 @@ class TagProvider extends ChangeNotifier {
       return;
     }
 
-    final i = _algolia?.index('prod_topics');
+    final i = algolia?.index('prod_topics');
     final o = await i?.query('$value').getObjects();
     filteredTopicSearchHistory = o?.hits
         .map((e) => e.data['objectID'] as String)
