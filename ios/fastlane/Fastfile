@@ -1,9 +1,11 @@
 default_platform(:ios)
 
 DEVELOPER_APP_ID = ENV["DEVELOPER_APP_ID"]
+DEVELOPER_APP_ID_DEV = ENV["DEVELOPER_APP_ID_DEV"]
 DEVELOPER_APP_IDENTIFIER = ENV["DEVELOPER_APP_IDENTIFIER"]
 DEVELOPER_APP_IDENTIFIER_DEV = ENV["DEVELOPER_APP_IDENTIFIER_DEV"]
 PROVISIONING_PROFILE_SPECIFIER = ENV["PROVISIONING_PROFILE_SPECIFIER"]
+PROVISIONING_PROFILE_SPECIFIER_DEV = ENV["PROVISIONING_PROFILE_SPECIFIER_DEV"]
 TEMP_KEYCHAIN_USER = ENV["TEMP_KEYCHAIN_USER"]
 TEMP_KEYCHAIN_PASSWORD = ENV["TEMP_KEYCHAIN_PASSWORD"]
 
@@ -87,7 +89,12 @@ platform :ios do
         configuration: "Release-dev",
         workspace: "Runner.xcworkspace",
         scheme: "dev",
-        export_method: "ad-hoc"
+        export_method: "ad-hoc",
+        export_options: {
+          provisioningProfiles: {
+              DEVELOPER_APP_ID_DEV => PROVISIONING_PROFILE_SPECIFIER_DEV
+          }
+        }
       )
       firebase_app_distribution(
         app: "1:388264600961:ios:cb9793dd455c23e50cf480",
