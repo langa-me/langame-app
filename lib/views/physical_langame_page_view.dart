@@ -300,7 +300,7 @@ class _State extends State<PhysicalLangamePageView>
                         Text('${ap.user != null ? ap.user!.credits : 0}',
                             style: Theme.of(context).textTheme.caption),
                         Icon(FontAwesomeIcons.bitcoin,
-                            color: ap.user!.credits == 0
+                            color: ap.user?.credits == 0
                                 ? Colors.red
                                 : getBlackAndWhite(context, 0))
                       ]))),

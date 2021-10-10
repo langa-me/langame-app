@@ -10,13 +10,14 @@ import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/hack.dart';
 import 'package:langame/views/integrations/readwise/readwise_settings.dart';
 import 'package:langame/views/language/language_settings.dart';
+import 'package:langame/views/notifications/notification_view.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
 import 'feature_preview/beta.dart';
-import 'login.dart';
 import 'profile_view.dart';
 
 class SettingsView extends StatefulWidget {
@@ -57,6 +58,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
+    var pp = Provider.of<PreferenceProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -73,19 +75,17 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(12),
-              child: Consumer<PreferenceProvider>(builder: (context, s, child) {
-                return FlexThemeModeSwitch(
-                  title: Text('Theme',
-                      style: Theme.of(context).textTheme.headline6),
-                  padding: EdgeInsets.all(5),
-                  themeMode: ThemeMode.values[s.preference!.themeIndex],
-                  onThemeModeChanged: s.setTheme,
-                  flexSchemeData: flexSchemeData,
-                );
-              }),
+              child: FlexThemeModeSwitch(
+                title:
+                    Text('Theme', style: Theme.of(context).textTheme.headline6),
+                padding: EdgeInsets.all(5),
+                themeMode: ThemeMode.values[pp.preference!.themeIndex],
+                onThemeModeChanged: pp.setTheme,
+                flexSchemeData: flexSchemeData,
+              ),
             ),
             Consumer<AuthenticationProvider>(
-                builder: (ctx, p, c) => p.user!.role == 'admin'
+                builder: (ctx, p, c) => p.user?.role == 'admin'
                     ? ListTile(
                         onTap: () {
                           cp.push(HackView());
@@ -117,39 +117,51 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             ),
             ListTile(
               onTap: () {
-                cap.logNewFeatureClick('settings_notifications');
+                cp.push(NotificationSettingsView());
               },
               leading: Beta(
                   Icon(Icons.notifications_outlined,
                       color: isLightThenDark(context)),
-                  type: BetaType.SOON),
+                  type: BetaType.NEW),
               title: Text('Notification',
                   style: Theme.of(context).textTheme.headline6),
             ),
-            Consumer<PreferenceProvider>(
-              builder: (context, p, child) => ListTile(
-                onTap: () {
-                  if (!p.preference!.userRecommendations) {
-                    cp.showSnackBar(
-                        'Understood! You will have recommendation in user search for example!');
-                  }
-                  p.setRecommendations(!p.preference!.userRecommendations);
-                },
+            ExpansionTile(
                 leading: Beta(
-                    Icon(Icons.recommend, color: isLightThenDark(context))),
-                title: Text('User Recommendation',
+                    Icon(FontAwesomeIcons.brain,
+                        color: isLightThenDark(context)),
+                    type: BetaType.PREVIEW),
+                title: Text('User recommendations',
                     style: Theme.of(context).textTheme.headline6),
-                trailing: Switch(
-                    value: p.preference!.userRecommendations,
-                    onChanged: (v) {
-                      if (!p.preference!.userRecommendations) {
-                        cp.showSnackBar(
-                            'Understood! You will have recommendation in user search for example!');
-                      }
-                      p.setRecommendations(!p.preference!.userRecommendations);
-                    }),
-              ),
-            ),
+                children: [
+                  ListTile(
+                    leading: Beta(
+                      Icon(FontAwesomeIcons.cartPlus,
+                          color: getBlackAndWhite(context, 0)),
+                      type: BetaType.SOON,
+                    ),
+                    title: Text('New relationships',
+                        style: Theme.of(context).textTheme.headline6),
+                    trailing: Switch(value: false, onChanged: (_) {}),
+                  ),
+                  ListTile(
+                    onTap: () => pp.setRecommendations(
+                        pp.preference!.userRecommendations ==
+                                lg.UserPreference_RecommendationType.COMPOUND
+                            ? lg.UserPreference_RecommendationType.NONE
+                            : lg.UserPreference_RecommendationType.COMPOUND),
+                    leading: Icon(FontAwesomeIcons.layerGroup,
+                        color: getBlackAndWhite(context, 0)),
+                    title: Text('Compound relationships',
+                        style: Theme.of(context).textTheme.headline6),
+                    trailing: Switch(
+                        value: pp.preference!.userRecommendations ==
+                            lg.UserPreference_RecommendationType.COMPOUND,
+                        onChanged: (v) => pp.setRecommendations(v
+                            ? lg.UserPreference_RecommendationType.COMPOUND
+                            : lg.UserPreference_RecommendationType.NONE)),
+                  ),
+                ]),
             ExpansionTile(
                 onExpansionChanged: (_) {
                   cap.logNewFeatureClick('settings_integration');
@@ -247,9 +259,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
     cp.handleLangameResponse(r, onSucceed: () async {
       cp.dialogComplete();
       cp.showSuccessDialog('You will miss us!');
-      await Future.delayed(Duration(seconds: 2));
-      cp.dialogComplete();
-      cp.pushReplacement(LoginView());
     }, onFailure: () async {
       cp.dialogComplete();
       cp.showFailureDialog(

@@ -12,11 +12,15 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
+import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
+import 'package:langame/views/colors/colors.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
+import 'feature_preview/beta.dart';
 import 'main_view.dart';
 
 /// Setup the app for the user (topics, friends...)
@@ -39,8 +43,10 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IntroductionScreen(
-        done: Text('Done', style: Theme.of(context).textTheme.headline6),
-        next: Text('Next', style: Theme.of(context).textTheme.headline6),
+        done: Icon(FontAwesomeIcons.check,
+            color: Theme.of(context).colorScheme.secondary),
+        next: Icon(FontAwesomeIcons.arrowRight,
+            color: Theme.of(context).colorScheme.secondary),
         pages: _buildPageModels(),
         isBottomSafeArea: true,
         showDoneButton: hasFinishedOnBoarding,
@@ -138,107 +144,123 @@ class _OnBoardingState extends State with AfterLayoutMixin {
     });
   }
 
-  List<PageViewModel> _buildPageModels() => [
-        // PageViewModel(
-        //   titleWidget: Text('What are your interests?',
-        //       style: Theme.of(context).textTheme.headline5),
-        //   bodyWidget: Container(
-        //       height: AppSize.safeBlockVertical * 80,
-        //       width: AppSize.safeBlockHorizontal *
-        //           45 *
-        //           (AppSize.isLargeWidth ? 1 : 2),
-        //       child: Consumer2<PreferenceProvider, TagProvider>(
-        //         builder: (context, pp, tp, child) => Container(
-        //             height: AppSize.safeBlockVertical * 80,
-        //             width: AppSize.safeBlockHorizontal *
-        //                 45 *
-        //                 (AppSize.isLargeWidth ? 1 : 2),
-        //             alignment: Alignment.center,
-        //             child: ListView(
-        //               physics: BouncingScrollPhysics(),
-        //               shrinkWrap: true,
-        //               padding: const EdgeInsets.all(20.0),
-        //               children: tp.topics.values
-        //                   .map(
-        //                     (e) => ToggleButton(
-        //                         width: AppSize.safeBlockHorizontal *
-        //                             45 *
-        //                             (AppSize.isLargeWidth ? 1 : 2),
-        //                         selected: pp.preference != null &&
-        //                             pp.preference!.favoriteTopics
-        //                                 .contains(e.topic.content),
-        //                         onChange: (bool selected) {
-        //                           if (selected)
-        //                             pp.addFavoriteTopic(e.topic.content);
-        //                           else
-        //                             pp.removeFavoriteTopic(e.topic.content);
-        //                         },
-        //                         textUnselected:
-        //                             '${e.topic.emojis.join('')}\n${e.topic.content}',
-        //                         textSelected:
-        //                             '${e.topic.emojis.join('')}\n${e.topic.content}'),
-        //                   )
-        //                   .toList(),
-        //             )),
-        //       )),
-        // ),
-        PageViewModel(
-          titleWidget: Text('Get user recommendations?',
-              style: Theme.of(context).textTheme.headline5),
-          bodyWidget: Consumer<PreferenceProvider>(
-            builder: (context, p, child) => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ListTile(
-                  onTap: () =>
-                      p.setRecommendations(!p.preference!.userRecommendations),
-                  leading: Icon(Icons.recommend),
-                  title: Text('User recommendations',
-                      style: Theme.of(context).textTheme.headline6),
-                  trailing: Switch(
-                    value: p.preference!.userRecommendations,
-                    onChanged: (v) => p
-                        .setRecommendations(!p.preference!.userRecommendations),
-                  ),
+  List<PageViewModel> _buildPageModels() {
+    var tp = Provider.of<TagProvider>(context);
+    return [
+      PageViewModel(
+        titleWidget: Text('What are your interests?',
+            style: Theme.of(context).textTheme.headline5),
+        bodyWidget: Container(
+            height: AppSize.safeBlockVertical * 80,
+            width: AppSize.safeBlockHorizontal *
+                45 *
+                (AppSize.isLargeWidth ? 1 : 2),
+            child: Consumer2<PreferenceProvider, TagProvider>(
+              builder: (context, pp, tp, child) => Container(
+                  height: AppSize.safeBlockVertical * 80,
+                  width: AppSize.safeBlockHorizontal *
+                      45 *
+                      (AppSize.isLargeWidth ? 1 : 2),
+                  alignment: Alignment.center,
+                  child: ListView(
+                    physics: BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(20.0),
+                    children: tp.availableTopics
+                        .map(
+                          (e) => ToggleButton(
+                              width: AppSize.safeBlockHorizontal *
+                                  45 *
+                                  (AppSize.isLargeWidth ? 1 : 2),
+                              selected: pp.preference != null &&
+                                  pp.preference!.favoriteTopics.contains(e),
+                              onChange: (bool selected) {
+                                if (selected)
+                                  pp.addFavoriteTopic(e);
+                                else
+                                  pp.removeFavoriteTopic(e);
+                              },
+                              textUnselected: e,
+                              textSelected: e),
+                        )
+                        .toList(),
+                  )),
+            )),
+      ),
+      PageViewModel(
+        titleWidget: Text('Get user recommendations?',
+            style: Theme.of(context).textTheme.headline5),
+        bodyWidget: Consumer<PreferenceProvider>(
+          builder: (context, p, child) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ListTile(
+                leading: Beta(
+                  Icon(FontAwesomeIcons.cartPlus,
+                      color: getBlackAndWhite(context, 0)),
+                  type: BetaType.SOON,
                 ),
-                !kIsWeb
-                    ? Lottie.asset(
-                        'animations/recommendations.json',
-                        height: AppSize.safeBlockVertical * 70,
-                        width: AppSize.safeBlockHorizontal * 70,
-                        alignment: Alignment.center,
-                      )
-                    : SizedBox.shrink(),
-              ],
-            ),
+                title: Text('New relationships',
+                    style: Theme.of(context).textTheme.headline6),
+                trailing: Switch(value: false, onChanged: (_) {}),
+              ),
+              ListTile(
+                onTap: () => p.setRecommendations(
+                    p.preference!.userRecommendations ==
+                            lg.UserPreference_RecommendationType.COMPOUND
+                        ? lg.UserPreference_RecommendationType.NONE
+                        : lg.UserPreference_RecommendationType.COMPOUND),
+                leading: Icon(FontAwesomeIcons.layerGroup,
+                    color: getBlackAndWhite(context, 0)),
+                title: Text('Compound relationships',
+                    style: Theme.of(context).textTheme.headline6),
+                trailing: Switch(
+                    value: p.preference!.userRecommendations ==
+                        lg.UserPreference_RecommendationType.COMPOUND,
+                    onChanged: (v) => p.setRecommendations(v
+                        ? lg.UserPreference_RecommendationType.COMPOUND
+                        : lg.UserPreference_RecommendationType.NONE)),
+              ),
+              !kIsWeb
+                  ? Lottie.asset(
+                      'animations/recommendations.json',
+                      height: AppSize.safeBlockVertical * 70,
+                      width: AppSize.safeBlockHorizontal * 70,
+                      alignment: Alignment.center,
+                    )
+                  : SizedBox.shrink(),
+            ],
           ),
         ),
-        PageViewModel(
-          titleWidget: Text('Your friends don\'t have Langame?',
-              style: Theme.of(context).textTheme.headline5),
-          bodyWidget: Column(children: [
-            !kIsWeb
-                ? Lottie.asset(
-                    'animations/share.json',
-                    height: AppSize.safeBlockVertical * 70,
-                    width: AppSize.safeBlockHorizontal * 70,
-                    alignment: Alignment.center,
-                  )
-                : SizedBox.shrink(),
-            LangameButton(
-              FontAwesomeIcons.shareAlt,
-              onPressed: () => Share.share(
-                  'I\'m using Langame to have incredible conversations, you should try:\n${AppConst.mainUrl}',
-                  subject:
-                      'Join me on Langame app for incredible conversations!'),
-              text: 'Invite your friends',
-            )
-          ]),
-        ),
-        PageViewModel(
-          titleWidget: Text('Choose a tag',
-              style: Theme.of(context).textTheme.headline5),
-          bodyWidget: _buildTagForm(),
-        ),
-      ];
+      ),
+      PageViewModel(
+        titleWidget: Text('Your friends don\'t have Langame?',
+            style: Theme.of(context).textTheme.headline5),
+        bodyWidget: Column(children: [
+          !kIsWeb
+              ? Lottie.asset(
+                  'animations/share.json',
+                  height: AppSize.safeBlockVertical * 70,
+                  width: AppSize.safeBlockHorizontal * 70,
+                  alignment: Alignment.center,
+                )
+              : SizedBox.shrink(),
+          LangameButton(
+            FontAwesomeIcons.shareAlt,
+            highlighted: true,
+            onPressed: () => Share.share(
+                'I\'m using Langame to have incredible conversations, you should try:\n${AppConst.mainUrl}',
+                subject:
+                    'Join me on Langame app for incredible conversations!'),
+            text: 'Invite your friends',
+          )
+        ]),
+      ),
+      PageViewModel(
+        titleWidget:
+            Text('Choose a tag', style: Theme.of(context).textTheme.headline5),
+        bodyWidget: _buildTagForm(),
+      ),
+    ];
+  }
 }

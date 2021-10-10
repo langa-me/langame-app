@@ -28,24 +28,39 @@ jobs:
         run: sh ./android/decrypt.sh
         env:
           RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      - name: Decrypt iOS keys
+        run: sh ./ios/decrypt.sh
+        env:
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
       # Hack because somehow refuse building if not in root (works in debug though)
       - run: cp android/app/src/main/google-services.json android/app
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.5.0
+          flutter-version: 2.5.1
       - name: Install Flutter dependencies
         run: flutter pub get
-      - run: flutter build apk --release --flavor prod
+      - run: flutter build apk --release --flavor dev
+      - run: flutter build ios --release --no-codesign --flavor dev
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7.2'
-      - name: Run Fastlane
+      - name: Run Fastlane Android
         uses: maierj/fastlane-action@v2.0.1
         with:
           lane: firebase_distribution
           subdirectory: android
         env:
-          FIREBASE_CLI_TOKEN: '${{ secrets.FIREBASE_CLI_TOKEN }}'
+          FIREBASE_CLI_TOKEN_DEV: '${{ secrets.FIREBASE_CLI_TOKEN_DEV }}'
+      - name: Run Fastlane iOS
+        uses: maierj/fastlane-action@v2.0.1
+        with:
+          lane: firebase_distribution
+          subdirectory: ios
+        env:
+          PROVISIONING_PROFILE_SPECIFIER_DEV: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER_DEV }}'
+          TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
+          TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
+          FIREBASE_CLI_TOKEN_DEV: '${{ secrets.FIREBASE_CLI_TOKEN_DEV }}'
 
   

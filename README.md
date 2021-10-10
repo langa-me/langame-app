@@ -21,6 +21,26 @@ flutter run --flavor dev -d [MY_DEVICE]
 flutter run --flavor prod -d [MY_DEVICE]
 ```
 
+
+### Indexes
+
+https://firebase.google.com/docs/firestore/query-data/index-overview?authuser=0#composite_indexes
+
+```bash
+firebase deploy --only firestore:indexes
+gcloud firestore operations list
+gcloud firestore operations describe [OPERATION_NAME]
+```
+
+```bash
+firebase firestore:indexes > ../firestore.indexes.json
+```
+
+### Data transfer
+
+See https://louis030195/firebase-data
+
+
 ### Stripe
 
 ```bash

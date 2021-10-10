@@ -5,8 +5,7 @@ STRIPE_PROTO_SUBPATH ?= stripe/protobuf
 LANGAME_PROTO_SUBPATH ?= langame/protobuf
 
 proto:
-	protoc -I protos --dart_out=./lib/models --python_out=${LANGAME_WORKER_PATH} \
-	langame/protobuf/langame.proto protos/stripe/protobuf/stripe.proto protos/google/protobuf/*.proto
+	protoc -I protos --dart_out=./lib/models langame/protobuf/langame.proto protos/google/protobuf/*.proto
 
 	mkdir -p ${FUNCTIONS_PATH}/lib/${GOOGLE_PROTO_SUBPATH}
 	mkdir -p ${FUNCTIONS_PATH}/src/${GOOGLE_PROTO_SUBPATH}
@@ -14,11 +13,11 @@ proto:
 	protos/${GOOGLE_PROTO_SUBPATH}/timestamp.proto && \
 	pbts -o ${FUNCTIONS_PATH}/src/${GOOGLE_PROTO_SUBPATH}/timestamp.d.ts ${FUNCTIONS_PATH}/lib/${GOOGLE_PROTO_SUBPATH}/timestamp.js
 
-	mkdir -p ${FUNCTIONS_PATH}/lib/${STRIPE_PROTO_SUBPATH}
-	mkdir -p ${FUNCTIONS_PATH}/src/${STRIPE_PROTO_SUBPATH}
-	pbjs -t static-module -w commonjs -o ${FUNCTIONS_PATH}/lib/${STRIPE_PROTO_SUBPATH}/stripe.js \
-	protos/${STRIPE_PROTO_SUBPATH}/stripe.proto && \
-	pbts -o ${FUNCTIONS_PATH}/src/${STRIPE_PROTO_SUBPATH}/stripe.d.ts ${FUNCTIONS_PATH}/lib/${STRIPE_PROTO_SUBPATH}/stripe.js
+	mkdir -p ${FUNCTIONS_PATH}/lib/${GOOGLE_PROTO_SUBPATH}
+	mkdir -p ${FUNCTIONS_PATH}/src/${GOOGLE_PROTO_SUBPATH}
+	pbjs -t static-module -w commonjs -o ${FUNCTIONS_PATH}/lib/${GOOGLE_PROTO_SUBPATH}/any.js \
+	protos/${GOOGLE_PROTO_SUBPATH}/any.proto && \
+	pbts -o ${FUNCTIONS_PATH}/src/${GOOGLE_PROTO_SUBPATH}/any.d.ts ${FUNCTIONS_PATH}/lib/${GOOGLE_PROTO_SUBPATH}/any.js
 
 	mkdir -p ${FUNCTIONS_PATH}/lib/${LANGAME_PROTO_SUBPATH}
 	mkdir -p ${FUNCTIONS_PATH}/src/${LANGAME_PROTO_SUBPATH}

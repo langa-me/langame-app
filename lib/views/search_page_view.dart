@@ -1,5 +1,6 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
@@ -10,6 +11,7 @@ import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/users/user_tile.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'app_bars/app_bars.dart';
 import 'colors/colors.dart';
@@ -50,10 +52,9 @@ class _State extends State<SearchPageView>
     super.dispose();
   }
 
-  Widget _buildSearchPageView() =>
-      Scaffold(
-        appBar: buildAppBar(context, 'Search people'),
-        body: Consumer2<PreferenceProvider, AuthenticationProvider>(
+  Widget _buildSearchPageView() => Scaffold(
+      appBar: buildAppBar(context, 'Search people'),
+      body: Consumer2<PreferenceProvider, AuthenticationProvider>(
         builder: (context, lsp, ap, _) => FloatingSearchBar(
           queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
               decorationColor: getBlackAndWhite(context, 1, reverse: true),
@@ -91,21 +92,16 @@ class _State extends State<SearchPageView>
               lsp.resetFilteredSearchTagHistory();
               return;
             }
-            ap.getLangameUsersStartingWithTag(query).then((v) =>
-                lsp.filteredUserSearchHistory =
-                    v.result?.map((e) => e.tag).toList());
+            ap.getUserTag(query).then((v) => lsp.filteredUserSearchHistory =
+                v.result != null ? v.result!.map((e) => e.tag).toList() : []);
           },
           onSubmitted: (query) {
             lsp.addUserSearchHistory(query);
             _searchBarController.close();
-            ap.getLangameUsersStartingWithTag(query).then((users) {
-              if (users.result?.length == 1) {
+            ap.getUserTag(query).then((users) {
+              if (users.result != null && users.result!.length > 0) {
                 lsp.selectedTag = query;
-                lsp.selectedUser = users.result?.first;
-              } else {
-                // TODO: should notify "no user found" or several found ...
-                lsp.selectedTag = null;
-                lsp.selectedUser = null;
+                lsp.selectedUser = users.result!.first;
               }
             });
           },
@@ -125,15 +121,20 @@ class _State extends State<SearchPageView>
           if (lsp.filteredUserSearchHistory.isEmpty &&
               _searchBarController.query.isEmpty) {
             return Container(
-              height: 56,
+              height: AppSize.safeBlockVertical * 10,
               width: double.infinity,
               alignment: Alignment.center,
-              child: Text(
-                'Start searching',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.headline6,
-              ),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SvgPicture.asset(
+                        isLight(context)
+                            ? 'images/search-by-algolia-light-background.svg'
+                            : 'images/search-by-algolia-dark-background.svg',
+                        width: AppSize.safeBlockHorizontal * 20,
+                        height: AppSize.safeBlockVertical * 5,
+                        ),
+                  ]),
             );
           } else if (lsp.filteredUserSearchHistory.isEmpty) {
             return ListTile(
@@ -141,9 +142,7 @@ class _State extends State<SearchPageView>
                   style: Theme.of(context).textTheme.headline6),
               leading: const Icon(Icons.search),
               onTap: () {
-                ap
-                    .getLangameUsersStartingWithTag(_searchBarController.query)
-                    .then((users) {
+                ap.getUserTag(_searchBarController.query).then((users) {
                   lsp.addUserSearchHistory(_searchBarController.query);
                   _searchBarController.close();
                   if (users.result?.length == 1) {
@@ -165,21 +164,27 @@ class _State extends State<SearchPageView>
               children: lsp.filteredUserSearchHistory
                   .map(
                     (tag) => ListTile(
-                      tileColor: Colors.white,
+                      tileColor: getBlackAndWhite(context, 1, reverse: true),
+
                       title: Text(tag,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.black)),
+                          style: Theme.of(context).textTheme.headline6!.merge(
+                              TextStyle(
+                                  color: getBlackAndWhite(context, 0,
+                                      reverse: false)))),
                       //leading: Icon(Icons.history, color: Colors.black),
                       trailing: IconButton(
-                        icon: Icon(Icons.clear, color: Colors.black),
+                        icon: Icon(Icons.clear,
+                            color:
+                                getBlackAndWhite(context, 0, reverse: false)),
                         onPressed: () {
                           lsp.deleteUserSearchHistory(tag);
                         },
                       ),
                       onTap: () {
                         _searchBarController.close();
-                        ap.getLangameUsersStartingWithTag(tag).then((users) {
+                        ap.getUserTag(tag).then((users) {
                           if (users.result != null &&
                               users.result!.length == 1) {
                             lsp.selectedTag = users.result?.first.tag;
@@ -226,7 +231,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     return Consumer2<PreferenceProvider, NewLangameProvider>(
         builder: (c, p, lp, _) {
       if (p.selectedUser == null) {
-        return p.preference!.userRecommendations
+        return p.preference!.userRecommendations != lg.UserPreference_RecommendationType.NONE
             ? Column(
                 children: [
                   Text('Recommendations',

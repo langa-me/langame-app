@@ -25,18 +25,18 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
-import 'buttons/button.dart';
-import 'colors/colors.dart';
-import 'main_view.dart';
+import '../buttons/button.dart';
+import '../colors/colors.dart';
+import '../main_view.dart';
 
-class LangameView extends StatefulWidget {
+class LangameAudioView extends StatefulWidget {
   final String channelName;
   final bool notifyOthers;
 
-  LangameView(this.channelName, this.notifyOthers);
+  LangameAudioView(this.channelName, this.notifyOthers);
 
   @override
-  _LangameViewState createState() => _LangameViewState();
+  _LangameAudioViewState createState() => _LangameAudioViewState();
 }
 
 class LocalPlayer {
@@ -46,7 +46,7 @@ class LocalPlayer {
   LocalPlayer(this.langameUser, this.isSpeaking);
 }
 
-class _LangameViewState extends State<LangameView> {
+class _LangameAudioViewState extends State<LangameAudioView> {
   bool permissionRequested = false;
   Stream<DocumentSnapshot<lg.Langame>>? langameStream;
   Map<int, LocalPlayer> _localPlayers = {};
@@ -97,8 +97,8 @@ class _LangameViewState extends State<LangameView> {
         'view': 'langame_view',
       });
       return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [cp.buildLoadingWidget(text: 'Offline')]);
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [cp.buildLoadingWidget(text: 'Offline')]);
     }
 
     if (langameStream == null) {
@@ -117,7 +117,7 @@ class _LangameViewState extends State<LangameView> {
                         'langame_locked') {
                   cp.showSnackBar(
                       'Unfortunately the Langame has been locked by the creator');
-                  _handleError(failNow: true, toast: false);
+                  _handleError(failNow: true);
                 } else {
                   _handleError();
                 }
@@ -424,21 +424,22 @@ class _LangameViewState extends State<LangameView> {
     ], height: 65);
   }
 
-  void _handleError({bool failNow = false, bool toast = true}) async {
+  void _handleError({bool failNow = false}) async {
     if (errors > maxErrors || failNow) {
       var f = Provider.of<AudioProvider>(context, listen: false).leaveChannel();
       var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
-      if (toast)
-        showToast(
-          _failingMessage,
-          color: Colors.red,
-        );
+      var cp = Provider.of<ContextProvider>(context, listen: false);
 
       cap.crashlytics?.recordError(
           LangameException('failed to start langame'), null,
           reason: 'failed to start langame', fatal: true);
       await f;
-      _goBackToMainMenu();
+      await cp.showFailureDialog(_failingMessage, actions: [
+        LangameButton(
+          FontAwesomeIcons.doorOpen,
+          onPressed: _goBackToMainMenu,
+        )
+      ]);
 
       return;
     }
@@ -724,7 +725,7 @@ class _LangameViewState extends State<LangameView> {
         Row(children: [
           IconButton(
             onPressed: () => Share.share(
-                    l.memes[l.currentMeme].content +
+                l.memes[l.currentMeme].content +
                     '\n' +
                     'Straight from ${AppConst.mainUrl}',
                 subject:
@@ -875,7 +876,7 @@ class _LangameViewState extends State<LangameView> {
   Future<void> _showEndDialog() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var currentLg = Provider.of<LangameProvider>(context, listen: false)
-        .runningLangames
+        .langames
         .values
         .firstWhere((e) => e.channelName == widget.channelName);
     cp.showCustomDialog(

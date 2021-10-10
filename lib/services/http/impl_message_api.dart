@@ -7,8 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
+import 'package:langame/models/extension.dart';
 import 'package:langame/services/http/message_api.dart';
 import 'package:universal_platform/universal_platform.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'firebase.dart';
 
@@ -27,12 +29,12 @@ class ImplMessageApi extends MessageApi {
   StreamSubscription<RemoteMessage>? _onForegroundMessage;
   // ignore: cancel_subscriptions
   StreamSubscription<RemoteMessage>? _onNonTerminatedOpened;
-  Function(dynamic)? _addCallback;
+  Function(lg.Message)? _addCallback;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   ImplMessageApi(FirebaseApi firebase,
-      void Function(dynamic) onBackgroundOrForegroundOpened)
+      void Function(lg.Message) onBackgroundOrForegroundOpened)
       : super(firebase, onBackgroundOrForegroundOpened);
 
   void _add(RemoteMessage m) async {
@@ -62,7 +64,7 @@ class ImplMessageApi extends MessageApi {
         // Then add id to local notifications
       );
     }
-    if (_addCallback != null) _addCallback!(m.data);
+    if (_addCallback != null) _addCallback!(MessageExt.fromObject(m.data));
   }
 
   Future<void> _firebaseMessagingForegroundHandler(
@@ -92,7 +94,8 @@ class ImplMessageApi extends MessageApi {
         onSelectNotification: (payload) async {
       if (payload == null)
         throw LangameException('received null payload on notification tap');
-      onBackgroundOrForegroundOpened(jsonDecode(payload));
+      onBackgroundOrForegroundOpened(
+          MessageExt.fromObject(jsonDecode(payload)));
     });
 
     if (UniversalPlatform.isAndroid) {
@@ -127,7 +130,7 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<void> listen(Function(dynamic)? add) async {
+  Future<void> listen(Function(lg.Message)? add) async {
     // Get the token each time the application loads
     String? token = await firebase.messaging!.getToken();
 
@@ -151,8 +154,8 @@ class ImplMessageApi extends MessageApi {
     _onForegroundMessage =
         FirebaseMessaging.onMessage.listen(_firebaseMessagingForegroundHandler);
 
-    _onNonTerminatedOpened = FirebaseMessaging.onMessageOpenedApp
-        .listen((m) => onBackgroundOrForegroundOpened(m.data));
+    _onNonTerminatedOpened = FirebaseMessaging.onMessageOpenedApp.listen(
+        (m) => onBackgroundOrForegroundOpened(MessageExt.fromObject(m.data)));
     runZonedGuarded(
         () => FirebaseMessaging.onBackgroundMessage(
             _firebaseMessagingBackgroundHandler),
@@ -202,19 +205,14 @@ class ImplMessageApi extends MessageApi {
   }
 
   @override
-  Future<Map<String, String>?> getInitialMessage() async {
+  Future<lg.Message?> getInitialMessage() async {
     var n2 = await Future.wait([
       flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails(),
       firebase.messaging!.getInitialMessage(),
     ]);
 
-    // if (n2.length > 0 &&
-    //     n2[0] != null &&
-    //     (n2[0] as NotificationAppLaunchDetails).payload != null) {
-    //   return jsonDecode((n2[0] as NotificationAppLaunchDetails).payload!);
-    // }
     if (n2.length > 1 && n2[1] != null && (n2[1] as RemoteMessage?) != null) {
-      return {'channelName': (n2[1] as RemoteMessage).data['channelName']};
+      return MessageExt.fromObject((n2[1] as RemoteMessage).data);
     }
     return null;
   }

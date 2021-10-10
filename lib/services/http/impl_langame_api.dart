@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:langame/helpers/constants.dart';
@@ -13,36 +15,49 @@ class ImplLangameApi extends LangameApi {
   ImplLangameApi(FirebaseApi firebase) : super(firebase);
 
   @override
-  Future<Iterable<Stream<DocumentSnapshot<lg.Langame>>>> getLangames(
-      {bool unDoneOnly = false}) async {
-    var p = await Future.wait([
-      firebase.firestore!
-          .collectionGroup('players')
-          .where('userId', isEqualTo: firebase.auth!.currentUser!.uid)
-          .get(),
-      firebase.firestore!
-          .collection(AppConst.firestoreLangamesCollection)
-          .where('initiator', isEqualTo: firebase.auth!.currentUser!.uid)
-          .get(),
-      firebase.firestore!
-          .collection(AppConst.firestoreLangamesCollection)
-          .where('reservedSpots',
-              arrayContains: firebase.auth!.currentUser!.uid)
-          .get()
-    ]);
-    var langamesParticipant = p[0]
-        .docs
-        .where((e) => e.reference.parent.parent != null)
-        .map((e) => e.reference.parent.parent!);
-    var langamesInitiator = p[1].docs.map((e) => e.reference);
-    var langameReservedSpots = p[2].docs.map((e) => e.reference);
-    return [...langamesParticipant, ...langamesInitiator, ...langameReservedSpots]
-        .map((e) => e
+  Stream<lg.Langame> getLangames() {
+    var stream = StreamController<lg.Langame>();
+
+    var i = firebase.firestore!
+        .collection(AppConst.firestoreLangamesCollection)
+        .where('initiator', isEqualTo: firebase.auth!.currentUser!.uid)
         .withConverter<lg.Langame>(
-          fromFirestore: (e, _) => LangameExt.fromObject(e.data()!),
-          toFirestore: (e, _) => e.toMapStringDynamic(),
+          fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
         )
-        .snapshots());
+        .snapshots()
+        .listen((e) => e.docs.forEach((doc) => stream.add(doc.data())));
+    var rs = firebase.firestore!
+        .collection(AppConst.firestoreLangamesCollection)
+        .where('reservedSpots', arrayContains: firebase.auth!.currentUser!.uid)
+        .withConverter<lg.Langame>(
+          fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
+          toFirestore: (s, _) => s.toMapStringDynamic(),
+        )
+        .snapshots()
+        .listen((e) => e.docs.forEach((doc) => stream.add(doc.data())));
+
+    var p = firebase.firestore!
+        .collectionGroup('players')
+        .where('userId', isEqualTo: firebase.auth!.currentUser!.uid)
+        .snapshots()
+        .listen(
+          (e) => e.docs.forEach(
+            (doc) async => doc.reference.parent.parent!.get().then(
+                  (l) => stream.add(
+                    LangameExt.fromObject(l.data()!),
+                  ),
+                ),
+          ),
+        );
+
+    stream.onCancel = () {
+      i.cancel();
+      rs.cancel();
+      p.cancel();
+    };
+    // Unique stream
+    return stream.stream.distinct((a, b) => a.channelName == b.channelName);
   }
 
   @override

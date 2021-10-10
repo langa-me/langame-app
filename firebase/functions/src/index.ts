@@ -5,8 +5,7 @@ if (admin.apps.length === 0) {
 }
 import * as functions from "firebase-functions";
 import {newFeedback} from "./feedback";
-import {onDeleteAuthentication} from "./onDeleteAuthentication";
-import {subscribe} from "./subscribe";
+import {onDeleteAuthentication} from "./users/onDeleteAuthentication";
 import {
   isDev,
   kLangamesCollection,
@@ -14,18 +13,18 @@ import {
 import {onCreateLangame} from "./onCreateLangame";
 import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
 import {onUpdateLangame} from "./onUpdateLangame";
-import {onCreateAuthentication} from "./onCreateAuthentication";
+import {onCreateAuthentication} from "./users/onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
 import {setLangamesDone} from "./setLangamesDone";
-import {setUserRecommendation} from "./setUserRecommendation";
+import {setUserRecommendation} from "./users/setUserRecommendation";
 import {resetCredits} from "./users/resetCredits";
 import {getMemes} from "./memes/getMemes";
 import * as Sentry from "@sentry/node";
 import {createMemes} from "./memes/createMemes";
-import {onUpdateMeme} from "./memes/onUpdateMeme";
-import {onDeleteMeme} from "./memes/onDeleteMeme";
 import {onWriteTopic} from "./memes/onWriteTopic";
-import {onCreateMeme} from "./memes/onCreateMeme";
+import {onWriteUser} from "./users/onWriteUser";
+import {onWriteMeme} from "./memes/onWriteMeme";
+import {onWriteMessage} from "./messages/onWriteMessage";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -45,12 +44,6 @@ Sentry.init({
 });
 
 
-exports.subscribe = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .https
-    .onCall(subscribe);
-
 exports.versionCheck = functions
     .region(region)
     .runWith(runtimeOpts)
@@ -58,7 +51,7 @@ exports.versionCheck = functions
     .onCall(versionCheck);
 
 
-exports.userRecommendations = functions
+exports.setUserRecommendation = functions
     .region(region)
     .runWith(runtimeOpts)
     .pubsub
@@ -119,7 +112,7 @@ exports.onUpdateLangamePlayers = functions
     .document(`${kLangamesCollection}/{langameId}/players/{playerId}`)
     .onWrite(onUpdateLangamePlayers);
 
-// Authentication //
+// User //
 
 exports.onDeleteAuthentication = functions
     .region(region)
@@ -135,6 +128,11 @@ exports.onCreateAuthentication = functions
     .user()
     .onCreate(onCreateAuthentication);
 
+exports.onWriteUser = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore.document("users/{userId}")
+    .onWrite(onWriteUser);
 
 // Meme //
 
@@ -155,26 +153,21 @@ exports.createMemes = functions
     .onCall(createMemes);
 
 
-exports.onCreateMeme = functions
+exports.onWriteMeme = functions
     .region(region)
     .runWith(runtimeOpts)
     .firestore.document("memes/{memeId}")
-    .onCreate(onCreateMeme);
-
-exports.onDeleteMeme = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .firestore.document("memes/{memeId}")
-    .onDelete(onDeleteMeme);
-
-exports.onUpdateMeme = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .firestore.document("memes/{memeId}")
-    .onUpdate(onUpdateMeme);
+    .onWrite(onWriteMeme);
 
 exports.onWriteTopic = functions
     .region(region)
     .runWith(runtimeOpts)
     .firestore.document("topics/{topicId}")
     .onWrite(onWriteTopic);
+
+
+exports.onWriteMessage = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore.document("messages/{messageId}")
+    .onWrite(onWriteMessage);

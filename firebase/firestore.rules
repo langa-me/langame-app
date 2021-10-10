@@ -2,7 +2,10 @@ rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
         function isAdmin(request) {
-            return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role =='admin';
+            return getUser(request.auth.uid).role =='admin';
+        }
+        function getUser(id) {
+            return get(/databases/$(database)/documents/users/$(id)).data;
         }
         // TODO: overall prevent DDOSes by setting "last update" stuff
         match /users/{userId} {
@@ -10,10 +13,11 @@ service cloud.firestore {
             // TODO: how to prevent taking someone else tag?
             allow delete: if request.auth != null && request.auth.uid == userId;
             allow update: if request.auth != null && request.auth.uid == userId &&
+                // Allow changing everything except credits
                 (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits'])); // &&
                 // If the user try to change lastSignInTime, it has to be within the 20 seconds obviously
                 //request.time - request.resource.data.get('lastSignInTime', request.time)  < duration.value(20, 's');
-            allow read: if request.auth != null;
+            allow read: if true; // TODO
         }
         match /recommendations/{recommendationId} {
             allow read: if request.auth != null && request.auth.uid == recommendationId;
@@ -36,10 +40,10 @@ service cloud.firestore {
             // TODO: security!!!!
             allow create: if request.auth != null &&
                              request.resource.data.keys()
-                                .hasOnly(['initiator', 'date', 'topics', 'reservedSpots']) &&
+                                .hasOnly(['initiator', 'date', 'topics', 'reservedSpots', 'isText']) &&
                              request.resource.data.initiator == request.auth.uid &&
                              // Has enough credits?
-                             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.credits > 0;
+                             getUser(request.auth.uid).credits > 0;
             // Client can update "currentMeme"
             allow update: if (request.resource.data.diff(resource.data)
                 .affectedKeys()
@@ -131,6 +135,24 @@ service cloud.firestore {
                     "text",
                     "metadata"]) &&
                 request.resource.data.userId == request.auth.uid;
+        }
+        match /messages/{messageId} {
+            allow read: if request.auth != null && (request.auth.uid == resource.data.fromUid || 
+                request.auth.uid == resource.data.toUid);
+            allow create: if request.auth != null &&
+                request.resource.data.keys()
+                .hasAll([
+                    "type",
+                    "body",
+                    "channelName",
+                    "createdAt",
+                    "fromUid",
+                    "toUid"]) &&
+                // Clients can only send messages of type "text"
+                request.resource.data.type == 1 &&
+                request.resource.data.fromUid == request.auth.uid &&
+                // "to" exists?
+                getUser(request.resource.data.toUid) != null;
         }
     }
 }

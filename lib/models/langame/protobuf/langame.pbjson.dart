@@ -90,117 +90,6 @@ const Meme_TranslatedEntry$json = const {
 
 /// Descriptor for `Meme`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List memeDescriptor = $convert.base64Decode('CgRNZW1lEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZ0b3BpY3MYBCADKAlSBnRvcGljcxIbCglwcm9tcHRfaWQYBSABKAlSCHByb21wdElkEkYKCnRyYW5zbGF0ZWQYBiADKAsyJi5sYW5nYW1lLnByb3RvYnVmLk1lbWUuVHJhbnNsYXRlZEVudHJ5Ugp0cmFuc2xhdGVkEg4KAmlkGAcgASgJUgJpZBIaCghkaXNhYmxlZBgIIAEoCFIIZGlzYWJsZWQaPQoPVHJhbnNsYXRlZEVudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag$json = const {
-  '1': 'Tag',
-  '2': const [
-    const {'1': 'created_at', '3': 1, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'createdAt'},
-    const {'1': 'topic', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Topic', '9': 0, '10': 'topic'},
-    const {'1': 'classification', '3': 3, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Classification', '9': 0, '10': 'classification'},
-    const {'1': 'engine', '3': 4, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Engine', '9': 0, '10': 'engine'},
-    const {'1': 'feedback', '3': 5, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback', '9': 0, '10': 'feedback'},
-    const {'1': 'context', '3': 6, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Context', '9': 0, '10': 'context'},
-    const {'1': 'aggregated_feedback', '3': 7, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback', '9': 0, '10': 'aggregatedFeedback'},
-  ],
-  '3': const [Tag_Topic$json, Tag_Classification$json, Tag_Engine$json, Tag_Feedback$json, Tag_Context$json],
-  '8': const [
-    const {'1': 'type'},
-  ],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Topic$json = const {
-  '1': 'Topic',
-  '2': const [
-    const {'1': 'content', '3': 2, '4': 1, '5': 9, '10': 'content'},
-    const {'1': 'emojis', '3': 3, '4': 3, '5': 9, '10': 'emojis'},
-  ],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Classification$json = const {
-  '1': 'Classification',
-  '2': const [
-    const {'1': 'content', '3': 1, '4': 1, '5': 9, '10': 'content'},
-    const {'1': 'score', '3': 2, '4': 1, '5': 1, '10': 'score'},
-    const {'1': 'human', '3': 3, '4': 1, '5': 8, '10': 'human'},
-  ],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Engine$json = const {
-  '1': 'Engine',
-  '2': const [
-    const {'1': 'parameters', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Engine.Parameters', '10': 'parameters'},
-  ],
-  '3': const [Tag_Engine_Parameters$json],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Engine_Parameters$json = const {
-  '1': 'Parameters',
-  '2': const [
-    const {'1': 'temperature', '3': 1, '4': 1, '5': 1, '10': 'temperature'},
-    const {'1': 'max_tokens', '3': 2, '4': 1, '5': 13, '10': 'maxTokens'},
-    const {'1': 'top_p', '3': 3, '4': 1, '5': 13, '10': 'topP'},
-    const {'1': 'frequency_penalty', '3': 4, '4': 1, '5': 1, '10': 'frequencyPenalty'},
-    const {'1': 'presence_penalty', '3': 5, '4': 1, '5': 1, '10': 'presencePenalty'},
-    const {'1': 'stop', '3': 6, '4': 3, '5': 9, '10': 'stop'},
-    const {'1': 'model', '3': 7, '4': 1, '5': 9, '10': 'model'},
-  ],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Feedback$json = const {
-  '1': 'Feedback',
-  '2': const [
-    const {'1': 'user_id', '3': 1, '4': 1, '5': 9, '10': 'userId'},
-    const {'1': 'general', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback.General', '9': 0, '10': 'general'},
-    const {'1': 'relevance', '3': 3, '4': 1, '5': 11, '6': '.langame.protobuf.Tag.Feedback.Relevance', '9': 0, '10': 'relevance'},
-  ],
-  '3': const [Tag_Feedback_General$json, Tag_Feedback_Relevance$json],
-  '8': const [
-    const {'1': 'type'},
-  ],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Feedback_General$json = const {
-  '1': 'General',
-  '2': const [
-    const {'1': 'score', '3': 1, '4': 1, '5': 13, '10': 'score'},
-  ],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Feedback_Relevance$json = const {
-  '1': 'Relevance',
-  '2': const [
-    const {'1': 'score', '3': 1, '4': 1, '5': 13, '10': 'score'},
-  ],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Context$json = const {
-  '1': 'Context',
-  '2': const [
-    const {'1': 'content', '3': 1, '4': 1, '5': 9, '10': 'content'},
-    const {'1': 'type', '3': 2, '4': 1, '5': 14, '6': '.langame.protobuf.Tag.Context.Type', '10': 'type'},
-  ],
-  '4': const [Tag_Context_Type$json],
-};
-
-@$core.Deprecated('Use tagDescriptor instead')
-const Tag_Context_Type$json = const {
-  '1': 'Type',
-  '2': const [
-    const {'1': 'WIKIPEDIA', '2': 0},
-    const {'1': 'OPENAI', '2': 1},
-  ],
-};
-
-/// Descriptor for `Tag`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List tagDescriptor = $convert.base64Decode('CgNUYWcSOQoKY3JlYXRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdBIzCgV0b3BpYxgCIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuVGFnLlRvcGljSABSBXRvcGljEk4KDmNsYXNzaWZpY2F0aW9uGAMgASgLMiQubGFuZ2FtZS5wcm90b2J1Zi5UYWcuQ2xhc3NpZmljYXRpb25IAFIOY2xhc3NpZmljYXRpb24SNgoGZW5naW5lGAQgASgLMhwubGFuZ2FtZS5wcm90b2J1Zi5UYWcuRW5naW5lSABSBmVuZ2luZRI8CghmZWVkYmFjaxgFIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrSABSCGZlZWRiYWNrEjkKB2NvbnRleHQYBiABKAsyHS5sYW5nYW1lLnByb3RvYnVmLlRhZy5Db250ZXh0SABSB2NvbnRleHQSUQoTYWdncmVnYXRlZF9mZWVkYmFjaxgHIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuVGFnLkZlZWRiYWNrSABSEmFnZ3JlZ2F0ZWRGZWVkYmFjaxo5CgVUb3BpYxIYCgdjb250ZW50GAIgASgJUgdjb250ZW50EhYKBmVtb2ppcxgDIAMoCVIGZW1vamlzGlYKDkNsYXNzaWZpY2F0aW9uEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnQSFAoFc2NvcmUYAiABKAFSBXNjb3JlEhQKBWh1bWFuGAMgASgIUgVodW1hbhq4AgoGRW5naW5lEkcKCnBhcmFtZXRlcnMYASABKAsyJy5sYW5nYW1lLnByb3RvYnVmLlRhZy5FbmdpbmUuUGFyYW1ldGVyc1IKcGFyYW1ldGVycxrkAQoKUGFyYW1ldGVycxIgCgt0ZW1wZXJhdHVyZRgBIAEoAVILdGVtcGVyYXR1cmUSHQoKbWF4X3Rva2VucxgCIAEoDVIJbWF4VG9rZW5zEhMKBXRvcF9wGAMgASgNUgR0b3BQEisKEWZyZXF1ZW5jeV9wZW5hbHR5GAQgASgBUhBmcmVxdWVuY3lQZW5hbHR5EikKEHByZXNlbmNlX3BlbmFsdHkYBSABKAFSD3ByZXNlbmNlUGVuYWx0eRISCgRzdG9wGAYgAygJUgRzdG9wEhQKBW1vZGVsGAcgASgJUgVtb2RlbBr9AQoIRmVlZGJhY2sSFwoHdXNlcl9pZBgBIAEoCVIGdXNlcklkEkIKB2dlbmVyYWwYAiABKAsyJi5sYW5nYW1lLnByb3RvYnVmLlRhZy5GZWVkYmFjay5HZW5lcmFsSABSB2dlbmVyYWwSSAoJcmVsZXZhbmNlGAMgASgLMigubGFuZ2FtZS5wcm90b2J1Zi5UYWcuRmVlZGJhY2suUmVsZXZhbmNlSABSCXJlbGV2YW5jZRofCgdHZW5lcmFsEhQKBXNjb3JlGAEgASgNUgVzY29yZRohCglSZWxldmFuY2USFAoFc2NvcmUYASABKA1SBXNjb3JlQgYKBHR5cGUafgoHQ29udGV4dBIYCgdjb250ZW50GAEgASgJUgdjb250ZW50EjYKBHR5cGUYAiABKA4yIi5sYW5nYW1lLnByb3RvYnVmLlRhZy5Db250ZXh0LlR5cGVSBHR5cGUiIQoEVHlwZRINCglXSUtJUEVESUEQABIKCgZPUEVOQUkQAUIGCgR0eXBl');
 @$core.Deprecated('Use userDescriptor instead')
 const User$json = const {
   '1': 'User',
@@ -244,7 +133,7 @@ const UserPreference$json = const {
   '1': 'UserPreference',
   '2': const [
     const {'1': 'user_id', '3': 2, '4': 1, '5': 9, '10': 'userId'},
-    const {'1': 'user_recommendations', '3': 3, '4': 1, '5': 8, '10': 'userRecommendations'},
+    const {'1': 'user_recommendations', '3': 3, '4': 1, '5': 14, '6': '.langame.protobuf.UserPreference.RecommendationType', '10': 'userRecommendations'},
     const {'1': 'theme_index', '3': 4, '4': 1, '5': 5, '10': 'themeIndex'},
     const {'1': 'has_done_on_boarding', '3': 5, '4': 1, '5': 8, '10': 'hasDoneOnBoarding'},
     const {'1': 'user_search_history', '3': 6, '4': 3, '5': 9, '10': 'userSearchHistory'},
@@ -254,21 +143,53 @@ const UserPreference$json = const {
     const {'1': 'errors', '3': 10, '4': 3, '5': 11, '6': '.langame.protobuf.Error', '10': 'errors'},
     const {'1': 'speech_to_text_locale', '3': 11, '4': 1, '5': 9, '10': 'speechToTextLocale'},
     const {'1': 'saw_whats_new', '3': 13, '4': 1, '5': 8, '10': 'sawWhatsNew'},
+    const {'1': 'notification', '3': 14, '4': 1, '5': 11, '6': '.langame.protobuf.UserPreference.Notification', '10': 'notification'},
   ],
   '3': const [UserPreference_Notification$json],
+  '4': const [UserPreference_RecommendationType$json],
 };
 
 @$core.Deprecated('Use userPreferenceDescriptor instead')
 const UserPreference_Notification$json = const {
   '1': 'Notification',
   '2': const [
+    const {'1': 'invite', '3': 1, '4': 1, '5': 11, '6': '.langame.protobuf.UserPreference.Notification.Invite', '10': 'invite'},
+    const {'1': 'message', '3': 2, '4': 1, '5': 11, '6': '.langame.protobuf.UserPreference.Notification.Message', '10': 'message'},
+  ],
+  '3': const [UserPreference_Notification_Invite$json, UserPreference_Notification_Message$json],
+};
+
+@$core.Deprecated('Use userPreferenceDescriptor instead')
+const UserPreference_Notification_Invite$json = const {
+  '1': 'Invite',
+  '2': const [
     const {'1': 'email', '3': 1, '4': 1, '5': 8, '10': 'email'},
     const {'1': 'push', '3': 2, '4': 1, '5': 8, '10': 'push'},
   ],
 };
 
+@$core.Deprecated('Use userPreferenceDescriptor instead')
+const UserPreference_Notification_Message$json = const {
+  '1': 'Message',
+  '2': const [
+    const {'1': 'email', '3': 1, '4': 1, '5': 8, '10': 'email'},
+    const {'1': 'push', '3': 2, '4': 1, '5': 8, '10': 'push'},
+  ],
+};
+
+@$core.Deprecated('Use userPreferenceDescriptor instead')
+const UserPreference_RecommendationType$json = const {
+  '1': 'RecommendationType',
+  '2': const [
+    const {'1': 'NONE', '2': 0},
+    const {'1': 'NEW', '2': 1},
+    const {'1': 'COMPOUND', '2': 2},
+    const {'1': 'ALL', '2': 3},
+  ],
+};
+
 /// Descriptor for `UserPreference`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List userPreferenceDescriptor = $convert.base64Decode('Cg5Vc2VyUHJlZmVyZW5jZRIXCgd1c2VyX2lkGAIgASgJUgZ1c2VySWQSMQoUdXNlcl9yZWNvbW1lbmRhdGlvbnMYAyABKAhSE3VzZXJSZWNvbW1lbmRhdGlvbnMSHwoLdGhlbWVfaW5kZXgYBCABKAVSCnRoZW1lSW5kZXgSLwoUaGFzX2RvbmVfb25fYm9hcmRpbmcYBSABKAhSEWhhc0RvbmVPbkJvYXJkaW5nEi4KE3VzZXJfc2VhcmNoX2hpc3RvcnkYBiADKAlSEXVzZXJTZWFyY2hIaXN0b3J5EioKEXNoYWtlX3RvX2ZlZWRiYWNrGAcgASgIUg9zaGFrZVRvRmVlZGJhY2sSJwoPZmF2b3JpdGVfdG9waWNzGAggAygJUg5mYXZvcml0ZVRvcGljcxIwChR0b3BpY19zZWFyY2hfaGlzdG9yeRgJIAMoCVISdG9waWNTZWFyY2hIaXN0b3J5Ei8KBmVycm9ycxgKIAMoCzIXLmxhbmdhbWUucHJvdG9idWYuRXJyb3JSBmVycm9ycxIxChVzcGVlY2hfdG9fdGV4dF9sb2NhbGUYCyABKAlSEnNwZWVjaFRvVGV4dExvY2FsZRIiCg1zYXdfd2hhdHNfbmV3GA0gASgIUgtzYXdXaGF0c05ldxo4CgxOb3RpZmljYXRpb24SFAoFZW1haWwYASABKAhSBWVtYWlsEhIKBHB1c2gYAiABKAhSBHB1c2g=');
+final $typed_data.Uint8List userPreferenceDescriptor = $convert.base64Decode('Cg5Vc2VyUHJlZmVyZW5jZRIXCgd1c2VyX2lkGAIgASgJUgZ1c2VySWQSZgoUdXNlcl9yZWNvbW1lbmRhdGlvbnMYAyABKA4yMy5sYW5nYW1lLnByb3RvYnVmLlVzZXJQcmVmZXJlbmNlLlJlY29tbWVuZGF0aW9uVHlwZVITdXNlclJlY29tbWVuZGF0aW9ucxIfCgt0aGVtZV9pbmRleBgEIAEoBVIKdGhlbWVJbmRleBIvChRoYXNfZG9uZV9vbl9ib2FyZGluZxgFIAEoCFIRaGFzRG9uZU9uQm9hcmRpbmcSLgoTdXNlcl9zZWFyY2hfaGlzdG9yeRgGIAMoCVIRdXNlclNlYXJjaEhpc3RvcnkSKgoRc2hha2VfdG9fZmVlZGJhY2sYByABKAhSD3NoYWtlVG9GZWVkYmFjaxInCg9mYXZvcml0ZV90b3BpY3MYCCADKAlSDmZhdm9yaXRlVG9waWNzEjAKFHRvcGljX3NlYXJjaF9oaXN0b3J5GAkgAygJUhJ0b3BpY1NlYXJjaEhpc3RvcnkSLwoGZXJyb3JzGAogAygLMhcubGFuZ2FtZS5wcm90b2J1Zi5FcnJvclIGZXJyb3JzEjEKFXNwZWVjaF90b190ZXh0X2xvY2FsZRgLIAEoCVISc3BlZWNoVG9UZXh0TG9jYWxlEiIKDXNhd193aGF0c19uZXcYDSABKAhSC3Nhd1doYXRzTmV3ElEKDG5vdGlmaWNhdGlvbhgOIAEoCzItLmxhbmdhbWUucHJvdG9idWYuVXNlclByZWZlcmVuY2UuTm90aWZpY2F0aW9uUgxub3RpZmljYXRpb24algIKDE5vdGlmaWNhdGlvbhJMCgZpbnZpdGUYASABKAsyNC5sYW5nYW1lLnByb3RvYnVmLlVzZXJQcmVmZXJlbmNlLk5vdGlmaWNhdGlvbi5JbnZpdGVSBmludml0ZRJPCgdtZXNzYWdlGAIgASgLMjUubGFuZ2FtZS5wcm90b2J1Zi5Vc2VyUHJlZmVyZW5jZS5Ob3RpZmljYXRpb24uTWVzc2FnZVIHbWVzc2FnZRoyCgZJbnZpdGUSFAoFZW1haWwYASABKAhSBWVtYWlsEhIKBHB1c2gYAiABKAhSBHB1c2gaMwoHTWVzc2FnZRIUCgVlbWFpbBgBIAEoCFIFZW1haWwSEgoEcHVzaBgCIAEoCFIEcHVzaCI+ChJSZWNvbW1lbmRhdGlvblR5cGUSCAoETk9ORRAAEgcKA05FVxABEgwKCENPTVBPVU5EEAISBwoDQUxMEAM=');
 @$core.Deprecated('Use langameDescriptor instead')
 const Langame$json = const {
   '1': 'Langame',
@@ -289,11 +210,12 @@ const Langame$json = const {
     const {'1': 'link', '3': 16, '4': 1, '5': 9, '10': 'link'},
     const {'1': 'reserved_spots', '3': 18, '4': 3, '5': 9, '10': 'reservedSpots'},
     const {'1': 'is_locked', '3': 19, '4': 1, '5': 8, '10': 'isLocked'},
+    const {'1': 'is_text', '3': 20, '4': 1, '5': 8, '10': 'isText'},
   ],
 };
 
 /// Descriptor for `Langame`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSGAoHcGxheWVycxgCIAMoCVIHcGxheWVycxIWCgZ0b3BpY3MYAyADKAlSBnRvcGljcxIsCgVtZW1lcxgEIAMoCzIWLmxhbmdhbWUucHJvdG9idWYuTWVtZVIFbWVtZXMSHAoJaW5pdGlhdG9yGAUgASgJUglpbml0aWF0b3ISLgoEZG9uZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBGRvbmUSIQoMY3VycmVudF9tZW1lGAggASgFUgtjdXJyZW50TWVtZRIuCgRkYXRlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIEZGF0ZRIvCgZlcnJvcnMYCiADKAsyFy5sYW5nYW1lLnByb3RvYnVmLkVycm9yUgZlcnJvcnMSNAoHc3RhcnRlZBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSB3N0YXJ0ZWQSNwoJbmV4dF9tZW1lGA0gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIIbmV4dE1lbWUSHQoKbWVtZXNfc2VlbhgOIAEoBVIJbWVtZXNTZWVuEj0KDG1lbWVfY2hhbmdlZBgPIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSC21lbWVDaGFuZ2VkEhIKBGxpbmsYECABKAlSBGxpbmsSJQoOcmVzZXJ2ZWRfc3BvdHMYEiADKAlSDXJlc2VydmVkU3BvdHMSGwoJaXNfbG9ja2VkGBMgASgIUghpc0xvY2tlZA==');
+final $typed_data.Uint8List langameDescriptor = $convert.base64Decode('CgdMYW5nYW1lEiEKDGNoYW5uZWxfbmFtZRgBIAEoCVILY2hhbm5lbE5hbWUSGAoHcGxheWVycxgCIAMoCVIHcGxheWVycxIWCgZ0b3BpY3MYAyADKAlSBnRvcGljcxIsCgVtZW1lcxgEIAMoCzIWLmxhbmdhbWUucHJvdG9idWYuTWVtZVIFbWVtZXMSHAoJaW5pdGlhdG9yGAUgASgJUglpbml0aWF0b3ISLgoEZG9uZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBGRvbmUSIQoMY3VycmVudF9tZW1lGAggASgFUgtjdXJyZW50TWVtZRIuCgRkYXRlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIEZGF0ZRIvCgZlcnJvcnMYCiADKAsyFy5sYW5nYW1lLnByb3RvYnVmLkVycm9yUgZlcnJvcnMSNAoHc3RhcnRlZBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSB3N0YXJ0ZWQSNwoJbmV4dF9tZW1lGA0gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIIbmV4dE1lbWUSHQoKbWVtZXNfc2VlbhgOIAEoBVIJbWVtZXNTZWVuEj0KDG1lbWVfY2hhbmdlZBgPIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSC21lbWVDaGFuZ2VkEhIKBGxpbmsYECABKAlSBGxpbmsSJQoOcmVzZXJ2ZWRfc3BvdHMYEiADKAlSDXJlc2VydmVkU3BvdHMSGwoJaXNfbG9ja2VkGBMgASgIUghpc0xvY2tlZBIXCgdpc190ZXh0GBQgASgIUgZpc1RleHQ=');
 @$core.Deprecated('Use playerDescriptor instead')
 const Player$json = const {
   '1': 'Player',
@@ -351,21 +273,6 @@ const Note_Definition$json = const {
 
 /// Descriptor for `Note`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List noteDescriptor = $convert.base64Decode('CgROb3RlEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSOgoHZ2VuZXJpYxgCIAEoCzIeLmxhbmdhbWUucHJvdG9idWYuTm90ZS5HZW5lcmljSABSB2dlbmVyaWMSMQoEZ29hbBgDIAEoCzIbLmxhbmdhbWUucHJvdG9idWYuTm90ZS5Hb2FsSABSBGdvYWwSQwoKZGVmaW5pdGlvbhgEIAEoCzIhLmxhbmdhbWUucHJvdG9idWYuTm90ZS5EZWZpbml0aW9uSABSCmRlZmluaXRpb24aIwoHR2VuZXJpYxIYCgdjb250ZW50GAEgASgJUgdjb250ZW50GiAKBEdvYWwSGAoHY29udGVudBgBIAEoCVIHY29udGVudBomCgpEZWZpbml0aW9uEhgKB2NvbnRlbnQYASABKAlSB2NvbnRlbnRCBgoEdHlwZQ==');
-@$core.Deprecated('Use notificationDescriptor instead')
-const Notification$json = const {
-  '1': 'Notification',
-  '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
-    const {'1': 'sender_uid', '3': 2, '4': 1, '5': 9, '10': 'senderUid'},
-    const {'1': 'recipients_uid', '3': 3, '4': 3, '5': 9, '10': 'recipientsUid'},
-    const {'1': 'topics', '3': 4, '4': 3, '5': 9, '10': 'topics'},
-    const {'1': 'channel_name', '3': 5, '4': 1, '5': 9, '10': 'channelName'},
-    const {'1': 'ready', '3': 6, '4': 1, '5': 8, '10': 'ready'},
-  ],
-};
-
-/// Descriptor for `Notification`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List notificationDescriptor = $convert.base64Decode('CgxOb3RpZmljYXRpb24SDgoCaWQYASABKAlSAmlkEh0KCnNlbmRlcl91aWQYAiABKAlSCXNlbmRlclVpZBIlCg5yZWNpcGllbnRzX3VpZBgDIAMoCVINcmVjaXBpZW50c1VpZBIWCgZ0b3BpY3MYBCADKAlSBnRvcGljcxIhCgxjaGFubmVsX25hbWUYBSABKAlSC2NoYW5uZWxOYW1lEhQKBXJlYWR5GAYgASgIUgVyZWFkeQ==');
 @$core.Deprecated('Use subscriptionDescriptor instead')
 const Subscription$json = const {
   '1': 'Subscription',
@@ -415,13 +322,13 @@ const Prompt$json = const {
   '2': const [
     const {'1': 'type', '3': 1, '4': 1, '5': 9, '10': 'type'},
     const {'1': 'template', '3': 2, '4': 1, '5': 9, '10': 'template'},
-    const {'1': 'tags', '3': 3, '4': 3, '5': 11, '6': '.langame.protobuf.Tag', '10': 'tags'},
     const {'1': 'id', '3': 4, '4': 1, '5': 9, '10': 'id'},
+    const {'1': 'parameters', '3': 5, '4': 1, '5': 11, '6': '.google.protobuf.Any', '10': 'parameters'},
   ],
 };
 
 /// Descriptor for `Prompt`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List promptDescriptor = $convert.base64Decode('CgZQcm9tcHQSEgoEdHlwZRgBIAEoCVIEdHlwZRIaCgh0ZW1wbGF0ZRgCIAEoCVIIdGVtcGxhdGUSKQoEdGFncxgDIAMoCzIVLmxhbmdhbWUucHJvdG9idWYuVGFnUgR0YWdzEg4KAmlkGAQgASgJUgJpZA==');
+final $typed_data.Uint8List promptDescriptor = $convert.base64Decode('CgZQcm9tcHQSEgoEdHlwZRgBIAEoCVIEdHlwZRIaCgh0ZW1wbGF0ZRgCIAEoCVIIdGVtcGxhdGUSDgoCaWQYBCABKAlSAmlkEjQKCnBhcmFtZXRlcnMYBSABKAsyFC5nb29nbGUucHJvdG9idWYuQW55UgpwYXJhbWV0ZXJz');
 @$core.Deprecated('Use recordingDescriptor instead')
 const Recording$json = const {
   '1': 'Recording',
@@ -447,3 +354,29 @@ const Recording_MetadataEntry$json = const {
 
 /// Descriptor for `Recording`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List recordingDescriptor = $convert.base64Decode('CglSZWNvcmRpbmcSOQoKY3JlYXRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNyZWF0ZWRBdBISCgR0ZXh0GAIgASgJUgR0ZXh0EhcKB3VzZXJfaWQYAyABKAlSBnVzZXJJZBJFCghtZXRhZGF0YRgEIAMoCzIpLmxhbmdhbWUucHJvdG9idWYuUmVjb3JkaW5nLk1ldGFkYXRhRW50cnlSCG1ldGFkYXRhEhIKBG5vdGUYBSABKAlSBG5vdGUaOwoNTWV0YWRhdGFFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoCVIFdmFsdWU6AjgB');
+@$core.Deprecated('Use messageDescriptor instead')
+const Message$json = const {
+  '1': 'Message',
+  '2': const [
+    const {'1': 'created_at', '3': 3, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'createdAt'},
+    const {'1': 'from_uid', '3': 4, '4': 1, '5': 9, '10': 'fromUid'},
+    const {'1': 'to_uid', '3': 5, '4': 1, '5': 9, '10': 'toUid'},
+    const {'1': 'channel_name', '3': 7, '4': 1, '5': 9, '10': 'channelName'},
+    const {'1': 'type', '3': 8, '4': 1, '5': 14, '6': '.langame.protobuf.Message.Type', '10': 'type'},
+    const {'1': 'body', '3': 9, '4': 1, '5': 9, '10': 'body'},
+    const {'1': 'title', '3': 10, '4': 1, '5': 9, '10': 'title'},
+  ],
+  '4': const [Message_Type$json],
+};
+
+@$core.Deprecated('Use messageDescriptor instead')
+const Message_Type$json = const {
+  '1': 'Type',
+  '2': const [
+    const {'1': 'INVITE', '2': 0},
+    const {'1': 'MESSAGE', '2': 1},
+  ],
+};
+
+/// Descriptor for `Message`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List messageDescriptor = $convert.base64Decode('CgdNZXNzYWdlEjkKCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGQoIZnJvbV91aWQYBCABKAlSB2Zyb21VaWQSFQoGdG9fdWlkGAUgASgJUgV0b1VpZBIhCgxjaGFubmVsX25hbWUYByABKAlSC2NoYW5uZWxOYW1lEjIKBHR5cGUYCCABKA4yHi5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuVHlwZVIEdHlwZRISCgRib2R5GAkgASgJUgRib2R5EhQKBXRpdGxlGAogASgJUgV0aXRsZSIfCgRUeXBlEgoKBklOVklURRAAEgsKB01FU1NBR0UQAQ==');

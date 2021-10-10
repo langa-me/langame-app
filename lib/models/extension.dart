@@ -9,7 +9,6 @@ import 'package:langame/models/google/protobuf/timestamp.pb.dart' as gg;
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:protobuf/protobuf.dart';
 
-
 extension interactionExtensions on lg.InteractionLevel {
   Color toColor() {
     switch (this) {
@@ -100,18 +99,29 @@ class UserPreferenceExt {
   static lg.UserPreference fromObject(Object o) {
     var m = o as Map<String, dynamic>;
     return lg.UserPreference(
-      userId: m['userId'],
-      userRecommendations: m['userRecommendations'],
-      themeIndex: m['themeIndex'],
-      hasDoneOnBoarding: m['hasDoneOnBoarding'],
-      userSearchHistory:
-          (m['userSearchHistory'] as List<dynamic>?)?.map((e) => e as String),
-      shakeToFeedback: m['shakeToFeedback'],
-      favoriteTopics:
-          (m['favoriteTopics'] as List<dynamic>?)?.map((e) => e as String),
-      speechToTextLocale: m['speechToTextLocale'],
-      sawWhatsNew: m['sawWhatsNew'],
-    );
+        userId: m['userId'],
+        userRecommendations: lg.UserPreference_RecommendationType.values
+            .firstWhere(
+                (e) => e.toString() == m['userRecommendations'].toString()),
+        themeIndex: m['themeIndex'],
+        hasDoneOnBoarding: m['hasDoneOnBoarding'],
+        userSearchHistory:
+            (m['userSearchHistory'] as List<dynamic>?)?.map((e) => e as String),
+        shakeToFeedback: m['shakeToFeedback'],
+        favoriteTopics:
+            (m['favoriteTopics'] as List<dynamic>?)?.map((e) => e as String),
+        speechToTextLocale: m['speechToTextLocale'],
+        sawWhatsNew: m['sawWhatsNew'],
+        notification: lg.UserPreference_Notification(
+          message: lg.UserPreference_Notification_Message(
+            email: m['notification']?['message']?['email'] ?? false,
+            push: m['notification']?['message']?['push'] ?? false,
+          ),
+          invite: lg.UserPreference_Notification_Invite(
+            email: m['notification']?['invite']?['email'] ?? false,
+            push: m['notification']?['invite']?['push'] ?? false,
+          ),
+        ));
   }
 }
 
@@ -122,18 +132,6 @@ class DeviceExt {
       langameVersion: m['langameVersion'],
       deviceInfo: m['deviceInfo'],
     );
-  }
-}
-
-class NotificationExt {
-  static lg.Notification fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Notification(
-        id: m['id'],
-        senderUid: m['senderUid'],
-        topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
-        channelName: m['channelName'],
-        ready: m['ready']);
   }
 }
 
@@ -161,6 +159,7 @@ class LangameExt {
       reservedSpots:
           (m['reservedSpots'] as List<dynamic>?)?.map((e) => e as String),
       isLocked: m['isLocked'],
+      isText: m['isText'],
     );
   }
 }
@@ -239,91 +238,6 @@ class MemeExt {
   }
 }
 
-class TagExt {
-  static lg.Tag fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Tag(
-      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
-      topic: m['topic'] != null ? TagTopicExt.fromObject(m['topic']) : null,
-      classification: m['classification'] != null
-          ? TagClassificationExt.fromObject(m['classification'])
-          : null,
-      engine: m['engine'] != null ? TagEngineExt.fromObject(m['origin']) : null,
-      feedback: m['feedback'] != null
-          ? TagFeedbackExt.fromObject(m['feedback'])
-          : null,
-      context:
-          m['context'] != null ? TagContextExt.fromObject(m['context']) : null,
-    );
-  }
-}
-
-class TagTopicExt {
-  static lg.Tag_Topic fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Tag_Topic(
-      content: m['content'],
-      emojis: (m['emojis'] as List<dynamic>?)?.map((e) => e as String),
-    );
-  }
-}
-
-class TagClassificationExt {
-  static lg.Tag_Classification fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Tag_Classification(
-      content: m['content'],
-      score: m['score'],
-      human: m['human'],
-    );
-  }
-}
-
-class TagEngineExt {
-  static lg.Tag_Engine fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Tag_Engine(
-        parameters: m['parameters'] != null
-            ? lg.Tag_Engine_Parameters(
-                temperature: m['parameters']!['temperature'],
-                maxTokens: m['parameters']!['maxTokens'],
-                topP: m['parameters']!['topP'],
-                frequencyPenalty: m['parameters']!['frequencyPenalty'],
-                presencePenalty: m['parameters']!['presencePenalty'],
-                stop: m['parameters']!['stop'],
-                model: m['parameters']!['model'],
-              )
-            : null);
-  }
-}
-
-class TagFeedbackExt {
-  static lg.Tag_Feedback fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Tag_Feedback(
-      userId: m['userId'],
-      general: m['general'] != null
-          ? lg.Tag_Feedback_General(score: m['general']!['score'])
-          : null,
-      relevance: m['relevance'] != null
-          ? lg.Tag_Feedback_Relevance(score: m['relevance']!['score'])
-          : null,
-    );
-  }
-}
-
-class TagContextExt {
-  static lg.Tag_Context fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Tag_Context(
-      content: m['content'],
-      type: lg.Tag_Context_Type.values.firstWhere(
-          (e) => e.toString() == m['type'],
-          orElse: () => lg.Tag_Context_Type.OPENAI),
-    );
-  }
-}
-
 class ErrorExt {
   static lg.Error fromObject(Object o) {
     var m = o as Map<String, dynamic>;
@@ -341,12 +255,11 @@ class PromptExt {
     return lg.Prompt(
       type: m['type'],
       template: m['template'],
-      tags: (m['tags'] as List<dynamic>?)?.map((e) => TagExt.fromObject(e)),
       id: m['id'],
+      parameters: m['parameters'],
     );
   }
 }
-
 
 class RecordingExt {
   static lg.Recording fromObject(Object o) {
@@ -357,6 +270,21 @@ class RecordingExt {
       userId: m['userId'],
       metadata: Map<String, String>.from(m['metadata']),
       note: m['note'] ?? '',
+    );
+  }
+}
+
+class MessageExt {
+  static lg.Message fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Message(
+      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
+      fromUid: m['fromUid'],
+      toUid: m['toUid'],
+      channelName: m['channelName'],
+      type: lg.Message_Type.values[m['type']],
+      body: m['body'],
+      title: m['title'],
     );
   }
 }

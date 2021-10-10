@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -36,6 +37,7 @@ class UserChange {
 class AuthenticationProvider extends ChangeNotifier {
   FirebaseApi firebase;
   CrashAnalyticsProvider _cap;
+  Algolia? algolia;
 
   /// Authentication, relations, users ///
 
@@ -60,7 +62,8 @@ class AuthenticationProvider extends ChangeNotifier {
   bool readyToInit = false;
 
   /// Create an authentication provider, and
-  AuthenticationProvider(this.firebase, this._authenticationApi, this._cap) {
+  AuthenticationProvider(
+      this.firebase, this._authenticationApi, this._cap, this.algolia) {
     _firebaseUserStream = _authenticationApi.userChanges;
     _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
@@ -87,16 +90,20 @@ class AuthenticationProvider extends ChangeNotifier {
         return null;
       }
 
+      final ref = firebase.firestore!
+          .collection(AppConst.firestoreUsersCollection)
+          .withConverter<lg.User>(
+            fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
+            toFirestore: (s, _) => s.toMapStringDynamic(),
+          )
+          .doc(data.uid);
+      // Wait until back-end created used
+      await ref
+          .snapshots()
+          .firstWhere((e) => e.exists)
+          .timeout(Duration(seconds: 20));
       var r = await firebase.firestore!.runTransaction((t) async {
-        final langameUser = UserExt.fromFirebase(data);
-        final ref = firebase.firestore!
-            .collection(AppConst.firestoreUsersCollection)
-            .withConverter<lg.User>(
-              fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
-              toFirestore: (s, _) => s.toMapStringDynamic(),
-            )
-            .doc(langameUser.uid);
-        t.set(ref, langameUser, SetOptions(merge: true));
+        t.set(ref, UserExt.fromFirebase(data), SetOptions(merge: true));
         return ref;
       });
 
@@ -250,14 +257,24 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  // TODO langame response
-  Future<LangameResponse<List<lg.User>>> getLangameUsersStartingWithTag(
-      String tag) async {
+  Future<LangameResponse<List<lg.User>>> getUserTag(String tag) async {
     try {
-      _cap.log('authentication_provider:getLangameUsersStartingWithTag $tag');
-      var u = await _authenticationApi.getLangameUsersStartingWithTag(
-          _user!.tag, tag);
-      return LangameResponse(LangameStatus.succeed, result: u);
+      _cap.log('authentication_provider:getUser $tag',
+          analyticsMessage: 'get_user_by_tag');
+
+      if (algolia == null)
+        return LangameResponse(LangameStatus.succeed, result: []);
+      final objects = await algolia!
+          .index(AppConst.isDev ? "dev_users" : "prod_users")
+          .query(tag)
+          .getObjects();
+      _cap.log('authentication_provider:getUser ${objects.hits.length} hits');
+
+      return LangameResponse(LangameStatus.succeed,
+          result: objects.hits
+              .where((e) => e.objectID != _user!.uid)
+              .map((e) => UserExt.fromObject(e.data))
+              .toList());
     } catch (e, s) {
       _cap.log('failed to getLangameUsersStartingWithTag $tag');
       _cap.recordError(e, s);
@@ -301,9 +318,11 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LangameResponse> updateTag(String tag) async {
     try {
-      var sameTag = await _authenticationApi.getLangameUsersStartingWithTag(
-          user!.tag, tag);
-      if (sameTag.map((e) => e.tag).contains(tag)) {
+      var sameTag = await getUserTag(tag);
+      if (sameTag.result == null) {
+        return LangameResponse.failed();
+      }
+      if (sameTag.result!.map((e) => e.tag).contains(tag)) {
         return LangameResponse(LangameStatus.failed,
             error: 'tag_already_exist');
       }

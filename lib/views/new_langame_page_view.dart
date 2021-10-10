@@ -16,9 +16,10 @@ import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
-import 'package:langame/views/langame.dart';
+import 'package:langame/views/langames/langame_audio.dart';
+import 'package:langame/views/langames/langame_text.dart';
 import 'package:langame/views/memes/topic_search_bar.dart';
-import 'package:langame/views/running_langames_view.dart';
+import 'package:langame/views/langame_list_view.dart';
 import 'package:langame/views/search_page_view.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
@@ -37,6 +38,10 @@ class NewLangamePageView extends StatefulWidget {
 class _SendLangameState extends State<NewLangamePageView>
     with AfterLayoutMixin<NewLangamePageView> {
   _SendLangameState();
+
+  List<bool> _textAudioToggles = [true, false];
+  bool get isText => _textAudioToggles[0];
+  bool get isAudio => _textAudioToggles[1];
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -88,10 +93,11 @@ class _SendLangameState extends State<NewLangamePageView>
                     ? [
                         LangameButton(
                           FontAwesomeIcons.userPlus,
-                          onPressed: () => cp.push(SearchPageView(widget._goToPage)),
-                          text: '',
+                          text: 'Invite',
+                          onPressed: () =>
+                              cp.push(SearchPageView(widget._goToPage)),
                           layer: 1,
-                          border: true,
+                          border: false,
                         ),
                         Text(
                             'Your friends can also join later using a link for example',
@@ -111,7 +117,28 @@ class _SendLangameState extends State<NewLangamePageView>
               ),
             ),
           ),
-          DateTimePicker(
+          ToggleButtons(
+              renderBorder: false,
+              children: [
+                LangameButton(
+                  FontAwesomeIcons.keyboard,
+                  onPressed: () =>
+                      setState(() => _textAudioToggles = [true, false]),
+                  text: 'Text',
+                  layer: 1,
+                  highlighted: _textAudioToggles[0],
+                ),
+                LangameButton(
+                  FontAwesomeIcons.microphone,
+                  onPressed: () =>
+                      setState(() => _textAudioToggles = [false, true]),
+                  text: 'Audio',
+                  layer: 1,
+                  highlighted: _textAudioToggles[1],
+                ),
+              ],
+              isSelected: _textAudioToggles),
+          isAudio ? DateTimePicker(
             timeFieldWidth: AppSize.safeBlockHorizontal * 50,
             type: DateTimePickerType.dateTimeSeparate,
             dateMask: 'd MMM, yyyy',
@@ -123,11 +150,11 @@ class _SendLangameState extends State<NewLangamePageView>
             style: Theme.of(context).textTheme.headline6,
             timeLabelText: 'Hour',
             onChanged: (val) => nlp.setSelectedDate(DateTime.parse(val)),
-          ),
+          ) : SizedBox.shrink(),
           LangameButton(
-            FontAwesomeIcons.comments,
+            FontAwesomeIcons.grinTongue,
             onPressed: () => onPressedNewLangame(cp, nlp),
-            text: 'New Langame',
+            text: 'Go',
             highlighted: true,
             layer: 1,
             padding: EdgeInsets.symmetric(
@@ -141,7 +168,8 @@ class _SendLangameState extends State<NewLangamePageView>
     var tp = Provider.of<TagProvider>(context, listen: false);
 
     if (ap.user!.credits == 0) {
-      cp.showSnackBar('You don\'t have any credits left 😥');
+      cp.showSnackBar(
+          'You don\'t have any credits left 😥, wait until tomorrow to get some again!');
       return;
     }
 
@@ -150,28 +178,44 @@ class _SendLangameState extends State<NewLangamePageView>
       return;
     }
 
+    if (nlp.shoppingList.length != 1) {
+      cp.showSnackBar('Currently, text Langames only support one-to-one 😃' +
+          (nlp.shoppingList.length == 0 ? ', please add a friend!' : ''));
+      return;
+    }
+
     var lp = Provider.of<LangameProvider>(context, listen: false);
     var fp = Provider.of<FunnyProvider>(context, listen: false);
     cp.showLoadingDialog();
-    var createLangame = await lp.createLangame(nlp.shoppingList,
-        tp.selectedTopics.toList(), nlp.selectedDate ?? DateTime.now());
+    var createLangame = await lp.createLangame(
+      nlp.shoppingList,
+      tp.selectedTopics.toList(),
+      nlp.selectedDate ?? DateTime.now(),
+      isText: isText,
+    );
     if (createLangame.error != null ||
         createLangame.result == null ||
         createLangame.result!.data() == null ||
         !createLangame.result!.data()!.hasChannelName()) {
       cp.dialogComplete();
       var msg = '${fp.getFailingRandom()}, please retry later';
-      cp.showFailureDialog(createLangame.error != null ? 
-      createLangame.error is LangameException ? (createLangame.error as LangameException).cause :
-      createLangame.error.toString() 
-    
-      : msg);
+      cp.showFailureDialog(createLangame.error != null
+          ? createLangame.error is LangameException
+              ? (createLangame.error as LangameException).cause
+              : createLangame.error.toString()
+          : msg);
       await Future.delayed(Duration(seconds: 2));
       cp.dialogComplete();
       return;
     }
 
     var snap = createLangame.result!.data()!;
+    if (isText) {
+      cp.dialogComplete();
+
+      cp.push(LangameTextView(createLangame.result!.data()!.channelName));
+      return;
+    }
 
     var dlp = Provider.of<DynamicLinksProvider>(context, listen: false);
     var createDynamicLink = await dlp.createDynamicLink(snap.channelName, true);
@@ -234,7 +278,7 @@ class _SendLangameState extends State<NewLangamePageView>
               // USE CASE: selected X, date Y
               // - a langame is created, anyone with the link can join anytime,
               // X is notified of date Y
-              cp.push(RunningLangamesView());
+              cp.push(LangameListView());
             }, text: 'Join later', layer: 2),
             LangameButton(FontAwesomeIcons.hourglass, onPressed: () {
               // USE CASE: didn't select anybody, any date
@@ -242,7 +286,7 @@ class _SendLangameState extends State<NewLangamePageView>
               // USE CASE: selected X, date Y
               // - a langame is created, anyone with the link can join anytime,
               // X is notified of date Y and of presence of self in lg
-              cp.pushReplacement(LangameView(snap.channelName, false));
+              cp.pushReplacement(LangameAudioView(snap.channelName, false));
             }, text: 'Join now', highlighted: true),
           ])
         ],

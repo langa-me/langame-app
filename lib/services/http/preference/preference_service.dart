@@ -5,7 +5,7 @@ import '../firebase.dart';
 abstract class PreferenceService {
   static const sharedPrefPrefKey = 'pref_key';
   static final lg.UserPreference defaultPreference = lg.UserPreference(
-    userRecommendations: false,
+    userRecommendations: lg.UserPreference_RecommendationType.NONE,
     themeIndex: 0, // System
     hasDoneOnBoarding: false,
     userSearchHistory: [],

@@ -1,6 +1,5 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:badges/badges.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/providers/audio_provider.dart';
@@ -17,7 +16,7 @@ import 'package:provider/provider.dart';
 import 'buttons/button.dart';
 import 'colors/colors.dart';
 import 'feature_preview/beta.dart';
-import 'running_langames_view.dart';
+import 'langame_list_view.dart';
 import 'whats_new/whats_new.dart';
 
 class MainView extends StatefulWidget {
@@ -58,12 +57,15 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onBackPressed,
-      child: Scaffold(
-        backgroundColor: isLightThenDark(context, reverse: true),
-        resizeToAvoidBottomInset: false,
-        appBar: _buildAppBar(),
-        body: _buildPageView(),
-        bottomNavigationBar: _buildBottomNavigationBar(),
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          backgroundColor: isLightThenDark(context, reverse: true),
+          resizeToAvoidBottomInset: false,
+          appBar: _buildAppBar(),
+          body: _buildPageView(),
+          bottomNavigationBar: _buildBottomNavigationBar(),
+        ),
       ),
     );
   }
@@ -89,7 +91,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
           return Badge(
             badgeColor: Theme.of(context).colorScheme.secondary,
             badgeContent: Text(
-              '${p.runningLangames.length}',
+              '${p.langames.length}',
               style:
                   TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
@@ -101,7 +103,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
             position: BadgePosition.topStart(top: 7, start: 10),
           );
         }),
-        onTap: () => cp.push(RunningLangamesView()));
+        onTap: () => cp.push(LangameListView()));
     return AppBar(
       backgroundColor: Colors.transparent,
       leading: notifications,
@@ -137,18 +139,16 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
         label: 'Meme',
       ),
     ];
-    if (!kIsWeb) {
-      navBarItems.insertAll(0, [
-        BottomNavigationBarItem(
-          backgroundColor: Colors.transparent,
-          icon: Beta(Icon(FontAwesomeIcons.phoneAlt,
-              color: Theme.of(context).iconTheme.color)),
-          activeIcon: Beta(Icon(FontAwesomeIcons.phoneAlt,
-              color: Theme.of(context).colorScheme.secondary)),
-          label: 'Audio',
-        ),
-      ]);
-    }
+    navBarItems.insertAll(0, [
+      BottomNavigationBarItem(
+        backgroundColor: Colors.transparent,
+        icon: Beta(Icon(FontAwesomeIcons.laptopHouse,
+            color: Theme.of(context).iconTheme.color)),
+        activeIcon: Beta(Icon(FontAwesomeIcons.laptopHouse,
+            color: Theme.of(context).colorScheme.secondary)),
+        label: 'Remote',
+      ),
+    ]);
     return BottomNavigationBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
@@ -167,7 +167,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       }),
       controller: _pageController,
       children: [
-        !kIsWeb ? NewLangamePageView(goToPage) : SizedBox.shrink(),
+        NewLangamePageView(goToPage),
         PhysicalLangamePageView(goToPage),
         RecordingPageView(goToPage),
       ],

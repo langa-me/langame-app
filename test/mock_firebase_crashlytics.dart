@@ -4,5 +4,6 @@ import 'package:mockito/mockito.dart';
 class MockFirebaseCrashlytics extends Mock implements FirebaseCrashlytics {
   @override
   Future<Function> setCrashlyticsCollectionEnabled(bool enabled) =>
+      // ignore: null_argument_to_non_null_type
       Future.value();
 }

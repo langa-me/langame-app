@@ -13,7 +13,7 @@ class AdminProvider extends ChangeNotifier {
   AdminProvider(this.firebase, this.cap, this.algolia);
   final FirebaseApi firebase;
   final CrashAnalyticsProvider cap;
-  final Algolia? algolia;
+  Algolia? algolia;
 
   Future<List<String>> query(String value) async {
     final i = algolia?.index('prod_topics');

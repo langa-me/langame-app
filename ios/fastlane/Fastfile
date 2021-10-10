@@ -2,7 +2,9 @@ default_platform(:ios)
 
 DEVELOPER_APP_ID = ENV["DEVELOPER_APP_ID"]
 DEVELOPER_APP_IDENTIFIER = ENV["DEVELOPER_APP_IDENTIFIER"]
+DEVELOPER_APP_IDENTIFIER_DEV = ENV["DEVELOPER_APP_IDENTIFIER_DEV"]
 PROVISIONING_PROFILE_SPECIFIER = ENV["PROVISIONING_PROFILE_SPECIFIER"]
+PROVISIONING_PROFILE_SPECIFIER_DEV = ENV["PROVISIONING_PROFILE_SPECIFIER_DEV"]
 TEMP_KEYCHAIN_USER = ENV["TEMP_KEYCHAIN_USER"]
 TEMP_KEYCHAIN_PASSWORD = ENV["TEMP_KEYCHAIN_PASSWORD"]
 
@@ -53,14 +55,6 @@ platform :ios do
       }
     )
 
-    # firebase_app_distribution(
-    #   app: "1:909899959016:ios:47d44be1ab94dfbfc0575d",
-    #   firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
-    #   ipa_path: "./Runner.ipa",
-    #   groups: "basic, internal",
-    #   release_notes: 'Add a feature upvote link'
-    # )
-
     pilot(
       apple_id: "#{DEVELOPER_APP_ID}",
       app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
@@ -74,5 +68,38 @@ platform :ios do
     )
 
     delete_temp_keychain(keychain_name)
+  end
+  lane :firebase_distribution do
+    begin
+      keychain_name = TEMP_KEYCHAIN_USER
+      keychain_password = TEMP_KEYCHAIN_PASSWORD
+      ensure_temp_keychain(keychain_name, keychain_password)
+  
+      match(
+        type: 'adhoc',
+        app_identifier: "#{DEVELOPER_APP_IDENTIFIER_DEV}",
+        git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
+        readonly: true,
+        keychain_name: keychain_name,
+        keychain_password: keychain_password
+      )
+  
+      gym(
+        configuration: "Release-dev",
+        workspace: "Runner.xcworkspace",
+        scheme: "dev",
+        export_method: "ad-hoc",
+        export_options: {
+          provisioningProfiles: {
+              DEVELOPER_APP_ID => PROVISIONING_PROFILE_SPECIFIER_DEV
+          }
+        }
+      )
+      firebase_app_distribution(
+        app: "1:388264600961:ios:cb9793dd455c23e50cf480",
+        firebase_cli_token: ENV["FIREBASE_CLI_TOKEN_DEV"],
+        ipa_path: "./Runner.ipa",
+      )
+    end
   end
 end

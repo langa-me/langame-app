@@ -1,4 +1,3 @@
-import 'package:algolia/algolia.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -10,11 +9,10 @@ import 'package:langame/services/http/firebase.dart';
 class CrashAnalyticsProvider extends ChangeNotifier {
   FirebaseCrashlytics? crashlytics;
   FirebaseAnalytics analytics;
-  Algolia? _algolia;
   RemoteConfig? _remoteConfig;
   FirebaseApi _firebase;
   CrashAnalyticsProvider(this.crashlytics, this.analytics, this._remoteConfig,
-      this._firebase, this._algolia);
+      this._firebase);
 
   void log(String message,
       {String? analyticsMessage, Map<String, Object?>? analyticsParameters}) {

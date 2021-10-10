@@ -26,7 +26,6 @@ platform :android do
         android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
         app: '1:909899959016:android:e74963d90d60a74cc0575d',
         firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
-        release_notes: ''
       )
     end
   end
@@ -35,15 +34,14 @@ platform :android do
       gradle(task: 'clean')
       gradle(
         task: 'bundle',
-        flavor: 'prod',
+        flavor: 'dev',
         build_type: 'Release'
       )
       firebase_app_distribution(
         android_artifact_type: 'AAB',
-        android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
-        app: '1:909899959016:android:e74963d90d60a74cc0575d',
-        firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
-        release_notes: ''
+        android_artifact_path: '../build/app/outputs/bundle/devRelease/app-dev-release.aab',
+        app: '1:388264600961:android:1146bdf3cc4851d30cf480',
+        firebase_cli_token: ENV['FIREBASE_CLI_TOKEN_DEV'],
       )
     end
   end
