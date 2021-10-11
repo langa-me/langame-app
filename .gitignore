@@ -57,3 +57,5 @@ doc
 coverage
 
 .runtimeconfig.json
+
+report.xml

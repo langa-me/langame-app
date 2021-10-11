@@ -78,7 +78,7 @@ platform :ios do
   
       match(
         type: 'adhoc',
-        app_identifier: "#{DEVELOPER_APP_IDENTIFIER_DEV}",
+        app_identifier: "me.langa.dev",
         git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
         readonly: true,
         keychain_name: keychain_name,
@@ -89,10 +89,10 @@ platform :ios do
         configuration: "Release-dev",
         workspace: "Runner.xcworkspace",
         scheme: "dev",
-        export_method: "adhoc",
+        export_method: "ad-hoc",
         export_options: {
           provisioningProfiles: {
-              DEVELOPER_APP_ID_DEV => PROVISIONING_PROFILE_SPECIFIER_DEV
+              "me.langa.dev" => "match AdHoc me.langa.dev"
           }
         }
       )

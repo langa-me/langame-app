@@ -43,7 +43,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7.2'
-      - name: Run Fastlane Android
+      - name: Run Fastlane
         uses: maierj/fastlane-action@v2.0.1
         with:
           lane: firebase_distribution
@@ -71,7 +71,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7.2'
-      - name: Deploy iOS Beta to TestFlight via Fastlane
+      - name: Run fastlane
         uses: maierj/fastlane-action@v2.0.1
         continue-on-error: true
         with:
