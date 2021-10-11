@@ -89,7 +89,7 @@ platform :ios do
         configuration: "Release-dev",
         workspace: "Runner.xcworkspace",
         scheme: "dev",
-        export_method: "ad-hoc",
+        export_method: "adhoc",
         export_options: {
           provisioningProfiles: {
               DEVELOPER_APP_ID_DEV => PROVISIONING_PROFILE_SPECIFIER_DEV
