@@ -227,12 +227,13 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<void>> loginWithHack(String password) async {
+  Future<LangameResponse<void>> loginWithHack(String password, {String email = 'hack@langa.me'}) async {
     try {
-      var res = await _authenticationApi.loginWithHack(password);
+      final res = await firebase.auth!
+        .signInWithEmailAndPassword(email: email, password: password);
       return _loginWith(userCredential: res);
     } catch (e, s) {
-      _cap.log('authentication_provider:failed to loginWithGoogle');
+      _cap.log('authentication_provider:failed to loginWithHack');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
@@ -259,7 +260,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   Future<LangameResponse<List<lg.User>>> getUserTag(String tag) async {
     try {
-      _cap.log('authentication_provider:getUser $tag',
+      _cap.log('authentication_provider:getUserTag $tag',
           analyticsMessage: 'get_user_by_tag');
 
       if (algolia == null)

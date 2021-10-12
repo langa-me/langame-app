@@ -55,9 +55,9 @@ void shareRecording(lg.Recording r) => Share.share(
     subject: 'Langame memes');
 
 class Recording extends StatefulWidget {
-  String _q = _questions.pickAny()!;
-  String _recordingId;
-  lg.Recording _recording;
+  final String _q = _questions.pickAny()!;
+  final String _recordingId;
+  final lg.Recording _recording;
   Recording(this._recordingId, this._recording);
   @override
   _State createState() => _State();

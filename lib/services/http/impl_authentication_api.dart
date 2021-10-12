@@ -58,6 +58,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   @override
   Future<OAuthCredential> loginWithGoogle() async {
     try {
+
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser =
           await firebase.googleSignIn!.signIn();
@@ -98,9 +99,9 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<UserCredential> loginWithHack(String password) async {
+  Future<UserCredential> loginWithHack(String password, {String email = 'hack@langa.me'}) async {
     return firebase.auth!
-        .signInWithEmailAndPassword(email: 'hack@langa.me', password: password);
+        .signInWithEmailAndPassword(email: email, password: password);
   }
 
   /// Query Firestore with [uid] looking for a LangameUser

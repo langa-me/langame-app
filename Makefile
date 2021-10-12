@@ -1,5 +1,5 @@
 LANGAME_WORKER_PATH ?= ../langame-worker
-FUNCTIONS_PATH ?= firebase/functions
+FUNCTIONS_PATH ?= ./functions
 GOOGLE_PROTO_SUBPATH ?= google/protobuf
 STRIPE_PROTO_SUBPATH ?= stripe/protobuf
 LANGAME_PROTO_SUBPATH ?= langame/protobuf

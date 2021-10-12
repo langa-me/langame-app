@@ -7,7 +7,6 @@ class ArrowPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // TODO: implement paint
     var paint = Paint();
     var path = Path();
     paint.style = PaintingStyle.stroke;
@@ -28,7 +27,6 @@ class ArrowPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    // TODO: implement shouldRepaint
     return false;
   }
 }

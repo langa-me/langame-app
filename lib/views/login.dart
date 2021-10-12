@@ -34,6 +34,8 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   bool isAuthenticating = true;
   TextEditingController _hackControllerPassword = TextEditingController();
+  TextEditingController _webControllerUsername = TextEditingController();
+  TextEditingController _webControllerPassword = TextEditingController();
   bool _isVersionCheckOk = false;
 
   @override
@@ -69,7 +71,8 @@ class _LoginViewState extends State<LoginView> {
         }
 
         var pp = Provider.of<PreferenceProvider>(context, listen: false);
-        await pp.preferenceStream.firstWhere((e) => e.userId == user.after!.uid)
+        await pp.preferenceStream
+            .firstWhere((e) => e.userId == user.after!.uid)
             .timeout(Duration(milliseconds: 500))
             .catchError((_) => lg.UserPreference());
 
@@ -129,23 +132,23 @@ class _LoginViewState extends State<LoginView> {
                   .RETRO_COMPATIBLE) {
         cp.showCustomDialog(
           stateless: [
-            UniversalPlatform.isAndroid || UniversalPlatform.isIOS
-                ? LangameButton(
-                    FontAwesomeIcons.externalLinkAlt,
-                    text: 'Update',
-                    onPressed: () async {
-                      final url = UniversalPlatform.isAndroid
-                          ? AppConst.googlePlayUrl
-                          : UniversalPlatform.isIOS
-                              ? AppConst.testFlightUrl
-                              : null;
-                      if (await canLaunch(url!)) {
-                        await launch(url,);
-                      }
-                    },
-                    highlighted: true,
-                  )
-                : SizedBox.shrink()
+            LangameButton(
+              FontAwesomeIcons.externalLinkAlt,
+              text: 'Update',
+              onPressed: () async {
+                final url = UniversalPlatform.isAndroid
+                    ? AppConst.googlePlayUrl
+                    : UniversalPlatform.isIOS
+                        ? AppConst.testFlightUrl
+                        : null;
+                if (await canLaunch(url!)) {
+                  await launch(
+                    url,
+                  );
+                }
+              },
+              highlighted: true,
+            )
           ],
           title: Text('You need to update your application 😓',
               textAlign: TextAlign.center,
@@ -185,7 +188,7 @@ class _LoginViewState extends State<LoginView> {
       return Scaffold(
           backgroundColor: getBlackAndWhite(context, 0, reverse: true),
           body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [cp.buildLoadingWidget(text: 'Offline', last: true)]));
     }
 
@@ -226,6 +229,64 @@ class _LoginViewState extends State<LoginView> {
           : SizedBox.shrink()
     ];
 
+    if (UniversalPlatform.isWeb) {
+      logins = [
+        LangameButton(FontAwesomeIcons.signInAlt, text: 'Sign In',
+            onPressed: () async {
+          if (isAuthenticating) return;
+          var cp = Provider.of<ContextProvider>(context, listen: false);
+          cp.showCustomDialog(
+              stateless: [
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      TextField(
+                        obscureText: false,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        controller: _webControllerUsername,
+                        style: Theme.of(context).textTheme.headline6,
+                        decoration: InputDecoration(
+                            hintStyle: Theme.of(context).textTheme.headline6,
+                            hintText: "email"),
+                      ),
+                      TextField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        controller: _webControllerPassword,
+                        style: Theme.of(context).textTheme.headline6,
+                        decoration: InputDecoration(
+                            hintStyle: Theme.of(context).textTheme.headline6,
+                            hintText: "password"),
+                      ),
+                      LangameButton(FontAwesomeIcons.signInAlt,
+                          layer: 2,
+                          highlighted: true,
+                          onPressed: () => _handleOnPressedLogin(
+                              () => ap.loginWithHack(
+                                  _webControllerPassword.text,
+                                  email: _webControllerUsername.text),
+                              'email')),
+                      Text(
+                        'If you don\'t have an account for Langame web beta, request one at contact@langa.me',
+                        style: Theme.of(context).textTheme.caption,
+                        textAlign: TextAlign.center,
+                      ),
+                    ]),
+              ],
+              canBack: true,
+              title: Text('Langame Web beta - VIP only',
+                  style: Theme.of(context).textTheme.headline4));
+        }, highlighted: true),
+        Text(
+          '⚠️ Langame web is very experimental and currently used for fast internal product design and many features does not work yet ⚠️',
+          style: Theme.of(context).textTheme.caption,
+          textAlign: TextAlign.center,
+        ),
+      ];
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Column(
@@ -233,48 +294,7 @@ class _LoginViewState extends State<LoginView> {
         children: [
           Center(
               child: GestureDetector(
-            onLongPress: () {
-              var cp = Provider.of<ContextProvider>(context, listen: false);
-              cp.showCustomDialog(stateless: [
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text('Are you a hacker 🤓?',
-                          style: Theme.of(context).textTheme.headline4),
-                      Divider(),
-                      SizedBox(height: AppSize.safeBlockVertical * 10),
-                      TextField(
-                        obscureText: true,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        controller: _hackControllerPassword,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline6!
-                            .merge(TextStyle(color: Colors.transparent)),
-                        decoration: InputDecoration(
-                            hintStyle: Theme.of(context).textTheme.headline6,
-                            hintText: "Enter the hack password"),
-                      ),
-                      LangameButton(FontAwesomeIcons.code,
-                          layer: 2,
-                          text: 'Enter the matrix 😈',
-                          border: true,
-                          onPressed: () => _handleOnPressedLogin(
-                              () => ap
-                                  .loginWithHack(_hackControllerPassword.text),
-                              'email')),
-                      LangameButton(
-                        FontAwesomeIcons.baby,
-                        layer: 2,
-                        text:
-                            'Bring me back to right\nside of the force,\nmaster, please 👼',
-                        border: true,
-                        onPressed: cp.dialogComplete,
-                      ),
-                    ]),
-              ], canBack: true);
-            },
+            onLongPress: _onLongPressLogo,
             child: Container(
               width: AppSize.safeBlockHorizontal * 30,
               height: AppSize.safeBlockVertical * 30,
@@ -285,7 +305,7 @@ class _LoginViewState extends State<LoginView> {
             ),
           )),
           SizedBox(height: AppSize.safeBlockVertical * 10),
-          Column(children: logins, mainAxisAlignment: MainAxisAlignment.center),
+          Column(children: logins, mainAxisAlignment: MainAxisAlignment.spaceEvenly),
           Spacer(),
           FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
@@ -299,6 +319,45 @@ class _LoginViewState extends State<LoginView> {
         ],
       ),
     );
+  }
+
+  void _onLongPressLogo() {
+    final ap = Provider.of<AuthenticationProvider>(context, listen: false);
+    var cp = Provider.of<ContextProvider>(context, listen: false);
+    cp.showCustomDialog(stateless: [
+      Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        Text('Are you a hacker 🤓?',
+            style: Theme.of(context).textTheme.headline4),
+        Divider(),
+        SizedBox(height: AppSize.safeBlockVertical * 10),
+        TextField(
+          obscureText: true,
+          enableSuggestions: false,
+          autocorrect: false,
+          controller: _hackControllerPassword,
+          style: Theme.of(context)
+              .textTheme
+              .headline6!
+              .merge(TextStyle(color: Colors.transparent)),
+          decoration: InputDecoration(
+              hintStyle: Theme.of(context).textTheme.headline6,
+              hintText: "Enter the hack password"),
+        ),
+        LangameButton(FontAwesomeIcons.code,
+            layer: 2,
+            text: 'Enter the matrix 😈',
+            highlighted: true,
+            onPressed: () => _handleOnPressedLogin(
+                () => ap.loginWithHack(_hackControllerPassword.text), 'email')),
+        LangameButton(
+          FontAwesomeIcons.baby,
+          layer: 2,
+          text: 'Bring me back to right\nside of the force,\nmaster, please 👼',
+          border: true,
+          onPressed: cp.dialogComplete,
+        ),
+      ]),
+    ], canBack: true);
   }
 
   Future _handleOnPressedLogin(

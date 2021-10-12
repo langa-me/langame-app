@@ -668,7 +668,6 @@ class _LangameAudioViewState extends State<LangameAudioView> {
     var theme = Theme.of(context);
     var tp = Provider.of<TagProvider>(context, listen: false);
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    print(l.memes[l.currentMeme].translated);
     var memeWidget = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

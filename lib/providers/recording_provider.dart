@@ -109,7 +109,6 @@ class RecordingProvider extends ChangeNotifier {
             onResult: (e) {
               if (e.finalResult) {
                 _textRecorded = e.recognizedWords;
-                print(e);
               }
             });
       } else {

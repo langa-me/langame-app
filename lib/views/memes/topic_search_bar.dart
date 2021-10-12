@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:langame/helpers/constants.dart';
@@ -22,7 +23,8 @@ class _State extends State<TopicSearchWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (WidgetsBinding.instance!.window.viewInsets.bottom == 0.0 &&
+    // Fucked up on web
+    if (!kIsWeb && WidgetsBinding.instance!.window.viewInsets.bottom == 0.0 &&
         !_searchBarController.isClosed) {
       //Keyboard is not visible, so we can close the search bar.
       _searchBarController.close();

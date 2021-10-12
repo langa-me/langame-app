@@ -1,5 +1,7 @@
 import 'package:after_layout/after_layout.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
@@ -29,6 +31,7 @@ class _State extends State<LangameTextView>
   TextEditingController _textEditingController = TextEditingController();
   String _currentText = '';
   final f = new DateFormat('hh:mm');
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -63,6 +66,7 @@ class _State extends State<LangameTextView>
                 ? langame!.initiator
                 : langame!.reservedSpots[0])
             .then((e) => setState(() => other = e.result));
+        _scrollToBottom();
       } catch (e) {
         setState(() {
           langame = null;
@@ -94,19 +98,22 @@ class _State extends State<LangameTextView>
           backgroundColor: Colors.transparent,
           actions: actions,
         ),
-        body: langame == null || langame!.memes.isEmpty
+        body: langame == null || langame!.memes.isEmpty || messages == null
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [Center(child: cp.buildLoadingWidget(last: true))])
             : Column(
                 children: [
                   Expanded(
-                    child: other != null ? ListView.builder(
-                      itemBuilder: (context, i) =>
-                          _buildMessageBox(messages!.values.elementAt(i)),
-                      itemCount: messages!.length,
-                      physics: BouncingScrollPhysics(),
-                    ) : cp.buildLoadingWidget(),
+                    child: other != null
+                        ? ListView.builder(
+                            controller: _scrollController,
+                            itemBuilder: (context, i) =>
+                                _buildMessageBox(messages.values.elementAt(i)),
+                            itemCount: messages.length,
+                            physics: BouncingScrollPhysics(),
+                          )
+                        : cp.buildLoadingWidget(),
                   ),
 
                   // This is a Whatsapp-like send message bar with rounded corner
@@ -125,7 +132,10 @@ class _State extends State<LangameTextView>
                           child: TextField(
                             style: Theme.of(context).textTheme.headline6,
                             // cursorColor: getBlackAndWhite(context, 0),
-                            onChanged: (e) => setState(() => _currentText = e),
+                            onChanged: (e) {
+                              setState(() => _currentText = e);
+                            },
+                            onSubmitted: (e) => _onSend(),
                             controller: _textEditingController,
                             decoration: InputDecoration(
                               // fillColor: getBlackAndWhite(context, 1, reverse: true),
@@ -141,19 +151,7 @@ class _State extends State<LangameTextView>
                                   FontAwesomeIcons.paperPlane,
                                   color: getBlackAndWhite(context, 0),
                                 ),
-                                onPressed: () {
-                                  if (_textEditingController.text.isNotEmpty) {
-                                    // TODO: feedback on response
-                                    mp.sendMessage(widget.langameChannelName,
-                                        _currentText, other!.uid);
-                                    // Clear text field
-                                    _textEditingController.clear();
-                                    setState(() => _currentText = '');
-                                    // Hide keyboard
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
-                                  }
-                                },
+                                onPressed: _onSend,
                               ),
                       ],
                     ),
@@ -162,6 +160,36 @@ class _State extends State<LangameTextView>
               ),
       ),
     );
+  }
+
+  void _onSend() async {
+    if (_textEditingController.text.isNotEmpty) {
+      // Clear text field
+      _textEditingController.clear();
+      // Hide keyboard
+      FocusManager.instance.primaryFocus?.unfocus();
+
+      _scrollToBottom();
+
+      var mp = Provider.of<MessageProvider>(context, listen: false);
+      mp.getSentiment(_textEditingController.text).then((r) {
+        r.first.then((e) => print(e.toProto3Json()));
+      });
+
+      // TODO: feedback on response
+      mp.sendMessage(widget.langameChannelName, _currentText, other!.uid);
+
+      setState(() => _currentText = '');
+    }
+  }
+
+  void _scrollToBottom({bool later = false}) async {
+    // Delay to make sure the frames are rendered properly
+    await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
+    });
   }
 
   /// This is a function that return a WhatsApp like message box
@@ -185,55 +213,63 @@ class _State extends State<LangameTextView>
                 : Theme.of(context).colorScheme.secondary,
           ),
           margin: EdgeInsets.all(10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                fit: FlexFit.loose,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      m.toUid != other!.uid ? other!.tag : 'You',
-                      style: Theme.of(context).textTheme.caption!.merge(
-                            TextStyle(
-                              color: getBlackAndWhite(context, 0,
-                                  reverse: m.toUid == other!.uid),
-                            ),
-                          ),
-                      textAlign: TextAlign.left,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      m.body,
-                      style: Theme.of(context).textTheme.headline6!.merge(
-                            TextStyle(
-                              color: getBlackAndWhite(context, 0,
-                                  reverse: m.toUid == other!.uid),
-                            ),
-                          ),
-                      textAlign: TextAlign.left,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          f.format(m.createdAt.toDateTime()),
-                          style: Theme.of(context).textTheme.caption!.merge(
-                                TextStyle(
-                                  color: getBlackAndWhite(context, 0,
-                                      reverse: m.toUid == other!.uid),
-                                ),
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onLongPress: () {
+              var cp = Provider.of<ContextProvider>(context, listen: false);
+              FlutterClipboard.copy(m.body);
+              cp.showSnackBar('copied to clipboard');
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        m.toUid != other!.uid ? other!.tag : 'You',
+                        style: Theme.of(context).textTheme.caption!.merge(
+                              TextStyle(
+                                color: getBlackAndWhite(context, 0,
+                                    reverse: m.toUid == other!.uid),
                               ),
-                          textAlign: TextAlign.right,
-                        ),
-                      ],
-                    )
-                  ],
+                            ),
+                        textAlign: TextAlign.left,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        m.body,
+                        style: Theme.of(context).textTheme.headline6!.merge(
+                              TextStyle(
+                                color: getBlackAndWhite(context, 0,
+                                    reverse: m.toUid == other!.uid),
+                              ),
+                            ),
+                        textAlign: TextAlign.left,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            f.format(m.createdAt.toDateTime()),
+                            style: Theme.of(context).textTheme.caption!.merge(
+                                  TextStyle(
+                                    color: getBlackAndWhite(context, 0,
+                                        reverse: m.toUid == other!.uid),
+                                  ),
+                                ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );

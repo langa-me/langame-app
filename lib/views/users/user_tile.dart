@@ -16,7 +16,6 @@ Widget buildUserTile(BuildContext context, NewLangameProvider lp, lg.User u,
               child: Text(u.tag),
             ),
       trailing: MaterialButton(
-        // TODO: might use ToggleButton instead? (with icon)
         onPressed: lp.shoppingList.any((e) => e.uid == u.uid)
             ? onRemoveFromShoppingList(u, lp,
                 Provider.of<ContextProvider>(context, listen: false), goToPage)

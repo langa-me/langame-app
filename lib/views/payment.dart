@@ -147,7 +147,6 @@ class _PaymentState extends State<PaymentView> {
     void Function(PaymentMethod) onLongPress,
   ) =>
       ListTile(
-        // TODO: handle deletion
         onTap: () => onTap(pm),
         onLongPress: () => onLongPress(pm.paymentMethod),
         shape: RoundedRectangleBorder(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:after_layout/after_layout.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
@@ -54,7 +55,6 @@ class _SendLangameState extends State<NewLangamePageView>
     var nlp = Provider.of<NewLangameProvider>(context);
     var cp = Provider.of<ContextProvider>(context);
     var tp = Provider.of<TagProvider>(context);
-    var ap = Provider.of<AuthenticationProvider>(context);
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     return Column(
@@ -138,19 +138,21 @@ class _SendLangameState extends State<NewLangamePageView>
                 ),
               ],
               isSelected: _textAudioToggles),
-          isAudio ? DateTimePicker(
-            timeFieldWidth: AppSize.safeBlockHorizontal * 50,
-            type: DateTimePickerType.dateTimeSeparate,
-            dateMask: 'd MMM, yyyy',
-            initialValue: DateTime.now().toString(),
-            firstDate: DateTime(2021),
-            lastDate: DateTime(2022),
-            icon: Icon(Icons.event),
-            dateLabelText: 'Date',
-            style: Theme.of(context).textTheme.headline6,
-            timeLabelText: 'Hour',
-            onChanged: (val) => nlp.setSelectedDate(DateTime.parse(val)),
-          ) : SizedBox.shrink(),
+          isAudio
+              ? DateTimePicker(
+                  timeFieldWidth: AppSize.safeBlockHorizontal * 50,
+                  type: DateTimePickerType.dateTimeSeparate,
+                  dateMask: 'd MMM, yyyy',
+                  initialValue: DateTime.now().toString(),
+                  firstDate: DateTime(2021),
+                  lastDate: DateTime(2022),
+                  icon: Icon(Icons.event),
+                  dateLabelText: 'Date',
+                  style: Theme.of(context).textTheme.headline6,
+                  timeLabelText: 'Hour',
+                  onChanged: (val) => nlp.setSelectedDate(DateTime.parse(val)),
+                )
+              : SizedBox.shrink(),
           LangameButton(
             FontAwesomeIcons.grinTongue,
             onPressed: () => onPressedNewLangame(cp, nlp),
@@ -179,7 +181,7 @@ class _SendLangameState extends State<NewLangamePageView>
     }
 
     if (nlp.shoppingList.length != 1) {
-      cp.showSnackBar('Currently, text Langames only support one-to-one 😃' +
+      cp.showSnackBar('You can\'t play Langame alone 😉' +
           (nlp.shoppingList.length == 0 ? ', please add a friend!' : ''));
       return;
     }
@@ -212,8 +214,13 @@ class _SendLangameState extends State<NewLangamePageView>
     var snap = createLangame.result!.data()!;
     if (isText) {
       cp.dialogComplete();
-
       cp.push(LangameTextView(createLangame.result!.data()!.channelName));
+      return;
+    }
+
+    if (kIsWeb) {
+      cp.dialogComplete();
+      cp.pushReplacement(LangameAudioView(snap.channelName, false));
       return;
     }
 

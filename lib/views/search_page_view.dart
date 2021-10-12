@@ -45,9 +45,6 @@ class _State extends State<SearchPageView>
 
   @override
   void dispose() {
-    // TODO:
-    // Provider.of<LocalStorageProvider>(context, listen: false)
-    //     .saveSearchHistory();
     _searchBarController.dispose();
     super.dispose();
   }

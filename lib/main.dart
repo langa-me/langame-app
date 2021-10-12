@@ -22,7 +22,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/helpers/future.dart';
 import 'package:langame/providers/admin_provider.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
@@ -60,14 +59,12 @@ import 'views/colors/colors.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  if (!kIsWeb) {
-    FirebaseAppCheck.instance.activate();
-  }
   FirebaseCrashlytics? crashlytics;
   RemoteConfig? remoteConfig;
   FirebaseDynamicLinks? dynamicLinks;
   // Crashlytics does not support web https://firebase.flutter.dev/
   if (!kIsWeb) {
+    FirebaseAppCheck.instance.activate();
     crashlytics = FirebaseCrashlytics.instance;
     await crashlytics.setCrashlyticsCollectionEnabled(true);
     // Pass all uncaught errors from the framework to Crashlytics.
@@ -81,15 +78,15 @@ void main() async {
     }).sendPort);
     remoteConfig = RemoteConfig.instance;
     dynamicLinks = FirebaseDynamicLinks.instance;
-    await SentryFlutter.init(
-      (options) {
-        options.dsn =
-            'https://ce6ae27b22094db983af540d6ddb8010@o404046.ingest.sentry.io/5891492';
-        options.environment =
-            AppConst.isDev || kDebugMode ? 'development' : 'production';
-      },
-    );
   }
+  await SentryFlutter.init(
+    (options) {
+      options.dsn =
+          'https://ce6ae27b22094db983af540d6ddb8010@o404046.ingest.sentry.io/5891492';
+      options.environment =
+          AppConst.isDev || kDebugMode ? 'development' : 'production';
+    },
+  );
   var analytics = FirebaseAnalytics();
   var useEmulator = false;
   FirebaseApi firebase = FirebaseApi(
@@ -122,11 +119,9 @@ void main() async {
   // Cloud messaging is fucked-up with emulator
   // (something with, messaging stuff have to happen on Google infra)
   // So using fake api when using emulator
-  var messageApi = useEmulator ||
-          kIsWeb // TODO: web unimplemented https://firebase.flutter.dev/docs/messaging/usage#web-tokens
+  var messageApi = useEmulator
       ? FakeMessageApi(firebase, (_) {})
       : ImplMessageApi(firebase, (n) {
-          print('opening $n');
           if (n.type == lg.Message_Type.INVITE) {
             contextProvider.pushReplacement(
               LangameAudioView(n.channelName, false),
@@ -137,8 +132,14 @@ void main() async {
             );
           }
         });
-  var messageProvider = MessageProvider(firebase, messageApi,
-      crashAnalyticsProvider, authenticationProvider, contextProvider);
+  var messageProvider = MessageProvider(
+    firebase,
+    messageApi,
+    crashAnalyticsProvider,
+    authenticationProvider,
+    contextProvider,
+    isLocalConversationApi: true,
+  );
   var preferenceProvider = PreferenceProvider(
       firebase, crashAnalyticsProvider, authenticationProvider);
   var remoteConfigProvider =
@@ -164,23 +165,14 @@ void main() async {
   var physicalLangameProvider =
       PhysicalLangameProvider(firebase, crashAnalyticsProvider, null);
   var adminProvider = AdminProvider(firebase, crashAnalyticsProvider, null);
-  remoteConfig?.ensureInitialized().then((_) async {
-    await waitUntil(
-      // TODO
-            () => remoteConfig!.getString('algolia_application_id').isNotEmpty,
-            maxIterations: 1000)
-        .catchError((error, stackTrace) =>
-            // ignore: invalid_return_type_for_catch_error
-            SystemChannels.platform.invokeMethod('SystemNavigator.pop'));
-    var algolia = Algolia.init(
-        applicationId: remoteConfig!.getString('algolia_application_id'),
-        apiKey: remoteConfig.getString('algolia_api_key'));
-    recordingProvider.algolia = algolia;
-    authenticationProvider.algolia = algolia;
-    tagProvider.algolia = algolia;
-    physicalLangameProvider.algolia = algolia;
-    adminProvider.algolia = algolia;
-  });
+  Algolia algolia = Algolia.init(
+      applicationId: 'B1SU8TE6UY', apiKey: 'a2c82fa22a5c4683b3caf14fadf78a33');
+  remoteConfig?.ensureInitialized();
+  recordingProvider.algolia = algolia;
+  authenticationProvider.algolia = algolia;
+  tagProvider.algolia = algolia;
+  physicalLangameProvider.algolia = algolia;
+  adminProvider.algolia = algolia;
   // SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
@@ -229,11 +221,9 @@ void main() async {
             ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, MessageProvider>(
-              // TODO: for now does not change on auth change
               update: (_, cap, ap, mp) => mp!,
               create: (_) => messageProvider,
             ),
-
             ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
                 ContextProvider, PreferenceProvider, FeedbackProvider>(
               update: (ctx, cap, cp, pp, fp) {

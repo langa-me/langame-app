@@ -3,8 +3,12 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:grpc/grpc.dart';
+import 'package:grpc/grpc_connection_interface.dart';
+import 'package:langame/models/djinn/djinn.pbgrpc.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
+import 'package:langame/models/grpc_interceptors.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/firebase.dart';
@@ -13,7 +17,6 @@ import 'package:langame/views/langames/langame_audio.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/views/langames/langame_text.dart';
 import 'package:sortedmap/sortedmap.dart';
-
 import 'authentication_provider.dart';
 
 class MessageProvider extends ChangeNotifier {
@@ -24,6 +27,10 @@ class MessageProvider extends ChangeNotifier {
   ContextProvider _cp;
   bool _isReady = false;
   bool get isReady => _isReady;
+
+  String? _conversationApiUrl;
+  ClientChannelBase? _conversationMagnifierChannel;
+  ConversationMagnifierClient? _conversationMagnifierClient;
 
   /// Messages, notifications ///
   ///
@@ -36,7 +43,7 @@ class MessageProvider extends ChangeNotifier {
 
   /// Create an authentication provider, and
   MessageProvider(
-      this.firebase, this._messageApi, this._cap, this._ap, this._cp) {
+      this.firebase, this._messageApi, this._cap, this._ap, this._cp, {bool isLocalConversationApi = false}) {
     _ap.userStream.listen((e) async {
       if (e.type == UserChangeType.NewAuthentication) {
         await _messageApi.cancel();
@@ -101,16 +108,49 @@ class MessageProvider extends ChangeNotifier {
             final exists = _messages.containsKey(key);
             _messages[e.channelName]!.addAll({key: e});
             if (exists) return;
-            _cap.log('message_provider: received message ${e.body}');
+            // _cap.log('message_provider: received message ${e.body}');
             notifyListeners();
           })
         ];
         _messageStream.onCancel = () => subs.forEach((e) => e.cancel());
+        setupSentimentApi(local: isLocalConversationApi);
       } else if (e.type == UserChangeType.Disconnection) {
         _messageApi.cancel();
         _messageStream.close();
+        _conversationMagnifierChannel!.shutdown();
+        _conversationMagnifierClient = null;
+        _conversationApiUrl = null;
+        _conversationMagnifierClient = null;
       }
     });
+  }
+
+  void setupSentimentApi({bool local = false}) async {
+    final token = await firebase.auth!.currentUser!.getIdToken();
+    _conversationApiUrl =
+    // TODO: ip???
+        local ? '192.168.43.41' : (await firebase.firestore!.collection('apis').doc('sentiment').get())
+            .data()!['url'];
+    //.split('://')[1];
+    final channelOptions =
+        const ChannelOptions(credentials: ChannelCredentials.insecure());
+    // _conversationMagnifierChannel = GrpcOrGrpcWebClientChannel.grpc(
+    //     _sentimentApiUrl!,
+    //     options: channelOptions);
+    _conversationMagnifierChannel = ClientChannel(
+      _conversationApiUrl!,
+      options: channelOptions,
+      port: local ? 8080 : 443,
+    );
+    _conversationMagnifierClient = ConversationMagnifierClient(
+      _conversationMagnifierChannel!,
+      options: CallOptions(
+        timeout: Duration(seconds: 30),
+      ),
+      interceptors: [
+        ClientFirebaseAuthInterceptor(token),
+      ],
+    );
   }
 
   Future<LangameResponse<void>> cancel() async {
@@ -146,5 +186,13 @@ class MessageProvider extends ChangeNotifier {
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
+  }
+
+  // Call the sentiment api to get the sentiment of the message
+  Future<ResponseStream<MagnificationResponse>> getSentiment(
+      String text) async {
+    // if (_conversationMagnifierClient == null) return 0.0;
+    return _conversationMagnifierClient!
+        .magnify(Stream.value(MagnificationRequest(text: text)));
   }
 }

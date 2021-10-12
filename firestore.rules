@@ -154,6 +154,9 @@ service cloud.firestore {
                 // "to" exists?
                 getUser(request.resource.data.toUid) != null;
         }
+        match /apis/{apiId} {
+            allow read: if request.auth != null;
+        }
     }
 }
 

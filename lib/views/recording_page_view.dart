@@ -10,6 +10,7 @@ import 'package:langame/views/recording/recording.dart';
 import 'package:provider/provider.dart';
 
 class RecordingPageView extends StatefulWidget {
+  // ignore: unused_field
   final void Function(int, {Curve? curve}) _goToPage;
   RecordingPageView(this._goToPage);
 

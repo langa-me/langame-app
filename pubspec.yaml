@@ -26,6 +26,7 @@ dependencies:
   # share_plus: ^2.1.4 # unless works on ipad
   share: ^2.0.4
   sentry_flutter: ^6.0.0
+  grpc: ^3.0.2
 
   # Firebase
 

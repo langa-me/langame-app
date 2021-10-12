@@ -39,31 +39,12 @@ jobs:
           echo 'OUTDATED_DEPENDENCIES<<EOF' >> $GITHUB_ENV
           flutter pub outdated >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
-      # TODO: BROKEN
-      # - name: New Flutter outdated issue
-      #   uses: imjohnbo/issue-bot@v3.3.1
-      #   with:
-      #     assignees: "louis030195"
-      #     labels: "medium priority"
-      #     title: Flutter outdated packages
-      #     body: |-
-      #       :wave: Hi, {{#each assignees}}@{{this}}{{#unless @last}}, {{/unless}}{{/each}}!
-      #       ## These packages are outdated
-
-      #       ```
-      #       ${{ env.OUTDATED_DEPENDENCIES }}
-      #       ```
-      #     pinned: true
-      #     close-previous: true
-      #     linked-comments: true
-      #     project: 1
-          # column: To Do
       # Backend checks
       # - name: Decrypt service account key
       #   env:
       #     RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
       #   run: |
-      #     cd firebase/functions
+      #     cd ./functions
       #     gpg --quiet --batch --yes --decrypt --passphrase="$RELEASE_SECRET_PASSPHRASE" \
       #     --output service-account.zip service-account.zip.gpg && unzip service-account.zip
       - uses: actions/setup-node@v2
@@ -71,7 +52,7 @@ jobs:
           node-version: '12'
       - name: npm install, build and test
         run: |
-          cd firebase/functions
+          cd ./functions
           npm i
           npm run build
           npm run lint

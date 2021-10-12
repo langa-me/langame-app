@@ -96,7 +96,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                             style: Theme.of(context).textTheme.headline6),
                       )
                     : SizedBox.shrink()),
-
             ListTile(
               onTap: () {
                 cp.push(ProfileView());
@@ -197,6 +196,21 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                         .merge(TextStyle(color: Colors.red))),
                 children: [
                   ListTile(
+                    onTap: () async {
+                      final ap = Provider.of<AuthenticationProvider>(context,
+                          listen: false);
+                      cp.showLoadingDialog();
+                      await writeOnlyPreferenceProvider?.save();
+                      await ap.logout();
+                      await Future.delayed(Duration(seconds: 1));
+                      cp.showSuccessDialog('You will miss us! 😞');
+                    },
+                    leading: Icon(Icons.login_outlined,
+                        color: isLightThenDark(context)),
+                    title: Text('Log out',
+                        style: Theme.of(context).textTheme.headline6),
+                  ),
+                  ListTile(
                     onTap: () {
                       cp.showCustomDialog(stateless: [
                         Center(
@@ -229,22 +243,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                         style: Theme.of(context).textTheme.headline6),
                   ),
                 ]),
-            // ListTile(
-            //   onTap: () async {
-            //     final ap =
-            //         Provider.of<AuthenticationProvider>(context, listen: false);
-            //     cp.showLoadingDialog();
-            //     await writeOnlyPreferenceProvider?.save();
-            //     await ap.logout();
-            //     await Future.delayed(Duration(seconds: 1));
-            //     cp.dialogComplete();
-            //     cp.pushReplacement(LoginView());
-            //   },
-            //   leading:
-            //       Icon(Icons.login_outlined, color: isLightThenDark(context)),
-            //   title:
-            //       Text('Log out', style: Theme.of(context).textTheme.headline6),
-            // ),
           ],
         ),
       ),

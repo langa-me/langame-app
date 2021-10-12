@@ -1,7 +1,7 @@
 {
     "eslint.workingDirectories": [
         {
-            "directory": "firebase/functions",
+            "directory": "./functions",
             "changeProcessCWD": true
         }
     ],
@@ -19,8 +19,8 @@
     },
     "workbench.editor.enablePreview": false,
     "workbench.editor.enablePreviewFromQuickOpen": false,
-    "mochaExplorer.files": "firebase/functions/lib/**/*.js",
+    "mochaExplorer.files": "./functions/lib/**/*.js",
     "mochaExplorer.require": "source-map-support/register",
-    "mochaExplorer.watch": "firebase/functions/lib/**/*.js",
+    "mochaExplorer.watch": "./functions/lib/**/*.js",
     "mochaExplorer.timeout": 50000000
 }
