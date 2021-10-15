@@ -7,6 +7,7 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
+import 'package:langame/views/feature_preview/preview_or_sized_box_shrink.dart';
 import 'package:langame/views/hack.dart';
 import 'package:langame/views/integrations/readwise/readwise_settings.dart';
 import 'package:langame/views/language/language_settings.dart';
@@ -105,7 +106,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title:
                   Text('Profile', style: Theme.of(context).textTheme.headline6),
             ),
-            ListTile(
+            pp.preference!.previewMode ? ListTile(
               onTap: () {
                 cp.push(LanguageSettingsView());
               },
@@ -113,7 +114,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   color: isLightThenDark(context)),
               title: Text('Language',
                   style: Theme.of(context).textTheme.headline6),
-            ),
+            ) : SizedBox.shrink(),
             ListTile(
               onTap: () {
                 cp.push(NotificationSettingsView());
@@ -125,11 +126,30 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title: Text('Notification',
                   style: Theme.of(context).textTheme.headline6),
             ),
-            ExpansionTile(
+            ListTile(
+              leading: Beta(
+                Icon(FontAwesomeIcons.flask,
+                    color: getBlackAndWhite(context, 0)),
+                type: BetaType.NEW,
+              ),
+              title: Text('Enable preview features',
+                  style: Theme.of(context).textTheme.headline6),
+              onTap: () {
+                pp.preference!.previewMode = !pp.preference!.previewMode;
+                pp.refresh();
+              },
+              trailing: Switch(
+                  value: pp.preference!.previewMode,
+                  onChanged: (_) {
+                    pp.preference!.previewMode = !pp.preference!.previewMode;
+                    pp.refresh();
+                  }),
+            ),
+            previewModeOrInvisible(pp, ExpansionTile(
                 leading: Beta(
                     Icon(FontAwesomeIcons.brain,
                         color: isLightThenDark(context)),
-                    type: BetaType.PREVIEW),
+                    type: BetaType.NEW),
                 title: Text('User recommendations',
                     style: Theme.of(context).textTheme.headline6),
                 children: [
@@ -160,8 +180,8 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                             ? lg.UserPreference_RecommendationType.COMPOUND
                             : lg.UserPreference_RecommendationType.NONE)),
                   ),
-                ]),
-            ExpansionTile(
+                ])),
+            previewModeOrInvisible(pp, ExpansionTile(
                 onExpansionChanged: (_) {
                   cap.logNewFeatureClick('settings_integration');
                 },
@@ -184,7 +204,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                           title: Text('Readwise',
                               style: Theme.of(context).textTheme.headline6),
                         )
-                      ]),
+                      ])),
             Divider(),
             ExpansionTile(
                 leading:

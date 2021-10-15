@@ -3,6 +3,7 @@ import "mocha";
 import {expect} from "chai";
 import {ImplAiApi} from "./implAiApi";
 import {offlineMemeSearch} from "../memes/memes";
+import {FakeAiApi} from "./fakeAiApi";
 
 
 it.skip("create Github issue", async () => {
@@ -91,4 +92,57 @@ describe("translation", async () => {
     console.log(t);
     expect(t).to.contain("cat");
   });
+});
+
+it("tokenExtraction", async () => {
+  const api = new ImplAiApi();
+  const tokens =
+    await api.tokenExtraction(
+        "What makes a human being unique in comparison to animals?"
+    );
+  console.log(tokens);
+  expect(tokens).to.not.be.undefined;
+});
+
+it("sentiment", async () => {
+  const api = new ImplAiApi();
+  const tokens =
+    await api.sentiment("I love you");
+  console.log(tokens);
+  expect(tokens).to.not.be.undefined;
+});
+
+it("hfCompletion", async () => {
+  const api = new ImplAiApi();
+  const completion =
+    await api.hfCompletion(
+        "The cat is running after a mice because he is", {
+          maxNewTokens: 2,
+        }
+    );
+  console.log(completion);
+  expect(completion).to.not.be.undefined;
+});
+
+it("hfCompletion fake", async () => {
+  const api = new FakeAiApi();
+  const completion =
+    await api.hfCompletion(
+        "The cat is running after a mice because he is", {
+          maxNewTokens: 2,
+        }
+    );
+  console.log(completion);
+  expect(completion).to.not.be.undefined;
+});
+
+it("filter", async () => {
+  const api = new ImplAiApi();
+  const completion =
+    await api.filter(
+        "The cat is running after a mice because he is",
+        {}
+    );
+  console.log(completion);
+  expect(completion).to.not.be.undefined;
 });

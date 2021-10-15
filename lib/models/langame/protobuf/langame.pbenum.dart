@@ -28,6 +28,23 @@ class InteractionLevel extends $pb.ProtobufEnum {
   const InteractionLevel._($core.int v, $core.String n) : super(v, n);
 }
 
+class ContentFilter extends $pb.ProtobufEnum {
+  static const ContentFilter Safe = ContentFilter._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Safe');
+  static const ContentFilter Sensitive = ContentFilter._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Sensitive');
+  static const ContentFilter Unsafe = ContentFilter._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Unsafe');
+
+  static const $core.List<ContentFilter> values = <ContentFilter> [
+    Safe,
+    Sensitive,
+    Unsafe,
+  ];
+
+  static final $core.Map<$core.int, ContentFilter> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static ContentFilter? valueOf($core.int value) => _byValue[value];
+
+  const ContentFilter._($core.int v, $core.String n) : super(v, n);
+}
+
 class UserPreference_RecommendationType extends $pb.ProtobufEnum {
   static const UserPreference_RecommendationType NONE = UserPreference_RecommendationType._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'NONE');
   static const UserPreference_RecommendationType NEW = UserPreference_RecommendationType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'NEW');

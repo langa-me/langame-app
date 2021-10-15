@@ -124,31 +124,33 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     var navBarItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         backgroundColor: Colors.transparent,
+        icon: Icon(FontAwesomeIcons.laptopHouse,
+            color: Theme.of(context).iconTheme.color),
+        activeIcon: Icon(FontAwesomeIcons.laptopHouse,
+            color: Theme.of(context).colorScheme.secondary),
+        label: 'Remote',
+      ),
+      BottomNavigationBarItem(
+        backgroundColor: Colors.transparent,
         icon: Icon(FontAwesomeIcons.peopleArrows,
             color: getBlackAndWhite(context, 0)),
         activeIcon: Icon(FontAwesomeIcons.peopleArrows,
             color: Theme.of(context).colorScheme.secondary),
         label: 'Face-to-face',
       ),
-      BottomNavigationBarItem(
+    ];
+    var pp = Provider.of<PreferenceProvider>(context, listen: false);
+    if (pp.preference!.previewMode) {
+      navBarItems.add(BottomNavigationBarItem(
         backgroundColor: Colors.transparent,
         icon: Beta(Icon(FontAwesomeIcons.brain,
             color: Theme.of(context).iconTheme.color)),
         activeIcon: Beta(Icon(FontAwesomeIcons.brain,
             color: Theme.of(context).colorScheme.secondary)),
         label: 'Meme',
-      ),
-    ];
-    navBarItems.insertAll(0, [
-      BottomNavigationBarItem(
-        backgroundColor: Colors.transparent,
-        icon: Beta(Icon(FontAwesomeIcons.laptopHouse,
-            color: Theme.of(context).iconTheme.color)),
-        activeIcon: Beta(Icon(FontAwesomeIcons.laptopHouse,
-            color: Theme.of(context).colorScheme.secondary)),
-        label: 'Remote',
-      ),
-    ]);
+      ));
+    }
+
     return BottomNavigationBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
@@ -161,16 +163,19 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   }
 
   Widget _buildPageView() {
+    var pp = Provider.of<PreferenceProvider>(context, listen: false);
+    var child = [
+      NewLangamePageView(goToPage),
+      PhysicalLangamePageView(goToPage),
+    ];
+    if (pp.preference!.previewMode) child.add(RecordingPageView(goToPage));
+
     return PageView(
       onPageChanged: (i) => setState(() {
         _selectedIndex = i;
       }),
       controller: _pageController,
-      children: [
-        NewLangamePageView(goToPage),
-        PhysicalLangamePageView(goToPage),
-        RecordingPageView(goToPage),
-      ],
+      children: child,
     );
   }
 

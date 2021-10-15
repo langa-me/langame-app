@@ -25,6 +25,7 @@ import {onWriteTopic} from "./memes/onWriteTopic";
 import {onWriteUser} from "./users/onWriteUser";
 import {onWriteMeme} from "./memes/onWriteMeme";
 import {onWriteMessage} from "./messages/onWriteMessage";
+import {onWriteMessageAnalysis} from "./messages/onWriteMessageAnalysis";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -171,3 +172,13 @@ exports.onWriteMessage = functions
     .runWith(runtimeOpts)
     .firestore.document("messages/{messageId}")
     .onWrite(onWriteMessage);
+
+
+exports.onWriteMessageAnalysis = functions
+    .region(region)
+    .runWith({
+      ...runtimeOpts,
+      failurePolicy: true,
+    })
+    .firestore.document("messages/{messageId}")
+    .onWrite(onWriteMessageAnalysis);

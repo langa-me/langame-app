@@ -28,6 +28,7 @@
     "@sentry/tracing": "^6.10.0",
     "agora-access-token": "^2.0.1",
     "algoliasearch": "^4.10.3",
+    "faker": "^5.5.3",
     "firebase-admin": "^9.9.0",
     "firebase-functions": "^3.15.3",
     "firebase-functions-rate-limiter": "^3.8.3",

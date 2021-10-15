@@ -98,6 +98,7 @@ message UserPreference {
   string speech_to_text_locale = 11;
   bool saw_whats_new = 13;
   Notification notification = 14;
+  bool preview_mode = 15;
 
   message Notification {
     Invite invite = 1;
@@ -146,6 +147,25 @@ message Langame {
   // Server-set simple discrete property to know whether the Langame is locked or not
   bool is_locked = 19;
   bool is_text = 20;
+  repeated Reflection reflections = 21;
+  repeated Suggestion suggestions = 22;
+
+  message Reflection {
+    string user_id = 1;
+    // Whatever is the last message, from me or you
+    string last_message_id = 2;
+    repeated string alternatives = 3;
+    google.protobuf.Timestamp created_at = 4;
+    ContentFilter content_filter = 5;
+  }
+  message Suggestion {
+    string user_id = 1;
+    // Whatever is the last message, from me or you
+    string last_message_id = 2;
+    repeated string alternatives = 3;
+    google.protobuf.Timestamp created_at = 4;
+    ContentFilter content_filter = 5;
+  }
 }
 
 message Player {
@@ -227,8 +247,23 @@ message Message {
   Type type = 8;
   string body = 9;
   string title = 10;
+  
   enum Type {
     INVITE = 0;
     MESSAGE = 1;
   }
+  message Analysis {
+    repeated Sentiment sentiments = 2;
+
+    message Sentiment {
+      float score = 1;
+      string label = 2;
+    }
+  }
+}
+
+enum ContentFilter {
+  Safe = 0;
+  Sensitive = 1;
+  Unsafe = 2;
 }

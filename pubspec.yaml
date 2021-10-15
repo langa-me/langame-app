@@ -94,6 +94,7 @@ dependencies:
   # international stuff
   intl: ^0.17.0
   flutter_svg: ^0.22.0
+  popover: ^0.2.6+3
   flutter:
     sdk: flutter
 

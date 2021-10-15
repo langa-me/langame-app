@@ -864,6 +864,9 @@ export namespace langame {
 
             /** UserPreference notification */
             notification?: (langame.protobuf.UserPreference.INotification|null);
+
+            /** UserPreference previewMode */
+            previewMode?: (boolean|null);
         }
 
         /** Represents a UserPreference. */
@@ -910,6 +913,9 @@ export namespace langame {
 
             /** UserPreference notification. */
             public notification?: (langame.protobuf.UserPreference.INotification|null);
+
+            /** UserPreference previewMode. */
+            public previewMode: boolean;
 
             /**
              * Creates a new UserPreference instance using the specified properties.
@@ -1337,6 +1343,12 @@ export namespace langame {
 
             /** Langame isText */
             isText?: (boolean|null);
+
+            /** Langame reflections */
+            reflections?: (langame.protobuf.Langame.IReflection[]|null);
+
+            /** Langame suggestions */
+            suggestions?: (langame.protobuf.Langame.ISuggestion[]|null);
         }
 
         /** Represents a Langame. */
@@ -1398,6 +1410,12 @@ export namespace langame {
 
             /** Langame isText. */
             public isText: boolean;
+
+            /** Langame reflections. */
+            public reflections: langame.protobuf.Langame.IReflection[];
+
+            /** Langame suggestions. */
+            public suggestions: langame.protobuf.Langame.ISuggestion[];
 
             /**
              * Creates a new Langame instance using the specified properties.
@@ -1468,6 +1486,237 @@ export namespace langame {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
+        }
+
+        namespace Langame {
+
+            /** Properties of a Reflection. */
+            interface IReflection {
+
+                /** Reflection userId */
+                userId?: (string|null);
+
+                /** Reflection lastMessageId */
+                lastMessageId?: (string|null);
+
+                /** Reflection alternatives */
+                alternatives?: (string[]|null);
+
+                /** Reflection createdAt */
+                createdAt?: (google.protobuf.ITimestamp|null);
+
+                /** Reflection contentFilter */
+                contentFilter?: (langame.protobuf.ContentFilter|null);
+            }
+
+            /** Represents a Reflection. */
+            class Reflection implements IReflection {
+
+                /**
+                 * Constructs a new Reflection.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.Langame.IReflection);
+
+                /** Reflection userId. */
+                public userId: string;
+
+                /** Reflection lastMessageId. */
+                public lastMessageId: string;
+
+                /** Reflection alternatives. */
+                public alternatives: string[];
+
+                /** Reflection createdAt. */
+                public createdAt?: (google.protobuf.ITimestamp|null);
+
+                /** Reflection contentFilter. */
+                public contentFilter: langame.protobuf.ContentFilter;
+
+                /**
+                 * Creates a new Reflection instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Reflection instance
+                 */
+                public static create(properties?: langame.protobuf.Langame.IReflection): langame.protobuf.Langame.Reflection;
+
+                /**
+                 * Encodes the specified Reflection message. Does not implicitly {@link langame.protobuf.Langame.Reflection.verify|verify} messages.
+                 * @param message Reflection message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.Langame.IReflection, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Reflection message, length delimited. Does not implicitly {@link langame.protobuf.Langame.Reflection.verify|verify} messages.
+                 * @param message Reflection message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.Langame.IReflection, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a Reflection message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Reflection
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Langame.Reflection;
+
+                /**
+                 * Decodes a Reflection message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Reflection
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Langame.Reflection;
+
+                /**
+                 * Verifies a Reflection message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a Reflection message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Reflection
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.Langame.Reflection;
+
+                /**
+                 * Creates a plain object from a Reflection message. Also converts values to other types if specified.
+                 * @param message Reflection
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.Langame.Reflection, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Reflection to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+
+            /** Properties of a Suggestion. */
+            interface ISuggestion {
+
+                /** Suggestion userId */
+                userId?: (string|null);
+
+                /** Suggestion lastMessageId */
+                lastMessageId?: (string|null);
+
+                /** Suggestion alternatives */
+                alternatives?: (string[]|null);
+
+                /** Suggestion createdAt */
+                createdAt?: (google.protobuf.ITimestamp|null);
+
+                /** Suggestion contentFilter */
+                contentFilter?: (langame.protobuf.ContentFilter|null);
+            }
+
+            /** Represents a Suggestion. */
+            class Suggestion implements ISuggestion {
+
+                /**
+                 * Constructs a new Suggestion.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.Langame.ISuggestion);
+
+                /** Suggestion userId. */
+                public userId: string;
+
+                /** Suggestion lastMessageId. */
+                public lastMessageId: string;
+
+                /** Suggestion alternatives. */
+                public alternatives: string[];
+
+                /** Suggestion createdAt. */
+                public createdAt?: (google.protobuf.ITimestamp|null);
+
+                /** Suggestion contentFilter. */
+                public contentFilter: langame.protobuf.ContentFilter;
+
+                /**
+                 * Creates a new Suggestion instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Suggestion instance
+                 */
+                public static create(properties?: langame.protobuf.Langame.ISuggestion): langame.protobuf.Langame.Suggestion;
+
+                /**
+                 * Encodes the specified Suggestion message. Does not implicitly {@link langame.protobuf.Langame.Suggestion.verify|verify} messages.
+                 * @param message Suggestion message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.Langame.ISuggestion, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Suggestion message, length delimited. Does not implicitly {@link langame.protobuf.Langame.Suggestion.verify|verify} messages.
+                 * @param message Suggestion message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.Langame.ISuggestion, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a Suggestion message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Suggestion
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Langame.Suggestion;
+
+                /**
+                 * Decodes a Suggestion message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Suggestion
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Langame.Suggestion;
+
+                /**
+                 * Verifies a Suggestion message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a Suggestion message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Suggestion
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.Langame.Suggestion;
+
+                /**
+                 * Creates a plain object from a Suggestion message. Also converts values to other types if specified.
+                 * @param message Suggestion
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.Langame.Suggestion, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Suggestion to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
         }
 
         /** Properties of a Player. */
@@ -2621,6 +2870,202 @@ export namespace langame {
                 INVITE = 0,
                 MESSAGE = 1
             }
+
+            /** Properties of an Analysis. */
+            interface IAnalysis {
+
+                /** Analysis sentiments */
+                sentiments?: (langame.protobuf.Message.Analysis.ISentiment[]|null);
+            }
+
+            /** Represents an Analysis. */
+            class Analysis implements IAnalysis {
+
+                /**
+                 * Constructs a new Analysis.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.Message.IAnalysis);
+
+                /** Analysis sentiments. */
+                public sentiments: langame.protobuf.Message.Analysis.ISentiment[];
+
+                /**
+                 * Creates a new Analysis instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Analysis instance
+                 */
+                public static create(properties?: langame.protobuf.Message.IAnalysis): langame.protobuf.Message.Analysis;
+
+                /**
+                 * Encodes the specified Analysis message. Does not implicitly {@link langame.protobuf.Message.Analysis.verify|verify} messages.
+                 * @param message Analysis message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.Message.IAnalysis, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Analysis message, length delimited. Does not implicitly {@link langame.protobuf.Message.Analysis.verify|verify} messages.
+                 * @param message Analysis message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.Message.IAnalysis, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes an Analysis message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Analysis
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Message.Analysis;
+
+                /**
+                 * Decodes an Analysis message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Analysis
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Message.Analysis;
+
+                /**
+                 * Verifies an Analysis message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates an Analysis message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Analysis
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.Message.Analysis;
+
+                /**
+                 * Creates a plain object from an Analysis message. Also converts values to other types if specified.
+                 * @param message Analysis
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.Message.Analysis, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Analysis to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+
+            namespace Analysis {
+
+                /** Properties of a Sentiment. */
+                interface ISentiment {
+
+                    /** Sentiment score */
+                    score?: (number|null);
+
+                    /** Sentiment label */
+                    label?: (string|null);
+                }
+
+                /** Represents a Sentiment. */
+                class Sentiment implements ISentiment {
+
+                    /**
+                     * Constructs a new Sentiment.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: langame.protobuf.Message.Analysis.ISentiment);
+
+                    /** Sentiment score. */
+                    public score: number;
+
+                    /** Sentiment label. */
+                    public label: string;
+
+                    /**
+                     * Creates a new Sentiment instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns Sentiment instance
+                     */
+                    public static create(properties?: langame.protobuf.Message.Analysis.ISentiment): langame.protobuf.Message.Analysis.Sentiment;
+
+                    /**
+                     * Encodes the specified Sentiment message. Does not implicitly {@link langame.protobuf.Message.Analysis.Sentiment.verify|verify} messages.
+                     * @param message Sentiment message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: langame.protobuf.Message.Analysis.ISentiment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified Sentiment message, length delimited. Does not implicitly {@link langame.protobuf.Message.Analysis.Sentiment.verify|verify} messages.
+                     * @param message Sentiment message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: langame.protobuf.Message.Analysis.ISentiment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a Sentiment message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns Sentiment
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Message.Analysis.Sentiment;
+
+                    /**
+                     * Decodes a Sentiment message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns Sentiment
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Message.Analysis.Sentiment;
+
+                    /**
+                     * Verifies a Sentiment message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a Sentiment message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns Sentiment
+                     */
+                    public static fromObject(object: { [k: string]: any }): langame.protobuf.Message.Analysis.Sentiment;
+
+                    /**
+                     * Creates a plain object from a Sentiment message. Also converts values to other types if specified.
+                     * @param message Sentiment
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: langame.protobuf.Message.Analysis.Sentiment, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this Sentiment to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+                }
+            }
+        }
+
+        /** ContentFilter enum. */
+        enum ContentFilter {
+            Safe = 0,
+            Sensitive = 1,
+            Unsafe = 2
         }
     }
 }

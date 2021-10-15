@@ -7,7 +7,10 @@ export const initFirebaseTest = ({isDev = true}) => {
   // require("firebase-functions-test")({
   //   credential: cred,
   // });
-  admin.initializeApp({
-    credential: cred,
-  });
+  try {
+    admin.initializeApp({
+      credential: cred,
+    });
+  // eslint-disable-next-line no-empty
+  } catch (e) {}
 };

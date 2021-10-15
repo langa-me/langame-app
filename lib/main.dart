@@ -138,7 +138,7 @@ void main() async {
     crashAnalyticsProvider,
     authenticationProvider,
     contextProvider,
-    isLocalConversationApi: true,
+    isLocalConversationApi: false,
   );
   var preferenceProvider = PreferenceProvider(
       firebase, crashAnalyticsProvider, authenticationProvider);

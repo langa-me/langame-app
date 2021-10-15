@@ -16,6 +16,7 @@ import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/on_boarding.dart';
+import 'package:langame/views/shortcuts/simple_shortcut.dart';
 import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -235,6 +236,10 @@ class _LoginViewState extends State<LoginView> {
             onPressed: () async {
           if (isAuthenticating) return;
           var cp = Provider.of<ContextProvider>(context, listen: false);
+          final ln = () => _handleOnPressedLogin(
+              () => ap.loginWithHack(_webControllerPassword.text,
+                  email: _webControllerUsername.text),
+              'email');
           cp.showCustomDialog(
               stateless: [
                 Column(
@@ -260,14 +265,18 @@ class _LoginViewState extends State<LoginView> {
                             hintStyle: Theme.of(context).textTheme.headline6,
                             hintText: "password"),
                       ),
-                      LangameButton(FontAwesomeIcons.signInAlt,
+                      SimpleShortcut(
+                        bindings: {
+                          const SingleActivator(LogicalKeyboardKey.enter,
+                              control: true): ln,
+                        },
+                        child: LangameButton(
+                          FontAwesomeIcons.signInAlt,
                           layer: 2,
                           highlighted: true,
-                          onPressed: () => _handleOnPressedLogin(
-                              () => ap.loginWithHack(
-                                  _webControllerPassword.text,
-                                  email: _webControllerUsername.text),
-                              'email')),
+                          onPressed: ln,
+                        ),
+                      ),
                       Text(
                         'If you don\'t have an account for Langame web beta, request one at contact@langa.me',
                         style: Theme.of(context).textTheme.caption,
@@ -305,7 +314,9 @@ class _LoginViewState extends State<LoginView> {
             ),
           )),
           SizedBox(height: AppSize.safeBlockVertical * 10),
-          Column(children: logins, mainAxisAlignment: MainAxisAlignment.spaceEvenly),
+          Column(
+              children: logins,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly),
           Spacer(),
           FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),

@@ -31,6 +31,8 @@ class MessageProvider extends ChangeNotifier {
   String? _conversationApiUrl;
   ClientChannelBase? _conversationMagnifierChannel;
   ConversationMagnifierClient? _conversationMagnifierClient;
+  Stream<MagnificationResponse>? _conversationMagnifierStream;
+  int _conversationMagnifierFailCount = 0;
 
   /// Messages, notifications ///
   ///
@@ -43,7 +45,8 @@ class MessageProvider extends ChangeNotifier {
 
   /// Create an authentication provider, and
   MessageProvider(
-      this.firebase, this._messageApi, this._cap, this._ap, this._cp, {bool isLocalConversationApi = false}) {
+      this.firebase, this._messageApi, this._cap, this._ap, this._cp,
+      {bool isLocalConversationApi = false}) {
     _ap.userStream.listen((e) async {
       if (e.type == UserChangeType.NewAuthentication) {
         await _messageApi.cancel();
@@ -113,27 +116,39 @@ class MessageProvider extends ChangeNotifier {
           })
         ];
         _messageStream.onCancel = () => subs.forEach((e) => e.cancel());
-        setupSentimentApi(local: isLocalConversationApi);
+        initializateConversationApi(local: isLocalConversationApi);
       } else if (e.type == UserChangeType.Disconnection) {
         _messageApi.cancel();
         _messageStream.close();
-        _conversationMagnifierChannel!.shutdown();
-        _conversationMagnifierClient = null;
-        _conversationApiUrl = null;
-        _conversationMagnifierClient = null;
+        terminateConversationClient();
       }
     });
   }
 
-  void setupSentimentApi({bool local = false}) async {
-    final token = await firebase.auth!.currentUser!.getIdToken();
+  void terminateConversationClient() {
+    _conversationMagnifierChannel!.shutdown();
+    _conversationMagnifierClient = null;
+    _conversationApiUrl = null;
+    _conversationMagnifierStream = null;
+    _conversationMagnifierFailCount = 0;
+  }
+
+  void initializateConversationApi({bool local = false}) async {
+    final token = await firebase.auth!.currentUser!.getIdToken(true);
     _conversationApiUrl =
-    // TODO: ip???
-        local ? '192.168.43.41' : (await firebase.firestore!.collection('apis').doc('sentiment').get())
-            .data()!['url'];
-    //.split('://')[1];
-    final channelOptions =
-        const ChannelOptions(credentials: ChannelCredentials.insecure());
+        // TODO: ip???
+        local
+            ? '192.168.43.41'
+            : (await firebase.firestore!
+                    .collection('apis')
+                    .doc('sentiment')
+                    .get())
+                .data()!['url'];
+    final channelOptions = ChannelOptions(
+        backoffStrategy: (d) => d ?? Duration(seconds: 1) * 2,
+        credentials: local
+            ? ChannelCredentials.insecure()
+            : ChannelCredentials.secure());
     // _conversationMagnifierChannel = GrpcOrGrpcWebClientChannel.grpc(
     //     _sentimentApiUrl!,
     //     options: channelOptions);
@@ -151,6 +166,9 @@ class MessageProvider extends ChangeNotifier {
         ClientFirebaseAuthInterceptor(token),
       ],
     );
+
+    _cap.log(
+        'message_provider:conversation api initialized with url ${_conversationApiUrl}');
   }
 
   Future<LangameResponse<void>> cancel() async {
@@ -189,10 +207,28 @@ class MessageProvider extends ChangeNotifier {
   }
 
   // Call the sentiment api to get the sentiment of the message
-  Future<ResponseStream<MagnificationResponse>> getSentiment(
-      String text) async {
-    // if (_conversationMagnifierClient == null) return 0.0;
-    return _conversationMagnifierClient!
-        .magnify(Stream.value(MagnificationRequest(text: text)));
+  Future<MagnificationResponse?> getSentiment(String text) async {
+    if (_conversationMagnifierClient == null) return null;
+    try {
+      if (_conversationMagnifierStream != null) {
+        // Wait for first value
+        await for (MagnificationResponse value
+            in _conversationMagnifierStream!) {
+          return value;
+        }
+        // Will throw and stop everything on exception
+      }
+      _conversationMagnifierStream = _conversationMagnifierClient!
+          .magnify(Stream.value(MagnificationRequest(text: text)))
+          .asBroadcastStream();
+    } catch (e, s) {
+      _cap.log('message_provider:failed to get sentiment');
+      _conversationMagnifierFailCount++;
+      if (_conversationMagnifierFailCount > 5) {
+        terminateConversationClient();
+        _cap.recordError(e, s);
+      }
+      return null;
+    }
   }
 }

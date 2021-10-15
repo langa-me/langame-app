@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:langame/views/colors/colors.dart';
+import 'package:langame/views/feature_preview/beta.dart';
 
 const double defaultBorderRadius = 3.0;
 
@@ -82,6 +83,7 @@ class LangameButton extends StatefulWidget {
   final bool highlighted;
   final Size? fixedSize;
   final int? disableForFewMs;
+  final bool beta;
 
   const LangameButton(
     this.icon, {
@@ -95,6 +97,7 @@ class LangameButton extends StatefulWidget {
     this.highlighted = false,
     this.fixedSize,
     this.disableForFewMs,
+    this.beta = false,
   }) : super(key: key);
   @override
   State<StatefulWidget> createState() =>
@@ -150,7 +153,7 @@ class _LangameButtonState extends State<LangameButton> {
           }
         }
       },
-      icon: Icon(widget.icon, color: fg),
+      icon: widget.beta ? Beta(Icon(widget.icon, color: fg), type: BetaType.BETA) : Icon(widget.icon, color: fg),
       label: widget.text != null
           ? Text(
               widget.text!,

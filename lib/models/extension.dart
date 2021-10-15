@@ -99,29 +99,31 @@ class UserPreferenceExt {
   static lg.UserPreference fromObject(Object o) {
     var m = o as Map<String, dynamic>;
     return lg.UserPreference(
-        userId: m['userId'],
-        userRecommendations: lg.UserPreference_RecommendationType.values
-            .firstWhere(
-                (e) => e.toString() == m['userRecommendations'].toString()),
-        themeIndex: m['themeIndex'],
-        hasDoneOnBoarding: m['hasDoneOnBoarding'],
-        userSearchHistory:
-            (m['userSearchHistory'] as List<dynamic>?)?.map((e) => e as String),
-        shakeToFeedback: m['shakeToFeedback'],
-        favoriteTopics:
-            (m['favoriteTopics'] as List<dynamic>?)?.map((e) => e as String),
-        speechToTextLocale: m['speechToTextLocale'],
-        sawWhatsNew: m['sawWhatsNew'],
-        notification: lg.UserPreference_Notification(
-          message: lg.UserPreference_Notification_Message(
-            email: m['notification']?['message']?['email'] ?? false,
-            push: m['notification']?['message']?['push'] ?? false,
-          ),
-          invite: lg.UserPreference_Notification_Invite(
-            email: m['notification']?['invite']?['email'] ?? false,
-            push: m['notification']?['invite']?['push'] ?? false,
-          ),
-        ));
+      userId: m['userId'],
+      userRecommendations: lg.UserPreference_RecommendationType.values
+          .firstWhere(
+              (e) => e.toString() == m['userRecommendations'].toString()),
+      themeIndex: m['themeIndex'],
+      hasDoneOnBoarding: m['hasDoneOnBoarding'],
+      userSearchHistory:
+          (m['userSearchHistory'] as List<dynamic>?)?.map((e) => e as String),
+      shakeToFeedback: m['shakeToFeedback'],
+      favoriteTopics:
+          (m['favoriteTopics'] as List<dynamic>?)?.map((e) => e as String),
+      speechToTextLocale: m['speechToTextLocale'],
+      sawWhatsNew: m['sawWhatsNew'],
+      notification: lg.UserPreference_Notification(
+        message: lg.UserPreference_Notification_Message(
+          email: m['notification']?['message']?['email'] ?? false,
+          push: m['notification']?['message']?['push'] ?? false,
+        ),
+        invite: lg.UserPreference_Notification_Invite(
+          email: m['notification']?['invite']?['email'] ?? false,
+          push: m['notification']?['invite']?['push'] ?? false,
+        ),
+      ),
+      previewMode: m['previewMode'] ?? false,
+    );
   }
 }
 
@@ -160,6 +162,41 @@ class LangameExt {
           (m['reservedSpots'] as List<dynamic>?)?.map((e) => e as String),
       isLocked: m['isLocked'],
       isText: m['isText'],
+      reflections: (m['reflections'] as List<dynamic>?)
+              ?.map((e) => ReflectionExt.fromObject(e)) ??
+          [],
+      suggestions: (m['suggestions'] as List<dynamic>?)?.map(
+            (e) => SuggestionExt.fromObject(e),
+          ) ??
+          [],
+    );
+  }
+}
+
+class ReflectionExt {
+  static lg.Langame_Reflection fromObject(Object o) {
+    var m = o as Map<Object?, Object?>;
+    return lg.Langame_Reflection(
+      userId: m['userId'] as String?,
+      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
+      lastMessageId: m['lastMessageId'] as String?,
+      alternatives:
+          (m['alternatives'] as List<dynamic>?)?.map((e) => e as String),
+      contentFilter: lg.ContentFilter.values[m['contentFilter'] as int? ?? 0],
+    );
+  }
+}
+
+class SuggestionExt {
+  static lg.Langame_Suggestion fromObject(Object o) {
+    var m = o as Map<Object?, Object?>;
+    return lg.Langame_Suggestion(
+      userId: m['userId'] as String?,
+      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
+      lastMessageId: m['lastMessageId'] as String?,
+      alternatives:
+          (m['alternatives'] as List<dynamic>?)?.map((e) => e as String),
+      contentFilter: lg.ContentFilter.values[m['contentFilter'] as int? ?? 0],
     );
   }
 }

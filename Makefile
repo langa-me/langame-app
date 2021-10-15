@@ -32,3 +32,8 @@ android_sync:
 	cp android/app/src/prod/AndroidManifest.xml android/app/src/dev/AndroidManifest.xml
 	cp android/app/src/prod/AndroidManifest.xml android/app/src/debug/AndroidManifest.xml
 	cp android/app/src/prod/AndroidManifest.xml android/app/src/profile/AndroidManifest.xml
+
+deploy_web:
+	$(eval VERSION=$(shell sh -c "cat pubspec.yaml | yq e '.version' -" | sed 's/+/./g'))
+	flutter build web --release
+	firebase hosting:channel:deploy "${VERSION}" --expires 7d

@@ -34,6 +34,15 @@ firebase functions:config:get > .runtimeconfig.json
 
 Then you need to re-deploy your functions
 
+### Firestore indexes
+
+```bash
+# Get indexes
+firebase firestore:indexes > firestore.indexes.json
+# Deploy indexes from json config
+firebase deploy --only firestore:indexes
+```
+
 
 ## Usage
 

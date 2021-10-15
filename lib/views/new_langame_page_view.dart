@@ -99,7 +99,7 @@ class _SendLangameState extends State<NewLangamePageView>
                           layer: 1,
                           border: false,
                         ),
-                        Text(
+                        isText ? SizedBox.shrink() : Text(
                             'Your friends can also join later using a link for example',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.caption!),
@@ -130,6 +130,7 @@ class _SendLangameState extends State<NewLangamePageView>
                 ),
                 LangameButton(
                   FontAwesomeIcons.microphone,
+                  beta: true,
                   onPressed: () =>
                       setState(() => _textAudioToggles = [false, true]),
                   text: 'Audio',
@@ -180,9 +181,14 @@ class _SendLangameState extends State<NewLangamePageView>
       return;
     }
 
-    if (nlp.shoppingList.length != 1) {
+    if (nlp.shoppingList.length == 0) {
       cp.showSnackBar('You can\'t play Langame alone 😉' +
           (nlp.shoppingList.length == 0 ? ', please add a friend!' : ''));
+      return;
+    }
+
+    if (isText && nlp.shoppingList.length > 1) {
+      cp.showSnackBar('Only one-to-one Langames are supported yet!');
       return;
     }
 

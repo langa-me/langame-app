@@ -924,6 +924,7 @@ class UserPreference extends $pb.GeneratedMessage {
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'speechToTextLocale')
     ..aOB(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sawWhatsNew')
     ..aOM<UserPreference_Notification>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'notification', subBuilder: UserPreference_Notification.create)
+    ..aOB(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'previewMode')
     ..hasRequiredFields = false
   ;
 
@@ -941,6 +942,7 @@ class UserPreference extends $pb.GeneratedMessage {
     $core.String? speechToTextLocale,
     $core.bool? sawWhatsNew,
     UserPreference_Notification? notification,
+    $core.bool? previewMode,
   }) {
     final _result = create();
     if (userId != null) {
@@ -978,6 +980,9 @@ class UserPreference extends $pb.GeneratedMessage {
     }
     if (notification != null) {
       _result.notification = notification;
+    }
+    if (previewMode != null) {
+      _result.previewMode = previewMode;
     }
     return _result;
   }
@@ -1087,6 +1092,213 @@ class UserPreference extends $pb.GeneratedMessage {
   void clearNotification() => clearField(14);
   @$pb.TagNumber(14)
   UserPreference_Notification ensureNotification() => $_ensure(11);
+
+  @$pb.TagNumber(15)
+  $core.bool get previewMode => $_getBF(12);
+  @$pb.TagNumber(15)
+  set previewMode($core.bool v) { $_setBool(12, v); }
+  @$pb.TagNumber(15)
+  $core.bool hasPreviewMode() => $_has(12);
+  @$pb.TagNumber(15)
+  void clearPreviewMode() => clearField(15);
+}
+
+class Langame_Reflection extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Langame.Reflection', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userId')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'lastMessageId')
+    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'alternatives')
+    ..aOM<$0.Timestamp>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
+    ..e<ContentFilter>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'contentFilter', $pb.PbFieldType.OE, defaultOrMaker: ContentFilter.Safe, valueOf: ContentFilter.valueOf, enumValues: ContentFilter.values)
+    ..hasRequiredFields = false
+  ;
+
+  Langame_Reflection._() : super();
+  factory Langame_Reflection({
+    $core.String? userId,
+    $core.String? lastMessageId,
+    $core.Iterable<$core.String>? alternatives,
+    $0.Timestamp? createdAt,
+    ContentFilter? contentFilter,
+  }) {
+    final _result = create();
+    if (userId != null) {
+      _result.userId = userId;
+    }
+    if (lastMessageId != null) {
+      _result.lastMessageId = lastMessageId;
+    }
+    if (alternatives != null) {
+      _result.alternatives.addAll(alternatives);
+    }
+    if (createdAt != null) {
+      _result.createdAt = createdAt;
+    }
+    if (contentFilter != null) {
+      _result.contentFilter = contentFilter;
+    }
+    return _result;
+  }
+  factory Langame_Reflection.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Langame_Reflection.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Langame_Reflection clone() => Langame_Reflection()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Langame_Reflection copyWith(void Function(Langame_Reflection) updates) => super.copyWith((message) => updates(message as Langame_Reflection)) as Langame_Reflection; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Langame_Reflection create() => Langame_Reflection._();
+  Langame_Reflection createEmptyInstance() => create();
+  static $pb.PbList<Langame_Reflection> createRepeated() => $pb.PbList<Langame_Reflection>();
+  @$core.pragma('dart2js:noInline')
+  static Langame_Reflection getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Langame_Reflection>(create);
+  static Langame_Reflection? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get userId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set userId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUserId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUserId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get lastMessageId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set lastMessageId($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasLastMessageId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLastMessageId() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.String> get alternatives => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $0.Timestamp get createdAt => $_getN(3);
+  @$pb.TagNumber(4)
+  set createdAt($0.Timestamp v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasCreatedAt() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearCreatedAt() => clearField(4);
+  @$pb.TagNumber(4)
+  $0.Timestamp ensureCreatedAt() => $_ensure(3);
+
+  @$pb.TagNumber(5)
+  ContentFilter get contentFilter => $_getN(4);
+  @$pb.TagNumber(5)
+  set contentFilter(ContentFilter v) { setField(5, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasContentFilter() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearContentFilter() => clearField(5);
+}
+
+class Langame_Suggestion extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Langame.Suggestion', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userId')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'lastMessageId')
+    ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'alternatives')
+    ..aOM<$0.Timestamp>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
+    ..e<ContentFilter>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'contentFilter', $pb.PbFieldType.OE, defaultOrMaker: ContentFilter.Safe, valueOf: ContentFilter.valueOf, enumValues: ContentFilter.values)
+    ..hasRequiredFields = false
+  ;
+
+  Langame_Suggestion._() : super();
+  factory Langame_Suggestion({
+    $core.String? userId,
+    $core.String? lastMessageId,
+    $core.Iterable<$core.String>? alternatives,
+    $0.Timestamp? createdAt,
+    ContentFilter? contentFilter,
+  }) {
+    final _result = create();
+    if (userId != null) {
+      _result.userId = userId;
+    }
+    if (lastMessageId != null) {
+      _result.lastMessageId = lastMessageId;
+    }
+    if (alternatives != null) {
+      _result.alternatives.addAll(alternatives);
+    }
+    if (createdAt != null) {
+      _result.createdAt = createdAt;
+    }
+    if (contentFilter != null) {
+      _result.contentFilter = contentFilter;
+    }
+    return _result;
+  }
+  factory Langame_Suggestion.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Langame_Suggestion.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Langame_Suggestion clone() => Langame_Suggestion()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Langame_Suggestion copyWith(void Function(Langame_Suggestion) updates) => super.copyWith((message) => updates(message as Langame_Suggestion)) as Langame_Suggestion; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Langame_Suggestion create() => Langame_Suggestion._();
+  Langame_Suggestion createEmptyInstance() => create();
+  static $pb.PbList<Langame_Suggestion> createRepeated() => $pb.PbList<Langame_Suggestion>();
+  @$core.pragma('dart2js:noInline')
+  static Langame_Suggestion getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Langame_Suggestion>(create);
+  static Langame_Suggestion? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get userId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set userId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUserId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUserId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get lastMessageId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set lastMessageId($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasLastMessageId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLastMessageId() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.String> get alternatives => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $0.Timestamp get createdAt => $_getN(3);
+  @$pb.TagNumber(4)
+  set createdAt($0.Timestamp v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasCreatedAt() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearCreatedAt() => clearField(4);
+  @$pb.TagNumber(4)
+  $0.Timestamp ensureCreatedAt() => $_ensure(3);
+
+  @$pb.TagNumber(5)
+  ContentFilter get contentFilter => $_getN(4);
+  @$pb.TagNumber(5)
+  set contentFilter(ContentFilter v) { setField(5, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasContentFilter() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearContentFilter() => clearField(5);
 }
 
 class Langame extends $pb.GeneratedMessage {
@@ -1108,6 +1320,8 @@ class Langame extends $pb.GeneratedMessage {
     ..pPS(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'reservedSpots')
     ..aOB(19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isLocked')
     ..aOB(20, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isText')
+    ..pc<Langame_Reflection>(21, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'reflections', $pb.PbFieldType.PM, subBuilder: Langame_Reflection.create)
+    ..pc<Langame_Suggestion>(22, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'suggestions', $pb.PbFieldType.PM, subBuilder: Langame_Suggestion.create)
     ..hasRequiredFields = false
   ;
 
@@ -1130,6 +1344,8 @@ class Langame extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? reservedSpots,
     $core.bool? isLocked,
     $core.bool? isText,
+    $core.Iterable<Langame_Reflection>? reflections,
+    $core.Iterable<Langame_Suggestion>? suggestions,
   }) {
     final _result = create();
     if (channelName != null) {
@@ -1182,6 +1398,12 @@ class Langame extends $pb.GeneratedMessage {
     }
     if (isText != null) {
       _result.isText = isText;
+    }
+    if (reflections != null) {
+      _result.reflections.addAll(reflections);
+    }
+    if (suggestions != null) {
+      _result.suggestions.addAll(suggestions);
     }
     return _result;
   }
@@ -1338,6 +1560,12 @@ class Langame extends $pb.GeneratedMessage {
   $core.bool hasIsText() => $_has(16);
   @$pb.TagNumber(20)
   void clearIsText() => clearField(20);
+
+  @$pb.TagNumber(21)
+  $core.List<Langame_Reflection> get reflections => $_getList(17);
+
+  @$pb.TagNumber(22)
+  $core.List<Langame_Suggestion> get suggestions => $_getList(18);
 }
 
 class Player extends $pb.GeneratedMessage {
@@ -2062,6 +2290,108 @@ class Recording extends $pb.GeneratedMessage {
   $core.bool hasNote() => $_has(4);
   @$pb.TagNumber(5)
   void clearNote() => clearField(5);
+}
+
+class Message_Analysis_Sentiment extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Message.Analysis.Sentiment', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..a<$core.double>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', $pb.PbFieldType.OF)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'label')
+    ..hasRequiredFields = false
+  ;
+
+  Message_Analysis_Sentiment._() : super();
+  factory Message_Analysis_Sentiment({
+    $core.double? score,
+    $core.String? label,
+  }) {
+    final _result = create();
+    if (score != null) {
+      _result.score = score;
+    }
+    if (label != null) {
+      _result.label = label;
+    }
+    return _result;
+  }
+  factory Message_Analysis_Sentiment.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Message_Analysis_Sentiment.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Message_Analysis_Sentiment clone() => Message_Analysis_Sentiment()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Message_Analysis_Sentiment copyWith(void Function(Message_Analysis_Sentiment) updates) => super.copyWith((message) => updates(message as Message_Analysis_Sentiment)) as Message_Analysis_Sentiment; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Message_Analysis_Sentiment create() => Message_Analysis_Sentiment._();
+  Message_Analysis_Sentiment createEmptyInstance() => create();
+  static $pb.PbList<Message_Analysis_Sentiment> createRepeated() => $pb.PbList<Message_Analysis_Sentiment>();
+  @$core.pragma('dart2js:noInline')
+  static Message_Analysis_Sentiment getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Message_Analysis_Sentiment>(create);
+  static Message_Analysis_Sentiment? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.double get score => $_getN(0);
+  @$pb.TagNumber(1)
+  set score($core.double v) { $_setFloat(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasScore() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearScore() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get label => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set label($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasLabel() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLabel() => clearField(2);
+}
+
+class Message_Analysis extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Message.Analysis', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..pc<Message_Analysis_Sentiment>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sentiments', $pb.PbFieldType.PM, subBuilder: Message_Analysis_Sentiment.create)
+    ..hasRequiredFields = false
+  ;
+
+  Message_Analysis._() : super();
+  factory Message_Analysis({
+    $core.Iterable<Message_Analysis_Sentiment>? sentiments,
+  }) {
+    final _result = create();
+    if (sentiments != null) {
+      _result.sentiments.addAll(sentiments);
+    }
+    return _result;
+  }
+  factory Message_Analysis.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Message_Analysis.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Message_Analysis clone() => Message_Analysis()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Message_Analysis copyWith(void Function(Message_Analysis) updates) => super.copyWith((message) => updates(message as Message_Analysis)) as Message_Analysis; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Message_Analysis create() => Message_Analysis._();
+  Message_Analysis createEmptyInstance() => create();
+  static $pb.PbList<Message_Analysis> createRepeated() => $pb.PbList<Message_Analysis>();
+  @$core.pragma('dart2js:noInline')
+  static Message_Analysis getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Message_Analysis>(create);
+  static Message_Analysis? _defaultInstance;
+
+  @$pb.TagNumber(2)
+  $core.List<Message_Analysis_Sentiment> get sentiments => $_getList(0);
 }
 
 class Message extends $pb.GeneratedMessage {

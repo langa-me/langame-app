@@ -10,3 +10,16 @@ export function shuffle<T>(array: T[]): T[] {
   }
   return array;
 }
+
+/**
+ *
+ * @param{T[]} items
+ * @param{number} n
+ * @return{any}
+ */
+export const chunkItems = <T>(items: T[], n: number): T[][] =>
+  items.reduce((chunks: T[][], item: T, index) => {
+    const chunk = Math.floor(index / n);
+    chunks[chunk] = ([] as T[]).concat(chunks[chunk] || [], item);
+    return chunks;
+  }, []);
