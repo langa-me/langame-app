@@ -63,7 +63,7 @@ platform :ios do
       skip_submission: false,
       notify_external_testers: true,
       ipa: "./Runner.ipa",
-      changelog: "Topics are now added to meme recordings. Exporting them therefore display them as tags.",
+      changelog: "Text mode!",
       distribute_external: true,
       groups: "public",
     )

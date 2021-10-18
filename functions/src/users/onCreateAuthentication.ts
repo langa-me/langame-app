@@ -7,12 +7,17 @@ import {auth} from "firebase-admin/lib/auth";
 import UserRecord = auth.UserRecord;
 import {reportError} from "../errors";
 import {html} from "../utils/html";
+import {sample} from "../utils/array";
+import {welcomeMessages} from "./welcomeMessages";
 
 const title = "Welcome to Langame 👋";
 /* eslint-disable max-len */
 const body = `Thank a lot for joining us 😋, start some <strong>Langames</strong> now with your friends!
 <br>
-If you have any question or want to give a feedback, you can find everything <a href="https://help.langa.me/welcome">here.</a>`;
+If you have any question or want to give a feedback, you can find everything <a href="https://help.langa.me/welcome">here.</a>
+<br>
+<em>${sample(welcomeMessages)}</em>
+`;
 /* eslint-disable max-len */
 
 
@@ -38,7 +43,9 @@ export const onCreateAuthentication = async (user: UserRecord,
       return t.set(db.collection(kUsersCollection).doc(user.uid), clone);
     });
 
-    return db.collection("mails").add({
+    const teamTitle = `Welcome to ${user.uid} 😋`;
+    const teamBody = `<h1>${user.uid} joined Langame 😋</h1><br><p>${JSON.stringify(clone)}</p><br><h2>Give her/him a warm welcome!</h2>`;
+    return Promise.all([db.collection("mails").add({
       to: user.email,
       message: {
         subject: title,
@@ -46,7 +53,15 @@ export const onCreateAuthentication = async (user: UserRecord,
           ${html(title, body, "Have a great day 😇.")}
         </code>`,
       },
-    });
+    }), db.collection("mails").add({
+      to: "louis.beaumont@langa.me",
+      message: {
+        subject: teamTitle,
+        html: `<code>
+          ${html(teamTitle, teamBody, "Have a great day 😇.")}
+        </code>`,
+      },
+    })]);
   } catch (e: any) {
     return reportError(e, {user: context.params.userId});
   }

@@ -13,8 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final _news = [
-  'Record yourself in conversation, you can then export you thoughts anywhere',
-  'User recommendation feature'
+  'Text mode!',
 ];
 
 Widget whatsNew(BuildContext context) {
