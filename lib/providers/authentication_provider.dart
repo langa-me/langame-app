@@ -182,6 +182,7 @@ class AuthenticationProvider extends ChangeNotifier {
         'lastSignInTime': DateTime.now(),
       });
       firebase.analytics?.logLogin();
+      _cap.log('authentication_provider:loginWith');
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
       _cap.log('failed to authentication_provider:loginWith');
@@ -223,7 +224,7 @@ class AuthenticationProvider extends ChangeNotifier {
       _cap.log('authentication_provider:loginWithHack');
       return _loginWith(userCredential: res);
     } catch (e, s) {
-      _cap.log('authentication_provider:failed to loginWithHack');
+      _cap.log('authentication_provider:failed to loginWithHack $e');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }

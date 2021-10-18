@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/random.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
@@ -24,6 +25,7 @@ import 'package:langame/views/langame_list_view.dart';
 import 'package:langame/views/search_page_view.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 import 'colors/colors.dart';
 import 'users/user_tile.dart';
@@ -99,10 +101,12 @@ class _SendLangameState extends State<NewLangamePageView>
                           layer: 1,
                           border: false,
                         ),
-                        isText ? SizedBox.shrink() : Text(
-                            'Your friends can also join later using a link for example',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.caption!),
+                        isText
+                            ? SizedBox.shrink()
+                            : Text(
+                                'Your friends can also join later using a link for example',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.caption!),
                       ]
                     : nlp.shoppingList
                         .map(
@@ -117,7 +121,7 @@ class _SendLangameState extends State<NewLangamePageView>
               ),
             ),
           ),
-          ToggleButtons(
+          UniversalPlatform.isWeb ? SizedBox.shrink() : ToggleButtons(
               renderBorder: false,
               children: [
                 LangameButton(
@@ -175,10 +179,9 @@ class _SendLangameState extends State<NewLangamePageView>
           'You don\'t have any credits left 😥, wait until tomorrow to get some again!');
       return;
     }
-
+    var topics = tp.selectedTopics;
     if (tp.selectedTopics.isEmpty) {
-      cp.showSnackBar('Please select at least one topic 😃');
-      return;
+      topics = [tp.availableTopics.pickAny()!].toSet();
     }
 
     if (nlp.shoppingList.length == 0) {
@@ -197,7 +200,7 @@ class _SendLangameState extends State<NewLangamePageView>
     cp.showLoadingDialog();
     var createLangame = await lp.createLangame(
       nlp.shoppingList,
-      tp.selectedTopics.toList(),
+      topics.toList(),
       nlp.selectedDate ?? DateTime.now(),
       isText: isText,
     );
@@ -262,9 +265,9 @@ class _SendLangameState extends State<NewLangamePageView>
               icon: Icon(FontAwesomeIcons.shareAlt,
                   color: isLightThenDark(context, reverse: false)),
               onPressed: () => Share.share(
-                'Join my Langame to talk about ${tp.selectedTopics.join(',')} at ${createDynamicLink.result!}',
+                'Join my Langame to talk about ${topics.join(',')} at ${createDynamicLink.result!}',
                 subject:
-                    'Join my Langame to talk about ${tp.selectedTopics.join(',')}',
+                    'Join my Langame to talk about ${topics.join(',')}',
               ),
             ),
             trailing: Icon(FontAwesomeIcons.copy,

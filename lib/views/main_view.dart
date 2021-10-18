@@ -26,9 +26,9 @@ class MainView extends StatefulWidget {
 
 /// Main page of Langame (temporary name...)
 class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   PageController _pageController = PageController(
-    initialPage: 0,
+    initialPage: 1,
   );
 
   @override
@@ -55,6 +55,14 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
 
   @override
   Widget build(BuildContext context) {
+    final pp = Provider.of<PreferenceProvider>(context);
+    if (this.mounted && !pp.preference!.previewMode && _selectedIndex >= 3) {
+      // Otherwise out of index
+      setState(() {
+        _selectedIndex = 1;
+        _pageController.jumpToPage(1);
+      });
+    }
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: GestureDetector(
@@ -106,7 +114,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
         onTap: () => cp.push(LangameListView()));
     return AppBar(
       backgroundColor: Colors.transparent,
-      leading: notifications,
+      // leading: notifications,
       actions: [
         IconButton(
           onPressed: () => cp.push(SettingsView()),
@@ -128,7 +136,15 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
             color: Theme.of(context).iconTheme.color),
         activeIcon: Icon(FontAwesomeIcons.laptopHouse,
             color: Theme.of(context).colorScheme.secondary),
-        label: 'Remote',
+        label: 'Distant',
+      ),
+      BottomNavigationBarItem(
+        backgroundColor: Colors.transparent,
+        icon: Icon(FontAwesomeIcons.grinTongue,
+            color: Theme.of(context).iconTheme.color),
+        activeIcon: Icon(FontAwesomeIcons.grinTongue,
+            color: Theme.of(context).colorScheme.secondary),
+        label: 'Langames',
       ),
       BottomNavigationBarItem(
         backgroundColor: Colors.transparent,
@@ -139,7 +155,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
         label: 'Face-to-face',
       ),
     ];
-    var pp = Provider.of<PreferenceProvider>(context, listen: false);
+    var pp = Provider.of<PreferenceProvider>(context);
     if (pp.preference!.previewMode) {
       navBarItems.add(BottomNavigationBarItem(
         backgroundColor: Colors.transparent,
@@ -166,6 +182,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     var pp = Provider.of<PreferenceProvider>(context, listen: false);
     var child = [
       NewLangamePageView(goToPage),
+      LangameListView(),
       PhysicalLangamePageView(goToPage),
     ];
     if (pp.preference!.previewMode) child.add(RecordingPageView(goToPage));

@@ -127,7 +127,8 @@ class MessageProvider extends ChangeNotifier {
   }
 
   void terminateConversationClient() {
-    _conversationMagnifierChannel!.shutdown();
+    _conversationMagnifierChannel?.shutdown();
+    _conversationMagnifierChannel = null;
     _conversationMagnifierClient = null;
     _conversationApiUrl = null;
     _conversationMagnifierStream = null;

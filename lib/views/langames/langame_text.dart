@@ -1,4 +1,5 @@
 import 'package:after_layout/after_layout.dart';
+import 'package:badges/badges.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,7 @@ class _State extends State<LangameTextView>
   final f = new DateFormat('hh:mm');
   final ScrollController _scrollController = ScrollController();
   MagnificationResponse_Sentiment? _currentSentiment;
+  int _seenReflections = 0;
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -256,7 +258,7 @@ class _State extends State<LangameTextView>
   void _scrollToBottom({bool later = false}) async {
     // Delay to make sure the frames are rendered properly
     // await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
-    await waitUntil(() => _scrollController.hasClients);
+    await waitUntil(() => _scrollController.hasClients, maxIterations: 1000);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       _scrollController.animateTo(_scrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
@@ -266,8 +268,20 @@ class _State extends State<LangameTextView>
   FloatingActionButton _buildReflectionButton(
           ContextProvider cp, List<lg.Langame_Reflection> reflections) =>
       FloatingActionButton(
-          child: Icon(FontAwesomeIcons.brain),
+          child: Badge(
+            position: BadgePosition.topEnd(top: -20, end: -20),
+            badgeColor: getBlackAndWhite(context, 0),
+            child: Icon(FontAwesomeIcons.brain),
+            badgeContent: Text(
+              (reflections.length - _seenReflections).toString(),
+              style: Theme.of(context).textTheme.headline6!.merge(TextStyle(color: getBlackAndWhite(context, 0, reverse: true))),
+              textAlign: TextAlign.center,
+            ),
+          ),
           onPressed: () {
+            setState(() {
+              _seenReflections = reflections.length;
+            });
             cp.showCustomDialog(
                 stateless: [
                   Container(
@@ -280,7 +294,7 @@ class _State extends State<LangameTextView>
                       itemBuilder: (ctx, i) => LangameButton(
                         FontAwesomeIcons.copy,
                         text: reflections[i].alternatives.last,
-                        layer: 2,
+                        layer: 1,
                         onPressed: () {
                           FlutterClipboard.copy(
                               reflections[i].alternatives.last);
@@ -312,7 +326,21 @@ class _State extends State<LangameTextView>
                                 'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme + 1].content}',
                             text: currentLg
                                     .memes[currentLg.currentMeme + 1].content
-                                    .substring(0, 20) +
+                                    .substring(
+                                        0,
+                                        currentLg
+                                                    .memes[
+                                                        currentLg.currentMeme +
+                                                            1]
+                                                    .content
+                                                    .length >
+                                                20
+                                            ? 20
+                                            : currentLg
+                                                .memes[
+                                                    currentLg.currentMeme + 1]
+                                                .content
+                                                .length) +
                                 '...', onPressed: () {
                           setState(() {
                             _textEditingController.text = currentLg
@@ -350,8 +378,12 @@ class _State extends State<LangameTextView>
                                     : FontAwesomeIcons.meh,
                             layer: 1,
                             tooltip: e.alternatives.last,
-                            text: e.alternatives.last.substring(0, 20) + '...',
-                            onPressed: () {
+                            text: e.alternatives.last.substring(
+                                    0,
+                                    e.alternatives.last.length > 20
+                                        ? 20
+                                        : e.alternatives.last.length) +
+                                '...', onPressed: () {
                           setState(() {
                             _textEditingController.text = e.alternatives.last;
                             _currentText = e.alternatives.last;

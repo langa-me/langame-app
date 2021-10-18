@@ -12,8 +12,7 @@ import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
-
-import 'buttons/popup_menu.dart';
+import 'package:universal_platform/universal_platform.dart';
 import 'colors/colors.dart';
 import 'langames/langame_audio.dart';
 import 'langames/langame_text.dart';
@@ -37,53 +36,26 @@ class _State extends State<LangameListView> {
     // TODO: fucking inefficient
     var langames = p.langames.values.toList();
     langames.sort((a, b) => b.date.toDateTime().compareTo(a.date.toDateTime()));
-    var textLangames = langames.where((l) => l.isText).toList();
-    var audioLangames = langames.where((l) => !l.isText).toList();
+    if (UniversalPlatform.isWeb) {
+      // Web does support audio yet
+      langames.retainWhere((e) => e.isText);
+    }
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-          appBar: AppBar(
-              title: Text(
-                'Langames',
-                style: Theme.of(context).textTheme.headline6,
-                textAlign: TextAlign.center,
+        backgroundColor: isLightThenDark(context, reverse: true),
+        resizeToAvoidBottomInset: false,
+        body: p.langames.length == 0
+            ? _noLangame()
+            : ListView.separated(
+                physics: BouncingScrollPhysics(),
+                itemBuilder: (_, int i) => langames[i].isText
+                    ? _buildTextCard(langames[i])
+                    : _buildAudioCard(langames[i]),
+                itemCount: langames.length,
+                separatorBuilder: (_, int i) => Divider(),
               ),
-              iconTheme: IconThemeData(
-                color: getBlackAndWhite(context, 0), //change your color here
-              ),
-              backgroundColor: Colors.transparent,
-              actions: [
-                buildPopupMenuWithHelpAndFeedback(context),
-              ],
-              bottom: TabBar(
-                tabs: [
-                  Tab(
-                      icon: Icon(
-                    FontAwesomeIcons.keyboard,
-                    color: getBlackAndWhite(context, 0),
-                  )),
-                  Tab(
-                      icon: Icon(FontAwesomeIcons.microphone,
-                          color: getBlackAndWhite(context, 0))),
-                ],
-              )),
-          body: TabBarView(
-              children: p.langames.length == 0
-                  ? [_noLangame(), _noLangame()]
-                  : [
-                      ListView.separated(
-                        physics: BouncingScrollPhysics(),
-                        itemBuilder: (_, int i) => _buildTextCard(textLangames[i]),
-                        itemCount: textLangames.length,
-                        separatorBuilder: (_, int i) => Divider(),
-                      ),
-                      ListView.separated(
-                        physics: BouncingScrollPhysics(),
-                        itemBuilder: (_, int i) => _buildAudioCard(audioLangames[i]),
-                        itemCount: audioLangames.length,
-                        separatorBuilder: (_, int i) => Divider(),
-                      ),
-                    ])),
+      ),
     );
   }
 
@@ -123,6 +95,10 @@ class _State extends State<LangameListView> {
             var s = format.format(l.started.toDateTime().toLocal());
             var startedString = l.hasStarted() ? '\n\nstarted: $s' : '';
             return ListTile(
+              leading: Icon(
+                FontAwesomeIcons.keyboard,
+                color: getBlackAndWhite(context, 1, reverse: false),
+              ),
               tileColor: getBlackAndWhite(context, 1, reverse: true),
               title: Text(l.topics.join(','),
                   textAlign: TextAlign.center,
@@ -138,9 +114,6 @@ class _State extends State<LangameListView> {
                               child: Text(e.tag),
                             ))
                       .toList()),
-              trailing: Tooltip(
-                  child: Icon(FontAwesomeIcons.clock),
-                  message: 'planned: $d$startedString'),
               onTap: () => cp.push(
                 LangameTextView(l.channelName),
               ),
@@ -165,7 +138,13 @@ class _State extends State<LangameListView> {
             var s = format.format(l.started.toDateTime().toLocal());
             var startedString = l.hasStarted() ? '\n\nstarted: $s' : '';
             return ExpansionTile(
+                leading: Icon(
+                  FontAwesomeIcons.headphones,
+                  color: getBlackAndWhite(context, 1, reverse: false),
+                ),
                 backgroundColor: getBlackAndWhite(context, 1, reverse: true),
+                collapsedBackgroundColor:
+                    getBlackAndWhite(context, 1, reverse: true),
                 title: Text(l.topics.join(','),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.caption),

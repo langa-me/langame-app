@@ -71,8 +71,7 @@ class AudioProvider extends ChangeNotifier {
   Future<LangameResponse<void>> initEngine(
       RtcEngineEventHandler eventHandler) async {
     try {
-      _engine = await RtcEngine.createWithConfig(
-          RtcEngineConfig(AppConst.agoraAppID));
+      _engine = await RtcEngine.create(AppConst.agoraAppID);
       eventHandler.leaveChannel = (a) {
         // TODO: might do some handler stuff on provider side too
         eventHandler.leaveChannel!(a);
@@ -94,7 +93,7 @@ class AudioProvider extends ChangeNotifier {
       ]); // Usually disabling microphone by default
 
     } catch (e, s) {
-      _cap.log('failed to init audio engine');
+      _cap.log('audio_provider: failed to init audio engine $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

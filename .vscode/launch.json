@@ -47,6 +47,36 @@
             "flutterMode": "debug",
         },
         {
+            "name": "prod-ios-simulator",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "prod",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "547F920B-591E-4B7D-9D66-5D09A5C72C72",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "dev-ios-simulator",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "547F920B-591E-4B7D-9D66-5D09A5C72C72",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
             "name": "prod-ipad",
             "type": "dart",
             "request": "launch",
