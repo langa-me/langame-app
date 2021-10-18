@@ -147,7 +147,6 @@ class _State extends State<SearchPageView>
                     lsp.selectedUser = users.result?.first;
                     setState(() {});
                   } else {
-                    // TODO: should notify "no user found" or several found ...
                     lsp.selectedTag = null;
                     lsp.selectedUser = null;
                   }
@@ -192,7 +191,6 @@ class _State extends State<SearchPageView>
                             lsp.placeFirstUserSearchHistory(
                                 users.result!.first.tag);
                           } else {
-                            // TODO: should notify "no user found" or several found ...
                             lsp.selectedTag = null;
                             lsp.selectedUser = null;
                             final snackBar =

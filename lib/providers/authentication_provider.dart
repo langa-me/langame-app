@@ -234,8 +234,6 @@ class AuthenticationProvider extends ChangeNotifier {
       _cap.log('authentication_provider:purging local storage');
       var i = await SharedPreferences.getInstance();
       await i.clear();
-      // TODO: permission denied somehow (firestore)
-      // _crashAnalyticsProvider.log('purging local firestore');
       if (user != null) {
         await firebase.firestore!
             .collection(AppConst.firestoreUsersCollection)

@@ -184,6 +184,7 @@ void main() async {
             ////////// Independent providers //////////
             ///////////////////////////////////////////
 
+            ChangeNotifierProvider(create: (_) => firebase),
             ChangeNotifierProvider(create: (_) => crashAnalyticsProvider),
             StreamProvider<ConnectivityResult>.value(
                 value: Connectivity().onConnectivityChanged,

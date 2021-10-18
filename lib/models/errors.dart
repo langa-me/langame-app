@@ -1,5 +1,3 @@
-// TODO: convert everything to protobuf
-
 /// API / service level errors
 class LangameException implements Exception {
   String cause;

@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import 'package:grpc/grpc_connection_interface.dart';
-import 'package:grpc/grpc_or_grpcweb.dart';
-import 'package:grpc/grpc_web.dart';
 import 'package:langame/models/djinn/djinn.pbgrpc.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';

@@ -81,9 +81,6 @@ class _OnBoardingState extends State with AfterLayoutMixin {
             maxLength: 8,
             // The validator receives the text that the user has entered.
             validator: (value) {
-              // showBasicSnackBar(context, 'this is not implemented yet!');
-              // TODO: validation should at least check availability of tag
-              // TODO: and maybe check profanity (funniest part)
               if (value == null || value.isEmpty) {
                 return 'Please enter some text';
               }
@@ -145,7 +142,6 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   }
 
   List<PageViewModel> _buildPageModels() {
-    var tp = Provider.of<TagProvider>(context);
     return [
       PageViewModel(
         titleWidget: Text('What are your interests?',

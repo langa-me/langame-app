@@ -6,10 +6,11 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
-class FirebaseApi {
+class FirebaseApi extends ChangeNotifier {
   final FirebaseMessaging? messaging;
   final FirebaseFirestore? firestore;
   final FirebaseAuth? auth;

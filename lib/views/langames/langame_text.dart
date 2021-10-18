@@ -1,5 +1,6 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -13,6 +14,7 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/message_provider.dart';
+import 'package:langame/services/http/firebase.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/colors/colors.dart';
@@ -141,35 +143,8 @@ class _State extends State<LangameTextView>
                         : cp.buildLoadingWidget(),
                   ),
                   Divider(),
-                  // This is a row showing quick replies
-                  Expanded(
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: suggestions
-                          // .take(3)
-                          .map(
-                            (e) => Padding(
-                                padding: EdgeInsets.all(12),
-                                child: LangameButton(
-                                    e.contentFilter == lg.ContentFilter.Safe
-                                        ? FontAwesomeIcons.smileBeam
-                                        : e.contentFilter ==
-                                                lg.ContentFilter.Sensitive
-                                            ? FontAwesomeIcons.frown
-                                            : FontAwesomeIcons.meh,
-                                    highlighted: true,
-                                    text: e.alternatives.last.substring(0, 20) +
-                                        '...', onPressed: () {
-                                  setState(() {
-                                    _textEditingController.text =
-                                        e.alternatives.last;
-                                    _currentText = e.alternatives.last;
-                                  });
-                                })),
-                          )
-                          .toList(),
-                    ),
-                  ),
+                  // This is a row showing suggestions
+                  _buildSuggestions(langame, suggestions),
                   Divider(),
                   // This is a Whatsapp-like send message bar with rounded corner
                   Container(
@@ -320,6 +295,68 @@ class _State extends State<LangameTextView>
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline4));
           });
+
+  Widget _buildSuggestions(
+          lg.Langame currentLg, List<lg.Langame_Suggestion> suggestions) =>
+      Expanded(
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+                currentLg.currentMeme < currentLg.memes.length ? Padding(
+                    padding: EdgeInsets.all(12),
+                    child: LangameButton(FontAwesomeIcons.grinTongue,
+                        highlighted: true,
+                        disableForFewMs: 5000,
+                        tooltip: 'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme+1].content}',
+                        text: currentLg.memes[currentLg.currentMeme+1].content
+                                .substring(0, 20) +
+                            '...', onPressed: () {
+                      setState(() {
+                        _textEditingController.text =
+                            currentLg.memes[currentLg.currentMeme+1].content;
+                        _currentText =
+                            currentLg.memes[currentLg.currentMeme+1].content;
+                      });
+                      _onSend();
+                      final fs =
+                          Provider.of<FirebaseApi>(context, listen: false)
+                              .firestore!;
+                      fs
+                          .collection('langames')
+                          .where('channelName',
+                              isEqualTo: widget.langameChannelName)
+                          .get()
+                          .then((e) {
+                        if (e.size == 0) return;
+                        e.docs[0].reference.update({
+                          'currentMeme': FieldValue.increment(1),
+                        });
+                      });
+                    })) : SizedBox.shrink()
+              ] +
+              suggestions
+                  .map(
+                    (e) => Padding(
+                        padding: EdgeInsets.all(12),
+                        child: LangameButton(
+                            e.contentFilter == lg.ContentFilter.Safe
+                                ? FontAwesomeIcons.smileBeam
+                                : e.contentFilter == lg.ContentFilter.Sensitive
+                                    ? FontAwesomeIcons.frown
+                                    : FontAwesomeIcons.meh,
+                            layer: 1,
+                            tooltip: e.alternatives.last,
+                            text: e.alternatives.last.substring(0, 20) + '...',
+                            onPressed: () {
+                          setState(() {
+                            _textEditingController.text = e.alternatives.last;
+                            _currentText = e.alternatives.last;
+                          });
+                        })),
+                  )
+                  .toList(),
+        ),
+      );
 
   /// This is a function that return a WhatsApp like message box
   Widget _buildMessageBox(lg.Message m) => Stack(

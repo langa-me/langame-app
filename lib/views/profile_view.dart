@@ -147,7 +147,6 @@ class _State extends State<ProfileView> {
                 maxLength: 8,
                 // The validator receives the text that the user has entered.
                 validator: (value) {
-                  // TODO: and maybe check profanity (funniest part)
                   if (value == null || value.isEmpty) {
                     return 'Please enter some text';
                   }

@@ -1,12 +1,12 @@
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/views/langames/langame_audio.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 class DynamicLinksProvider extends ChangeNotifier {
@@ -14,11 +14,8 @@ class DynamicLinksProvider extends ChangeNotifier {
   final ContextProvider _cp;
   final FirebaseDynamicLinks? _dynamicLinks;
   final AuthenticationProvider _ap;
-  bool? _isDev;
 
   DynamicLinksProvider(this._cap, this._cp, this._dynamicLinks, this._ap) {
-    PackageInfo.fromPlatform() // TODO: move to smthing global
-        .then((e) => _isDev = e.packageName.contains('dev'));
     _ap.userStream.listen((e) {
       if (e.type == UserChangeType.NewAuthentication && !UniversalPlatform.isWeb) {
         setupAndCheckDynamicLinks();
@@ -31,7 +28,7 @@ class DynamicLinksProvider extends ChangeNotifier {
     return sp[sp.length > 4 ? 4 : 3];
   }
 
-  String getBasePath() => _isDev != null && !_isDev!
+  String getBasePath() => !AppConst.isDev
       ? 'https://langa.me/join'
       : 'https://langamedev.page.link';
 
@@ -40,15 +37,13 @@ class DynamicLinksProvider extends ChangeNotifier {
     bool short,
   ) async {
     try {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      final isDev = packageInfo.packageName.contains('dev');
       final basePath = Uri.encodeFull(
-          !isDev ? 'https://langa.me/join' : 'https://langamedev.page.link');
+          !AppConst.isDev ? 'https://langa.me/join' : 'https://langamedev.page.link');
       final DynamicLinkParameters parameters = DynamicLinkParameters(
         uriPrefix: basePath,
         link: Uri.parse(basePath + Uri.encodeFull('/$path')),
         androidParameters: AndroidParameters(
-          packageName: packageInfo.packageName.contains('dev')
+          packageName: AppConst.isDev
               ? 'me.langa.dev'
               : 'me.langa',
           // minimumVersion: int.parse(packageInfo.buildNumber),
@@ -57,7 +52,7 @@ class DynamicLinksProvider extends ChangeNotifier {
           shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short,
         ),
         iosParameters: IosParameters(
-          bundleId: packageInfo.packageName.contains('dev')
+          bundleId: AppConst.isDev
               ? 'me.langa.dev'
               : 'me.langa.prod',
           // minimumVersion: packageInfo.buildNumber,

@@ -84,6 +84,7 @@ class LangameButton extends StatefulWidget {
   final Size? fixedSize;
   final int? disableForFewMs;
   final bool beta;
+  final String? tooltip;
 
   const LangameButton(
     this.icon, {
@@ -98,6 +99,7 @@ class LangameButton extends StatefulWidget {
     this.fixedSize,
     this.disableForFewMs,
     this.beta = false,
+    this.tooltip,
   }) : super(key: key);
   @override
   State<StatefulWidget> createState() =>
@@ -117,7 +119,7 @@ class _LangameButtonState extends State<LangameButton> {
       bg = Theme.of(context).colorScheme.secondary;
       fg = isLightThenDark(context, reverse: true);
     }
-    return ElevatedButton.icon(
+    final b = ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         fixedSize: widget.fixedSize,
         primary: bg,
@@ -164,6 +166,7 @@ class _LangameButtonState extends State<LangameButton> {
             )
           : SizedBox.shrink(),
     );
+    return widget.tooltip != null ? Tooltip(message: widget.tooltip!, child: b) : b;
   }
 }
 
