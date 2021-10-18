@@ -80,10 +80,10 @@ export const createMemes = async (data: any,
       let meme: string | undefined;
       try {
         meme =
-        await api.completion(
-            randomPrompt.data().template.replace("[TOPIC]", data.topic),
-            randomPrompt.data().parameters
-        );
+        await api.openaiCompletion({
+          prompt: randomPrompt.data().template.replace("[TOPIC]", data.topic),
+          ...randomPrompt.data().parameters,
+        });
       } catch (e: any) {
         reportError(e);
         throw e;

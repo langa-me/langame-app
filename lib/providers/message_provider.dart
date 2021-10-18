@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import 'package:grpc/grpc_connection_interface.dart';
+import 'package:grpc/grpc_or_grpcweb.dart';
+import 'package:grpc/grpc_web.dart';
 import 'package:langame/models/djinn/djinn.pbgrpc.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/extension.dart';
@@ -17,6 +19,7 @@ import 'package:langame/views/langames/langame_audio.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/views/langames/langame_text.dart';
 import 'package:sortedmap/sortedmap.dart';
+import 'package:universal_platform/universal_platform.dart';
 import 'authentication_provider.dart';
 
 class MessageProvider extends ChangeNotifier {
@@ -134,6 +137,8 @@ class MessageProvider extends ChangeNotifier {
   }
 
   void initializateConversationApi({bool local = false}) async {
+    if (UniversalPlatform.isWeb) return;
+
     final token = await firebase.auth!.currentUser!.getIdToken(true);
     _conversationApiUrl =
         // TODO: ip???
@@ -149,14 +154,12 @@ class MessageProvider extends ChangeNotifier {
         credentials: local
             ? ChannelCredentials.insecure()
             : ChannelCredentials.secure());
-    // _conversationMagnifierChannel = GrpcOrGrpcWebClientChannel.grpc(
-    //     _sentimentApiUrl!,
-    //     options: channelOptions);
     _conversationMagnifierChannel = ClientChannel(
       _conversationApiUrl!,
       options: channelOptions,
       port: local ? 8080 : 443,
     );
+
     _conversationMagnifierClient = ConversationMagnifierClient(
       _conversationMagnifierChannel!,
       options: CallOptions(
@@ -208,6 +211,8 @@ class MessageProvider extends ChangeNotifier {
 
   // Call the sentiment api to get the sentiment of the message
   Future<MagnificationResponse?> getSentiment(String text) async {
+    if (UniversalPlatform.isWeb) return null;
+
     if (_conversationMagnifierClient == null) return null;
     try {
       if (_conversationMagnifierStream != null) {

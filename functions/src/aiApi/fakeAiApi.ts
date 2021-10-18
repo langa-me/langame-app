@@ -2,7 +2,7 @@
 /* eslint-disable require-jsdoc */
 import {SearchIndex} from "algoliasearch";
 import {langame} from "../langame/protobuf/langame";
-import {Api} from "./aiApi";
+import {Api, OpenaiCompletionOptions, OpenaiCompletionParameters} from "./aiApi";
 
 /**
  *
@@ -15,7 +15,10 @@ export class FakeAiApi implements Api {
     getIndex(indexName: string): SearchIndex {
       throw new Error("Method not implemented.");
     }
-    completion(prompt: string, parameters: any): Promise<string | undefined> {
+    openaiCompletion(
+        parameters: OpenaiCompletionParameters,
+        options: OpenaiCompletionOptions
+    ): Promise<string | undefined> {
       return Promise.resolve(this.faker.lorem.sentence());
     }
     classify(content: string, classes: string[], multiLabel: boolean, ignoreBelowThreshold: number): Promise<string[]> {
@@ -25,7 +28,7 @@ export class FakeAiApi implements Api {
     openAITopicClassify(content: string, parameters: any): Promise<string | undefined> {
       throw new Error("Method not implemented.");
     }
-    filter(content: string, parameters: any): Promise<langame.protobuf.ContentFilter | undefined> {
+    filter(parameters: OpenaiCompletionParameters): Promise<langame.protobuf.ContentFilter | undefined> {
       // Return random langame.protobuf.ContentFilter
       const rand = Math.floor(Math.random() * Object.keys(langame.protobuf.ContentFilter).length);
       return Promise.resolve(langame.protobuf.ContentFilter[

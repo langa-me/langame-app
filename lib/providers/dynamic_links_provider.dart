@@ -7,6 +7,7 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/views/langames/langame_audio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 class DynamicLinksProvider extends ChangeNotifier {
   final CrashAnalyticsProvider _cap;
@@ -19,7 +20,7 @@ class DynamicLinksProvider extends ChangeNotifier {
     PackageInfo.fromPlatform() // TODO: move to smthing global
         .then((e) => _isDev = e.packageName.contains('dev'));
     _ap.userStream.listen((e) {
-      if (e.type == UserChangeType.NewAuthentication) {
+      if (e.type == UserChangeType.NewAuthentication && !UniversalPlatform.isWeb) {
         setupAndCheckDynamicLinks();
       } else if (e.type == UserChangeType.Disconnection) {}
     });

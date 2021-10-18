@@ -247,6 +247,7 @@ message Message {
   Type type = 8;
   string body = 9;
   string title = 10;
+  string id = 11;
   
   enum Type {
     INVITE = 0;

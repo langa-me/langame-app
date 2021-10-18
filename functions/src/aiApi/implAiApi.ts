@@ -1,11 +1,13 @@
 import {
   algoliaId, algoliaKey, Api,
-  huggingfaceKey, openAiKey,
+  huggingfaceKey, isFineTunedModel, OpenaiCompletionParameters,
+  OpenaiCompletionOptions, openAiKey,
 } from "./aiApi";
 import algoliasearch, {SearchClient, SearchIndex} from "algoliasearch";
 import {sleep} from "../utils/time";
 import {Translate} from "@google-cloud/translate/build/src/v2";
 import {langame} from "../langame/protobuf/langame";
+import {converCamelCaseToSnake} from "../utils/object";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require("node-fetch");
@@ -30,9 +32,6 @@ export const openAIClassifierFiles = {
 
 const openAiEndpoint = "https://api.openai.com/v1";
 const huggingfaceEndpoint = "https://api-inference.huggingface.co/models";
-const isFineTunedModel =
-  (model: string) => !["babbage", "ada", "curie", "davinci"].includes(model);
-
 
 /**
  */
@@ -94,33 +93,25 @@ export class ImplAiApi implements Api {
 
   /**
    * Async completion
-   * @param{string} prompt
-   * @param{any} parameters
+   * @param{OpenaiCompletionParameters} parameters
+   * @param{OpenaiCompletionOptions} options
    */
-  async completion(prompt: string,
-      parameters: any): Promise<string | undefined> {
+  async openaiCompletion(
+      parameters: OpenaiCompletionParameters,
+      options?: OpenaiCompletionOptions,
+  ): Promise<string | undefined> {
     let url = `${openAiEndpoint}/engines/${parameters.model}/completions`;
-    const body: any = {
-      prompt: prompt,
-      temperature: parameters.temperature,
-      max_tokens: parameters.maxTokens,
-      top_p: parameters.topP,
-      frequency_penalty: parameters.frequencyPenalty,
-      presence_penalty: parameters.presencePenalty,
-      stream: false,
-    };
-    // OpenAI API does not like [] for stop
-    if (parameters.stop) {
-      body.stop = parameters.stop;
-    }
-    if (isFineTunedModel(parameters.model!)) {
-      body.model = parameters.model;
+    if (parameters.model && isFineTunedModel(parameters.model!)) {
       url = `${openAiEndpoint}/completions`;
+    } else if (parameters.model) {
+      delete parameters.model;
     }
     const r =
       await fetch(url, {
         method: "POST",
-        body: JSON.stringify(body),
+        body: JSON.stringify(
+            converCamelCaseToSnake(parameters)
+        ),
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
@@ -136,14 +127,14 @@ export class ImplAiApi implements Api {
       // And no proper code so need to do ugly string checking
       JSON.stringify(data.error)
           .includes("That model is still being loaded.") &&
-      parameters.maxRetriesOnColdStart! > 0
+      options?.maxRetriesOnColdStart! > 0
     ) {
-      parameters.maxRetriesOnColdStart = parameters.maxRetriesOnColdStart! - 1;
+      options!.maxRetriesOnColdStart = options!.maxRetriesOnColdStart! - 1;
       await sleep(1000);
       // When it's cold start, retry using recursion,
       // The exit condition using the maxRetriesOnColdStart
       // argument for compactness
-      return await this.completion(prompt, parameters);
+      return await this.openaiCompletion(parameters, options);
       // Unexpected error, propagate to higher levels
     } else if (data.error) {
       throw new Error(JSON.stringify(data.error.message));
@@ -155,7 +146,7 @@ export class ImplAiApi implements Api {
       // shit output.
       // A smarter logic could possibly re-complete from that
       // But it would add a lot of complexity.
-      (parameters.skipWhenFinishReasonIsLength &&
+      (options?.skipWhenFinishReasonIsLength &&
         data.choices[0].finish_reason === "length")) return undefined;
     // We trim the output by default, especially for fine-tuned models
     // which are trained to return trailing space on completion
@@ -171,18 +162,17 @@ export class ImplAiApi implements Api {
    * built it to err on the side of caution,
    * thus, resulting in higher false positives
    * https://beta.openai.com/docs/engines/content-filter
-   * @param{string} content
-   * @param{any} parameters
+   * @param{OpenaiCompletionParameters} parameters
    * @return{Promise<string>}
    */
-  async filter(content: string, parameters: any
+  async filter(parameters: OpenaiCompletionParameters
   ): Promise<langame.protobuf.ContentFilter | undefined> {
     const r =
       // eslint-disable-next-line max-len
       await fetch("https://api.openai.com/v1/engines/content-filter-alpha-c4/completions", {
         method: "POST",
         body: JSON.stringify({
-          "prompt": `<|endoftext|>${content}\n--\nLabel:`,
+          "prompt": `<|endoftext|>${parameters.prompt}\n--\nLabel:`,
           "temperature": parameters.temperature ?? 0,
           "max_tokens": parameters.maxTokens ?? 1,
           "top_p": parameters.topP ?? 1,
@@ -242,48 +232,6 @@ export class ImplAiApi implements Api {
     return result.labels
         .filter((_: string, i: number) =>
           result.scores[i] > ignoreBelowThreshold);
-  }
-
-
-  /**
-   * @param{string} content
-   * @param{any} parameters
-   */
-  async openAITopicClassify(
-      content: string,
-      parameters: any
-  ): Promise<string | undefined> {
-    try {
-      const r =
-        await fetch("https://api.openai.com/v1/classifications", {
-          method: "POST",
-          body: JSON.stringify({
-            "file": openAIClassifierFiles.first.file,
-            "query": content,
-            "search_model": "ada",
-            "model": parameters?.classificationModel ?? "curie",
-            "max_examples": parameters?.maxExamples ?? 10,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Authorization": `Bearer ${openAiKey()}`,
-            "OpenAI-Organization": "org-KwcHNgfGe4pqdKDLQIJt99UZ",
-          },
-        });
-      const data = await r.json();
-      if (data.error &&
-        data.error.message
-        // eslint-disable-next-line max-len
-            ?.includes("No similar documents were found in file with ID")) {
-        return undefined;
-      }
-      if (data.error) return undefined;
-      if (data.label.toLowerCase() === "unknown") return undefined;
-      return data.label;
-    } catch (e) {
-      return undefined;
-    }
   }
 
   /**

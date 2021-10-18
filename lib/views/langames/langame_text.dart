@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/future.dart';
 import 'package:langame/models/djinn/djinn.pbgrpc.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
@@ -65,6 +66,20 @@ class _State extends State<LangameTextView>
         cp.pop();
       });
     }
+    final reflections =
+        lp.langames[widget.langameChannelName]?.reflections ?? [];
+    reflections.sort(
+      (a, b) => b.createdAt.toDateTime().compareTo(
+            a.createdAt.toDateTime(),
+          ),
+    );
+    final suggestions =
+        lp.langames[widget.langameChannelName]?.suggestions ?? [];
+    suggestions.sort(
+      (a, b) => b.createdAt.toDateTime().compareTo(
+            a.createdAt.toDateTime(),
+          ),
+    );
     if (other == null) {
       try {
         var ap = Provider.of<AuthenticationProvider>(context, listen: false);
@@ -89,36 +104,9 @@ class _State extends State<LangameTextView>
         resizeToAvoidBottomInset: true,
         backgroundColor: getBlackAndWhite(context, 0, reverse: true),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
-        floatingActionButton: FloatingActionButton(
-            child: Icon(FontAwesomeIcons.brain),
-            onPressed: () {
-              cp.showCustomDialog(
-                  stateless: [
-                    // Show a nice box with corners box rounded
-                    Container(
-                      child: Text(
-                        langame!.reflections.last.alternatives.last,
-                        style: Theme.of(context).textTheme.headline6,
-                        textAlign: TextAlign.center,
-                      ),
-                      decoration: BoxDecoration(
-                        color: getBlackAndWhite(context, 1, reverse: true),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 10,
-                            offset: Offset(0, 0),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                  canBack: true,
-                  title: Text('Reflections',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline4));
-            }),
+        floatingActionButton: langame!.reflections.length > 0
+            ? _buildReflectionButton(cp, langame.reflections)
+            : null,
         appBar: AppBar(
           title: other != null
               ? Text(
@@ -133,7 +121,7 @@ class _State extends State<LangameTextView>
           backgroundColor: Colors.transparent,
           actions: actions,
         ),
-        body: langame!.memes.isEmpty || messages == null
+        body: langame.memes.isEmpty || messages == null
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [Center(child: cp.buildLoadingWidget(last: true))])
@@ -154,12 +142,15 @@ class _State extends State<LangameTextView>
                   ),
                   Divider(),
                   // This is a row showing quick replies
-                  Expanded(child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: langame.suggestions
-                              .take(3)
-                              .map(
-                                (e) => LangameButton(
+                  Expanded(
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: suggestions
+                          // .take(3)
+                          .map(
+                            (e) => Padding(
+                                padding: EdgeInsets.all(12),
+                                child: LangameButton(
                                     e.contentFilter == lg.ContentFilter.Safe
                                         ? FontAwesomeIcons.smileBeam
                                         : e.contentFilter ==
@@ -168,11 +159,17 @@ class _State extends State<LangameTextView>
                                             : FontAwesomeIcons.meh,
                                     highlighted: true,
                                     text: e.alternatives.last.substring(0, 20) +
-                                        '...',
-                                    onPressed: () {}),
-                              )
-                              .toList(),
-                        )),
+                                        '...', onPressed: () {
+                                  setState(() {
+                                    _textEditingController.text =
+                                        e.alternatives.last;
+                                    _currentText = e.alternatives.last;
+                                  });
+                                })),
+                          )
+                          .toList(),
+                    ),
+                  ),
                   Divider(),
                   // This is a Whatsapp-like send message bar with rounded corner
                   Container(
@@ -283,12 +280,46 @@ class _State extends State<LangameTextView>
 
   void _scrollToBottom({bool later = false}) async {
     // Delay to make sure the frames are rendered properly
-    await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
+    // await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
+    await waitUntil(() => _scrollController.hasClients);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       _scrollController.animateTo(_scrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
     });
   }
+
+  FloatingActionButton _buildReflectionButton(
+          ContextProvider cp, List<lg.Langame_Reflection> reflections) =>
+      FloatingActionButton(
+          child: Icon(FontAwesomeIcons.brain),
+          onPressed: () {
+            cp.showCustomDialog(
+                stateless: [
+                  Container(
+                    height: AppSize.safeBlockVertical * 40,
+                    width: AppSize.safeBlockHorizontal * 70,
+                    child: ListView.separated(
+                      scrollDirection: Axis.vertical,
+                      itemCount: reflections.length,
+                      separatorBuilder: (ctx, i) => Divider(),
+                      itemBuilder: (ctx, i) => LangameButton(
+                        FontAwesomeIcons.copy,
+                        text: reflections[i].alternatives.last,
+                        layer: 2,
+                        onPressed: () {
+                          FlutterClipboard.copy(
+                              reflections[i].alternatives.last);
+                        },
+                      ),
+                    ),
+                  ),
+                  // Show a nice box with corners box rounded
+                ],
+                canBack: true,
+                title: Text('Reflections',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headline4));
+          });
 
   /// This is a function that return a WhatsApp like message box
   Widget _buildMessageBox(lg.Message m) => Stack(

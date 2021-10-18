@@ -2760,6 +2760,9 @@ export namespace langame {
 
             /** Message title */
             title?: (string|null);
+
+            /** Message id */
+            id?: (string|null);
         }
 
         /** Represents a Message. */
@@ -2791,6 +2794,9 @@ export namespace langame {
 
             /** Message title. */
             public title: string;
+
+            /** Message id. */
+            public id: string;
 
             /**
              * Creates a new Message instance using the specified properties.

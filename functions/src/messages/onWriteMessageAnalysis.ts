@@ -6,8 +6,8 @@ import {shouldDrop} from "../utils/contexts";
 import {chunkItems} from "../utils/array";
 import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
-import {FakeAiApi} from "../aiApi/fakeAiApi";
 import {Api} from "../aiApi/aiApi";
+import {ImplAiApi} from "../aiApi/implAiApi";
 
 export const onWriteMessageAnalysis = async (
     change: Change<admin.firestore.DocumentSnapshot>,
@@ -22,11 +22,6 @@ export const onWriteMessageAnalysis = async (
     if (shouldDrop(ctx, {
       eventMaxAgeMs: 120_000, // 2 minutes
     })) return;
-    if (change.after.data()?.delivery?.status !== "success") {
-      functions.logger.log(
-          "delivery failed, aborting");
-      return Promise.resolve();
-    }
     if (change.after.data()?.analysis?.error?.tries > 3) {
       functions.logger.log(
           "too many failures, aborting");
@@ -35,7 +30,7 @@ export const onWriteMessageAnalysis = async (
     const langame = (await admin.firestore().collection("langames")
         .where("channelName", "==", change.after.data()?.channelName)
         .withConverter(converter<langame.protobuf.Langame>()).get()).docs[0];
-    const api = new FakeAiApi();
+    const api = new ImplAiApi();
     const db = admin.firestore();
     const promises = [];
     if (!change.after.data()!.analysis?.tokens) {
@@ -110,9 +105,9 @@ export const onWriteMessageAnalysis = async (
       }
     }
     if (!change.after.data()!.analysis?.filter) {
-      const filter = await api.filter(
-        change.after.data()!.body, {}
-      );
+      const filter = await api.filter({
+        prompt: change.after.data()!.body,
+      });
       if (filter) {
         promises.push(db.runTransaction(async (t) => t.set(change.after.ref, {
           analysis: {
@@ -162,19 +157,39 @@ export const createSuggestion = async (
   // ...
   const prompt = messages.docs.map((e) => (e.data()!.fromUid ===
       fromUid ? "Me: " : "You: ") +
-      e.data()!.body).join("\n") + "\nMe:";
-  const alternative = await api.hfCompletion(prompt, {
-    maxNewTokens: 100,
-    repetitionPenalty: 20.1,
+      e.data()!.body).join("\n") +
+      "\nSuggestion:";
+  // const alternative = await api.hfCompletion(prompt, {
+  //   maxNewTokens: 100,
+  //   repetitionPenalty: 20.1,
+  // });
+  const alternative = await api.openaiCompletion({
+    prompt:
+      "This is a suggestion of answer given to the user in a conversation " +
+      "to help him have more meaningful exchanges, think " +
+      "further before talking and overall having better conversations.\n\n" +
+      "You: Do you think we should all become vegan?\n\n" +
+      "Me: Why? After all other animals eat eachother\n\n" +
+      "You: Can't we be better than other animals?\n\n" +
+      "Suggestion: Thank you for changing my opinion on this.\n###\n" +
+    prompt,
+    maxTokens: 300,
+    frequencyPenalty: 0.3,
+    presencePenalty: 0.3,
+    temperature: 0.7,
+    stop: ["###", "\n", "Me:", "You:"],
+    model: "davinci-codex",
   });
   if (!alternative) return Promise.resolve(undefined);
-  const filter = await api.filter(alternative, {});
+  const filter = await api.filter({prompt: alternative});
   if (filter === undefined) return Promise.resolve(undefined);
   return {
     userId: fromUid,
     lastMessageId: messages.docs[messages.size-1].id,
     alternatives: [alternative],
     contentFilter: filter,
+    // @ts-ignore
+    createdAt: new Date(),
   };
 };
 
@@ -202,19 +217,37 @@ export const createReflection = async (
   const prompt = messages.docs.map((e) => (e.data()!.fromUid ===
     fromUid ? "Me: " : "You: ") +
     e.data()!.body).join("\n") +
-      // eslint-disable-next-line max-len
-      "\n\nThis is a question the user should ask himself before answering, which should improve the conversation:";
-  const alternative = await api.hfCompletion(prompt, {
-    maxNewTokens: 100,
-    repetitionPenalty: 20.1,
+      "\nReflection:";
+  // const alternative = await api.hfCompletion(prompt, {
+  //   maxNewTokens: 100,
+  //   repetitionPenalty: 20.1,
+  // });
+  const alternative = await api.openaiCompletion({
+    prompt:
+      "This is a reflection given to the user in a conversation " +
+      "to help him have more meaningful exchanges, think " +
+      "further before talking and overall having better conversations.\n\n" +
+      "You: Do you think we all become vegan?\n\n" +
+      "Me: Why? After all other animals eat eachother\n\n" +
+      "You: Can't we be better than other animals?\n\n" +
+      "Reflection: What are your ethical principles?\n###\n" +
+    prompt,
+    maxTokens: 300,
+    frequencyPenalty: 0.3,
+    presencePenalty: 0.3,
+    temperature: 0.7,
+    stop: ["###", "\n", "Me:", "You:"],
+    model: "davinci-codex",
   });
   if (!alternative) return Promise.resolve(undefined);
-  const filter = await api.filter(alternative, {});
+  const filter = await api.filter({prompt: alternative});
   if (filter === undefined) return Promise.resolve(undefined);
   return {
     userId: fromUid,
     lastMessageId: messages.docs[messages.size-1].id,
     alternatives: [alternative],
     contentFilter: filter,
+    // @ts-ignore
+    createdAt: new Date(),
   };
 };

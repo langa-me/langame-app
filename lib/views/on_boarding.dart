@@ -36,7 +36,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .setCurrentScreen('setup');
+        .setCurrentScreen('on_boarding');
   }
 
   @override

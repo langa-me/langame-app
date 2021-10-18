@@ -34,6 +34,7 @@ android_sync:
 	cp android/app/src/prod/AndroidManifest.xml android/app/src/profile/AndroidManifest.xml
 
 deploy_web:
+	firebase use langame-dev
 	$(eval VERSION=$(shell sh -c "cat pubspec.yaml | yq e '.version' -" | sed 's/+/./g'))
 	flutter build web --release
 	firebase hosting:channel:deploy "${VERSION}" --expires 7d

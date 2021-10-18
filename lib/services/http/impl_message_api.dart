@@ -132,7 +132,10 @@ class ImplMessageApi extends MessageApi {
   @override
   Future<void> listen(Function(lg.Message)? add) async {
     // Get the token each time the application loads
-    String? token = await firebase.messaging!.getToken();
+    String? token = await firebase.messaging!.getToken(
+        vapidKey: AppConst.isDev
+            ? 'BFRs0auVQUjC1RuKwZprcEmv1d-JPr52sMUdHQxKa99WBCmZWhUS6sb6FelhbkZxK9LgVy7efWoynHJ1Y1Pt_RY'
+            : 'BMe8L3jPKhCUJEGPKr5K9IaUqdcxoowuEnLv6RBjmVjf9G3u5BFG8x_ztvp-Z7tDHmk9Usdp4Hp0JsAWYzrGLeE');
 
     if (token == null)
       throw LangameMessageException('could_not_get_firebase_messaging_token');

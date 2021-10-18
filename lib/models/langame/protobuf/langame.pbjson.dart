@@ -405,6 +405,7 @@ const Message$json = const {
     const {'1': 'type', '3': 8, '4': 1, '5': 14, '6': '.langame.protobuf.Message.Type', '10': 'type'},
     const {'1': 'body', '3': 9, '4': 1, '5': 9, '10': 'body'},
     const {'1': 'title', '3': 10, '4': 1, '5': 9, '10': 'title'},
+    const {'1': 'id', '3': 11, '4': 1, '5': 9, '10': 'id'},
   ],
   '3': const [Message_Analysis$json],
   '4': const [Message_Type$json],
@@ -438,4 +439,4 @@ const Message_Type$json = const {
 };
 
 /// Descriptor for `Message`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List messageDescriptor = $convert.base64Decode('CgdNZXNzYWdlEjkKCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGQoIZnJvbV91aWQYBCABKAlSB2Zyb21VaWQSFQoGdG9fdWlkGAUgASgJUgV0b1VpZBIhCgxjaGFubmVsX25hbWUYByABKAlSC2NoYW5uZWxOYW1lEjIKBHR5cGUYCCABKA4yHi5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuVHlwZVIEdHlwZRISCgRib2R5GAkgASgJUgRib2R5EhQKBXRpdGxlGAogASgJUgV0aXRsZRqRAQoIQW5hbHlzaXMSTAoKc2VudGltZW50cxgCIAMoCzIsLmxhbmdhbWUucHJvdG9idWYuTWVzc2FnZS5BbmFseXNpcy5TZW50aW1lbnRSCnNlbnRpbWVudHMaNwoJU2VudGltZW50EhQKBXNjb3JlGAEgASgCUgVzY29yZRIUCgVsYWJlbBgCIAEoCVIFbGFiZWwiHwoEVHlwZRIKCgZJTlZJVEUQABILCgdNRVNTQUdFEAE=');
+final $typed_data.Uint8List messageDescriptor = $convert.base64Decode('CgdNZXNzYWdlEjkKCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGQoIZnJvbV91aWQYBCABKAlSB2Zyb21VaWQSFQoGdG9fdWlkGAUgASgJUgV0b1VpZBIhCgxjaGFubmVsX25hbWUYByABKAlSC2NoYW5uZWxOYW1lEjIKBHR5cGUYCCABKA4yHi5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuVHlwZVIEdHlwZRISCgRib2R5GAkgASgJUgRib2R5EhQKBXRpdGxlGAogASgJUgV0aXRsZRIOCgJpZBgLIAEoCVICaWQakQEKCEFuYWx5c2lzEkwKCnNlbnRpbWVudHMYAiADKAsyLC5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuQW5hbHlzaXMuU2VudGltZW50UgpzZW50aW1lbnRzGjcKCVNlbnRpbWVudBIUCgVzY29yZRgBIAEoAlIFc2NvcmUSFAoFbGFiZWwYAiABKAlSBWxhYmVsIh8KBFR5cGUSCgoGSU5WSVRFEAASCwoHTUVTU0FHRRAB');

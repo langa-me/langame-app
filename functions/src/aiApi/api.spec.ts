@@ -24,21 +24,22 @@ it.skip("zero shot classification", async () => {
 });
 
 
-it.skip("emojis inference", async () => {
+it("emojis inference", async () => {
   const api = new ImplAiApi();
   const inferredEmojis =
-      await api.completion("philosophy:🤔🧠💭📚📖\nice breaker:😜\nphysics:",
-          {
-            model: "davinci",
-            temperature: 0.8,
-            maxTokens: 60,
-            topP: 1,
-            frequencyPenalty: 0.1,
-            presencePenalty: 0.1,
-            stop: ["\n"],
-          });
+      await api.openaiCompletion({
+        prompt: "philosophy:🤔🧠💭📚📖\n###\nice breaker:😜\n###\nbiology:",
+        model: "davinci-codex",
+        temperature: 0,
+        maxTokens: 60,
+        topP: 1,
+        frequencyPenalty: 0.1,
+        presencePenalty: 0.1,
+        stop: ["###"],
+      });
   console.log(inferredEmojis);
   expect(inferredEmojis).to.not.be.undefined;
+  expect(inferredEmojis).to.include("🧬");
 });
 it.skip("insert algolia", async () => {
   const api = new ImplAiApi();
@@ -69,16 +70,16 @@ it.skip("search algolia low level", async () => {
 it.skip("completion", async () => {
   const api = new ImplAiApi();
   const completion =
-      await api.completion("",
-          {
-            model: "curie:ft-louis-personal-2021-08-27-16-57-14",
-            temperature: 0.8,
-            maxTokens: 60,
-            topP: 1,
-            frequencyPenalty: 0.1,
-            presencePenalty: 0.1,
-            stop: ["\n###\n", "###"],
-          });
+      await api.openaiCompletion({
+        prompt: "",
+        model: "curie:ft-louis-personal-2021-08-27-16-57-14",
+        temperature: 0.8,
+        maxTokens: 60,
+        topP: 1,
+        frequencyPenalty: 0.1,
+        presencePenalty: 0.1,
+        stop: ["\n###\n", "###"],
+      });
   console.log(completion);
   expect(completion).to.not.be.undefined;
 });
@@ -139,10 +140,9 @@ it("hfCompletion fake", async () => {
 it("filter", async () => {
   const api = new ImplAiApi();
   const completion =
-    await api.filter(
-        "The cat is running after a mice because he is",
-        {}
-    );
+    await api.filter({
+      prompt: "The cat is running after a mice because he is",
+    });
   console.log(completion);
   expect(completion).to.not.be.undefined;
 });

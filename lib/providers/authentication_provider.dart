@@ -64,23 +64,13 @@ class AuthenticationProvider extends ChangeNotifier {
   /// Create an authentication provider, and
   AuthenticationProvider(
       this.firebase, this._authenticationApi, this._cap, this.algolia) {
-    _firebaseUserStream = _authenticationApi.userChanges;
+    _firebaseUserStream = _authenticationApi.userChanges.asBroadcastStream();
     _userStream = StreamController.broadcast();
     _firebaseUserStream.listen((data) async {
       await waitUntil(() => readyToInit);
       if (data == null || firebase.auth!.currentUser == null) {
         // TODO: should go back to login automatically
-        // If logged out, set logout time
-        // TODO: can't update firestore when disconnected
-        // if (user != null) {
-        //   firebase.firestore!
-        //       .collection(AppConst.firestoreUsersCollection)
-        //       .doc(user!.uid)
-        //       .update({
-        //     'lastLogout': FieldValue.serverTimestamp(),
-        //   });
-        //   _user = null;
-        // }
+
         final change = UserChange(UserChangeType.Disconnection, _user, null);
         _user = null;
         _userStream.add(change);
@@ -131,27 +121,25 @@ class AuthenticationProvider extends ChangeNotifier {
   _onNewAuthentication() async {
     final packageInfo = await PackageInfo.fromPlatform();
     // Asynchronously, update devices information in db
-
+    final dip = DeviceInfoPlugin();
     final deviceInfo = UniversalPlatform.isAndroid
-        ? (await DeviceInfoPlugin().androidInfo).model
+        ? (await dip.androidInfo).model
         : UniversalPlatform.isIOS
-            ? (await DeviceInfoPlugin().iosInfo).utsname.machine
-            : null; // TODO other platforms not supported
-    bool newDevice = true;
-    for (var i = 0; i < _user!.devices.length; i++) {
-      if (_user!.devices[i].deviceInfo == deviceInfo) {
-        _user!.devices[i].langameVersion = _getLangameVersion(packageInfo);
-        newDevice = false;
-      }
-    }
-    if (newDevice) {
-      _user!.devices.add(
-        lg.User_Device(
-          langameVersion: _getLangameVersion(packageInfo),
-          deviceInfo: deviceInfo.toString(),
-        ),
-      );
-    }
+            ? (await dip.iosInfo).utsname.machine
+            : UniversalPlatform.isWeb
+                ? (await dip.webBrowserInfo).userAgent
+                : null; // TODO other platforms not supported
+
+    _user!.devices.add(
+      lg.User_Device(
+        langameVersion: _getLangameVersion(packageInfo),
+        deviceInfo: deviceInfo.toString(),
+      ),
+    );
+    // dumb way to de-duplicate devices
+    final ids = Set();
+    _user!.devices.retainWhere((x) => ids.add(x.deviceInfo));
+
     final ref = firebase.firestore!
         .collection(AppConst.firestoreUsersCollection)
         .doc(_user!.uid)
@@ -227,10 +215,12 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<void>> loginWithHack(String password, {String email = 'hack@langa.me'}) async {
+  Future<LangameResponse<void>> loginWithHack(String password,
+      {String email = 'hack@langa.me'}) async {
     try {
       final res = await firebase.auth!
-        .signInWithEmailAndPassword(email: email, password: password);
+          .signInWithEmailAndPassword(email: email, password: password);
+      _cap.log('authentication_provider:loginWithHack');
       return _loginWith(userCredential: res);
     } catch (e, s) {
       _cap.log('authentication_provider:failed to loginWithHack');
@@ -246,13 +236,22 @@ class AuthenticationProvider extends ChangeNotifier {
       await i.clear();
       // TODO: permission denied somehow (firestore)
       // _crashAnalyticsProvider.log('purging local firestore');
-      // await firebase.firestore!.clearPersistence();
+      if (user != null) {
+        await firebase.firestore!
+            .collection(AppConst.firestoreUsersCollection)
+            .doc(user!.uid)
+            .update({
+          'lastLogout': FieldValue.serverTimestamp(),
+        });
+      }
       await _authenticationApi.logout();
+      await firebase.firestore!.terminate();
+      await firebase.firestore!.clearPersistence();
       _user = null;
       _cap.log('logout');
       return LangameResponse<lg.User>(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('authentication_provider:failed to logout');
+      _cap.log('authentication_provider:failed to logout $e');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

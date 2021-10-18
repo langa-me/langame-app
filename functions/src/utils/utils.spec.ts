@@ -1,11 +1,7 @@
 import {expect} from "chai";
 import "mocha";
 import {chunkItems} from "./array";
-
-// @ts-ignore
-// eslint-disable-next-line import/no-unresolved
-// import {google} from "./google/protobuf/timestamp.gen";
-// import {google} from "../src/google/protobuf/timestamp.gen";
+import {converCamelCaseToSnake} from "./object";
 
 describe.skip("Utils", () => {
   it("Test google timestamp", () => {
@@ -27,4 +23,16 @@ it("chunk", () => {
     [18, 19, 20, 21, 22],
   ]);
   // I love you copilot
+});
+
+it("convert to snake case", () => {
+  const foo = {
+    barBam: "barBam",
+    bazBiz: "bazBiz",
+  };
+  const snake = converCamelCaseToSnake(foo);
+  expect(snake).to.deep.equal({
+    bar_bam: "barBam",
+    baz_biz: "bazBiz",
+  });
 });

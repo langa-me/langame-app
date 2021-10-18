@@ -216,7 +216,7 @@ class ContextProvider extends ChangeNotifier {
           textAlign: TextAlign.center,
           style: Theme.of(_navigationKey.currentContext!).textTheme.headline6!,
         ),
-      ]);
+      ], height: 70);
 
   Future<void> showFailureDialog(String? text, {List<Widget>? actions}) =>
       showCustomDialog(stateless: [

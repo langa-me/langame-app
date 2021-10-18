@@ -26,9 +26,9 @@ class MainView extends StatefulWidget {
 
 /// Main page of Langame (temporary name...)
 class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   PageController _pageController = PageController(
-    initialPage: 1,
+    initialPage: 0,
   );
 
   @override

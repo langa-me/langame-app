@@ -2403,6 +2403,7 @@ class Message extends $pb.GeneratedMessage {
     ..e<Message_Type>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: Message_Type.INVITE, valueOf: Message_Type.valueOf, enumValues: Message_Type.values)
     ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'body')
     ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'title')
+    ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
     ..hasRequiredFields = false
   ;
 
@@ -2415,6 +2416,7 @@ class Message extends $pb.GeneratedMessage {
     Message_Type? type,
     $core.String? body,
     $core.String? title,
+    $core.String? id,
   }) {
     final _result = create();
     if (createdAt != null) {
@@ -2437,6 +2439,9 @@ class Message extends $pb.GeneratedMessage {
     }
     if (title != null) {
       _result.title = title;
+    }
+    if (id != null) {
+      _result.id = id;
     }
     return _result;
   }
@@ -2525,5 +2530,14 @@ class Message extends $pb.GeneratedMessage {
   $core.bool hasTitle() => $_has(6);
   @$pb.TagNumber(10)
   void clearTitle() => clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.String get id => $_getSZ(7);
+  @$pb.TagNumber(11)
+  set id($core.String v) { $_setString(7, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasId() => $_has(7);
+  @$pb.TagNumber(11)
+  void clearId() => clearField(11);
 }
 

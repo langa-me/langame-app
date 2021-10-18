@@ -322,6 +322,7 @@ class MessageExt {
       type: lg.Message_Type.values[m['type']],
       body: m['body'],
       title: m['title'],
+      id: m['id'],
     );
   }
 }

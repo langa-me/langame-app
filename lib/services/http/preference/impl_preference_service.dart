@@ -64,7 +64,7 @@ class ImplPreferenceService extends PreferenceService {
       cancelOnError: false,
     ); // Can happen when listening to in-existent document (yet)
 
-    return _streamPreference!.stream;
+    return _streamPreference!.stream.asBroadcastStream();
   }
 
   @override
