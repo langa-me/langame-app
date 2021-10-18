@@ -124,7 +124,7 @@ class _LangameButtonState extends State<LangameButton> {
         fixedSize: widget.fixedSize,
         primary: bg,
         // onSurface = disabled
-        onSurface: getBlackAndWhite(context, widget.layer + 1, reverse: true),
+        onSurface: getBlackAndWhite(context, disabled ? 0 : widget.layer + 1, reverse: true),
         elevation: 0,
         shadowColor: variantIsLightThenDark(context, reverse: true),
         shape: RoundedRectangleBorder(

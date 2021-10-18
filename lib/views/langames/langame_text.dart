@@ -302,37 +302,41 @@ class _State extends State<LangameTextView>
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: [
-                currentLg.currentMeme < currentLg.memes.length ? Padding(
-                    padding: EdgeInsets.all(12),
-                    child: LangameButton(FontAwesomeIcons.grinTongue,
-                        highlighted: true,
-                        disableForFewMs: 5000,
-                        tooltip: 'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme+1].content}',
-                        text: currentLg.memes[currentLg.currentMeme+1].content
-                                .substring(0, 20) +
-                            '...', onPressed: () {
-                      setState(() {
-                        _textEditingController.text =
-                            currentLg.memes[currentLg.currentMeme+1].content;
-                        _currentText =
-                            currentLg.memes[currentLg.currentMeme+1].content;
-                      });
-                      _onSend();
-                      final fs =
-                          Provider.of<FirebaseApi>(context, listen: false)
-                              .firestore!;
-                      fs
-                          .collection('langames')
-                          .where('channelName',
-                              isEqualTo: widget.langameChannelName)
-                          .get()
-                          .then((e) {
-                        if (e.size == 0) return;
-                        e.docs[0].reference.update({
-                          'currentMeme': FieldValue.increment(1),
-                        });
-                      });
-                    })) : SizedBox.shrink()
+                currentLg.currentMeme < currentLg.memes.length - 1
+                    ? Padding(
+                        padding: EdgeInsets.all(12),
+                        child: LangameButton(FontAwesomeIcons.grinTongue,
+                            highlighted: true,
+                            disableForFewMs: 5000,
+                            tooltip:
+                                'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme + 1].content}',
+                            text: currentLg
+                                    .memes[currentLg.currentMeme + 1].content
+                                    .substring(0, 20) +
+                                '...', onPressed: () {
+                          setState(() {
+                            _textEditingController.text = currentLg
+                                .memes[currentLg.currentMeme + 1].content;
+                            _currentText = currentLg
+                                .memes[currentLg.currentMeme + 1].content;
+                          });
+                          _onSend();
+                          final fs =
+                              Provider.of<FirebaseApi>(context, listen: false)
+                                  .firestore!;
+                          fs
+                              .collection('langames')
+                              .where('channelName',
+                                  isEqualTo: widget.langameChannelName)
+                              .get()
+                              .then((e) {
+                            if (e.size == 0) return;
+                            e.docs[0].reference.update({
+                              'currentMeme': FieldValue.increment(1),
+                            });
+                          });
+                        }))
+                    : SizedBox.shrink()
               ] +
               suggestions
                   .map(
