@@ -20,7 +20,7 @@ class PreferenceProvider extends ChangeNotifier {
       if (e.type == UserChangeType.NewAuthentication) {
         _stream = _api.streamPreference(e.after!);
         _streamSubscription = _stream!.listen((p) {
-          _cap.log('streamPreference');
+          _cap.log('preference_provider: streamPreference');
           _preference = p;
           _preferenceStream.add(p);
           notifyListeners();
@@ -67,9 +67,9 @@ class PreferenceProvider extends ChangeNotifier {
         'userRecommendations': preference!.userRecommendations.value,
         'themeIndex': preference!.themeIndex,
       });
-      _cap.log('save preference');
+      _cap.log('preference_provider: save preference');
     } catch (e, s) {
-      _cap.log('failed to save');
+      _cap.log('preference_provider: failed to save');
       firebase.crashlytics?.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -138,7 +138,7 @@ class PreferenceProvider extends ChangeNotifier {
             .remove(_preference!.userSearchHistory.elementAt(i));
       }
     }
-    _cap.log('adduserSearchHistory');
+    _cap.log('preference_provider: adduserSearchHistory');
 
     notifyListeners();
     firebase.analytics
@@ -146,14 +146,14 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   void placeFirstUserSearchHistory(String tag) {
-    _cap.log('placeFirstuserSearchHistory');
+    _cap.log('preference_provider: placeFirstuserSearchHistory');
 
     _preference!.userSearchHistory.removeWhere((e) => e == tag);
     _preference!.userSearchHistory.add(tag);
   }
 
   void deleteUserSearchHistory(String tag) {
-    _cap.log('deleteuserSearchHistory');
+    _cap.log('preference_provider: deleteuserSearchHistory');
 
     _preference!.userSearchHistory.removeWhere((e) => e == tag);
     _filteredUserSearchHistory.removeWhere((e) => e == tag);
@@ -163,7 +163,7 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   void resetFilteredSearchTagHistory() {
-    _cap.log('resetFilteredSearchTagHistory');
+    _cap.log('preference_provider: resetFilteredSearchTagHistory');
 
     _filteredUserSearchHistory = _preference!.userSearchHistory;
     notifyListeners();

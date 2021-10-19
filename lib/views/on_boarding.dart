@@ -109,10 +109,6 @@ class _OnBoardingState extends State with AfterLayoutMixin {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: LangameButton(
               FontAwesomeIcons.tag,
-              onPressed: () {
-                // Validate returns true if the form is valid, or false otherwise.
-                if (_formKey.currentState!.validate()) {}
-              },
               text: 'Choose this tag',
               highlighted: true,
             ),
