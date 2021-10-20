@@ -86,6 +86,8 @@ class MessageProvider extends ChangeNotifier {
               .snapshots()
               .listen((e) {
             e.docs.forEach((b) => _messageStream.add(b.data()));
+            notifyListeners();
+
           }),
           firebase.firestore!
               .collection('messages')
@@ -98,6 +100,8 @@ class MessageProvider extends ChangeNotifier {
               .snapshots()
               .listen((e) {
             e.docs.forEach((b) => _messageStream.add(b.data()));
+            notifyListeners();
+
           }),
           _messageStream.stream
               // .distinct((a, b) => a.createdAt.nanos != b.createdAt.nanos)

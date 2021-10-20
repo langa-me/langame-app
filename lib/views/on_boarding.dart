@@ -32,6 +32,7 @@ class OnBoarding extends StatefulWidget {
 class _OnBoardingState extends State with AfterLayoutMixin {
   final _formKey = GlobalKey<FormState>(debugLabel: '_formKey');
   bool hasFinishedOnBoarding = false;
+  TextEditingController _textEditingController = TextEditingController();
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -63,6 +64,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
         children: <Widget>[
           TextFormField(
             style: Theme.of(context).textTheme.headline6,
+            controller: _textEditingController,
             decoration: new InputDecoration(
               focusColor: Theme.of(context).colorScheme.secondary,
               // fillColor: Theme.of(context).colorScheme.primary,
@@ -84,14 +86,24 @@ class _OnBoardingState extends State with AfterLayoutMixin {
               if (value == null || value.isEmpty) {
                 return 'Please enter some text';
               }
-              var cp = Provider.of<ContextProvider>(context, listen: false);
+              
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: LangameButton(
+              FontAwesomeIcons.tag,
+              text: 'Choose this tag',
+              highlighted: true,
+              onPressed: () {
+                var cp = Provider.of<ContextProvider>(context, listen: false);
               cp.showLoadingDialog(text: 'Validating...');
               var ap =
                   Provider.of<AuthenticationProvider>(context, listen: false);
-              ap.updateTag(value).then((res) {
+              ap.updateTag(_textEditingController.text).then((res) {
                 cp.handleLangameResponse(
                   res,
-                  succeedMessage: 'Welcome to Langame $value',
+                  succeedMessage: 'Welcome to Langame ${_textEditingController.text}',
                   failedMessage: 'Tag is not available',
                   onSucceed: () {
                     setState(() => hasFinishedOnBoarding = true);
@@ -103,14 +115,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                 // Hide keyboard
                 FocusScope.of(context).requestFocus(FocusNode());
               });
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: LangameButton(
-              FontAwesomeIcons.tag,
-              text: 'Choose this tag',
-              highlighted: true,
+              },
             ),
           ),
         ],

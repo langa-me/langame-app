@@ -258,11 +258,12 @@ class _State extends State<LangameTextView>
   void _scrollToBottom({bool later = false}) async {
     // Delay to make sure the frames are rendered properly
     // await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
-    await waitUntil(() => _scrollController.hasClients, maxIterations: 1000);
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
-    });
+
+    // // await waitUntil(() => _scrollController.hasClients, maxIterations: 1000);
+    // SchedulerBinding.instance?.addPostFrameCallback((_) {
+    //   _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+    //       duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
+    // });
   }
 
   FloatingActionButton _buildReflectionButton(

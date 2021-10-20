@@ -80,7 +80,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 title:
                     Text('Theme', style: Theme.of(context).textTheme.headline6),
                 padding: EdgeInsets.all(5),
-                themeMode: ThemeMode.values[pp.preference!.themeIndex],
+                themeMode: pp.preference != null ? ThemeMode.values[pp.preference!.themeIndex] : ThemeMode.system,
                 onThemeModeChanged: pp.setTheme,
                 flexSchemeData: flexSchemeData,
               ),
@@ -106,7 +106,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title:
                   Text('Profile', style: Theme.of(context).textTheme.headline6),
             ),
-            pp.preference!.previewMode ? ListTile(
+            pp.preference != null && pp.preference!.previewMode ? ListTile(
               onTap: () {
                 cp.push(LanguageSettingsView());
               },
@@ -139,7 +139,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 pp.refresh();
               },
               trailing: Switch(
-                  value: pp.preference!.previewMode,
+                  value: pp.preference != null ? pp.preference!.previewMode : false,
                   onChanged: (_) {
                     pp.preference!.previewMode = !pp.preference!.previewMode;
                     pp.refresh();
