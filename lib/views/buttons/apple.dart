@@ -53,7 +53,7 @@ class AppleSignInButton extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 22.0, bottom: 3.0),
                 child: Container(
                   height: 38.0,
-                  width: 32.0,
+                  width: 36.0,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(this.borderRadius),
                   ),

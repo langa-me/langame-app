@@ -57,7 +57,7 @@ class PreferenceProvider extends ChangeNotifier {
   lg.UserPreference? _preference;
   lg.UserPreference? get preference => _preference;
 
-  Future<LangameResponse> save() async {
+  Future<LangameResponse<void>> save() async {
     try {
       if (_ap.user == null) return LangameResponse(LangameStatus.succeed);
       await _api.savePreference(_ap.user!.uid, _preference!);
@@ -71,9 +71,9 @@ class PreferenceProvider extends ChangeNotifier {
     } catch (e, s) {
       _cap.log('preference_provider: failed to save');
       firebase.crashlytics?.recordError(e, s);
-      return LangameResponse(LangameStatus.failed, error: e);
+      return LangameResponse.failed(error: e);
     }
-    return LangameResponse(LangameStatus.succeed);
+    return LangameResponse.succeed();
   }
 
   addFavoriteTopic(String topic) {

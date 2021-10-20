@@ -185,7 +185,7 @@ class AuthenticationProvider extends ChangeNotifier {
       _cap.log('authentication_provider:loginWith');
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('failed to authentication_provider:loginWith');
+      _cap.log('failed to authentication_provider:loginWith $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -196,7 +196,7 @@ class AuthenticationProvider extends ChangeNotifier {
       var res = await _authenticationApi.loginWithApple();
       return _loginWith(oAuthCredential: res);
     } catch (e, s) {
-      _cap.log('authentication_provider:failed to loginWithApple');
+      _cap.log('authentication_provider:failed to loginWithApple $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
@@ -208,9 +208,9 @@ class AuthenticationProvider extends ChangeNotifier {
       return _loginWith(oAuthCredential: res);
     } catch (e, s) {
       // HACK
-      if (e is LangameGoogleSignInException && e.cause.contains('cancel'))
-        return LangameResponse(LangameStatus.cancelled);
-      _cap.log('authentication_provider:failed to loginWithGoogle');
+      if (e.toString().contains('cancel') || e.toString().contains('closed'))
+        return LangameResponse.cancelled();
+      _cap.log('authentication_provider:failed to loginWithGoogle $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }

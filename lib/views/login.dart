@@ -14,7 +14,6 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
-import 'package:langame/views/buttons/google.dart';
 import 'package:langame/views/on_boarding.dart';
 import 'package:langame/views/shortcuts/simple_shortcut.dart';
 import 'package:lottie/lottie.dart';
@@ -23,7 +22,6 @@ import 'package:provider/provider.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'buttons/apple.dart';
 import 'colors/colors.dart';
 import 'main_view.dart';
 
@@ -213,87 +211,106 @@ class _LoginViewState extends State<LoginView> {
 
     final ap = Provider.of<AuthenticationProvider>(context, listen: false);
 
+    var _buildButtonParent = (Widget child) => Container(
+          child: child,
+          padding: EdgeInsets.all(12),
+        );
     var logins = [
-      GoogleSignInButton(
-          onPressed: () async {
-            if (isAuthenticating) return;
-            await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
-          },
-          splashColor: Theme.of(context).colorScheme.primary),
+      _buildButtonParent(LangameButton(
+        FontAwesomeIcons.google,
+        fixedSize: Size(
+            AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
+        onPressed: () async {
+          if (isAuthenticating) return;
+          await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
+        },
+        layer: 1,
+      )),
       UniversalPlatform.isIOS
-          ? AppleSignInButton(
-              onPressed: () async {
-                if (isAuthenticating) return;
-                await _handleOnPressedLogin(ap.loginWithApple, 'Apple');
-              },
-              splashColor: Theme.of(context).colorScheme.primary)
+          ? _buildButtonParent(
+              LangameButton(
+                FontAwesomeIcons.apple,
+                onPressed: () async {
+                  if (isAuthenticating) return;
+                  await _handleOnPressedLogin(ap.loginWithApple, 'Apple');
+                },
+                layer: 1,
+                fixedSize: Size(AppSize.safeBlockHorizontal * 20,
+                    AppSize.safeBlockVertical * 5),
+              ),
+            )
           : SizedBox.shrink()
     ];
 
     if (UniversalPlatform.isWeb) {
-      logins = [
-        LangameButton(FontAwesomeIcons.signInAlt, text: 'Sign In',
-            onPressed: () async {
-          if (isAuthenticating) return;
-          var cp = Provider.of<ContextProvider>(context, listen: false);
-          final ln = () => _handleOnPressedLogin(
-              () => ap.loginWithHack(_webControllerPassword.text,
-                  email: _webControllerUsername.text),
-              'email');
-          cp.showCustomDialog(
-              stateless: [
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      TextField(
-                        obscureText: false,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        controller: _webControllerUsername,
-                        style: Theme.of(context).textTheme.headline6,
-                        decoration: InputDecoration(
-                            hintStyle: Theme.of(context).textTheme.headline6,
-                            hintText: "email"),
-                      ),
-                      TextField(
-                        obscureText: true,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        controller: _webControllerPassword,
-                        style: Theme.of(context).textTheme.headline6,
-                        decoration: InputDecoration(
-                            hintStyle: Theme.of(context).textTheme.headline6,
-                            hintText: "password"),
-                      ),
-                      SimpleShortcut(
-                        bindings: {
-                          const SingleActivator(LogicalKeyboardKey.enter,
-                              control: true): ln,
-                        },
-                        child: LangameButton(
-                          FontAwesomeIcons.signInAlt,
-                          layer: 2,
-                          highlighted: true,
-                          onPressed: ln,
+      logins.addAll([
+        _buildButtonParent(LangameButton(
+          FontAwesomeIcons.envelope,
+          fixedSize: Size(
+              AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
+          onPressed: () async {
+            if (isAuthenticating) return;
+            var cp = Provider.of<ContextProvider>(context, listen: false);
+            final ln = () => _handleOnPressedLogin(
+                () => ap.loginWithHack(_webControllerPassword.text,
+                    email: _webControllerUsername.text),
+                'email');
+            cp.showCustomDialog(
+                stateless: [
+                  Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        TextField(
+                          obscureText: false,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          controller: _webControllerUsername,
+                          style: Theme.of(context).textTheme.headline6,
+                          decoration: InputDecoration(
+                              hintStyle: Theme.of(context).textTheme.headline6,
+                              hintText: "email"),
                         ),
-                      ),
-                      Text(
-                        'If you don\'t have an account for Langame web beta, request one at contact@langa.me',
-                        style: Theme.of(context).textTheme.caption,
-                        textAlign: TextAlign.center,
-                      ),
-                    ]),
-              ],
-              canBack: true,
-              title: Text('Langame Web beta - VIP only',
-                  style: Theme.of(context).textTheme.headline4));
-        }, highlighted: true),
+                        TextField(
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          controller: _webControllerPassword,
+                          style: Theme.of(context).textTheme.headline6,
+                          decoration: InputDecoration(
+                              hintStyle: Theme.of(context).textTheme.headline6,
+                              hintText: "password"),
+                        ),
+                        SimpleShortcut(
+                          bindings: {
+                            const SingleActivator(LogicalKeyboardKey.enter,
+                                control: true): ln,
+                          },
+                          child: LangameButton(
+                            FontAwesomeIcons.signInAlt,
+                            layer: 2,
+                            highlighted: true,
+                            onPressed: ln,
+                          ),
+                        ),
+                        Text(
+                          'If you don\'t have an account for Langame web beta, request one at contact@langa.me',
+                          style: Theme.of(context).textTheme.caption,
+                          textAlign: TextAlign.center,
+                        ),
+                      ]),
+                ],
+                canBack: true,
+                title: Text('Langame Web beta - VIP only',
+                    style: Theme.of(context).textTheme.headline4));
+          },
+          layer: 1,
+        )),
         Text(
           '⚠️ Langame web is very experimental and currently used for fast internal product design and many features does not work yet ⚠️',
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),
-      ];
+      ]);
     }
 
     return Scaffold(
@@ -316,7 +333,7 @@ class _LoginViewState extends State<LoginView> {
           SizedBox(height: AppSize.safeBlockVertical * 10),
           Column(
               children: logins,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween),
           Spacer(),
           FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
@@ -374,24 +391,23 @@ class _LoginViewState extends State<LoginView> {
   Future _handleOnPressedLogin(
       Future<LangameResponse<void>> Function() fn, String entity) async {
     setState(() => isAuthenticating = true);
-    var f = fn().timeout(const Duration(seconds: 10));
+    var f = fn().timeout(const Duration(seconds: 120));
     var cp = Provider.of<ContextProvider>(context, listen: false);
     cp.showLoadingDialog();
     f.whenComplete(() {
       cp.dialogComplete();
       setState(() => isAuthenticating = false);
     });
-    f.then((res) {
-      if (res.status == LangameStatus.succeed) {
-        Provider.of<CrashAnalyticsProvider>(context, listen: false)
-            .analytics
-            .logSignUp(signUpMethod: entity);
-      }
-      cp.handleLangameResponse(
-        res,
-        failedMessage: Provider.of<FunnyProvider>(context, listen: false)
-            .getFailingRandom(),
-      );
-    });
+
+    final res = await f;
+    cp.handleLangameResponse(
+      res,
+      failedMessage:
+          Provider.of<FunnyProvider>(context, listen: false).getFailingRandom(),
+      onSucceed: () =>
+          Provider.of<CrashAnalyticsProvider>(context, listen: false)
+              .analytics
+              .logSignUp(signUpMethod: entity),
+    );
   }
 }

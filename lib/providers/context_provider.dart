@@ -258,6 +258,8 @@ class ContextProvider extends ChangeNotifier {
         if (succeedMessage != null) showSnackBar(succeedMessage);
         if (onSucceed != null) onSucceed();
         break;
+      default:
+        throw Exception('Unknown status');
     }
   }
 
