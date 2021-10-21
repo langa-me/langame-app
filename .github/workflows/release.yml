@@ -100,7 +100,7 @@ jobs:
         uses: maierj/fastlane-action@v2.0.1
         continue-on-error: true
         with:
-          lane: closed_beta
+          lane: beta_prod
           subdirectory: ios
           skip-tracking: true
         env:

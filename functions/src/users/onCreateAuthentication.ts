@@ -1,4 +1,5 @@
 import {
+  isDev,
   kUsersCollection,
 } from "../helpers";
 import * as admin from "firebase-admin";
@@ -45,15 +46,7 @@ export const onCreateAuthentication = async (user: UserRecord,
 
     const teamTitle = `Welcome to ${user.uid} 😋`;
     const teamBody = `<h1>${user.uid} joined Langame 😋</h1><br><p>${JSON.stringify(clone)}</p><br><h2>Give her/him a warm welcome!</h2>`;
-    return Promise.all([db.collection("mails").add({
-      to: user.email,
-      message: {
-        subject: title,
-        html: `<code>
-          ${html(title, body, "Have a great day 😇.")}
-        </code>`,
-      },
-    }), db.collection("mails").add({
+    const p2 = isDev ? Promise.resolve() : db.collection("mails").add({
       to: "louis.beaumont@langa.me",
       message: {
         subject: teamTitle,
@@ -61,7 +54,16 @@ export const onCreateAuthentication = async (user: UserRecord,
           ${html(teamTitle, teamBody, "Have a great day 😇.")}
         </code>`,
       },
-    })]);
+    });
+    return Promise.all<any>([db.collection("mails").add({
+      to: user.email,
+      message: {
+        subject: title,
+        html: `<code>
+          ${html(title, body, "Have a great day 😇.")}
+        </code>`,
+      },
+    }), p2]);
   } catch (e: any) {
     return reportError(e, {user: context.params.userId});
   }

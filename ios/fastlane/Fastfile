@@ -69,6 +69,13 @@ platform :ios do
     )
 
     delete_temp_keychain(keychain_name)
+
+    # TODO:
+    # firebase_app_distribution(
+    #   app: "1:388264600961:ios:cb9793dd455c23e50cf480",
+    #   firebase_cli_token: ENV["FIREBASE_CLI_TOKEN_DEV"],
+    #   ipa_path: "./Runner.ipa",
+    # )
   end
   lane :beta_dev do
     begin
