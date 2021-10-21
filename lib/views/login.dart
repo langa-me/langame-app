@@ -75,7 +75,7 @@ class _LoginViewState extends State<LoginView> {
             .timeout(Duration(milliseconds: 500))
             .catchError((_) => lg.UserPreference());
 
-        if (pp.preference != null && pp.preference!.hasDoneOnBoarding) {
+        if (pp.preference.hasDoneOnBoarding) {
           // Probably logged-out, skip message api init
           var mp = Provider.of<MessageProvider>(context, listen: false);
           await waitUntil(() => mp.isReady == true, maxIterations: 10000)

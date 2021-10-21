@@ -43,7 +43,6 @@ import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
-import 'package:langame/services/http/preference/preference_service.dart';
 import 'package:langame/views/langames/langame_audio.dart';
 import 'package:langame/views/langames/langame_text.dart';
 import 'package:langame/views/login.dart';
@@ -314,9 +313,7 @@ class _MyAppState extends State<MyApp> {
     return Consumer<PreferenceProvider>(builder: (context, s, child) {
       return MaterialApp(
         title: 'Langame',
-        themeMode: ThemeMode.values[s.preference != null
-            ? s.preference!.themeIndex
-            : PreferenceService.defaultPreference.themeIndex],
+        themeMode: ThemeMode.values[s.preference.themeIndex],
         theme: FlexColorScheme.light(
           scheme: scheme,
           fontFamily: AppFont.mainFont,

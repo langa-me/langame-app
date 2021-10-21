@@ -10,86 +10,81 @@ on:
       - completed
 
 jobs:
-  # CD
-  # deploy_android:
-  #   name: Deploy to Firebase distribution
-  #   runs-on: ubuntu-latest
-  #   if: ${{ github.event.workflow_run.conclusion == 'success' }}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
-  #     - name: Setup Java
-  #       uses: actions/setup-java@v1
-  #       with:
-  #         java-version: 11.x
-  #     - name: Decrypt Android keys
-  #       run: sh ./android/decrypt.sh
-  #       env:
-  #         RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
-  #     - name: Decrypt iOS keys
-  #       run: sh ./ios/decrypt.sh
-  #       env:
-  #         RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
-  #     # Hack because somehow refuse building if not in root (works in debug though)
-  #     - run: cp android/app/src/main/google-services.json android/app
-  #     - name: Setup Flutter
-  #       uses: subosito/flutter-action@v1
-  #       with:
-  #         flutter-version: 2.5.1
-  #     - name: Install Flutter dependencies
-  #       run: flutter pub get
-  #     - run: flutter build apk --release --flavor dev
-  #     - uses: ruby/setup-ruby@v1
-  #       with:
-  #         ruby-version: '2.7.2'
-  #     - name: Run Fastlane
-  #       uses: maierj/fastlane-action@v2.0.1
-  #       with:
-  #         lane: firebase_distribution
-  #         subdirectory: android
-  #       env:
-  #         FIREBASE_CLI_TOKEN_DEV: '${{ secrets.FIREBASE_CLI_TOKEN_DEV }}'
+  deploy_android:
+    name: Deploy to beta dev android
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11.x
+      - name: Decrypt Android keys
+        run: sh ./android/decrypt.sh
+        env:
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      # Hack because somehow refuse building if not in root (works in debug though)
+      - run: cp android/app/src/main/google-services.json android/app
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: 2.5.1
+      - name: Install Flutter dependencies
+        run: flutter pub get
+      - run: flutter build apk --release --flavor dev
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.2'
+      - name: Run Fastlane
+        uses: maierj/fastlane-action@v2.0.1
+        with:
+          lane: beta_dev
+          subdirectory: android
+        env:
+          FIREBASE_CLI_TOKEN_DEV: '${{ secrets.FIREBASE_CLI_TOKEN_DEV }}'
 
-  # deploy_ios:
-  #   name: Deploy to Firebase distribution
-  #   runs-on: macos-latest
-  #   if: ${{ github.event.workflow_run.conclusion == 'success' }}
-  #   steps:
-  #     - name: Checkout code from ref
-  #       uses: actions/checkout@v2
-  #     - name: Decrypt iOS keys
-  #       run: sh ./ios/decrypt.sh
-  #       env:
-  #         RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
-  #     - name: Setup Flutter
-  #       uses: subosito/flutter-action@v1
-  #       with:
-  #         flutter-version: 2.5.1
-  #     - run: flutter pub get
-  #     - run: flutter build ios --release --no-codesign --flavor dev
-  #     - uses: ruby/setup-ruby@v1
-  #       with:
-  #         ruby-version: '2.7.2'
-  #     - name: Run fastlane
-  #       uses: maierj/fastlane-action@v2.0.1
-  #       continue-on-error: true
-  #       with:
-  #         lane: firebase_distribution
-  #         subdirectory: ios
-  #         skip-tracking: true
-  #       env:
-  #         APP_STORE_CONNECT_TEAM_ID: '${{ secrets.APP_STORE_CONNECT_TEAM_ID }}'
-  #         DEVELOPER_APP_ID: '${{ secrets.DEVELOPER_APP_ID }}'
-  #         DEVELOPER_APP_IDENTIFIER_DEV: '${{ secrets.DEVELOPER_APP_IDENTIFIER_DEV }}'
-  #         DEVELOPER_PORTAL_TEAM_ID: '${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}'
-  #         FASTLANE_APPLE_ID: '${{ secrets.FASTLANE_APPLE_ID }}'
-  #         FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}'
-  #         MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
-  #         GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
-  #         PROVISIONING_PROFILE_SPECIFIER_DEV: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER_DEV }}'
-  #         TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
-  #         TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
-  #         FIREBASE_CLI_TOKEN_DEV: '${{ secrets.FIREBASE_CLI_TOKEN_DEV }}'
+  deploy_ios:
+    name: Deploy to beta dev ios
+    runs-on: macos-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout code from ref
+        uses: actions/checkout@v2
+      - name: Decrypt iOS keys
+        run: sh ./ios/decrypt.sh
+        env:
+          RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: 2.5.1
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign --flavor dev
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.2'
+      - name: Run fastlane
+        uses: maierj/fastlane-action@v2.0.1
+        continue-on-error: true
+        with:
+          lane: beta_dev
+          subdirectory: ios
+          skip-tracking: true
+        env:
+          APP_STORE_CONNECT_TEAM_ID: '${{ secrets.APP_STORE_CONNECT_TEAM_ID }}'
+          DEVELOPER_APP_ID: '${{ secrets.DEVELOPER_APP_ID }}'
+          DEVELOPER_APP_IDENTIFIER_DEV: '${{ secrets.DEVELOPER_APP_IDENTIFIER_DEV }}'
+          DEVELOPER_PORTAL_TEAM_ID: '${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}'
+          FASTLANE_APPLE_ID: '${{ secrets.FASTLANE_APPLE_ID }}'
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}'
+          MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
+          GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
+          PROVISIONING_PROFILE_SPECIFIER_DEV: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER_DEV }}'
+          TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
+          TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
+          FIREBASE_CLI_TOKEN_DEV: '${{ secrets.FIREBASE_CLI_TOKEN_DEV }}'
 
   deploy_web:
     name: Deploy web version to Firebase hosting

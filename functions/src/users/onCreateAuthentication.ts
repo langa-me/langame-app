@@ -40,7 +40,7 @@ export const onCreateAuthentication = async (user: UserRecord,
     clone.photoUrl = photo;
     clone.credits = 5;
     await db.runTransaction(async (t) => {
-      return t.set(db.collection(kUsersCollection).doc(user.uid), clone);
+      return t.set(db.collection(kUsersCollection).doc(user.uid), clone, {merge: true});
     });
 
     const teamTitle = `Welcome to ${user.uid} 😋`;

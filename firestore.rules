@@ -11,9 +11,9 @@ service cloud.firestore {
         match /users/{userId} {
             // TODO: Maybe more strict
             // TODO: how to prevent taking someone else tag?
-            allow write: if request.auth != null && request.auth.uid == userId &&
+            allow write: if request.auth != null && request.auth.uid == userId;// &&
                 // Allow changing everything except credits
-                (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits'])); // &&
+                // (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits'])); // &&
                 // If the user try to change lastSignInTime, it has to be within the 20 seconds obviously
                 //request.time - request.resource.data.get('lastSignInTime', request.time)  < duration.value(20, 's');
             allow read: if true; // TODO

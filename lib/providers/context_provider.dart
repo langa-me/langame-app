@@ -137,11 +137,14 @@ class ContextProvider extends ChangeNotifier {
                   reverse: true),
           children: [
             Container(
-              color: backgroundColor ??
-                  getBlackAndWhite(_navigationKey.currentContext!, 1,
-                      reverse: true),
               height: AppSize.safeBlockVertical * height,
               width: AppSize.safeBlockHorizontal * width,
+              // Rounded corner
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: backgroundColor ??
+                      getBlackAndWhite(_navigationKey.currentContext!, 1,
+                          reverse: true)),
               child: Scaffold(
                 backgroundColor: backgroundColor ??
                     getBlackAndWhite(_navigationKey.currentContext!, 1,

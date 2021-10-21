@@ -10,6 +10,12 @@ abstract class PreferenceService {
     hasDoneOnBoarding: false,
     userSearchHistory: [],
     shakeToFeedback: false,
+    previewMode: false,
+    notification: lg.UserPreference_Notification(
+      invite: lg.UserPreference_Notification_Invite(email: true, push: true),
+      message:
+          lg.UserPreference_Notification_Message(email: false, push: false),
+    ),
   );
   final FirebaseApi firebase;
   PreferenceService(this.firebase);

@@ -58,9 +58,9 @@ class RecordingProvider extends ChangeNotifier {
 
   List<LocaleName> _locales = [];
   List<LocaleName> get locales => _locales;
-  String get selectedSpeechToTextLocaleId => pp.preference!.speechToTextLocale;
+  String get selectedSpeechToTextLocaleId => pp.preference.speechToTextLocale;
   void set selectedSpeechToTextLocaleId(String id) {
-    pp.preference!.speechToTextLocale = id;
+    pp.preference.speechToTextLocale = id;
     notifyListeners();
   }
 
@@ -103,8 +103,8 @@ class RecordingProvider extends ChangeNotifier {
       bool available = await _init();
       if (available) {
         _speech.listen(
-            localeId: pp.preference!.hasSpeechToTextLocale()
-                ? pp.preference!.speechToTextLocale
+            localeId: pp.preference.hasSpeechToTextLocale()
+                ? pp.preference.speechToTextLocale
                 : null,
             onResult: (e) {
               if (e.finalResult) {

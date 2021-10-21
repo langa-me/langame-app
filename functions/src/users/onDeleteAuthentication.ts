@@ -41,10 +41,7 @@ export const onDeleteAuthentication = async (user: UserRecord,
   const batch = db.batch();
   // TODO: shouldn't we use transaction for read too?
   try {
-    if (!customer) {
-      await reportError(new Error("could not retrieve Stripe customer"),
-          {user: context.params.userId});
-    } else {
+    if (customer) {
       functions.logger.info("preparing customer deletion", customerDoc.id);
       await stripe.customers.del(customer.customer_id);
       // Delete the customers payments & payment methods in firestore.

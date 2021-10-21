@@ -226,7 +226,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     return Consumer2<PreferenceProvider, NewLangameProvider>(
         builder: (c, p, lp, _) {
       if (p.selectedUser == null) {
-        return p.preference!.userRecommendations != lg.UserPreference_RecommendationType.NONE
+        return p.preference.userRecommendations != lg.UserPreference_RecommendationType.NONE
             ? Column(
                 children: [
                   Text('Recommendations',

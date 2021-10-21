@@ -87,17 +87,24 @@ class AuthenticationProvider extends ChangeNotifier {
             toFirestore: (s, _) => s.toMapStringDynamic(),
           )
           .doc(data.uid);
+
       // Wait until back-end created used
-      await ref
-          .snapshots()
-          .firstWhere((e) => e.exists)
-          .timeout(Duration(seconds: 20));
-      var r = await firebase.firestore!.runTransaction((t) async {
-        t.set(ref, UserExt.fromFirebase(data), SetOptions(merge: true));
+      if (_user == null) {
+        await ref
+            .snapshots()
+            .where((e) => e.exists && e.data() != null)
+            .timeout(Duration(seconds: 20));
+      }
+      final userAsMap = UserExt.fromFirebaseAsMap(data);
+      // Note that we don't use lg.User otherwise would fuck up with firestore
+      // rules
+      await firebase.firestore!.runTransaction((t) async {
+        t.set(firebase.firestore!.collection('users').doc(data.uid), userAsMap,
+            SetOptions(merge: true));
         return ref;
       });
 
-      final newUser = (await r.get()).data();
+      final newUser = (await ref.get()).data();
       final change = UserChange(
           _user == null
               ? UserChangeType.NewAuthentication
@@ -107,7 +114,7 @@ class AuthenticationProvider extends ChangeNotifier {
       // First auth, hack to notify only after other dependencies have constructed
       // if (_user == null) await Future.delayed(Duration(milliseconds: 1000));
       if (_user == null) {
-        _onNewAuthentication();
+        _onNewAuthentication(ref);
       }
       _userStream.add(change);
       _user = newUser;
@@ -118,7 +125,7 @@ class AuthenticationProvider extends ChangeNotifier {
     });
   }
 
-  _onNewAuthentication() async {
+  _onNewAuthentication(DocumentReference<lg.User> u) async {
     final packageInfo = await PackageInfo.fromPlatform();
     // Asynchronously, update devices information in db
     final dip = DeviceInfoPlugin();
@@ -140,16 +147,9 @@ class AuthenticationProvider extends ChangeNotifier {
     final ids = Set();
     _user!.devices.retainWhere((x) => ids.add(x.deviceInfo));
 
-    final ref = firebase.firestore!
-        .collection(AppConst.firestoreUsersCollection)
-        .doc(_user!.uid)
-        .withConverter<lg.User>(
-          fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
-          toFirestore: (s, _) => s.toMapStringDynamic(),
-        );
-    await ref.set(lg.User(devices: _user!.devices), SetOptions(merge: true));
+    await u.set(lg.User(devices: _user!.devices), SetOptions(merge: true));
 
-    _userSubscription = ref.snapshots().listen((s) {
+    _userSubscription = u.snapshots().listen((s) {
       final change = UserChange(UserChangeType.ProfileEdition, _user, s.data());
       _userStream.add(change);
       _user = s.data();

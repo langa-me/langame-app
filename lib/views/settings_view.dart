@@ -80,7 +80,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 title:
                     Text('Theme', style: Theme.of(context).textTheme.headline6),
                 padding: EdgeInsets.all(5),
-                themeMode: pp.preference != null ? ThemeMode.values[pp.preference!.themeIndex] : ThemeMode.system,
+                themeMode: ThemeMode.values[pp.preference.themeIndex],
                 onThemeModeChanged: pp.setTheme,
                 flexSchemeData: flexSchemeData,
               ),
@@ -106,7 +106,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title:
                   Text('Profile', style: Theme.of(context).textTheme.headline6),
             ),
-            pp.preference != null && pp.preference!.previewMode ? ListTile(
+            pp.preference.previewMode ? ListTile(
               onTap: () {
                 cp.push(LanguageSettingsView());
               },
@@ -135,13 +135,13 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title: Text('Enable preview features',
                   style: Theme.of(context).textTheme.headline6),
               onTap: () {
-                pp.preference!.previewMode = !pp.preference!.previewMode;
+                pp.preference.previewMode = !pp.preference.previewMode;
                 pp.refresh();
               },
               trailing: Switch(
-                  value: pp.preference != null ? pp.preference!.previewMode : false,
+                  value: pp.preference.previewMode,
                   onChanged: (_) {
-                    pp.preference!.previewMode = !pp.preference!.previewMode;
+                    pp.preference.previewMode = !pp.preference.previewMode;
                     pp.refresh();
                   }),
             ),
@@ -165,7 +165,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   ),
                   ListTile(
                     onTap: () => pp.setRecommendations(
-                        pp.preference!.userRecommendations ==
+                        pp.preference.userRecommendations ==
                                 lg.UserPreference_RecommendationType.COMPOUND
                             ? lg.UserPreference_RecommendationType.NONE
                             : lg.UserPreference_RecommendationType.COMPOUND),
@@ -174,7 +174,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                     title: Text('Compound relationships',
                         style: Theme.of(context).textTheme.headline6),
                     trailing: Switch(
-                        value: pp.preference!.userRecommendations ==
+                        value: pp.preference.userRecommendations ==
                             lg.UserPreference_RecommendationType.COMPOUND,
                         onChanged: (v) => pp.setRecommendations(v
                             ? lg.UserPreference_RecommendationType.COMPOUND

@@ -7,6 +7,7 @@
     "build": "tsc",
     "start": "npm run build -- --watch | firebase emulators:start",
     "deploy": "firebase deploy",
+    "deploy-ff": "firebase deploy --only functions,firestore",
     "deploy-rules": "firebase deploy --only firestore:rules",
     "deploy-indexes": "firebase deploy --only firestore:indexes",
     "deploy-remoteconfig": "firebase deploy --only remoteconfig",

@@ -134,7 +134,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
       cp.dialogComplete();
     };
     var pp = Provider.of<PreferenceProvider>(context, listen: false);
-    pp.preference!.hasDoneOnBoarding = true;
+    pp.preference.hasDoneOnBoarding = true;
     var r = await pp.save();
     cp.handleLangameResponse(r, onFailure: showFailure, onSucceed: () {
       cp.dialogComplete();
@@ -169,8 +169,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                               width: AppSize.safeBlockHorizontal *
                                   45 *
                                   (AppSize.isLargeWidth ? 1 : 2),
-                              selected: pp.preference != null &&
-                                  pp.preference!.favoriteTopics.contains(e),
+                              selected:
+                                  pp.preference.favoriteTopics.contains(e),
                               onChange: (bool selected) {
                                 if (selected)
                                   pp.addFavoriteTopic(e);
@@ -203,7 +203,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
               ),
               ListTile(
                 onTap: () => p.setRecommendations(
-                    p.preference!.userRecommendations ==
+                    p.preference.userRecommendations ==
                             lg.UserPreference_RecommendationType.COMPOUND
                         ? lg.UserPreference_RecommendationType.NONE
                         : lg.UserPreference_RecommendationType.COMPOUND),
@@ -212,7 +212,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                 title: Text('Compound relationships',
                     style: Theme.of(context).textTheme.headline6),
                 trailing: Switch(
-                    value: p.preference!.userRecommendations ==
+                    value: p.preference.userRecommendations ==
                         lg.UserPreference_RecommendationType.COMPOUND,
                     onChanged: (v) => p.setRecommendations(v
                         ? lg.UserPreference_RecommendationType.COMPOUND

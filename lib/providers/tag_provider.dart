@@ -68,13 +68,13 @@ class TagProvider extends ChangeNotifier {
   static const _historyLength = 5;
 
   void addTopicSearchHistory(String topic) {
-    _pp.preference!.topicSearchHistory.add(topic);
-    if (_pp.preference!.topicSearchHistory.length > _historyLength) {
-      for (var i = _pp.preference!.topicSearchHistory.length;
+    _pp.preference.topicSearchHistory.add(topic);
+    if (_pp.preference.topicSearchHistory.length > _historyLength) {
+      for (var i = _pp.preference.topicSearchHistory.length;
           i > _historyLength;
           i--) {
-        _pp.preference!.topicSearchHistory
-            .remove(_pp.preference!.topicSearchHistory.elementAt(i));
+        _pp.preference.topicSearchHistory
+            .remove(_pp.preference.topicSearchHistory.elementAt(i));
       }
     }
     _cap.log('tag_provider:addTopicSearchHistory');
@@ -87,14 +87,14 @@ class TagProvider extends ChangeNotifier {
   void placeFirstTopicSearchHistory(String topic) {
     _cap.log('tag_provider:placeFirstTopicSearchHistory');
 
-    _pp.preference!.topicSearchHistory.removeWhere((e) => e == topic);
-    _pp.preference!.topicSearchHistory.add(topic);
+    _pp.preference.topicSearchHistory.removeWhere((e) => e == topic);
+    _pp.preference.topicSearchHistory.add(topic);
   }
 
   void deleteTopicSearchHistory(String tag) {
     _cap.log('tag_provider:deleteTopicSearchHistory');
 
-    _pp.preference!.topicSearchHistory.removeWhere((e) => e == tag);
+    _pp.preference.topicSearchHistory.removeWhere((e) => e == tag);
     _filteredTopicSearchHistory.removeWhere((e) => e == tag);
     notifyListeners();
     firebase.analytics?.logEvent(
@@ -104,7 +104,7 @@ class TagProvider extends ChangeNotifier {
   void resetFilteredTopicSearchTagHistory() {
     _cap.log('tag_provider:resetFilteredTopicSearchTagHistory');
 
-    _filteredTopicSearchHistory = _pp.preference!.topicSearchHistory;
+    _filteredTopicSearchHistory = _pp.preference.topicSearchHistory;
     notifyListeners();
   }
 }

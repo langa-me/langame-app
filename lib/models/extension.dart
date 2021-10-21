@@ -93,6 +93,16 @@ class UserExt {
         apple: user.providerData.any((e) => e.providerId == "apple.com"),
         creationTime: dynamicToProtobufTimestamp(user.metadata.creationTime),
       );
+  static Map<String, dynamic> fromFirebaseAsMap(fb.User user) => {
+        'uid': user.uid,
+        'email': user.email,
+        'displayName': user.displayName,
+        'phoneNumber': user.phoneNumber,
+        'photoUrl': user.photoURL,
+        'google': user.providerData.any((e) => e.providerId == "google.com"),
+        'apple': user.providerData.any((e) => e.providerId == "apple.com"),
+        'creationTime': user.metadata.creationTime,
+      };
 }
 
 class UserPreferenceExt {

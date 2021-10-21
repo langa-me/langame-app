@@ -30,16 +30,16 @@ class _State extends State<NotificationSettingsView> {
               color: getBlackAndWhite(context, 0),
             ),
             onTap: () {
-              pp.preference!.notification.message.push =
-                  !pp.preference!.notification.message.push;
+              pp.preference.notification.message.push =
+                  !pp.preference.notification.message.push;
               pp.refresh();
             },
             title: Text('Push', style: Theme.of(context).textTheme.headline6),
             trailing: Switch(
-                value: pp.preference!.notification.message.push,
+                value: pp.preference.notification.message.push,
                 onChanged: (_) {
-                  pp.preference!.notification.message.push =
-                      !pp.preference!.notification.message.push;
+                  pp.preference.notification.message.push =
+                      !pp.preference.notification.message.push;
                   pp.refresh();
                 }),
           ),
@@ -50,16 +50,16 @@ class _State extends State<NotificationSettingsView> {
               color: getBlackAndWhite(context, 0),
             ),
             onTap: () {
-              pp.preference!.notification.invite.push =
-                  !pp.preference!.notification.invite.push;
+              pp.preference.notification.invite.push =
+                  !pp.preference.notification.invite.push;
               pp.refresh();
             },
             title: Text('Push', style: Theme.of(context).textTheme.headline6),
             trailing: Switch(
-                value: pp.preference!.notification.invite.push,
+                value: pp.preference.notification.invite.push,
                 onChanged: (_) {
-                  pp.preference!.notification.invite.push =
-                      !pp.preference!.notification.invite.push;
+                  pp.preference.notification.invite.push =
+                      !pp.preference.notification.invite.push;
                   pp.refresh();
                 }),
           ),

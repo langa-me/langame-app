@@ -39,8 +39,8 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     Provider.of<AudioProvider>(context, listen: false).leaveChannel();
     var pp = Provider.of<PreferenceProvider>(context, listen: false);
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    if (!pp.preference!.sawWhatsNew) {
-      pp.preference!.sawWhatsNew = true;
+    if (!pp.preference.sawWhatsNew) {
+      pp.preference.sawWhatsNew = true;
       pp.save();
       cp.showCustomDialog(
           stateless: [whatsNew(context)],
@@ -56,7 +56,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   @override
   Widget build(BuildContext context) {
     final pp = Provider.of<PreferenceProvider>(context);
-    if (this.mounted && pp.preference != null && !pp.preference!.previewMode && _selectedIndex >= 3) {
+    if (this.mounted && pp.preference != null && !pp.preference.previewMode && _selectedIndex >= 3) {
       // Otherwise out of index
       setState(() {
         _selectedIndex = 1;
@@ -156,7 +156,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       ),
     ];
     var pp = Provider.of<PreferenceProvider>(context);
-    if (pp.preference != null && pp.preference!.previewMode) {
+    if (pp.preference != null && pp.preference.previewMode) {
       navBarItems.add(BottomNavigationBarItem(
         backgroundColor: Colors.transparent,
         icon: Beta(Icon(FontAwesomeIcons.brain,
@@ -185,7 +185,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       LangameListView(),
       PhysicalLangamePageView(goToPage),
     ];
-    if (pp.preference != null && pp.preference!.previewMode) child.add(RecordingPageView(goToPage));
+    if (pp.preference.previewMode) child.add(RecordingPageView(goToPage));
 
     return PageView(
       onPageChanged: (i) => setState(() {

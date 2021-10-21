@@ -2,13 +2,24 @@ default_platform(:android)
 
 platform :android do
   desc 'Deploy to closed beta track'
-  lane :closed_beta do
+  lane :beta_prod do
     begin
       gradle(task: 'clean')
       gradle(
         task: 'bundle',
         flavor: 'prod',
         build_type: 'Release'
+      )
+      upload_to_play_store(
+        track: 'internal',
+        aab: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
+        skip_upload_metadata: false,
+        skip_upload_images: false,
+        skip_upload_screenshots: false,
+        release_status: 'completed',
+        version_code: flutter_version(
+          pubspec_location: '../pubspec.yaml'
+        )['version_code'],
       )
       upload_to_play_store(
         track: 'beta',
@@ -21,21 +32,33 @@ platform :android do
           pubspec_location: '../pubspec.yaml'
         )['version_code'],
       )
-      firebase_app_distribution(
-        android_artifact_type: 'AAB',
-        android_artifact_path: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
-        app: '1:909899959016:android:e74963d90d60a74cc0575d',
-        firebase_cli_token: ENV['FIREBASE_CLI_TOKEN'],
-      )
+      # TODO:
+      # firebase_app_distribution(
+      #   android_artifact_type: 'AAB',
+      #   android_artifact_path: '../build/app/outputs/bundle/devRelease/app-dev-release.aab',
+      #   app: '1:388264600961:android:1146bdf3cc4851d30cf480',
+      #   firebase_cli_token: ENV['FIREBASE_CLI_TOKEN_DEV'],
+      # )
     end
   end
-  lane :firebase_distribution do
+  lane :beta_dev do
     begin
       gradle(task: 'clean')
       gradle(
         task: 'bundle',
         flavor: 'dev',
         build_type: 'Release'
+      )
+      upload_to_play_store(
+        track: 'internal',
+        aab: '../build/app/outputs/bundle/devRelease/app-dev-release.aab',
+        skip_upload_metadata: false,
+        skip_upload_images: false,
+        skip_upload_screenshots: false,
+        release_status: 'completed',
+        version_code: flutter_version(
+          pubspec_location: '../pubspec.yaml'
+        )['version_code'],
       )
       firebase_app_distribution(
         android_artifact_type: 'AAB',

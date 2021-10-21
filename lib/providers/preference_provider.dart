@@ -30,7 +30,7 @@ class PreferenceProvider extends ChangeNotifier {
         _stream?.drain(); // TODO: necessary?
         _stream = null;
         _streamSubscription = null;
-        _preference = null;
+        _preference = PreferenceService.defaultPreference;
         notifyListeners();
       }
     });
@@ -54,18 +54,18 @@ class PreferenceProvider extends ChangeNotifier {
     return _preferenceStream.stream.asBroadcastStream();
   }
 
-  lg.UserPreference? _preference;
-  lg.UserPreference? get preference => _preference;
+  lg.UserPreference _preference = PreferenceService.defaultPreference;
+  lg.UserPreference get preference => _preference;
 
   Future<LangameResponse<void>> save() async {
     try {
       if (_ap.user == null) return LangameResponse(LangameStatus.succeed);
-      await _api.savePreference(_ap.user!.uid, _preference!);
+      await _api.savePreference(_ap.user!.uid, _preference);
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
-        'shakeToFeedback': preference!.shakeToFeedback,
-        'hasDoneOnBoarding': preference!.hasDoneOnBoarding,
-        'userRecommendations': preference!.userRecommendations.value,
-        'themeIndex': preference!.themeIndex,
+        'shakeToFeedback': preference.shakeToFeedback,
+        'hasDoneOnBoarding': preference.hasDoneOnBoarding,
+        'userRecommendations': preference.userRecommendations.value,
+        'themeIndex': preference.themeIndex,
       });
       _cap.log('preference_provider: save preference');
     } catch (e, s) {
@@ -78,29 +78,29 @@ class PreferenceProvider extends ChangeNotifier {
 
   addFavoriteTopic(String topic) {
     _cap.sendClickTopic(topic);
-    _preference?.favoriteTopics.add(topic);
+    _preference.favoriteTopics.add(topic);
     notifyListeners();
   }
 
   removeFavoriteTopic(String topic) {
     // Removing can still be interesting event interaction.
     _cap.sendClickTopic(topic);
-    _preference?.favoriteTopics.remove(topic);
+    _preference.favoriteTopics.remove(topic);
     notifyListeners();
   }
 
   void setTheme(ThemeMode t) {
-    _preference?.themeIndex = t.index;
+    _preference.themeIndex = t.index;
     notifyListeners();
   }
 
   void setShakeToFeedback(bool value) {
-    _preference?.shakeToFeedback = value;
+    _preference.shakeToFeedback = value;
     notifyListeners();
   }
 
   void setRecommendations(lg.UserPreference_RecommendationType v) {
-    _preference?.userRecommendations = v;
+    _preference.userRecommendations = v;
     notifyListeners();
   }
 
@@ -129,13 +129,13 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   void addUserSearchHistory(String tag) {
-    _preference!.userSearchHistory.add(tag);
-    if (_preference!.userSearchHistory.length > _historyLength) {
-      for (var i = _preference!.userSearchHistory.length;
+    _preference.userSearchHistory.add(tag);
+    if (_preference.userSearchHistory.length > _historyLength) {
+      for (var i = _preference.userSearchHistory.length;
           i > _historyLength;
           i--) {
-        _preference!.userSearchHistory
-            .remove(_preference!.userSearchHistory.elementAt(i));
+        _preference.userSearchHistory
+            .remove(_preference.userSearchHistory.elementAt(i));
       }
     }
     _cap.log('preference_provider: adduserSearchHistory');
@@ -148,14 +148,14 @@ class PreferenceProvider extends ChangeNotifier {
   void placeFirstUserSearchHistory(String tag) {
     _cap.log('preference_provider: placeFirstuserSearchHistory');
 
-    _preference!.userSearchHistory.removeWhere((e) => e == tag);
-    _preference!.userSearchHistory.add(tag);
+    _preference.userSearchHistory.removeWhere((e) => e == tag);
+    _preference.userSearchHistory.add(tag);
   }
 
   void deleteUserSearchHistory(String tag) {
     _cap.log('preference_provider: deleteuserSearchHistory');
 
-    _preference!.userSearchHistory.removeWhere((e) => e == tag);
+    _preference.userSearchHistory.removeWhere((e) => e == tag);
     _filteredUserSearchHistory.removeWhere((e) => e == tag);
     notifyListeners();
     firebase.analytics?.logEvent(
@@ -165,7 +165,7 @@ class PreferenceProvider extends ChangeNotifier {
   void resetFilteredSearchTagHistory() {
     _cap.log('preference_provider: resetFilteredSearchTagHistory');
 
-    _filteredUserSearchHistory = _preference!.userSearchHistory;
+    _filteredUserSearchHistory = _preference.userSearchHistory;
     notifyListeners();
   }
 }
