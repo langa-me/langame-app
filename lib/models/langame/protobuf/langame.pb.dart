@@ -1110,6 +1110,7 @@ class Langame_Reflection extends $pb.GeneratedMessage {
     ..pPS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'alternatives')
     ..aOM<$0.Timestamp>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createdAt', subBuilder: $0.Timestamp.create)
     ..e<ContentFilter>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'contentFilter', $pb.PbFieldType.OE, defaultOrMaker: ContentFilter.Safe, valueOf: ContentFilter.valueOf, enumValues: ContentFilter.values)
+    ..m<$core.String, $core.int>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userFeedbacks', protoName: 'userFeedbacks', entryClassName: 'Langame.Reflection.UserFeedbacksEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OU3, packageName: const $pb.PackageName('langame.protobuf'))
     ..hasRequiredFields = false
   ;
 
@@ -1120,6 +1121,7 @@ class Langame_Reflection extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? alternatives,
     $0.Timestamp? createdAt,
     ContentFilter? contentFilter,
+    $core.Map<$core.String, $core.int>? userFeedbacks,
   }) {
     final _result = create();
     if (userId != null) {
@@ -1136,6 +1138,9 @@ class Langame_Reflection extends $pb.GeneratedMessage {
     }
     if (contentFilter != null) {
       _result.contentFilter = contentFilter;
+    }
+    if (userFeedbacks != null) {
+      _result.userFeedbacks.addAll(userFeedbacks);
     }
     return _result;
   }
@@ -1200,6 +1205,9 @@ class Langame_Reflection extends $pb.GeneratedMessage {
   $core.bool hasContentFilter() => $_has(4);
   @$pb.TagNumber(5)
   void clearContentFilter() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.Map<$core.String, $core.int> get userFeedbacks => $_getMap(5);
 }
 
 class Langame_Suggestion extends $pb.GeneratedMessage {
@@ -2414,12 +2422,116 @@ class Message_Analysis_Sentiment extends $pb.GeneratedMessage {
   void clearLabel() => clearField(2);
 }
 
+class Message_Analysis_Token extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Message.Analysis.Token', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'start', $pb.PbFieldType.OU3)
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'end', $pb.PbFieldType.OU3)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'word')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'entityGroup')
+    ..a<$core.double>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'score', $pb.PbFieldType.OF)
+    ..hasRequiredFields = false
+  ;
+
+  Message_Analysis_Token._() : super();
+  factory Message_Analysis_Token({
+    $core.int? start,
+    $core.int? end,
+    $core.String? word,
+    $core.String? entityGroup,
+    $core.double? score,
+  }) {
+    final _result = create();
+    if (start != null) {
+      _result.start = start;
+    }
+    if (end != null) {
+      _result.end = end;
+    }
+    if (word != null) {
+      _result.word = word;
+    }
+    if (entityGroup != null) {
+      _result.entityGroup = entityGroup;
+    }
+    if (score != null) {
+      _result.score = score;
+    }
+    return _result;
+  }
+  factory Message_Analysis_Token.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Message_Analysis_Token.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Message_Analysis_Token clone() => Message_Analysis_Token()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Message_Analysis_Token copyWith(void Function(Message_Analysis_Token) updates) => super.copyWith((message) => updates(message as Message_Analysis_Token)) as Message_Analysis_Token; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Message_Analysis_Token create() => Message_Analysis_Token._();
+  Message_Analysis_Token createEmptyInstance() => create();
+  static $pb.PbList<Message_Analysis_Token> createRepeated() => $pb.PbList<Message_Analysis_Token>();
+  @$core.pragma('dart2js:noInline')
+  static Message_Analysis_Token getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Message_Analysis_Token>(create);
+  static Message_Analysis_Token? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get start => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set start($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasStart() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearStart() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.int get end => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set end($core.int v) { $_setUnsignedInt32(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasEnd() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearEnd() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get word => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set word($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasWord() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearWord() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get entityGroup => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set entityGroup($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasEntityGroup() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearEntityGroup() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.double get score => $_getN(4);
+  @$pb.TagNumber(5)
+  set score($core.double v) { $_setFloat(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasScore() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearScore() => clearField(5);
+}
+
 class Message_Analysis extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Message.Analysis', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..pPS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'topics')
     ..pc<Message_Analysis_Sentiment>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sentiments', $pb.PbFieldType.PM, subBuilder: Message_Analysis_Sentiment.create)
     ..aOM<Message_Analysis_Error>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'error', subBuilder: Message_Analysis_Error.create)
     ..e<ContentFilter>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'filter', $pb.PbFieldType.OE, defaultOrMaker: ContentFilter.Safe, valueOf: ContentFilter.valueOf, enumValues: ContentFilter.values)
+    ..pc<Message_Analysis_Token>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'token', $pb.PbFieldType.PM, subBuilder: Message_Analysis_Token.create)
     ..hasRequiredFields = false
   ;
 
@@ -2429,6 +2541,7 @@ class Message_Analysis extends $pb.GeneratedMessage {
     $core.Iterable<Message_Analysis_Sentiment>? sentiments,
     Message_Analysis_Error? error,
     ContentFilter? filter,
+    $core.Iterable<Message_Analysis_Token>? token,
   }) {
     final _result = create();
     if (topics != null) {
@@ -2442,6 +2555,9 @@ class Message_Analysis extends $pb.GeneratedMessage {
     }
     if (filter != null) {
       _result.filter = filter;
+    }
+    if (token != null) {
+      _result.token.addAll(token);
     }
     return _result;
   }
@@ -2491,6 +2607,9 @@ class Message_Analysis extends $pb.GeneratedMessage {
   $core.bool hasFilter() => $_has(3);
   @$pb.TagNumber(4)
   void clearFilter() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<Message_Analysis_Token> get token => $_getList(4);
 }
 
 class Message extends $pb.GeneratedMessage {

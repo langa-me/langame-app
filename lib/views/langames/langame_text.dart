@@ -8,23 +8,23 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/djinn/djinn.pbgrpc.dart';
+import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:langame/views/images/image.dart';
-import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
+import 'package:langame/helpers/functional.dart';
 
 class LangameTextView extends StatefulWidget {
-  LangameTextView(this.langameChannelName);
   final String langameChannelName;
+  LangameTextView(this.langameChannelName);
   @override
   _State createState() => _State();
 }
@@ -48,12 +48,6 @@ class _State extends State<LangameTextView>
 
     var lp = Provider.of<LangameProvider>(context, listen: false);
     lp.joinLangame(widget.langameChannelName);
-  }
-
-  @override
-  void dispose() {
-    _textEditingController.dispose();
-    super.dispose();
   }
 
   @override
@@ -234,191 +228,11 @@ class _State extends State<LangameTextView>
     );
   }
 
-  void _onSend() async {
-    if (_textEditingController.text.isNotEmpty) {
-      // Clear text field
-      _textEditingController.clear();
-      // Hide keyboard
-      FocusManager.instance.primaryFocus?.unfocus();
-
-      _scrollToBottom();
-
-      var mp = Provider.of<MessageProvider>(context, listen: false);
-
-      // TODO: feedback on response
-      mp.sendMessage(widget.langameChannelName, _currentText, other!.uid);
-
-      setState(() {
-        _currentText = '';
-        _currentSentiment = null;
-      });
-    }
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
   }
-
-  void _scrollToBottom({bool later = false}) async {
-    // Delay to make sure the frames are rendered properly
-    await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
-    if (!_scrollController.hasClients) return;
-
-    // await waitUntil(() => _scrollController.hasClients, maxIterations: 1000);
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
-    });
-  }
-
-  FloatingActionButton _buildSuggestionButton(
-          ContextProvider cp, List<lg.Langame_Suggestion> suggestions) =>
-      FloatingActionButton(
-          child: Badge(
-            position: BadgePosition.topEnd(top: -20, end: -20),
-            badgeColor: getBlackAndWhite(context, 0),
-            child: Icon(FontAwesomeIcons.brain),
-            badgeContent: Text(
-              (suggestions.length - _seenSuggestions).toString(),
-              style: Theme.of(context).textTheme.headline6!.merge(TextStyle(
-                  color: getBlackAndWhite(context, 0, reverse: true))),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          onPressed: () {
-            setState(() {
-              _seenSuggestions = suggestions.length;
-            });
-            cp.showCustomDialog(
-                stateless: [
-                  Container(
-                    height: AppSize.safeBlockVertical * 40,
-                    width: AppSize.safeBlockHorizontal * 70,
-                    child: ListView.separated(
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemCount: suggestions.length,
-                      separatorBuilder: (ctx, i) => Divider(),
-                      itemBuilder: (ctx, i) => LangameButton(
-                        FontAwesomeIcons.copy,
-                        text: suggestions[i].alternatives.last,
-                        labelMaxLines: null,
-                        layer: 1,
-                        onPressed: () {
-                          FlutterClipboard.copy(
-                              suggestions[i].alternatives.last);
-                        },
-                      ),
-                    ),
-                  ),
-                  // Show a nice box with corners box rounded
-                ],
-                canBack: true,
-                title: Text('Suggestions',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline4));
-          });
-
-  Widget _buildReflections(
-          lg.Langame currentLg, List<lg.Langame_Reflection> reflections) =>
-      Expanded(
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: [
-                currentLg.currentMeme < currentLg.memes.length - 1
-                    ? Padding(
-                        padding: EdgeInsets.all(12),
-                        child: LangameButton(FontAwesomeIcons.grinTongue,
-                            highlighted: true,
-                            disableForFewMs: 5000,
-                            tooltip:
-                                'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme + 1].content}',
-                            text: currentLg
-                                    .memes[currentLg.currentMeme + 1].content
-                                    .substring(
-                                        0,
-                                        currentLg
-                                                    .memes[
-                                                        currentLg.currentMeme +
-                                                            1]
-                                                    .content
-                                                    .length >
-                                                20
-                                            ? 20
-                                            : currentLg
-                                                .memes[
-                                                    currentLg.currentMeme + 1]
-                                                .content
-                                                .length) +
-                                '...', onPressed: () {
-                          setState(() {
-                            _textEditingController.text = currentLg
-                                .memes[currentLg.currentMeme + 1].content;
-                            _currentText = currentLg
-                                .memes[currentLg.currentMeme + 1].content;
-                          });
-                          _onSend();
-                          final fs =
-                              Provider.of<FirebaseApi>(context, listen: false)
-                                  .firestore!;
-                          fs
-                              .collection('langames')
-                              .where('channelName',
-                                  isEqualTo: widget.langameChannelName)
-                              .get()
-                              .then((e) {
-                            if (e.size == 0) return;
-                            e.docs[0].reference.update({
-                              'currentMeme': FieldValue.increment(1),
-                            });
-                          });
-                        }))
-                    : SizedBox.shrink()
-              ] +
-              reflections
-                  .map(
-                    (e) => Padding(
-                        padding: EdgeInsets.all(12),
-                        child: LangameButton(
-                            e.contentFilter == lg.ContentFilter.Safe
-                                ? FontAwesomeIcons.smileBeam
-                                : e.contentFilter == lg.ContentFilter.Sensitive
-                                    ? FontAwesomeIcons.frown
-                                    : FontAwesomeIcons.meh,
-                            layer: 1,
-                            tooltip: e.alternatives.last,
-                            text: e.alternatives.last.substring(
-                                    0,
-                                    e.alternatives.last.length > 20
-                                        ? 20
-                                        : e.alternatives.last.length) +
-                                '...', onPressed: () {
-                          // setState(() {
-                          //   _textEditingController.text = e.alternatives.last;
-                          //   _currentText = e.alternatives.last;
-                          // });
-                          final cp = Provider.of<ContextProvider>(context,
-                              listen: false);
-                          cp.showCustomDialog(
-                            stateless: [
-                              Container(
-                                height: AppSize.safeBlockVertical * 30,
-                                width: AppSize.safeBlockHorizontal * 70,
-                                child: SingleChildScrollView(
-                                    child: Text(
-                                  e.alternatives.last,
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.headline4,
-                                )),
-                              ),
-                            ],
-                            canBack: true,
-                            height: 40,
-                            title: Text('🤔',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.headline4),
-                          );
-                        })),
-                  )
-                  .toList(),
-        ),
-      );
 
   /// This is a function that return a WhatsApp like message box
   Widget _buildMessageBox(lg.Message m) => Stack(
@@ -506,4 +320,237 @@ class _State extends State<LangameTextView>
           ),
         ],
       );
+
+  Widget _buildReflections(
+          lg.Langame currentLg, List<lg.Langame_Reflection> reflections) =>
+      Expanded(
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+                currentLg.currentMeme < currentLg.memes.length - 1
+                    ? Padding(
+                        padding: EdgeInsets.all(12),
+                        child: LangameButton(FontAwesomeIcons.grinTongue,
+                            highlighted: true,
+                            disableForFewMs: 5000,
+                            tooltip:
+                                'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme + 1].content}',
+                            text: currentLg
+                                    .memes[currentLg.currentMeme + 1].content
+                                    .substring(
+                                        0,
+                                        currentLg
+                                                    .memes[
+                                                        currentLg.currentMeme +
+                                                            1]
+                                                    .content
+                                                    .length >
+                                                20
+                                            ? 20
+                                            : currentLg
+                                                .memes[
+                                                    currentLg.currentMeme + 1]
+                                                .content
+                                                .length) +
+                                '...', onPressed: () {
+                          setState(() {
+                            _textEditingController.text = currentLg
+                                .memes[currentLg.currentMeme + 1].content;
+                            _currentText = currentLg
+                                .memes[currentLg.currentMeme + 1].content;
+                          });
+                          _onSend();
+                          final fs =
+                              Provider.of<FirebaseApi>(context, listen: false)
+                                  .firestore!;
+                          fs
+                              .collection('langames')
+                              .where('channelName',
+                                  isEqualTo: widget.langameChannelName)
+                              .get()
+                              .then((e) {
+                            if (e.size == 0) return;
+                            e.docs[0].reference.update({
+                              'currentMeme': FieldValue.increment(1),
+                            });
+                          });
+                        }))
+                    : SizedBox.shrink()
+              ] +
+              reflections
+                  .mapIndexed(
+                    (e, i) => Padding(
+                        padding: EdgeInsets.all(12),
+                        child: LangameButton(
+                            e.contentFilter == lg.ContentFilter.Safe
+                                ? FontAwesomeIcons.smileBeam
+                                : e.contentFilter == lg.ContentFilter.Sensitive
+                                    ? FontAwesomeIcons.frown
+                                    : FontAwesomeIcons.meh,
+                            layer: 1,
+                            tooltip: e.alternatives.last,
+                            text: e.alternatives.last.substring(
+                                    0,
+                                    e.alternatives.last.length > 20
+                                        ? 20
+                                        : e.alternatives.last.length) +
+                                '...', onPressed: () {
+                          // setState(() {
+                          //   _textEditingController.text = e.alternatives.last;
+                          //   _currentText = e.alternatives.last;
+                          // });
+                          final cp = Provider.of<ContextProvider>(context,
+                              listen: false);
+                          cp.showCustomDialog(
+                            stateless: [
+                              Column(children: [
+                                Container(
+                                  height: AppSize.safeBlockVertical * 20,
+                                  width: AppSize.safeBlockHorizontal * 70,
+                                  child: SingleChildScrollView(
+                                      child: Text(
+                                    e.alternatives.last,
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
+                                  )),
+                                ),
+                              //   Row(
+                              //       mainAxisAlignment: MainAxisAlignment.center,
+                              //       children: [
+                              //         LangameButton(FontAwesomeIcons.thumbsDown,
+                              //             layer: 1,
+                              //             disableForFewMs: 3000, onPressed: () {
+                              //           final f = Provider.of<FirebaseApi>(
+                              //               context,
+                              //               listen: false);
+                              //           f.firestore!
+                              //               .collection('langames')
+                              //               .where('channelName',
+                              //                   isEqualTo:
+                              //                       widget.langameChannelName)
+                              //               .get()
+                              //               .then((e) {
+                              //             if (e.size == 0) return;
+                              //             e.docs[0].reference.set({
+                              //               'reflections.userFeedbacks.${f.auth!.currentUser!.uid}.$i':
+                              //                   -1
+                              //             }, SetOptions(merge: true));
+                              //           });
+                              //         }),
+                              //         LangameButton(FontAwesomeIcons.thumbsUp,
+                              //             layer: 1,
+                              //             disableForFewMs: 3000, onPressed: () {
+                              //           final f = Provider.of<FirebaseApi>(
+                              //               context,
+                              //               listen: false);
+                              //           f.firestore!
+                              //               .collection('langames')
+                              //               .where('channelName',
+                              //                   isEqualTo:
+                              //                       widget.langameChannelName)
+                              //               .get()
+                              //               .then((e) {
+                              //             if (e.size == 0) return;
+                              //             e.docs[0].reference.set({
+                              //               'reflections.userFeedbacks.${f.auth!.currentUser!.uid}.$i':
+                              //                   1
+                              //             }, SetOptions(merge: true));
+                              //           });
+                              //         }),
+                              //       ]),
+                              ]),
+                            ],
+                            canBack: true,
+                            height: 40,
+                            title: Text('🤔',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.headline4),
+                          );
+                        })),
+                  )
+                  .toList(),
+        ),
+      );
+
+  FloatingActionButton _buildSuggestionButton(
+          ContextProvider cp, List<lg.Langame_Suggestion> suggestions) =>
+      FloatingActionButton(
+          child: Badge(
+            position: BadgePosition.topEnd(top: -20, end: -20),
+            badgeColor: getBlackAndWhite(context, 0),
+            child: Icon(FontAwesomeIcons.brain),
+            badgeContent: Text(
+              (suggestions.length - _seenSuggestions).toString(),
+              style: Theme.of(context).textTheme.headline6!.merge(TextStyle(
+                  color: getBlackAndWhite(context, 0, reverse: true))),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          onPressed: () {
+            setState(() {
+              _seenSuggestions = suggestions.length;
+            });
+            cp.showCustomDialog(
+                stateless: [
+                  Container(
+                    height: AppSize.safeBlockVertical * 40,
+                    width: AppSize.safeBlockHorizontal * 70,
+                    child: ListView.separated(
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemCount: suggestions.length,
+                      separatorBuilder: (ctx, i) => Divider(),
+                      itemBuilder: (ctx, i) => LangameButton(
+                        FontAwesomeIcons.copy,
+                        text: suggestions[i].alternatives.last,
+                        labelMaxLines: null,
+                        layer: 1,
+                        onPressed: () {
+                          FlutterClipboard.copy(
+                              suggestions[i].alternatives.last);
+                        },
+                      ),
+                    ),
+                  ),
+                  // Show a nice box with corners box rounded
+                ],
+                canBack: true,
+                title: Text('Suggestions',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headline4));
+          });
+
+  void _onSend() async {
+    if (_textEditingController.text.isNotEmpty) {
+      // Clear text field
+      _textEditingController.clear();
+      // Hide keyboard
+      FocusManager.instance.primaryFocus?.unfocus();
+
+      _scrollToBottom();
+
+      var mp = Provider.of<MessageProvider>(context, listen: false);
+
+      // TODO: feedback on response
+      mp.sendMessage(widget.langameChannelName, _currentText, other!.uid);
+
+      setState(() {
+        _currentText = '';
+        _currentSentiment = null;
+      });
+    }
+  }
+
+  void _scrollToBottom({bool later = false}) async {
+    // Delay to make sure the frames are rendered properly
+    await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
+    if (!_scrollController.hasClients) return;
+
+    // await waitUntil(() => _scrollController.hasClients, maxIterations: 1000);
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
+    });
+  }
 }

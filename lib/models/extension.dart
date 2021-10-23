@@ -193,6 +193,7 @@ class ReflectionExt {
       alternatives:
           (m['alternatives'] as List<dynamic>?)?.map((e) => e as String),
       contentFilter: lg.ContentFilter.values[m['contentFilter'] as int? ?? 0],
+      userFeedbacks: m['userFeedbacks'] as Map<String, int>?,
     );
   }
 }

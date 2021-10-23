@@ -1507,6 +1507,9 @@ export namespace langame {
 
                 /** Reflection contentFilter */
                 contentFilter?: (langame.protobuf.ContentFilter|null);
+
+                /** Reflection userFeedbacks */
+                userFeedbacks?: ({ [k: string]: number }|null);
             }
 
             /** Represents a Reflection. */
@@ -1532,6 +1535,9 @@ export namespace langame {
 
                 /** Reflection contentFilter. */
                 public contentFilter: langame.protobuf.ContentFilter;
+
+                /** Reflection userFeedbacks. */
+                public userFeedbacks: { [k: string]: number };
 
                 /**
                  * Creates a new Reflection instance using the specified properties.
@@ -2897,6 +2903,9 @@ export namespace langame {
 
                 /** Analysis filter */
                 filter?: (langame.protobuf.ContentFilter|null);
+
+                /** Analysis token */
+                token?: (langame.protobuf.Message.Analysis.IToken[]|null);
             }
 
             /** Represents an Analysis. */
@@ -2919,6 +2928,9 @@ export namespace langame {
 
                 /** Analysis filter. */
                 public filter: langame.protobuf.ContentFilter;
+
+                /** Analysis token. */
+                public token: langame.protobuf.Message.Analysis.IToken[];
 
                 /**
                  * Creates a new Analysis instance using the specified properties.
@@ -3180,6 +3192,120 @@ export namespace langame {
 
                     /**
                      * Converts this Sentiment to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+                }
+
+                /** Properties of a Token. */
+                interface IToken {
+
+                    /** Token start */
+                    start?: (number|null);
+
+                    /** Token end */
+                    end?: (number|null);
+
+                    /** Token word */
+                    word?: (string|null);
+
+                    /** Token entityGroup */
+                    entityGroup?: (string|null);
+
+                    /** Token score */
+                    score?: (number|null);
+                }
+
+                /** Represents a Token. */
+                class Token implements IToken {
+
+                    /**
+                     * Constructs a new Token.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: langame.protobuf.Message.Analysis.IToken);
+
+                    /** Token start. */
+                    public start: number;
+
+                    /** Token end. */
+                    public end: number;
+
+                    /** Token word. */
+                    public word: string;
+
+                    /** Token entityGroup. */
+                    public entityGroup: string;
+
+                    /** Token score. */
+                    public score: number;
+
+                    /**
+                     * Creates a new Token instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns Token instance
+                     */
+                    public static create(properties?: langame.protobuf.Message.Analysis.IToken): langame.protobuf.Message.Analysis.Token;
+
+                    /**
+                     * Encodes the specified Token message. Does not implicitly {@link langame.protobuf.Message.Analysis.Token.verify|verify} messages.
+                     * @param message Token message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: langame.protobuf.Message.Analysis.IToken, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified Token message, length delimited. Does not implicitly {@link langame.protobuf.Message.Analysis.Token.verify|verify} messages.
+                     * @param message Token message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: langame.protobuf.Message.Analysis.IToken, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes a Token message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns Token
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Message.Analysis.Token;
+
+                    /**
+                     * Decodes a Token message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns Token
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Message.Analysis.Token;
+
+                    /**
+                     * Verifies a Token message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates a Token message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns Token
+                     */
+                    public static fromObject(object: { [k: string]: any }): langame.protobuf.Message.Analysis.Token;
+
+                    /**
+                     * Creates a plain object from a Token message. Also converts values to other types if specified.
+                     * @param message Token
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: langame.protobuf.Message.Analysis.Token, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this Token to JSON.
                      * @returns JSON object
                      */
                     public toJSON(): { [k: string]: any };

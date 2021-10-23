@@ -126,6 +126,7 @@ class _SendLangameState extends State<NewLangamePageView>
               children: [
                 LangameButton(
                   FontAwesomeIcons.keyboard,
+                  beta: true,
                   onPressed: () =>
                       setState(() => _textAudioToggles = [true, false]),
                   text: 'Text',

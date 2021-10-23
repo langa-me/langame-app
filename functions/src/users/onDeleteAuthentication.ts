@@ -89,11 +89,31 @@ export const onDeleteAuthentication = async (user: UserRecord,
         .where("reservedSpots", "array-contains", user.uid).get();
 
     for (const p of presenceInLangamesTwo.docs) {
-      p.data().isText ?
-        batch.delete(p.ref) :
+      if (p.data().isText) {
+        batch.delete(p.ref);
+        const childs = await p.ref.collection("players").get();
+        childs.forEach((c) => batch.delete(c.ref));
+      } else {
         batch.update(p.ref, {
           reservedSpots: admin.firestore.FieldValue.arrayRemove(user.uid),
         });
+      }
+    }
+
+    const messagesReceived = await db
+        .collection("messages")
+        .where("toUid", "==", user.uid).get();
+
+    const messagesSent = await db
+        .collection("messages")
+        .where("fromUid", "==", user.uid).get();
+
+    for (const message of messagesReceived.docs) {
+      batch.delete(message.ref);
+    }
+
+    for (const message of messagesSent.docs) {
+      batch.delete(message.ref);
     }
 
     batch.delete(db.collection("recommendations").doc(user.uid));

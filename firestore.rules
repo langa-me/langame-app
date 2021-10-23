@@ -44,7 +44,7 @@ service cloud.firestore {
                              // Has enough credits?
                              getUser(request.auth.uid).credits > 0;
             // Client can update "currentMeme"
-            allow update: if (request.resource.data.diff(resource.data)
+            allow update: if request.auth != null && (request.resource.data.diff(resource.data)
                 .affectedKeys()
                 .hasOnly(['currentMeme'])) &&
                 request.resource.data.currentMeme >= 0 &&
@@ -57,11 +57,10 @@ service cloud.firestore {
                 // initiator can lock/unlock the Langame by setting 'isLocked'
                 (request.resource.data.diff(resource.data).affectedKeys()
                 .hasOnly(['isLocked'])) &&
-                request.auth.uid == resource.data.initiator; // &&
+                request.auth.uid == resource.data.initiator; // TODO: only give feedback
                 // TODO:
                 // It can only do so if does not hit the hard limit of 6 players
                 // resource.data.players.size() < 6 - resouce.data.reversedSpots.size();
-
             function canEnterLangame() {
                 let langame = get(/databases/$(database)/documents/langames/$(langameId)).data;
                 // Can enter only if the room is not full or I have a reserved spot

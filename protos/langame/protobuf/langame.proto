@@ -157,6 +157,7 @@ message Langame {
     repeated string alternatives = 3;
     google.protobuf.Timestamp created_at = 4;
     ContentFilter content_filter = 5;
+    map<string, uint32> userFeedbacks = 6;
   }
   message Suggestion {
     string user_id = 1;
