@@ -159,16 +159,14 @@ class AuthenticationProvider extends ChangeNotifier {
     _cap.log('authentication_provider:updated devices');
   }
 
-  Future<LangameResponse<void>> _loginWith(
-      {OAuthCredential? oAuthCredential,
-      UserCredential? userCredential}) async {
+  Future<LangameResponse<void>> _loginWith(Credential c) async {
     try {
       _cap.log('authentication_provider:loginWith');
       UserCredential uc;
-      if (oAuthCredential != null) {
-        uc = await _authenticationApi.loginWithFirebase(oAuthCredential);
-      } else if (userCredential != null) {
-        uc = userCredential;
+      if (c.oAuthCrendential != null) {
+        uc = await firebase.auth!.signInWithCredential(c.oAuthCrendential!);
+      } else if (c.userCredential != null) {
+        uc = c.userCredential!;
       } else {
         _cap.log(
             'should either provide oauth credentials (Google, Apple ...), or UserCredential (email)');
@@ -194,7 +192,7 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse<void>> loginWithApple() async {
     try {
       var res = await _authenticationApi.loginWithApple();
-      return _loginWith(oAuthCredential: res);
+      return _loginWith(res);
     } catch (e, s) {
       _cap.log('authentication_provider:failed to loginWithApple $e $s');
       _cap.recordError(e, s);
@@ -205,7 +203,7 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<LangameResponse<void>> loginWithGoogle() async {
     try {
       var res = await _authenticationApi.loginWithGoogle();
-      return _loginWith(oAuthCredential: res);
+      return _loginWith(res);
     } catch (e, s) {
       // HACK
       if (e.toString().contains('cancel') || e.toString().contains('closed'))
@@ -216,15 +214,13 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<void>> loginWithHack(String password,
-      {String email = 'hack@langa.me'}) async {
+  Future<LangameResponse<void>> loginWithEmail(String email, String password) async {
     try {
-      final res = await firebase.auth!
-          .signInWithEmailAndPassword(email: email, password: password);
-      _cap.log('authentication_provider:loginWithHack');
-      return _loginWith(userCredential: res);
+      final res = await _authenticationApi.loginWithEmail(email, password);
+      _cap.log('authentication_provider:loginWithEmail');
+      return _loginWith(res);
     } catch (e, s) {
-      _cap.log('authentication_provider:failed to loginWithHack $e');
+      _cap.log('authentication_provider:failed to loginWithEmail $email $e');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e.toString());
     }
@@ -265,9 +261,11 @@ class AuthenticationProvider extends ChangeNotifier {
         return LangameResponse(LangameStatus.succeed, result: []);
       final objects = await algolia!
           .index(AppConst.isDev ? "dev_users" : "prod_users")
+          // .filters(tag)
           .query(tag)
+          // .query('tag:$tag')
           .getObjects();
-      _cap.log('authentication_provider:getUser ${objects.hits.length} hits');
+      _cap.log('authentication_provider:getUserTag ${objects.hits.length} hits');
 
       return LangameResponse(LangameStatus.succeed,
           result: objects.hits
@@ -363,16 +361,13 @@ class AuthenticationProvider extends ChangeNotifier {
       // [firebase_auth/requires-recent-login] This operation is sensitive
       //  and requires recent authentication. Log in again before
       //retrying this request.
-      var cred = await (user!.google
+      final Credential cred = await (user!.google
           ? _authenticationApi.loginWithGoogle()
           : user!.apple
               ? _authenticationApi.loginWithApple()
-              : null);
-      if (cred == null)
-        throw LangameException(
-            'the user is authenticated without any social providers');
-      await _authenticationApi.reAuthenticate(cred);
-      await _authenticationApi.delete();
+              : _authenticationApi.loginWithEmail(null, null));
+      firebase.auth!.currentUser!.reauthenticateWithCredential(cred.oAuthCrendential!);
+      await firebase.auth!.currentUser!.delete();
       _cap.log('purging local storage');
       var i = await SharedPreferences.getInstance();
       await i.clear();

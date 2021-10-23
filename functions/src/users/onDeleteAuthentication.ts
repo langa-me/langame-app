@@ -17,7 +17,7 @@ const title = "Farewell from Langame 😥";
 const body = `We are saddened by your departure, we will miss you.
 <br>
 Please do not hesitate to give us feedback <a href="https://help.langa.me/feedback">here.</a>, thank you!`;
-/* eslint-disable max-len */
+/* eslint-enable max-len */
 
 
 /**
@@ -84,10 +84,25 @@ export const onDeleteAuthentication = async (user: UserRecord,
       batch.delete(p.ref);
     }
 
+    const presenceInLangamesTwo = await db
+        .collection("langames")
+        .where("reservedSpots", "array-contains", user.uid).get();
+
+    for (const p of presenceInLangamesTwo.docs) {
+      p.data().isText ?
+        batch.delete(p.ref) :
+        batch.update(p.ref, {
+          reservedSpots: admin.firestore.FieldValue.arrayRemove(user.uid),
+        });
+    }
+
     batch.delete(db.collection("recommendations").doc(user.uid));
     batch.delete(db.collection("seenMemes").doc(user.uid));
 
-    functions.logger.info("preparing interactions, preferences, recommendations, seenMemes, user deletion");
+    functions.logger.info(
+        "preparing interactions, preferences, " +
+        "recommendations, seenMemes, user deletion"
+    );
 
     batch.delete(userDocToDelete).commit();
     return db.collection("mails").add({

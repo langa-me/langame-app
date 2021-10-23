@@ -3,6 +3,7 @@ import 'package:badges/badges.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
@@ -18,6 +19,7 @@ import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:langame/views/images/image.dart';
+import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
 
 class LangameTextView extends StatefulWidget {
@@ -37,7 +39,7 @@ class _State extends State<LangameTextView>
   final f = new DateFormat('hh:mm');
   final ScrollController _scrollController = ScrollController();
   MagnificationResponse_Sentiment? _currentSentiment;
-  int _seenReflections = 0;
+  int _seenSuggestions = 0;
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -106,8 +108,8 @@ class _State extends State<LangameTextView>
         resizeToAvoidBottomInset: true,
         backgroundColor: getBlackAndWhite(context, 0, reverse: true),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
-        floatingActionButton: langame!.reflections.length > 0
-            ? _buildReflectionButton(cp, langame.reflections)
+        floatingActionButton: langame!.suggestions.length > 0
+            ? _buildSuggestionButton(cp, langame.suggestions)
             : null,
         appBar: AppBar(
           title: other != null
@@ -144,7 +146,7 @@ class _State extends State<LangameTextView>
                   ),
                   Divider(),
                   // This is a row showing suggestions
-                  _buildSuggestions(langame, suggestions),
+                  _buildReflections(langame, reflections),
                   Divider(),
                   // This is a Whatsapp-like send message bar with rounded corner
                   Container(
@@ -255,31 +257,33 @@ class _State extends State<LangameTextView>
 
   void _scrollToBottom({bool later = false}) async {
     // Delay to make sure the frames are rendered properly
-    // await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
+    await Future.delayed(Duration(milliseconds: later ? 1000 : 300));
+    if (!_scrollController.hasClients) return;
 
-    // // await waitUntil(() => _scrollController.hasClients, maxIterations: 1000);
-    // SchedulerBinding.instance?.addPostFrameCallback((_) {
-    //   _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-    //       duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
-    // });
+    // await waitUntil(() => _scrollController.hasClients, maxIterations: 1000);
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
+    });
   }
 
-  FloatingActionButton _buildReflectionButton(
-          ContextProvider cp, List<lg.Langame_Reflection> reflections) =>
+  FloatingActionButton _buildSuggestionButton(
+          ContextProvider cp, List<lg.Langame_Suggestion> suggestions) =>
       FloatingActionButton(
           child: Badge(
             position: BadgePosition.topEnd(top: -20, end: -20),
             badgeColor: getBlackAndWhite(context, 0),
             child: Icon(FontAwesomeIcons.brain),
             badgeContent: Text(
-              (reflections.length - _seenReflections).toString(),
-              style: Theme.of(context).textTheme.headline6!.merge(TextStyle(color: getBlackAndWhite(context, 0, reverse: true))),
+              (suggestions.length - _seenSuggestions).toString(),
+              style: Theme.of(context).textTheme.headline6!.merge(TextStyle(
+                  color: getBlackAndWhite(context, 0, reverse: true))),
               textAlign: TextAlign.center,
             ),
           ),
           onPressed: () {
             setState(() {
-              _seenReflections = reflections.length;
+              _seenSuggestions = suggestions.length;
             });
             cp.showCustomDialog(
                 stateless: [
@@ -287,16 +291,18 @@ class _State extends State<LangameTextView>
                     height: AppSize.safeBlockVertical * 40,
                     width: AppSize.safeBlockHorizontal * 70,
                     child: ListView.separated(
+                      physics: BouncingScrollPhysics(),
                       scrollDirection: Axis.vertical,
-                      itemCount: reflections.length,
+                      itemCount: suggestions.length,
                       separatorBuilder: (ctx, i) => Divider(),
                       itemBuilder: (ctx, i) => LangameButton(
                         FontAwesomeIcons.copy,
-                        text: reflections[i].alternatives.last,
+                        text: suggestions[i].alternatives.last,
+                        labelMaxLines: null,
                         layer: 1,
                         onPressed: () {
                           FlutterClipboard.copy(
-                              reflections[i].alternatives.last);
+                              suggestions[i].alternatives.last);
                         },
                       ),
                     ),
@@ -304,13 +310,13 @@ class _State extends State<LangameTextView>
                   // Show a nice box with corners box rounded
                 ],
                 canBack: true,
-                title: Text('Reflections',
+                title: Text('Suggestions',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline4));
           });
 
-  Widget _buildSuggestions(
-          lg.Langame currentLg, List<lg.Langame_Suggestion> suggestions) =>
+  Widget _buildReflections(
+          lg.Langame currentLg, List<lg.Langame_Reflection> reflections) =>
       Expanded(
         child: ListView(
           scrollDirection: Axis.horizontal,
@@ -365,7 +371,7 @@ class _State extends State<LangameTextView>
                         }))
                     : SizedBox.shrink()
               ] +
-              suggestions
+              reflections
                   .map(
                     (e) => Padding(
                         padding: EdgeInsets.all(12),
@@ -383,10 +389,31 @@ class _State extends State<LangameTextView>
                                         ? 20
                                         : e.alternatives.last.length) +
                                 '...', onPressed: () {
-                          setState(() {
-                            _textEditingController.text = e.alternatives.last;
-                            _currentText = e.alternatives.last;
-                          });
+                          // setState(() {
+                          //   _textEditingController.text = e.alternatives.last;
+                          //   _currentText = e.alternatives.last;
+                          // });
+                          final cp = Provider.of<ContextProvider>(context,
+                              listen: false);
+                          cp.showCustomDialog(
+                            stateless: [
+                              Container(
+                                height: AppSize.safeBlockVertical * 30,
+                                width: AppSize.safeBlockHorizontal * 70,
+                                child: SingleChildScrollView(
+                                    child: Text(
+                                  e.alternatives.last,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.headline4,
+                                )),
+                              ),
+                            ],
+                            canBack: true,
+                            height: 40,
+                            title: Text('🤔',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.headline4),
+                          );
                         })),
                   )
                   .toList(),

@@ -85,6 +85,7 @@ class LangameButton extends StatefulWidget {
   final int? disableForFewMs;
   final bool beta;
   final String? tooltip;
+  final int? labelMaxLines;
 
   const LangameButton(
     this.icon, {
@@ -100,6 +101,7 @@ class LangameButton extends StatefulWidget {
     this.disableForFewMs,
     this.beta = false,
     this.tooltip,
+    this.labelMaxLines = 2,
   }) : super(key: key);
   @override
   State<StatefulWidget> createState() =>
@@ -124,7 +126,8 @@ class _LangameButtonState extends State<LangameButton> {
         fixedSize: widget.fixedSize,
         primary: bg,
         // onSurface = disabled
-        onSurface: getBlackAndWhite(context, disabled ? 0 : widget.layer + 1, reverse: true),
+        onSurface: getBlackAndWhite(context, disabled ? 0 : widget.layer + 1,
+            reverse: true),
         elevation: 0,
         shadowColor: variantIsLightThenDark(context, reverse: true),
         shape: RoundedRectangleBorder(
@@ -155,18 +158,22 @@ class _LangameButtonState extends State<LangameButton> {
           }
         }
       },
-      icon: widget.beta ? Beta(Icon(widget.icon, color: fg), type: BetaType.BETA) : Icon(widget.icon, color: fg),
+      icon: widget.beta
+          ? Beta(Icon(widget.icon, color: fg), type: BetaType.BETA)
+          : Icon(widget.icon, color: fg),
       label: widget.text != null
           ? Text(
               widget.text!,
               textAlign: TextAlign.center,
               overflow: TextOverflow.fade,
-              maxLines: 2,
+              maxLines: widget.labelMaxLines,
               style: TextStyle(color: fg),
             )
           : SizedBox.shrink(),
     );
-    return widget.tooltip != null ? Tooltip(message: widget.tooltip!, child: b) : b;
+    return widget.tooltip != null
+        ? Tooltip(message: widget.tooltip!, child: b)
+        : b;
   }
 }
 

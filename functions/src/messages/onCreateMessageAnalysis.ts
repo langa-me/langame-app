@@ -1,87 +1,53 @@
-import {Change, EventContext} from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import {reportError} from "../errors";
-import {shouldDrop} from "../utils/contexts";
-import {chunkItems} from "../utils/array";
-import {langame} from "../langame/protobuf/langame";
-import {converter} from "../utils/firestore";
+import {EventContext} from "firebase-functions";
 import {Api} from "../aiApi/aiApi";
 import {ImplAiApi} from "../aiApi/implAiApi";
+import {reportError} from "../errors";
+import {langame} from "../langame/protobuf/langame";
+import {shouldDrop} from "../utils/contexts";
+import {converter} from "../utils/firestore";
 
-export const onWriteMessageAnalysis = async (
-    change: Change<admin.firestore.DocumentSnapshot>,
-    ctx: EventContext) => {
+export const onCreateMessageAnalysis = async (
+    snap: admin.firestore.DocumentSnapshot,
+    ctx: EventContext
+) => {
   try {
     // TODO: should probably put more security on this function
     // which call paid apis :)
-    functions.logger.log("onWriteMessageAnalysis",
-        ctx.eventType, change.after.id);
-    // eventType seems to always be "write"?
-    if (!change.after.exists) return;
+    functions.logger.log(ctx);
+    // Skip if deleted
+    if (!snap.exists) return;
     if (shouldDrop(ctx, {
       eventMaxAgeMs: 120_000, // 2 minutes
     })) return;
-    if (change.after.data()?.analysis?.error?.tries > 3) {
-      functions.logger.log(
-          "too many failures, aborting");
-      return Promise.resolve();
+    const messageData = snap.data() as langame.protobuf.Message;
+    if (messageData?.analysis?.error?.tries &&
+      messageData?.analysis?.error?.tries! > 3) {
+      return Promise.reject(reportError(
+          new Error("too many failures, aborting")));
     }
-    const langame = (await admin.firestore().collection("langames")
-        .where("channelName", "==", change.after.data()?.channelName)
+    const lg = (await admin.firestore().collection("langames")
+        .where("channelName", "==", snap.data()?.channelName)
         .withConverter(converter<langame.protobuf.Langame>()).get()).docs[0];
     const api = new ImplAiApi();
     const db = admin.firestore();
     const promises = [];
-    if (!change.after.data()!.analysis?.tokens) {
-      const tokens = await api.tokenExtraction(change.after.data()!.body);
-      if (tokens) {
-        promises.push(db.runTransaction(async (t) => t.set(change.after.ref, {
-          analysis: {
-            tokens: tokens,
-          },
-        }, {merge: true})));
-      }
-    }
-    if (!change.after.data()!.analysis?.sentiments) {
-      const sentiments = await api.sentiment(change.after.data()!.body);
-      if (sentiments) {
-        promises.push(db.runTransaction(async (t) => t.set(change.after.ref, {
-          analysis: {
-            sentiments: sentiments,
-          },
-        }, {merge: true})));
-      }
-    }
-    if (!change.after.data()!.analysis?.topics) {
-      // Because API is max 9 classes, split into chunks
-      const topics = chunkItems((await admin.firestore()
-          .collection("topics").get()).docs.map((e) => e.id), 9);
-      const classifiedTopics = await Promise.all(
-          topics.map((topicsChunk) => api.classify(
-        change.after.data()!.body, topicsChunk, true, 0.5)));
-      // Flatten the classifiedTopics 2d array
-      const flattenedTopics =
-        classifiedTopics.reduce((acc, cur) => acc.concat(cur), []);
-      if (flattenedTopics.length > 0) {
-        promises.push(db.runTransaction(async (t) => t.set(change.after.ref, {
-          analysis: {
-            topics: flattenedTopics,
-          },
-        }, {merge: true})));
-      }
-    }
     // Here we want to give message suggestions based on previous user messages
     // Only when a suggestions has not already been made
-    if (!langame.data()!.suggestions || !langame.data()!.suggestions
-        .some((e) => e.lastMessageId === change.after.id)) {
+    if (!lg.data()!.suggestions || !lg.data()!.suggestions
+        .some((e) => e.lastMessageId === snap.id)) {
       const suggestions = await createSuggestion(
           api,
-        change.after.data()!.channelName,
-        change.after.data()!.fromUid,
+        messageData!.channelName,
+        messageData!.fromUid,
       );
-      if (suggestions) {
-        promises.push(db.runTransaction(async (t) => t.set(langame.ref, {
+      // Check that no suggestion with similar text appear
+      if (suggestions &&
+        (!lg.data()!.suggestions || !lg.data()!.suggestions!.some((e) =>
+          e.alternatives![0] === suggestions!.alternatives![0]))) {
+        functions.logger.log("suggestions", suggestions);
+        promises.push(db.runTransaction(async (t) => t.set(lg.ref, {
           // @ts-ignore
           suggestions: admin.firestore.FieldValue.arrayUnion(suggestions),
         }, {merge: true})));
@@ -90,26 +56,31 @@ export const onWriteMessageAnalysis = async (
     // Here we want to make the user think further about his conversations
     // based on previous user messages
     // Only when a reflection has not already been made
-    if (!langame.data()!.reflections || !langame.data()!.reflections
-        .some((e) => e.lastMessageId === change.after.id)) {
+    if (!lg.data()!.reflections || !lg.data()!.reflections
+        .some((e) => e.lastMessageId === snap.id)) {
       const reflections = await createReflection(
           api,
-        change.after.data()!.channelName,
-        change.after.data()!.fromUid,
+        messageData!.channelName,
+        messageData!.fromUid,
       );
-      if (reflections) {
-        promises.push(db.runTransaction(async (t) => t.set(langame.ref, {
+      // Check that no reflection with similar text appear
+      if (reflections && (!lg.data()!.reflections || !lg.data()!.reflections
+          .some((e) => e.alternatives![0] === reflections!.alternatives![0]))
+      ) {
+        functions.logger.log("reflections", reflections);
+        promises.push(db.runTransaction(async (t) => t.set(lg.ref, {
           // @ts-ignore
           reflections: admin.firestore.FieldValue.arrayUnion(reflections),
         }, {merge: true})));
       }
     }
-    if (!change.after.data()!.analysis?.filter) {
+    if (!messageData!.analysis?.filter) {
       const filter = await api.filter({
-        prompt: change.after.data()!.body,
+        prompt: messageData!.body,
       });
       if (filter) {
-        promises.push(db.runTransaction(async (t) => t.set(change.after.ref, {
+        functions.logger.log("filter", filter);
+        promises.push(db.runTransaction(async (t) => t.set(snap.ref, {
           analysis: {
             filter: filter,
           },
@@ -119,10 +90,10 @@ export const onWriteMessageAnalysis = async (
     return Promise.all(promises);
   } catch (e: any) {
     const p1 = reportError(e,
-      change.after.data()!.fromUid ? {
-        user: change.after.data()!.fromUid,
+      snap.data()!.fromUid ? {
+        user: snap.data()!.fromUid,
       } : undefined);
-    const p2 = change.after.ref.set({
+    const p2 = snap.ref.set({
       analysis: {
         error: {
           developerMessage: e.toString(),
@@ -156,9 +127,9 @@ export const createSuggestion = async (
   // You: Hello Louis, how are you?
   // ...
   const prompt = messages.docs.map((e) => (e.data()!.fromUid ===
-      fromUid ? "Me: " : "You: ") +
-      e.data()!.body).join("\n") +
-      "\nSuggestion:";
+    fromUid ? "Me: " : "You: ") +
+    e.data()!.body).join("\n") +
+    "\nSuggestion:";
   // const alternative = await api.hfCompletion(prompt, {
   //   maxNewTokens: 100,
   //   repetitionPenalty: 20.1,
@@ -172,7 +143,7 @@ export const createSuggestion = async (
       "Me: Why? After all other animals eat eachother\n\n" +
       "You: Can't we be better than other animals?\n\n" +
       "Suggestion: Thank you for changing my opinion on this.\n###\n" +
-    prompt,
+      prompt,
     maxTokens: 300,
     frequencyPenalty: 0.3,
     presencePenalty: 0.3,
@@ -183,9 +154,10 @@ export const createSuggestion = async (
   if (!alternative) return Promise.resolve(undefined);
   const filter = await api.filter({prompt: alternative});
   if (filter === undefined) return Promise.resolve(undefined);
+  // TODO: classification, further quality filtering
   return {
     userId: fromUid,
-    lastMessageId: messages.docs[messages.size-1].id,
+    lastMessageId: messages.docs[messages.size - 1].id,
     alternatives: [alternative],
     contentFilter: filter,
     // @ts-ignore
@@ -217,7 +189,7 @@ export const createReflection = async (
   const prompt = messages.docs.map((e) => (e.data()!.fromUid ===
     fromUid ? "Me: " : "You: ") +
     e.data()!.body).join("\n") +
-      "\nReflection:";
+    "\nReflection:";
   // const alternative = await api.hfCompletion(prompt, {
   //   maxNewTokens: 100,
   //   repetitionPenalty: 20.1,
@@ -231,7 +203,7 @@ export const createReflection = async (
       "Me: Why? After all other animals eat eachother\n\n" +
       "You: Can't we be better than other animals?\n\n" +
       "Reflection: What are your ethical principles?\n###\n" +
-    prompt,
+      prompt,
     maxTokens: 300,
     frequencyPenalty: 0.3,
     presencePenalty: 0.3,
@@ -242,9 +214,10 @@ export const createReflection = async (
   if (!alternative) return Promise.resolve(undefined);
   const filter = await api.filter({prompt: alternative});
   if (filter === undefined) return Promise.resolve(undefined);
+  // TODO: classification, further quality filtering
   return {
     userId: fromUid,
-    lastMessageId: messages.docs[messages.size-1].id,
+    lastMessageId: messages.docs[messages.size - 1].id,
     alternatives: [alternative],
     contentFilter: filter,
     // @ts-ignore

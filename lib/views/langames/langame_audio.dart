@@ -20,7 +20,6 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
-import 'package:langame/providers/tag_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
@@ -90,7 +89,6 @@ class _LangameAudioViewState extends State<LangameAudioView> {
     var lp = Provider.of<LangameProvider>(context, listen: false);
     var audio = Provider.of<AudioProvider>(context, listen: false);
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    // TODO: might do that on other pages too
     var network = Provider.of<ConnectivityResult>(context, listen: false);
     if (network == ConnectivityResult.none) {
       crash.analytics.logEvent(name: 'offline', parameters: {
@@ -231,7 +229,7 @@ class _LangameAudioViewState extends State<LangameAudioView> {
   Widget _buildRunningLangame(DocumentSnapshot<lg.Langame> l) {
     Provider.of<LangameProvider>(context, listen: false)
         .addNote(widget.channelName, notesController.text, lg.Note_Type.goal);
-    Provider.of<AudioProvider>(context, listen: false) // TODO
+    Provider.of<AudioProvider>(context, listen: false)
         // ignore: invalid_return_type_for_catch_error
         .joinChannel(l)
         .then((e) {
@@ -421,7 +419,7 @@ class _LangameAudioViewState extends State<LangameAudioView> {
           onFailure: _goBackToMainMenu,
         );
       }, text: 'Accept', layer: 2),
-    ], height: 65);
+    ], height: 75);
   }
 
   void _handleError({bool failNow = false}) async {
@@ -495,7 +493,7 @@ class _LangameAudioViewState extends State<LangameAudioView> {
           cap.log('userJoined $audioId', analyticsMessage: 'langame_user_join');
         },
         userOffline: (int uid, UserOfflineReason reason) {
-          if (!_localPlayers.containsKey(uid)) return; // TODO
+          if (!_localPlayers.containsKey(uid)) return;
           Provider.of<CrashAnalyticsProvider>(context, listen: false).log(
               'userOffline $uid $reason',
               analyticsMessage: 'langame_user_leave',
@@ -666,7 +664,6 @@ class _LangameAudioViewState extends State<LangameAudioView> {
 
   Widget _buildMeme(lg.Langame l) {
     var theme = Theme.of(context);
-    var tp = Provider.of<TagProvider>(context, listen: false);
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var memeWidget = Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -830,8 +827,6 @@ class _LangameAudioViewState extends State<LangameAudioView> {
                                           child: Text(p.langameUser.tag),
                                         )),
                             ),
-                            // Icon(Icons
-                            //     .mic_rounded), // TODO: use show if other has mic on or not
                           ],
                         ),
                       )
@@ -849,13 +844,6 @@ class _LangameAudioViewState extends State<LangameAudioView> {
                               : Icons.mic_off_rounded),
                           onPressed: () => p.switchMicrophone(),
                         ),
-                        // TODO: does not work somehow, not rly mandatory
-                        // IconButton(
-                        //   icon: Icon(p.isSpeakerphoneEnabled
-                        //       ? Icons.speaker_notes_outlined
-                        //       : Icons.speaker_notes_off_outlined),
-                        //   onPressed: () => p.switchSpeakerphone(),
-                        // )
                       ])),
         ],
       ),
@@ -874,10 +862,6 @@ class _LangameAudioViewState extends State<LangameAudioView> {
   ];
   Future<void> _showEndDialog() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    var currentLg = Provider.of<LangameProvider>(context, listen: false)
-        .langames
-        .values
-        .firstWhere((e) => e.channelName == widget.channelName);
     cp.showCustomDialog(
         stateless: [
           Consumer<FeedbackProvider>(

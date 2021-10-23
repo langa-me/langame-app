@@ -1,4 +1,4 @@
-import {Change, EventContext} from "firebase-functions";
+import {EventContext} from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {handleError, reportError} from "../errors";
@@ -6,31 +6,32 @@ import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
 import {html} from "../utils/html";
 
-export const onWriteMessage = async (
-    change: Change<admin.firestore.DocumentSnapshot>,
+export const onCreateMessage = async (
+    snap: admin.firestore.DocumentSnapshot,
     ctx: EventContext) => {
   try {
-    functions.logger.log("onWriteMessage", ctx.eventType, change.after.id);
-    // eventType seems to always be "write"?
-    if (!change.after.exists) return;
-    if (change.after.data()?.delivery?.attempts >= 3) {
-      functions.logger.log("onWriteMessage",
-          "delivery attempts >= 3, aborting");
+    functions.logger.log(ctx);
+    if (!snap.exists) return;
+    if (snap.data()?.delivery?.attempts >= 3) {
+      functions.logger.log(
+          "delivery attempts >= 3, aborting"
+      );
       return Promise.reject(Error("delivery attempts >= 3, aborting"));
     }
-    if (change.after.data()?.delivery?.status === "success") {
-      functions.logger.log("onWriteMessage",
-          "delivery succeed, aborting");
+    if (snap.data()?.delivery?.status === "success") {
+      functions.logger.log(
+          "delivery succeed, aborting"
+      );
       return Promise.resolve();
     }
     const db = admin.firestore();
     const to = await db
         .collection("users")
-        .doc(change.after.data()!.toUid)
+        .doc(snap.data()!.toUid)
         .get();
     if (!to.data() || !to.data()!.tokens) {
       const e = "No tokens for user " + to.id;
-      await change.after.ref.set({
+      await snap.ref.set({
         delivery: {
           attempts: admin.firestore.FieldValue.increment(1),
           endTime: admin.firestore.FieldValue.serverTimestamp(),
@@ -40,13 +41,13 @@ export const onWriteMessage = async (
       }, {merge: true});
       const error = Error(e);
       await reportError(error,
-        change.after.data()!.fromUid ? {
-          user: change.after.data()!.fromUid,
+        snap.data()!.fromUid ? {
+          user: snap.data()!.fromUid,
         } : undefined);
       return Promise.reject(error);
     }
 
-    const message = change.after.data()! as langame.protobuf.Message;
+    const message = snap.data()! as langame.protobuf.Message;
     let title = message!.title;
 
     // Build a title ourselves if it's not set. (message)
@@ -74,7 +75,7 @@ export const onWriteMessage = async (
         body: message.body,
         title: title,
         // Hack because messaging only take string
-        createdAt: change.after.data()!.createdAt.toString(),
+        createdAt: snap.data()!.createdAt.toString(),
       },
     };
     if (
@@ -142,7 +143,7 @@ export const onWriteMessage = async (
                     uid: to.id,
                   }));
           } else {
-            return change.after.ref.set({
+            return snap.ref.set({
               delivery: {
                 attempts: admin.firestore.FieldValue.increment(1),
                 endTime: admin.firestore.FieldValue.serverTimestamp(),
@@ -156,10 +157,10 @@ export const onWriteMessage = async (
     return Promise.resolve();
   } catch (e: any) {
     await reportError(e,
-      change.after.data()!.fromUid ? {
-        user: change.after.data()!.fromUid,
+      snap.data()!.fromUid ? {
+        user: snap.data()!.fromUid,
       } : undefined);
-    await change.after.ref.set({
+    await snap.ref.set({
       delivery: {
         attempts: admin.firestore.FieldValue.increment(1),
         endTime: admin.firestore.FieldValue.serverTimestamp(),

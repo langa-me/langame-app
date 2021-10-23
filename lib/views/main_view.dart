@@ -1,11 +1,9 @@
 import 'package:after_layout/after_layout.dart';
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/new_langame_page_view.dart';
 import 'package:langame/views/physical_langame_page_view.dart';
@@ -56,7 +54,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   @override
   Widget build(BuildContext context) {
     final pp = Provider.of<PreferenceProvider>(context);
-    if (this.mounted && pp.preference != null && !pp.preference.previewMode && _selectedIndex >= 3) {
+    if (this.mounted && !pp.preference.previewMode && _selectedIndex >= 3) {
       // Otherwise out of index
       setState(() {
         _selectedIndex = 1;
@@ -94,24 +92,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
 
   PreferredSizeWidget? _buildAppBar() {
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    Widget notifications = InkWell(
-        child: Consumer<LangameProvider>(builder: (context, p, c) {
-          return Badge(
-            badgeColor: Theme.of(context).colorScheme.secondary,
-            badgeContent: Text(
-              '${p.langames.length}',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-            child: Icon(
-              FontAwesomeIcons.grinTongue,
-              color: isLightThenDark(context),
-            ),
-            padding: const EdgeInsets.all(3.0),
-            position: BadgePosition.topStart(top: 7, start: 10),
-          );
-        }),
-        onTap: () => cp.push(LangameListView()));
     return AppBar(
       backgroundColor: Colors.transparent,
       // leading: notifications,
@@ -156,7 +136,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       ),
     ];
     var pp = Provider.of<PreferenceProvider>(context);
-    if (pp.preference != null && pp.preference.previewMode) {
+    if (pp.preference.previewMode) {
       navBarItems.add(BottomNavigationBarItem(
         backgroundColor: Colors.transparent,
         icon: Beta(Icon(FontAwesomeIcons.brain,

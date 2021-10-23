@@ -96,6 +96,7 @@ make proto
 
 ```bash
 flutter upgrade
+# then cmd + shift + r "flutter-version: 2.x.x"
 flutter pub global activate protoc_plugin
 ```
 

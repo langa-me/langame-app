@@ -54,10 +54,14 @@ import 'services/http/firebase.dart';
 import 'services/http/impl_langame_api.dart';
 import 'services/http/impl_payment_api.dart';
 import 'views/colors/colors.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // Here we set the URL strategy for our web app.
+  // It is safe to call this function when running on mobile or desktop as well.
+  setPathUrlStrategy();
   FirebaseCrashlytics? crashlytics;
   RemoteConfig? remoteConfig;
   FirebaseDynamicLinks? dynamicLinks;

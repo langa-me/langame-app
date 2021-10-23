@@ -2763,6 +2763,9 @@ export namespace langame {
 
             /** Message id */
             id?: (string|null);
+
+            /** Message analysis */
+            analysis?: (langame.protobuf.Message.IAnalysis|null);
         }
 
         /** Represents a Message. */
@@ -2797,6 +2800,9 @@ export namespace langame {
 
             /** Message id. */
             public id: string;
+
+            /** Message analysis. */
+            public analysis?: (langame.protobuf.Message.IAnalysis|null);
 
             /**
              * Creates a new Message instance using the specified properties.
@@ -2880,8 +2886,17 @@ export namespace langame {
             /** Properties of an Analysis. */
             interface IAnalysis {
 
+                /** Analysis topics */
+                topics?: (string[]|null);
+
                 /** Analysis sentiments */
                 sentiments?: (langame.protobuf.Message.Analysis.ISentiment[]|null);
+
+                /** Analysis error */
+                error?: (langame.protobuf.Message.Analysis.IError|null);
+
+                /** Analysis filter */
+                filter?: (langame.protobuf.ContentFilter|null);
             }
 
             /** Represents an Analysis. */
@@ -2893,8 +2908,17 @@ export namespace langame {
                  */
                 constructor(properties?: langame.protobuf.Message.IAnalysis);
 
+                /** Analysis topics. */
+                public topics: string[];
+
                 /** Analysis sentiments. */
                 public sentiments: langame.protobuf.Message.Analysis.ISentiment[];
+
+                /** Analysis error. */
+                public error?: (langame.protobuf.Message.Analysis.IError|null);
+
+                /** Analysis filter. */
+                public filter: langame.protobuf.ContentFilter;
 
                 /**
                  * Creates a new Analysis instance using the specified properties.
@@ -2968,6 +2992,102 @@ export namespace langame {
             }
 
             namespace Analysis {
+
+                /** Properties of an Error. */
+                interface IError {
+
+                    /** Error developerMessage */
+                    developerMessage?: (string|null);
+
+                    /** Error tries */
+                    tries?: (number|null);
+                }
+
+                /** Represents an Error. */
+                class Error implements IError {
+
+                    /**
+                     * Constructs a new Error.
+                     * @param [properties] Properties to set
+                     */
+                    constructor(properties?: langame.protobuf.Message.Analysis.IError);
+
+                    /** Error developerMessage. */
+                    public developerMessage: string;
+
+                    /** Error tries. */
+                    public tries: number;
+
+                    /**
+                     * Creates a new Error instance using the specified properties.
+                     * @param [properties] Properties to set
+                     * @returns Error instance
+                     */
+                    public static create(properties?: langame.protobuf.Message.Analysis.IError): langame.protobuf.Message.Analysis.Error;
+
+                    /**
+                     * Encodes the specified Error message. Does not implicitly {@link langame.protobuf.Message.Analysis.Error.verify|verify} messages.
+                     * @param message Error message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encode(message: langame.protobuf.Message.Analysis.IError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Encodes the specified Error message, length delimited. Does not implicitly {@link langame.protobuf.Message.Analysis.Error.verify|verify} messages.
+                     * @param message Error message or plain object to encode
+                     * @param [writer] Writer to encode to
+                     * @returns Writer
+                     */
+                    public static encodeDelimited(message: langame.protobuf.Message.Analysis.IError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                    /**
+                     * Decodes an Error message from the specified reader or buffer.
+                     * @param reader Reader or buffer to decode from
+                     * @param [length] Message length if known beforehand
+                     * @returns Error
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Message.Analysis.Error;
+
+                    /**
+                     * Decodes an Error message from the specified reader or buffer, length delimited.
+                     * @param reader Reader or buffer to decode from
+                     * @returns Error
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Message.Analysis.Error;
+
+                    /**
+                     * Verifies an Error message.
+                     * @param message Plain object to verify
+                     * @returns `null` if valid, otherwise the reason why it is not
+                     */
+                    public static verify(message: { [k: string]: any }): (string|null);
+
+                    /**
+                     * Creates an Error message from a plain object. Also converts values to their respective internal types.
+                     * @param object Plain object
+                     * @returns Error
+                     */
+                    public static fromObject(object: { [k: string]: any }): langame.protobuf.Message.Analysis.Error;
+
+                    /**
+                     * Creates a plain object from an Error message. Also converts values to other types if specified.
+                     * @param message Error
+                     * @param [options] Conversion options
+                     * @returns Plain object
+                     */
+                    public static toObject(message: langame.protobuf.Message.Analysis.Error, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                    /**
+                     * Converts this Error to JSON.
+                     * @returns JSON object
+                     */
+                    public toJSON(): { [k: string]: any };
+                }
 
                 /** Properties of a Sentiment. */
                 interface ISentiment {

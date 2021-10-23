@@ -15,7 +15,7 @@
     "set-dev": "firebase use langame-dev",
     "set-prod": "firebase use langame-86ac4",
     "compile": "npm run build -- --declaration --watch",
-    "test": "mocha -g Utils --timeout 50000"
+    "test": "firebase emulators:exec --only firestore \"mocha --timeout 50000 --exit -g '^(Utils|Completion1)'\""
   },
   "engines": {
     "node": "14"
@@ -46,6 +46,7 @@
     "@types/cors": "^2.8.10",
     "@types/mocha": "^8.2.2",
     "@types/node": "14.0.11",
+    "@types/sinon": "^10.0.4",
     "@typescript-eslint/eslint-plugin": "^4.20.0",
     "@typescript-eslint/parser": "^4.20.0",
     "chai": "^4.3.4",
@@ -53,7 +54,7 @@
     "eslint": "^7.6.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.22.0",
-    "firebase-functions-test": "^0.3.1",
+    "firebase-functions-test": "^0.3.3",
     "firebase-tools": "^9.11.0",
     "mocha": "^8.4.0",
     "nyc": "^15.1.0",

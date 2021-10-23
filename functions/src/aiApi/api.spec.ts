@@ -1,9 +1,10 @@
 import {newFeedback} from "../feedback";
 import "mocha";
 import {expect} from "chai";
-import {ImplAiApi} from "./implAiApi";
+import {ImplAiApi, openAiEndpoint} from "./implAiApi";
 import {offlineMemeSearch} from "../memes/memes";
 import {FakeAiApi} from "./fakeAiApi";
+import {parseHrtimeToSeconds} from "../utils/time";
 
 
 it.skip("create Github issue", async () => {
@@ -145,4 +146,113 @@ it("filter", async () => {
     });
   console.log(completion);
   expect(completion).to.not.be.undefined;
+});
+
+
+describe("Completion1", () => {
+  let nock: any;
+  const endpoint = openAiEndpoint + "/engines";
+  const competionsPath = "/davinci/completions";
+  before(() => {
+    nock = require("nock");
+  });
+
+  it("cold start, retry 2 times and succeed", async () => {
+    const api = new ImplAiApi();
+    const startTime = process.hrtime();
+    nock(endpoint)
+        .post(competionsPath)
+        .reply(200, {
+          error: {
+            message: "That model is still being loaded.",
+          },
+        });
+    nock(endpoint)
+        .post(competionsPath)
+        .reply(200, {
+          error: {
+            message: "That model is still being loaded.",
+          },
+        });
+    nock(endpoint)
+        .post(competionsPath)
+        .reply(200, {
+          choices: [
+            {text: "bar"},
+          ],
+        });
+    const completion = await api.openaiCompletion({
+      prompt: "foo",
+    }, {
+      maxRetriesOnColdStart: 2,
+    });
+    const elapsedSeconds = parseHrtimeToSeconds(process.hrtime(startTime));
+    expect(elapsedSeconds).to.be.lessThan(3);
+    expect(completion).to.be.equal("bar");
+  });
+  it("cold start, retry 2 times and fail", async () => {
+    const api = new ImplAiApi();
+    nock(endpoint)
+        .post(competionsPath)
+        .reply(200, {
+          error: {
+            message: "That model is still being loaded.",
+          },
+        });
+    nock(endpoint)
+        .post(competionsPath)
+        .reply(200, {
+          error: {
+            message: "That model is still being loaded.",
+          },
+        });
+    nock(endpoint)
+        .post(competionsPath)
+        .reply(200, {
+          error:
+            {message: "too many cold starts 😛"},
+        });
+    let error: Error | undefined;
+    await api.openaiCompletion({
+      prompt: "foo",
+    }, {
+      maxRetriesOnColdStart: 2,
+    }).catch((e) => error = e);
+    expect(error).to.be.not.undefined;
+    expect(error).to.be.instanceOf(Error);
+    expect(error!.message).to.include("too many cold starts 😛");
+  });
+  it("skip on length", async () => {
+    const api = new ImplAiApi();
+    nock(endpoint)
+        .post(competionsPath)
+        .reply(200, {
+          choices: [
+            {finish_reason: "length"},
+          ],
+        });
+    let completion = await api.openaiCompletion({
+      prompt: "foo",
+    }, {
+      skipWhenFinishReasonIsLength: true,
+    });
+    expect(completion).to.be.undefined;
+    nock(endpoint)
+        .post(competionsPath)
+        .reply(200, {
+          choices: [
+            {
+              text: "bar",
+              finish_reason: "length",
+            },
+          ],
+        });
+    completion = await api.openaiCompletion({
+      prompt: "foo",
+    }, {
+      skipWhenFinishReasonIsLength: false,
+    });
+    expect(completion).to.be.not.undefined;
+    expect(completion).to.be.equal("bar");
+  });
 });

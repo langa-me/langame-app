@@ -223,3 +223,11 @@ export function groupBy<K, V>(list: Array<V>, keyGetter: (input: V) => K):
   });
   return map;
 }
+
+/**
+ * Return Algolia index prefix for the given environment.
+ * (prod, dev, emulator)
+ */
+export const algoliaPrefix =
+ !process.env.GCLOUD_PROJECT?.includes("dev") ? "prod_" :
+ !process.env.FUNCTIONS_EMULATOR ? "dev_" : "emulator_";

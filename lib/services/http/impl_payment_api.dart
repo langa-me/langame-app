@@ -131,7 +131,7 @@ class ImplPaymentApi extends PaymentApi {
     final currency = products.first.currency;
     await firebase.firestore!
         .collection(AppConst.firestoreStripeCustomersCollection)
-        .doc(firebase.auth!.currentUser!.uid) // TODO: fix
+        .doc(firebase.auth!.currentUser!.uid)
         .collection('payments')
         .add({
       'amount': price,
@@ -152,7 +152,7 @@ class ImplPaymentApi extends PaymentApi {
   Stream<QuerySnapshot<lg.Subscription>> getSubcriptions() =>
       firebase.firestore!
           .collection(AppConst.firestoreStripeCustomersCollection)
-          .doc(firebase.auth!.currentUser!.uid) // TODO: fix
+          .doc(firebase.auth!.currentUser!.uid)
           .collection('subscriptions')
           .where('status', isEqualTo: 'active')
           .withConverter<lg.Subscription>(

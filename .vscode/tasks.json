@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      // Run "make proto" in root directory by using python to run bash
+      {
+        "label": "compile-proto",
+        "type": "shell",
+        "command": "make",
+        "args": [
+          "proto"
+        ],
+      }
+    ]
+  }

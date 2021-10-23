@@ -9,12 +9,15 @@ import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/services/http/firebase.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:tuple/tuple.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 import 'authentication_api.dart';
 
 class ImplAuthenticationApi extends AuthenticationApi {
   GoogleSignInAccount? _google;
   AuthorizationCredentialAppleID? _apple;
+  String? _email;
+  String? _password;
 
   late Stream<User?> _authStateChanges;
 
@@ -26,7 +29,7 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<OAuthCredential> loginWithApple() async {
+  Future<Credential> loginWithApple() async {
     try {
       // To prevent replay attacks with the credential returned from Apple, we
       // include a nonce in the credential request. When signing in in with
@@ -45,10 +48,12 @@ class ImplAuthenticationApi extends AuthenticationApi {
       );
 
       // Create an `OAuthCredential` from the credential returned by Apple.
-      return OAuthProvider('apple.com').credential(
-        idToken: _apple!.identityToken,
-        rawNonce: rawNonce,
-      );
+      return Credential(
+          OAuthProvider('apple.com').credential(
+            idToken: _apple!.identityToken,
+            rawNonce: rawNonce,
+          ),
+          null);
     } catch (e) {
       throw LangameAppleSignInException(
           'authentication failed ${e.toString()}');
@@ -56,9 +61,22 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<OAuthCredential> loginWithGoogle() async {
+  Future<Credential> loginWithGoogle() async {
     try {
+      if (UniversalPlatform.isWeb) {
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
+        googleProvider
+            .addScope('https://www.googleapis.com/auth/contacts.readonly');
+        googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
+
+        await firebase.auth!.signInWithRedirect(googleProvider);
+        // Once signed in, return the UserCredential
+        return Credential(
+          null,
+          await firebase.auth!.getRedirectResult(),
+        );
+      }
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser =
           await firebase.googleSignIn!.signIn();
@@ -75,10 +93,12 @@ class ImplAuthenticationApi extends AuthenticationApi {
           await googleUser.authentication;
 
       // Create a new credential
-      return GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      return Credential(
+          GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          ),
+          null);
     } catch (e) {
       throw LangameGoogleSignInException(
           'authentication failed ${e.toString()}');
@@ -86,22 +106,31 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<UserCredential> loginWithFirebase(OAuthCredential credential) {
-    try {
-      return firebase.auth!.signInWithCredential(credential);
-    } on FirebaseAuthException catch (e) {
-      throw LangameFirebaseSignInException(
-          cause: 'failed to signInWithCredential ${e.code}');
-    } catch (e) {
-      throw LangameFirebaseSignInException(
-          cause: 'failed to signInWithCredential ${e.toString()}');
-    }
-  }
-
-  @override
-  Future<UserCredential> loginWithHack(String password, {String email = 'hack@langa.me'}) async {
-    return firebase.auth!
-        .signInWithEmailAndPassword(email: email, password: password);
+  Future<Credential> loginWithEmail(
+    String? email,
+    String? password,
+  ) async {
+    return Credential(
+        null,
+        await firebase.auth!
+            .signInWithEmailAndPassword(
+                email: email != null
+                    ? email
+                    : _email != null
+                        ? _email!
+                        : '',
+                password: password != null
+                    ? password
+                    : _password != null
+                        ? _password!
+                        : '')
+            .then((value) {
+          if (value.user != null) {
+            _password = password;
+            _email = email;
+          }
+          return value;
+        }));
   }
 
   /// Query Firestore with [uid] looking for a LangameUser
@@ -121,34 +150,14 @@ class ImplAuthenticationApi extends AuthenticationApi {
   }
 
   @override
-  Future<List<lg.User>> getLangameUsersStartingWithTag(
-      String ignoreTag, String tag,
-      {int limit = 5}) async {
-    CollectionReference users =
-        firebase.firestore!.collection(AppConst.firestoreUsersCollection);
-
-    tag = tag.toLowerCase();
-
-    // https://medium.com/@ken11zer01/firebase-firestore-text-search-and-pagination-91a0df8131ef
-    /// Query users with tag starting with [tag]
-    var doc = await users
-        .where('tag', isNotEqualTo: ignoreTag)
-        .where('tag', isGreaterThanOrEqualTo: tag)
-        .where('tag', isLessThan: tag + 'z')
-        .limit(limit)
-        .withConverter<lg.User>(
-          fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
-          toFirestore: (s, _) => s.toMapStringDynamic(),
-        )
-        .get();
-    return doc.docs.map((e) => e.data()).toList();
-  }
-
-  @override
   Future<void> logout() async {
     if (_google != null) await firebase.googleSignIn!.signOut();
     // if (_apple != null) await SignInWithApple.
     await firebase.auth!.signOut();
+    _google = null;
+    _apple = null;
+    _email = null;
+    _password = null;
     // TODO: Apple
   }
 
@@ -205,11 +214,5 @@ class ImplAuthenticationApi extends AuthenticationApi {
             e.data()['interactions'] as int))
         .toList();
   }
-
-  @override
-  Future<void> delete() => firebase.auth!.currentUser!.delete();
-
-  @override
-  Future<void> reAuthenticate(OAuthCredential credential) =>
-      firebase.auth!.currentUser!.reauthenticateWithCredential(credential);
+      
 }

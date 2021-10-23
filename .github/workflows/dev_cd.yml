@@ -30,7 +30,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.5.1
+          flutter-version: 2.5.3
       - name: Install Flutter dependencies
         run: flutter pub get
       - run: flutter build apk --release --flavor dev
@@ -59,7 +59,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.5.1
+          flutter-version: 2.5.3
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign --flavor dev
       - uses: ruby/setup-ruby@v1
@@ -96,7 +96,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.5.1
+          flutter-version: 2.5.3
       - run: flutter pub get
       - run: flutter build web --release
       - name: Set up Firebase CLI

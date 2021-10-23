@@ -1,6 +1,5 @@
 {
     "configurations": [
-        
         {
             "name": "dev-pocophone",
             "type": "dart",
@@ -189,5 +188,71 @@
             // "debug", "profile" or "release".
             "flutterMode": "debug",
         },
+        // Run npm run set-dev from functions directory
+        {
+            "name": "Set firebase development project",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/functions",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "set-dev"
+            ],
+        },
+        // Run npm run set-prod from functions directory
+        {
+            "name": "Set firebase production project",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/functions",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "set-prod"
+            ],
+        },
+        // Run npm run deploy-ff from functions directory
+        {
+            "name": "Deploy firebase functions and firestore rules",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/functions",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "deploy-ff"
+            ],
+        },
+        // Run npm run compile from functions directory
+        {
+            "name": "Enable automatic compilation for running tests locally",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/functions",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "compile"
+            ],
+        },
+        // Run npm run test from functions directory
+        {
+            "name": "Run tests",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/functions",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "test"
+            ],
+        },
+        {
+            "name": "Compile protos",
+            "request": "launch",
+            "type":"node",
+            "preLaunchTask": "compile-proto",
+        }
     ]
 }

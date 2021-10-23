@@ -30,7 +30,7 @@ export const openAIClassifierFiles = {
   },
 };
 
-const openAiEndpoint = "https://api.openai.com/v1";
+export const openAiEndpoint = "https://api.openai.com/v1";
 const huggingfaceEndpoint = "https://api-inference.huggingface.co/models";
 
 /**
@@ -100,6 +100,7 @@ export class ImplAiApi implements Api {
       parameters: OpenaiCompletionParameters,
       options?: OpenaiCompletionOptions,
   ): Promise<string | undefined> {
+    if (!parameters.model) parameters.model = "davinci";
     let url = `${openAiEndpoint}/engines/${parameters.model}/completions`;
     if (parameters.model && isFineTunedModel(parameters.model!)) {
       url = `${openAiEndpoint}/completions`;

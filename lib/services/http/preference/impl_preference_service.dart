@@ -25,7 +25,6 @@ class ImplPreferenceService extends PreferenceService {
     if (!preferences.hasUserId() && userId != null) {
       preferences.userId = userId;
     }
-    // TODO: typed
     String jsonString = preferences.writeToJson();
     final prefs = await SharedPreferences.getInstance();
     final result =

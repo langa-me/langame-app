@@ -73,7 +73,7 @@ class _State extends State<LangameListView> {
                 style: Theme.of(context).textTheme.headline4),
             SizedBox(height: AppSize.safeBlockVertical * 5),
             Text(
-                'After participating to an audio Langame, you will see it here',
+                'After participating to a Langame, you will see it here',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.caption),
           ],
@@ -83,17 +83,12 @@ class _State extends State<LangameListView> {
   Widget _buildTextCard(lg.Langame l) {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var lp = Provider.of<LangameProvider>(context, listen: false);
-    var ap = Provider.of<AuthenticationProvider>(context, listen: false);
     return FutureBuilder<LangameResponse<List<lg.User>>>(
         future: lp.getUsers(l.channelName),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData &&
               snapshot.data != null &&
               snapshot.data!.result != null) {
-            var format = DateFormat("d/M/y HH:mm:ss");
-            var d = format.format(l.date.toDateTime().toLocal());
-            var s = format.format(l.started.toDateTime().toLocal());
-            var startedString = l.hasStarted() ? '\n\nstarted: $s' : '';
             return ListTile(
               leading: Icon(
                 FontAwesomeIcons.keyboard,
@@ -179,7 +174,7 @@ class _State extends State<LangameListView> {
                                 LangameAudioView(l.channelName, false),
                               ),
                             )),
-                        l.initiator == ap.user!.uid
+                        l.initiator == ap.user?.uid
                             ? Align(
                                 alignment: Alignment.centerRight,
                                 child: IconButton(
@@ -190,15 +185,6 @@ class _State extends State<LangameListView> {
                                 ))
                             : SizedBox.shrink(),
                       ])),
-
-                  // TODO
-                  // LangameButton(
-                  //   FontAwesomeIcons.doorClosed,
-                  //   text: 'quit',
-                  //   onPressed: () => cp.pushReplacement(
-                  //     LangameView(l.channelName, false),
-                  //   ),
-                  // ),
                 ]);
           }
           return SizedBox.shrink();

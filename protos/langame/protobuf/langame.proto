@@ -248,17 +248,34 @@ message Message {
   string body = 9;
   string title = 10;
   string id = 11;
+  Analysis analysis = 12;
   
   enum Type {
     INVITE = 0;
     MESSAGE = 1;
   }
   message Analysis {
+    repeated string topics = 1;
     repeated Sentiment sentiments = 2;
+    Error error = 3;
+    ContentFilter filter = 4;
+    repeated Token token = 5;
+
+    message Error {
+      string developer_message = 1;
+      int32 tries = 2;
+    }
 
     message Sentiment {
       float score = 1;
       string label = 2;
+    }
+    message Token {
+      uint32 start = 1;
+      uint32 end = 2;
+      string word = 3;
+      string entity_group = 4;
+      float score = 5;
     }
   }
 }

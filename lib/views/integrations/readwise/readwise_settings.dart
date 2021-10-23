@@ -22,7 +22,6 @@ class _State extends State<ReadwiseView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     var rp = Provider.of<ReadwiseProvider>(context, listen: false);
     _apiKeyController.text = rp.apiKey ?? '';

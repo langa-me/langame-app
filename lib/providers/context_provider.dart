@@ -135,6 +135,8 @@ class ContextProvider extends ChangeNotifier {
           backgroundColor: backgroundColor ??
               getBlackAndWhite(_navigationKey.currentContext!, 1,
                   reverse: true),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))),
           children: [
             Container(
               height: AppSize.safeBlockVertical * height,

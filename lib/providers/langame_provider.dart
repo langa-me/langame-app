@@ -45,7 +45,10 @@ class LangameProvider extends ChangeNotifier {
     try {
       var stream = await _langameApi.getLangames();
       stream.listen((e) {
+        // Somehow
+        if (e.channelName.isEmpty) return;
         _langames[e.channelName] = e;
+        // _cap.log('Langame ${e.channelName} added');
         notifyListeners();
       });
       // TODO: what happen if user log in / out, delete acc, to the stream subs?

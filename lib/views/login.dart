@@ -45,8 +45,12 @@ class _LoginViewState extends State<LoginView> {
     final ap = Provider.of<AuthenticationProvider>(context, listen: false);
     Provider.of<FeedbackProvider>(context, listen: false).init();
     var cp = Provider.of<ContextProvider>(context, listen: false);
+    var mp = Provider.of<MessageProvider>(context, listen: false);
+
     // Load for this page
     Provider.of<FunnyProvider>(context, listen: false).getLoadingRandom();
+    var pp = Provider.of<PreferenceProvider>(context, listen: false);
+
     Connectivity().checkConnectivity().then((network) async {
       if (network == ConnectivityResult.none) {
         cap.log('I am offline', analyticsMessage: 'offline');
@@ -54,7 +58,8 @@ class _LoginViewState extends State<LoginView> {
         await Connectivity().onConnectivityChanged.first;
       }
       // Bunch of spaghetti code to check if it is a new user or already authenticated
-      ap.userStream.first.then((user) async {
+      ap.userStream.listen((user) async {
+        if (!this.mounted) return;
         // 10 seconds
         await waitUntil(() => _isVersionCheckOk == true, maxIterations: 10000);
         if (user.after == null) {
@@ -69,7 +74,6 @@ class _LoginViewState extends State<LoginView> {
           return;
         }
 
-        var pp = Provider.of<PreferenceProvider>(context, listen: false);
         await pp.preferenceStream
             .firstWhere((e) => e.userId == user.after!.uid)
             .timeout(Duration(milliseconds: 500))
@@ -77,12 +81,10 @@ class _LoginViewState extends State<LoginView> {
 
         if (pp.preference.hasDoneOnBoarding) {
           // Probably logged-out, skip message api init
-          var mp = Provider.of<MessageProvider>(context, listen: false);
           await waitUntil(() => mp.isReady == true, maxIterations: 10000)
               .catchError((_) =>
                   // ignore: invalid_return_type_for_catch_error
-                  Provider.of<ContextProvider>(context, listen: false)
-                      .showFailureDialog(null));
+                  cp.showFailureDialog(null));
           // Just a check that we didn't open notification / DL
           if (cp.route == LangameRoute.LoginView)
             cp.pushReplacement(MainView());
@@ -252,8 +254,10 @@ class _LoginViewState extends State<LoginView> {
             if (isAuthenticating) return;
             var cp = Provider.of<ContextProvider>(context, listen: false);
             final ln = () => _handleOnPressedLogin(
-                () => ap.loginWithHack(_webControllerPassword.text,
-                    email: _webControllerUsername.text),
+                () => ap.loginWithEmail(
+                      _webControllerUsername.text,
+                      _webControllerPassword.text,
+                    ),
                 'email');
             cp.showCustomDialog(
                 stateless: [
@@ -376,7 +380,9 @@ class _LoginViewState extends State<LoginView> {
             text: 'Enter the matrix 😈',
             highlighted: true,
             onPressed: () => _handleOnPressedLogin(
-                () => ap.loginWithHack(_hackControllerPassword.text), 'email')),
+                () => ap.loginWithEmail(
+                    'hack@langa.me', _hackControllerPassword.text),
+                'email')),
         LangameButton(
           FontAwesomeIcons.baby,
           layer: 2,
