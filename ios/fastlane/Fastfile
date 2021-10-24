@@ -75,6 +75,7 @@ platform :ios do
     #   app: "1:388264600961:ios:cb9793dd455c23e50cf480",
     #   firebase_cli_token: ENV["FIREBASE_CLI_TOKEN_DEV"],
     #   ipa_path: "./Runner.ipa",
+    #   testers: "louis.beaumont@gmail.com",
     # )
   end
   lane :beta_dev do
@@ -107,6 +108,7 @@ platform :ios do
         app: "1:388264600961:ios:cb9793dd455c23e50cf480",
         firebase_cli_token: ENV["FIREBASE_CLI_TOKEN_DEV"],
         ipa_path: "./Runner.ipa",
+        testers: "louis.beaumont@gmail.com",
       )
     end
   end

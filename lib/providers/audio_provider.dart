@@ -49,6 +49,7 @@ class AudioProvider extends ChangeNotifier {
   Future<LangameResponse<bool>> checkPermission() async {
     try {
       bool s = await Permission.microphone.isGranted;
+      _cap.log('audio_provider: checkPermission: granted: $s');
       return LangameResponse(LangameStatus.succeed, result: s);
     } catch (e, s) {
       _cap.log('failed to check permission');
@@ -60,6 +61,7 @@ class AudioProvider extends ChangeNotifier {
   Future<LangameResponse<bool>> requestPermission() async {
     try {
       var s = await Permission.microphone.request();
+      _cap.log('audio_provider: requestPermission: granted: $s');
       return LangameResponse(LangameStatus.succeed, result: s.isGranted);
     } catch (e, s) {
       _cap.log('failed to requestPermission');

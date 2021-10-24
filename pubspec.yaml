@@ -1,6 +1,6 @@
 name: langame
 description: Augmented conversations
-version: 1.4.8+80
+version: 1.4.9+81
 homepage: https://github.com/langa-me/langame-app
 
 environment:
@@ -18,7 +18,7 @@ dependencies:
   connectivity: ^3.0.3
   url_launcher: ^6.0.9
   uuid: ^3.0.4
-  permission_handler: ^8.1.6
+  permission_handler: ^8.2.5
   crypto: ^3.0.0
   shared_preferences: ^2.0.3
   json_annotation: ^4.0.1
