@@ -44,6 +44,7 @@ jobs:
           subdirectory: android
         env:
           FIREBASE_CLI_TOKEN_DEV: '${{ secrets.FIREBASE_CLI_TOKEN_DEV }}'
+          ANDROID_PACKAGE_NAME: "me.langa.dev"
 
   deploy_ios:
     name: Deploy to beta dev ios

@@ -128,6 +128,7 @@ class _LangameButtonState extends State<LangameButton> {
         // onSurface = disabled
         onSurface: getBlackAndWhite(context, disabled ? 0 : widget.layer + 1,
             reverse: true),
+        splashFactory: disabled ? NoSplash.splashFactory : null,
         elevation: 0,
         shadowColor: variantIsLightThenDark(context, reverse: true),
         shape: RoundedRectangleBorder(

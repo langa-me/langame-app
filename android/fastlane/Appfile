@@ -1,2 +1,2 @@
 json_key_file("service_account_key.json")
-package_name("me.langa")
+package_name(ENV["ANDROID_PACKAGE_NAME"])

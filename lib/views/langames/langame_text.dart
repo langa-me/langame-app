@@ -40,6 +40,7 @@ class _State extends State<LangameTextView>
   final ScrollController _scrollController = ScrollController();
   MagnificationResponse_Sentiment? _currentSentiment;
   int _seenSuggestions = 0;
+  bool _canSend = true;
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -201,6 +202,7 @@ class _State extends State<LangameTextView>
                               setState(() =>
                                   _currentSentiment = val.sentimentResponse);
                             },
+                            enabled: _canSend,
                             onSubmitted: (e) => _onSend(),
                             controller: _textEditingController,
                             decoration: InputDecoration(
@@ -215,7 +217,7 @@ class _State extends State<LangameTextView>
                             : IconButton(
                                 icon: Icon(
                                   FontAwesomeIcons.paperPlane,
-                                  color: getBlackAndWhite(context, 0),
+                                  color: getBlackAndWhite(context, _canSend ? 0 : 1),
                                 ),
                                 onPressed: _onSend,
                               ),
@@ -332,7 +334,7 @@ class _State extends State<LangameTextView>
                         padding: EdgeInsets.all(12),
                         child: LangameButton(FontAwesomeIcons.grinTongue,
                             highlighted: true,
-                            disableForFewMs: 5000,
+                            disabled: _canSend,
                             tooltip:
                                 'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme + 1].content}',
                             text: currentLg
@@ -415,50 +417,50 @@ class _State extends State<LangameTextView>
                                         Theme.of(context).textTheme.headline5,
                                   )),
                                 ),
-                              //   Row(
-                              //       mainAxisAlignment: MainAxisAlignment.center,
-                              //       children: [
-                              //         LangameButton(FontAwesomeIcons.thumbsDown,
-                              //             layer: 1,
-                              //             disableForFewMs: 3000, onPressed: () {
-                              //           final f = Provider.of<FirebaseApi>(
-                              //               context,
-                              //               listen: false);
-                              //           f.firestore!
-                              //               .collection('langames')
-                              //               .where('channelName',
-                              //                   isEqualTo:
-                              //                       widget.langameChannelName)
-                              //               .get()
-                              //               .then((e) {
-                              //             if (e.size == 0) return;
-                              //             e.docs[0].reference.set({
-                              //               'reflections.userFeedbacks.${f.auth!.currentUser!.uid}.$i':
-                              //                   -1
-                              //             }, SetOptions(merge: true));
-                              //           });
-                              //         }),
-                              //         LangameButton(FontAwesomeIcons.thumbsUp,
-                              //             layer: 1,
-                              //             disableForFewMs: 3000, onPressed: () {
-                              //           final f = Provider.of<FirebaseApi>(
-                              //               context,
-                              //               listen: false);
-                              //           f.firestore!
-                              //               .collection('langames')
-                              //               .where('channelName',
-                              //                   isEqualTo:
-                              //                       widget.langameChannelName)
-                              //               .get()
-                              //               .then((e) {
-                              //             if (e.size == 0) return;
-                              //             e.docs[0].reference.set({
-                              //               'reflections.userFeedbacks.${f.auth!.currentUser!.uid}.$i':
-                              //                   1
-                              //             }, SetOptions(merge: true));
-                              //           });
-                              //         }),
-                              //       ]),
+                                //   Row(
+                                //       mainAxisAlignment: MainAxisAlignment.center,
+                                //       children: [
+                                //         LangameButton(FontAwesomeIcons.thumbsDown,
+                                //             layer: 1,
+                                //             disableForFewMs: 3000, onPressed: () {
+                                //           final f = Provider.of<FirebaseApi>(
+                                //               context,
+                                //               listen: false);
+                                //           f.firestore!
+                                //               .collection('langames')
+                                //               .where('channelName',
+                                //                   isEqualTo:
+                                //                       widget.langameChannelName)
+                                //               .get()
+                                //               .then((e) {
+                                //             if (e.size == 0) return;
+                                //             e.docs[0].reference.set({
+                                //               'reflections.userFeedbacks.${f.auth!.currentUser!.uid}.$i':
+                                //                   -1
+                                //             }, SetOptions(merge: true));
+                                //           });
+                                //         }),
+                                //         LangameButton(FontAwesomeIcons.thumbsUp,
+                                //             layer: 1,
+                                //             disableForFewMs: 3000, onPressed: () {
+                                //           final f = Provider.of<FirebaseApi>(
+                                //               context,
+                                //               listen: false);
+                                //           f.firestore!
+                                //               .collection('langames')
+                                //               .where('channelName',
+                                //                   isEqualTo:
+                                //                       widget.langameChannelName)
+                                //               .get()
+                                //               .then((e) {
+                                //             if (e.size == 0) return;
+                                //             e.docs[0].reference.set({
+                                //               'reflections.userFeedbacks.${f.auth!.currentUser!.uid}.$i':
+                                //                   1
+                                //             }, SetOptions(merge: true));
+                                //           });
+                                //         }),
+                                //       ]),
                               ]),
                             ],
                             canBack: true,
@@ -522,7 +524,8 @@ class _State extends State<LangameTextView>
           });
 
   void _onSend() async {
-    if (_textEditingController.text.isNotEmpty) {
+    if (_textEditingController.text.isNotEmpty && _canSend) {
+      debugPrint('send: ' + _textEditingController.text);
       // Clear text field
       _textEditingController.clear();
       // Hide keyboard
@@ -538,6 +541,13 @@ class _State extends State<LangameTextView>
       setState(() {
         _currentText = '';
         _currentSentiment = null;
+        _canSend = false;
+      });
+      Future.delayed(Duration(milliseconds: 1000)).then((_) {
+        if (!this.mounted) return;
+        setState(() {
+          _canSend = true;
+        });
       });
     }
   }

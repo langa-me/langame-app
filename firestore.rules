@@ -11,9 +11,9 @@ service cloud.firestore {
         match /users/{userId} {
             // TODO: Maybe more strict
             // TODO: how to prevent taking someone else tag?
-            allow write: if request.auth != null && request.auth.uid == userId;// &&
+            allow write: if request.auth != null && request.auth.uid == userId &&
                 // Allow changing everything except credits
-                // (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits'])); // &&
+                (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits', 'rateLimits'])); // &&
                 // If the user try to change lastSignInTime, it has to be within the 20 seconds obviously
                 //request.time - request.resource.data.get('lastSignInTime', request.time)  < duration.value(20, 's');
             allow read: if true; // TODO
@@ -135,6 +135,11 @@ service cloud.firestore {
                 request.resource.data.userId == request.auth.uid;
         }
         match /messages/{messageId} {
+            function isRateLimited(request) {
+                let user = getUser(request.auth.uid);
+                // Is rate limited? (one second per user)
+                return "rateLimits" in user && (request.time - duration.value(1, 's')) <= user.rateLimits.message;
+            }
             allow read: if request.auth != null && (request.auth.uid == resource.data.fromUid || 
                 request.auth.uid == resource.data.toUid);
             allow create: if request.auth != null &&
@@ -150,7 +155,8 @@ service cloud.firestore {
                 request.resource.data.type == 1 &&
                 request.resource.data.fromUid == request.auth.uid &&
                 // "to" exists?
-                getUser(request.resource.data.toUid) != null;
+                getUser(request.resource.data.toUid) != null &&
+                !isRateLimited(request);
         }
         match /apis/{apiId} {
             allow read: if request.auth != null;

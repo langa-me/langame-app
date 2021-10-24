@@ -169,7 +169,10 @@ exports.onWriteTopic = functions
 
 exports.onCreateMessage = functions
     .region(region)
-    .runWith(runtimeOpts)
+    .runWith({
+      ...runtimeOpts,
+      failurePolicy: true,
+    })
     .firestore.document("messages/{messageId}")
     .onCreate(onCreateMessage);
 

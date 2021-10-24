@@ -16,14 +16,14 @@ or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
-### android closed_beta
+### android beta_prod
 ```
-fastlane android closed_beta
+fastlane android beta_prod
 ```
 Deploy to closed beta track
-### android firebase_distribution
+### android beta_dev
 ```
-fastlane android firebase_distribution
+fastlane android beta_dev
 ```
 
 

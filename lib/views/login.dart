@@ -218,7 +218,8 @@ class _LoginViewState extends State<LoginView> {
           padding: EdgeInsets.all(12),
         );
     var logins = [
-      _buildButtonParent(LangameButton(
+     !UniversalPlatform.isWeb
+          ? _buildButtonParent(LangameButton(
         FontAwesomeIcons.google,
         fixedSize: Size(
             AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
@@ -227,7 +228,7 @@ class _LoginViewState extends State<LoginView> {
           await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
         },
         layer: 1,
-      )),
+      )) : SizedBox.shrink(),
       UniversalPlatform.isIOS
           ? _buildButtonParent(
               LangameButton(

@@ -5,6 +5,7 @@ import {handleError, reportError} from "../errors";
 import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
 import {html} from "../utils/html";
+import {shouldDrop} from "../utils/contexts";
 
 export const onCreateMessage = async (
     snap: admin.firestore.DocumentSnapshot,
@@ -12,6 +13,9 @@ export const onCreateMessage = async (
   try {
     functions.logger.log(ctx);
     if (!snap.exists) return;
+    if (shouldDrop(ctx, {
+      eventMaxAgeMs: 120_000, // 2 minutes
+    })) return;
     if (snap.data()?.delivery?.attempts >= 3) {
       functions.logger.log(
           "delivery attempts >= 3, aborting"
@@ -25,6 +29,17 @@ export const onCreateMessage = async (
       return Promise.resolve();
     }
     const db = admin.firestore();
+    const from = await db
+        .collection("users")
+        .doc(snap.data()!.fromUid)
+        .get();
+    await db.runTransaction(async (t) => {
+      t.set(from.ref, {
+        rateLimits: {
+          message: admin.firestore.FieldValue.serverTimestamp(),
+        },
+      }, {merge: true});
+    });
     const to = await db
         .collection("users")
         .doc(snap.data()!.toUid)
@@ -55,10 +70,6 @@ export const onCreateMessage = async (
       const notificationSubjectClipSize = 30;
       const bodyClipped = message.body!.substr(0, notificationSubjectClipSize) +
         (message.body!.length > notificationSubjectClipSize ? "..." : "");
-      const from = await db
-          .collection("users")
-          .doc(message.fromUid)
-          .get();
       title = `${from.data()!.tag} says: ${bodyClipped}...`;
     }
     const toPreferences = await db
