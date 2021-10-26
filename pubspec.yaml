@@ -1,6 +1,6 @@
 name: langame
 description: Augmented conversations
-version: 1.4.9+82
+version: 1.5.0+83
 homepage: https://github.com/langa-me/langame-app
 
 environment:

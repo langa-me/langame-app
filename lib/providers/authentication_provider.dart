@@ -273,7 +273,7 @@ class AuthenticationProvider extends ChangeNotifier {
               .map((e) => UserExt.fromObject(e.data))
               .toList());
     } catch (e, s) {
-      _cap.log('failed to getLangameUsersStartingWithTag $tag');
+      _cap.log('authentication_provider: failed to getUserTag $tag');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -285,10 +285,10 @@ class AuthenticationProvider extends ChangeNotifier {
           .getLangameUser(uid)
           .firstWhere((e) => e.data() != null)
           .timeout(Duration(seconds: 20));
-      _cap.log('getLangameUser');
+      _cap.log('authentication_provider: getLangameUser');
       return LangameResponse<lg.User>(LangameStatus.succeed, result: r.data()!);
     } catch (e, s) {
-      _cap.log('failed to getLangameUser');
+      _cap.log('authentication_provider: failed to getLangameUser');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -303,11 +303,11 @@ class AuthenticationProvider extends ChangeNotifier {
               .firstWhere((e) => e.data() != null)
               .timeout(Duration(seconds: 20))));
 
-      _cap.log('getLangameUsers');
+      _cap.log('authentication_provider: getLangameUsers');
       return LangameResponse<List<lg.User>>(LangameStatus.succeed,
           result: r.map((e) => e.data()!).toList());
     } catch (e, s) {
-      _cap.log('failed to get users');
+      _cap.log('authentication_provider: failed to get users');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -327,13 +327,13 @@ class AuthenticationProvider extends ChangeNotifier {
           .collection('users')
           .doc(user!.uid)
           .update({'tag': tag});
-      _cap.log('updateTag');
+      _cap.log('authentication_provider: updateTag');
       _user!.tag = tag;
 
       notifyListeners();
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('failed to updateTag');
+      _cap.log('authentication_provider: failed to updateTag');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

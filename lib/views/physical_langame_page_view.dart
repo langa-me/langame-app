@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/messages.dart';
 import 'package:langame/helpers/random.dart';
 import 'package:langame/helpers/widget.dart';
 import 'package:langame/models/errors.dart';
@@ -37,19 +38,6 @@ final _couldNotHear = [
   'Can you say that again, please? 🤨',
 ];
 
-// This is a list of texts to display when the user gives a feedback, it is a grateful message to thank him
-final _gratitudeMessages = [
-  'Thank you for your valuable feedback 😃!',
-  'Wow, we really appreciate that we got your feedback and we will do better 😇!',
-  'Have a great day, the system should be improved by now!',
-  'Thank you for your feedback, we will improve the system soon!',
-  'Thank you for improving the AI behind Langame 😍!',
-  'Thank you, the system will be more efficient soon!',
-  'Thank you for your help 😌!',
-  'Thank you for the support, the system will improve soon!',
-  'The system can be improved by thanks to your contribution 👍!',
-  'Thank you so much for the helpful feedback 😃!',
-];
 
 class PhysicalLangamePageView extends StatefulWidget {
   final void Function(int, {Curve? curve}) _goToPage;
@@ -262,7 +250,7 @@ class _State extends State<PhysicalLangamePageView>
                           listen: false)
                       .sendMemeLike(plp.memes[plp.currentMeme].id, false)
                       .whenComplete(
-                          () => cp.showSnackBar(_gratitudeMessages.pickAny()!)),
+                          () => cp.showSnackBar(gratitudeMessages.pickAny()!)),
                 ),
                 LangameButton(
                   FontAwesomeIcons.solidThumbsUp,
@@ -271,7 +259,7 @@ class _State extends State<PhysicalLangamePageView>
                           listen: false)
                       .sendMemeLike(plp.memes[plp.currentMeme].id, true)
                       .whenComplete(
-                          () => cp.showSnackBar(_gratitudeMessages.pickAny()!)),
+                          () => cp.showSnackBar(gratitudeMessages.pickAny()!)),
                 ),
               ])
             : SizedBox.shrink(),

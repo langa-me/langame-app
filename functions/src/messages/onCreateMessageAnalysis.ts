@@ -205,7 +205,7 @@ export const createReflection = async (
       "Reflection: What are your ethical principles?\n###\n" +
       prompt,
     maxTokens: 300,
-    frequencyPenalty: 0.3,
+    frequencyPenalty: 0.4,
     presencePenalty: 0.3,
     temperature: 0.7,
     stop: ["###", "\n", "Me:", "You:"],

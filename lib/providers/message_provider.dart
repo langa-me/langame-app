@@ -13,9 +13,7 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/message_api.dart';
-import 'package:langame/views/langames/langame_audio.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
-import 'package:langame/views/langames/langame_text.dart';
 import 'package:sortedmap/sortedmap.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'authentication_provider.dart';
@@ -57,19 +55,20 @@ class MessageProvider extends ChangeNotifier {
         notifyListeners();
         _cap.log('message_provider:initialize');
         _messageApi.getInitialMessage().then((e) async {
+          // TODO
           // Leave some time for UI
-          await Future.delayed(Duration(seconds: 1));
-          // Note that we ignore failures in dynamic link initialization
-          if (e != null &&
-              e.channelName.isNotEmpty &&
-              e.type == lg.Message_Type.INVITE) {
-            _cp.pushReplacement(LangameAudioView(e.channelName, false));
-          } else if (e != null &&
-              e.channelName.isNotEmpty &&
-              e.type == lg.Message_Type.MESSAGE) {
-            // On opening text notification, go to text view
-            _cp.pushReplacement(LangameTextView(e.channelName));
-          }
+          // await Future.delayed(Duration(seconds: 1));
+          // // Note that we ignore failures in dynamic link initialization
+          // if (e != null &&
+          //     e.channelName.isNotEmpty &&
+          //     e.type == lg.Message_Type.INVITE) {
+          //   _cp.pushReplacement(LangameAudioView(e.channelName, false));
+          // } else if (e != null &&
+          //     e.channelName.isNotEmpty &&
+          //     e.type == lg.Message_Type.MESSAGE) {
+          //   // On opening text notification, go to text view
+          //   _cp.pushReplacement(LangameTextView(e.channelName));
+          // }
         }).catchError((e, s) {
           _cap.log('message_provider:failed to get initial messages');
           _cap.recordError(e, s);

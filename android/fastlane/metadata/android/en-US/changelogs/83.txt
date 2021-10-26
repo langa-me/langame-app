@@ -1,0 +1,1 @@
+Play Langame in text mode and get reflections from AI!

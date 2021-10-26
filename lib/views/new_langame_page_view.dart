@@ -208,7 +208,8 @@ class _SendLangameState extends State<NewLangamePageView>
     if (createLangame.error != null ||
         createLangame.result == null ||
         createLangame.result!.data() == null ||
-        !createLangame.result!.data()!.hasChannelName()) {
+        !createLangame.result!.data()!.hasChannelName() ||
+        createLangame.result!.data()!.channelName.isEmpty) {
       cp.dialogComplete();
       var msg = '${fp.getFailingRandom()}, please retry later';
       cp.showFailureDialog(createLangame.error != null
@@ -224,7 +225,7 @@ class _SendLangameState extends State<NewLangamePageView>
     var snap = createLangame.result!.data()!;
     if (isText) {
       cp.dialogComplete();
-      cp.push(LangameTextView(createLangame.result!.data()!.channelName));
+      cp.push(LangameTextView(snap));
       return;
     }
 

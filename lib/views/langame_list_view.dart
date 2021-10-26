@@ -110,7 +110,7 @@ class _State extends State<LangameListView> {
                             ))
                       .toList()),
               onTap: () => cp.push(
-                LangameTextView(l.channelName),
+                LangameTextView(l),
               ),
             );
           }

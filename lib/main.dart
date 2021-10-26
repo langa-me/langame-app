@@ -43,12 +43,9 @@ import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
 import 'package:langame/services/http/impl_message_api.dart';
-import 'package:langame/views/langames/langame_audio.dart';
-import 'package:langame/views/langames/langame_text.dart';
 import 'package:langame/views/login.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'services/http/firebase.dart';
 import 'services/http/impl_langame_api.dart';
@@ -69,7 +66,7 @@ void main() async {
   if (!kIsWeb) {
     FirebaseAppCheck.instance.activate();
     crashlytics = FirebaseCrashlytics.instance;
-    await crashlytics.setCrashlyticsCollectionEnabled(true);
+    await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
     // Pass all uncaught errors from the framework to Crashlytics.
     FlutterError.onError = crashlytics.recordFlutterError;
     Isolate.current.addErrorListener(RawReceivePort((pair) async {
@@ -125,15 +122,16 @@ void main() async {
   var messageApi = useEmulator
       ? FakeMessageApi(firebase, (_) {})
       : ImplMessageApi(firebase, (n) {
-          if (n.type == lg.Message_Type.INVITE) {
-            contextProvider.pushReplacement(
-              LangameAudioView(n.channelName, false),
-            );
-          } else {
-            contextProvider.pushReplacement(
-              LangameTextView(n.channelName),
-            );
-          }
+          // TODO
+          // if (n.type == lg.Message_Type.INVITE) {
+          //   contextProvider.pushReplacement(
+          //     LangameAudioView(n.channelName, false),
+          //   );
+          // } else {
+          //   contextProvider.pushReplacement(
+          //     LangameTextView(n.channelName),
+          //   );
+          // }
         });
   var messageProvider = MessageProvider(
     firebase,

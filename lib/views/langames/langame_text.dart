@@ -7,6 +7,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
+import 'package:langame/helpers/messages.dart';
+import 'package:langame/helpers/random.dart';
+import 'package:langame/helpers/widget.dart';
 import 'package:langame/models/djinn/djinn.pbgrpc.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
@@ -21,17 +24,17 @@ import 'package:langame/views/colors/colors.dart';
 import 'package:langame/views/images/image.dart';
 import 'package:provider/provider.dart';
 import 'package:langame/helpers/functional.dart';
+import 'package:sortedmap/sortedmap.dart';
 
 class LangameTextView extends StatefulWidget {
-  final String langameChannelName;
-  LangameTextView(this.langameChannelName);
+  final lg.Langame initialLangame;
+  LangameTextView(this.initialLangame);
   @override
   _State createState() => _State();
 }
 
 class _State extends State<LangameTextView>
     with AfterLayoutMixin<LangameTextView> {
-  lg.Langame? langame;
   lg.User? other;
   // Stream<List<lg.Message>>? messages;
   TextEditingController _textEditingController = TextEditingController();
@@ -41,6 +44,7 @@ class _State extends State<LangameTextView>
   MagnificationResponse_Sentiment? _currentSentiment;
   int _seenSuggestions = 0;
   bool _canSend = true;
+  Set<String> _reflectionsLiked = {};
 
   @override
   void afterFirstLayout(BuildContext context) {
@@ -48,7 +52,7 @@ class _State extends State<LangameTextView>
         .setCurrentScreen('langame_text_view');
 
     var lp = Provider.of<LangameProvider>(context, listen: false);
-    lp.joinLangame(widget.langameChannelName);
+    lp.joinLangame(widget.initialLangame.channelName);
   }
 
   @override
@@ -56,24 +60,17 @@ class _State extends State<LangameTextView>
     final cp = Provider.of<ContextProvider>(context, listen: false);
     final lp = Provider.of<LangameProvider>(context);
     final mp = Provider.of<MessageProvider>(context);
-    final langame = lp.langames[widget.langameChannelName];
-    if (langame == null) {
-      // Show error message and pop back
-      cp.showFailureDialog(null);
-      Future.delayed(Duration(seconds: 2)).then((_) {
-        cp.dialogComplete();
-        cp.pop();
-      });
-    }
-    final reflections =
-        lp.langames[widget.langameChannelName]?.reflections ?? [];
+    final ap = Provider.of<AuthenticationProvider>(context, listen: false);
+
+    final langame =
+        lp.langames[widget.initialLangame.channelName] ?? widget.initialLangame;
+    final reflections = langame.reflections;
     reflections.sort(
       (a, b) => b.createdAt.toDateTime().compareTo(
             a.createdAt.toDateTime(),
           ),
     );
-    final suggestions =
-        lp.langames[widget.langameChannelName]?.suggestions ?? [];
+    final suggestions = langame.suggestions;
     suggestions.sort(
       (a, b) => b.createdAt.toDateTime().compareTo(
             a.createdAt.toDateTime(),
@@ -81,16 +78,16 @@ class _State extends State<LangameTextView>
     );
     if (other == null) {
       try {
-        var ap = Provider.of<AuthenticationProvider>(context, listen: false);
         ap
-            .getLangameUser(langame!.reservedSpots[0] == ap.user!.uid
+            .getLangameUser(langame.reservedSpots[0] == ap.user!.uid
                 ? langame.initiator
                 : langame.reservedSpots[0])
-            .then((e) => setState(() => other = e.result));
+            .then((e) =>
+                postFrameCallback((_) => setState(() => other = e.result)));
         _scrollToBottom();
       } catch (e) {}
     }
-    final messages = mp.messages[widget.langameChannelName];
+    final messages = mp.messages[widget.initialLangame.channelName];
 
     final actions = other?.photoUrl != null
         ? [
@@ -103,8 +100,12 @@ class _State extends State<LangameTextView>
         resizeToAvoidBottomInset: true,
         backgroundColor: getBlackAndWhite(context, 0, reverse: true),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
-        floatingActionButton: langame!.suggestions.length > 0
-            ? _buildSuggestionButton(cp, langame.suggestions)
+        floatingActionButton: langame.suggestions.length > 0
+            ? _buildSuggestionButton(
+                cp,
+                langame.suggestions
+                    .where((e) => e.userId == ap.user!.uid)
+                    .toList())
             : null,
         appBar: AppBar(
           title: other != null
@@ -141,7 +142,12 @@ class _State extends State<LangameTextView>
                   ),
                   Divider(),
                   // This is a row showing suggestions
-                  _buildReflections(langame, reflections),
+                  _buildReflections(
+                      messages,
+                      langame,
+                      reflections
+                          .where((e) => e.userId == ap.user!.uid)
+                          .toList()),
                   Divider(),
                   // This is a Whatsapp-like send message bar with rounded corner
                   Container(
@@ -217,7 +223,8 @@ class _State extends State<LangameTextView>
                             : IconButton(
                                 icon: Icon(
                                   FontAwesomeIcons.paperPlane,
-                                  color: getBlackAndWhite(context, _canSend ? 0 : 1),
+                                  color: getBlackAndWhite(
+                                      context, _canSend ? 0 : 1),
                                 ),
                                 onPressed: _onSend,
                               ),
@@ -323,157 +330,145 @@ class _State extends State<LangameTextView>
         ],
       );
 
-  Widget _buildReflections(
-          lg.Langame currentLg, List<lg.Langame_Reflection> reflections) =>
-      Expanded(
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: [
-                currentLg.currentMeme < currentLg.memes.length - 1
-                    ? Padding(
-                        padding: EdgeInsets.all(12),
-                        child: LangameButton(FontAwesomeIcons.grinTongue,
-                            highlighted: true,
-                            disabled: _canSend,
-                            tooltip:
-                                'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme + 1].content}',
-                            text: currentLg
-                                    .memes[currentLg.currentMeme + 1].content
-                                    .substring(
-                                        0,
-                                        currentLg
-                                                    .memes[
-                                                        currentLg.currentMeme +
-                                                            1]
-                                                    .content
-                                                    .length >
-                                                20
-                                            ? 20
-                                            : currentLg
-                                                .memes[
-                                                    currentLg.currentMeme + 1]
-                                                .content
-                                                .length) +
-                                '...', onPressed: () {
-                          setState(() {
-                            _textEditingController.text = currentLg
-                                .memes[currentLg.currentMeme + 1].content;
-                            _currentText = currentLg
-                                .memes[currentLg.currentMeme + 1].content;
+  Widget _buildReflections(SortedMap<int, lg.Message> messages,
+      lg.Langame currentLg, List<lg.Langame_Reflection> reflections) {
+    final fp = Provider.of<FirebaseApi>(context, listen: false);
+    final cp = Provider.of<ContextProvider>(context, listen: false);
+    return Expanded(
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+              currentLg.currentMeme < currentLg.memes.length - 1
+                  ? Padding(
+                      padding: EdgeInsets.all(12),
+                      child: LangameButton(FontAwesomeIcons.grinTongue,
+                          highlighted: true,
+                          disabled: !_canSend,
+                          tooltip:
+                              'Send a new conversation starter: ${currentLg.memes[currentLg.currentMeme + 1].content}',
+                          text: currentLg
+                                  .memes[currentLg.currentMeme + 1].content
+                                  .substring(
+                                      0,
+                                      currentLg.memes[currentLg.currentMeme + 1]
+                                                  .content.length >
+                                              20
+                                          ? 20
+                                          : currentLg
+                                              .memes[currentLg.currentMeme + 1]
+                                              .content
+                                              .length) +
+                              '...', onPressed: () {
+                        final nt = 'Topics:' +
+                            currentLg.memes[currentLg.currentMeme + 1].topics
+                                .join(', ') +
+                            '\n' +
+                            currentLg.memes[currentLg.currentMeme + 1].content;
+                        setState(() {
+                          _textEditingController.text = nt;
+                          _currentText = nt;
+                        });
+                        _onSend();
+                        final fs =
+                            Provider.of<FirebaseApi>(context, listen: false)
+                                .firestore!;
+                        fs
+                            .collection('langames')
+                            .where('channelName',
+                                isEqualTo: widget.initialLangame.channelName)
+                            .get()
+                            .then((e) {
+                          if (e.size == 0) return;
+                          e.docs[0].reference.update({
+                            'currentMeme': FieldValue.increment(1),
                           });
-                          _onSend();
-                          final fs =
-                              Provider.of<FirebaseApi>(context, listen: false)
-                                  .firestore!;
-                          fs
-                              .collection('langames')
-                              .where('channelName',
-                                  isEqualTo: widget.langameChannelName)
-                              .get()
-                              .then((e) {
-                            if (e.size == 0) return;
-                            e.docs[0].reference.update({
-                              'currentMeme': FieldValue.increment(1),
-                            });
-                          });
-                        }))
-                    : SizedBox.shrink()
-              ] +
-              reflections
-                  .mapIndexed(
-                    (e, i) => Padding(
-                        padding: EdgeInsets.all(12),
-                        child: LangameButton(
-                            e.contentFilter == lg.ContentFilter.Safe
-                                ? FontAwesomeIcons.smileBeam
-                                : e.contentFilter == lg.ContentFilter.Sensitive
-                                    ? FontAwesomeIcons.frown
-                                    : FontAwesomeIcons.meh,
-                            layer: 1,
-                            tooltip: e.alternatives.last,
-                            text: e.alternatives.last.substring(
-                                    0,
-                                    e.alternatives.last.length > 20
-                                        ? 20
-                                        : e.alternatives.last.length) +
-                                '...', onPressed: () {
-                          // setState(() {
-                          //   _textEditingController.text = e.alternatives.last;
-                          //   _currentText = e.alternatives.last;
-                          // });
-                          final cp = Provider.of<ContextProvider>(context,
-                              listen: false);
-                          cp.showCustomDialog(
-                            stateless: [
-                              Column(children: [
-                                Container(
-                                  height: AppSize.safeBlockVertical * 20,
-                                  width: AppSize.safeBlockHorizontal * 70,
-                                  child: SingleChildScrollView(
-                                      child: Text(
-                                    e.alternatives.last,
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
-                                  )),
-                                ),
-                                //   Row(
-                                //       mainAxisAlignment: MainAxisAlignment.center,
-                                //       children: [
-                                //         LangameButton(FontAwesomeIcons.thumbsDown,
-                                //             layer: 1,
-                                //             disableForFewMs: 3000, onPressed: () {
-                                //           final f = Provider.of<FirebaseApi>(
-                                //               context,
-                                //               listen: false);
-                                //           f.firestore!
-                                //               .collection('langames')
-                                //               .where('channelName',
-                                //                   isEqualTo:
-                                //                       widget.langameChannelName)
-                                //               .get()
-                                //               .then((e) {
-                                //             if (e.size == 0) return;
-                                //             e.docs[0].reference.set({
-                                //               'reflections.userFeedbacks.${f.auth!.currentUser!.uid}.$i':
-                                //                   -1
-                                //             }, SetOptions(merge: true));
-                                //           });
-                                //         }),
-                                //         LangameButton(FontAwesomeIcons.thumbsUp,
-                                //             layer: 1,
-                                //             disableForFewMs: 3000, onPressed: () {
-                                //           final f = Provider.of<FirebaseApi>(
-                                //               context,
-                                //               listen: false);
-                                //           f.firestore!
-                                //               .collection('langames')
-                                //               .where('channelName',
-                                //                   isEqualTo:
-                                //                       widget.langameChannelName)
-                                //               .get()
-                                //               .then((e) {
-                                //             if (e.size == 0) return;
-                                //             e.docs[0].reference.set({
-                                //               'reflections.userFeedbacks.${f.auth!.currentUser!.uid}.$i':
-                                //                   1
-                                //             }, SetOptions(merge: true));
-                                //           });
-                                //         }),
-                                //       ]),
-                              ]),
-                            ],
-                            canBack: true,
-                            height: 40,
-                            title: Text('🤔',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.headline4),
-                          );
-                        })),
-                  )
-                  .toList(),
-        ),
-      );
+                        });
+                      }))
+                  : SizedBox.shrink()
+            ] +
+            reflections
+                .mapIndexed(
+                  (e, i) => Padding(
+                      padding: EdgeInsets.all(12),
+                      child: LangameButton(
+                          e.contentFilter == lg.ContentFilter.Safe
+                              ? FontAwesomeIcons.smileBeam
+                              : e.contentFilter == lg.ContentFilter.Sensitive
+                                  ? FontAwesomeIcons.frown
+                                  : FontAwesomeIcons.meh,
+                          layer: 1,
+                          tooltip: e.alternatives.last,
+                          text: e.alternatives.last.substring(
+                                  0,
+                                  e.alternatives.last.length > 20
+                                      ? 20
+                                      : e.alternatives.last.length) +
+                              '...', onPressed: () {
+                        cp.showCustomDialog(
+                          stateless: [
+                            Column(children: [
+                              Container(
+                                height: AppSize.safeBlockVertical * 20,
+                                width: AppSize.safeBlockHorizontal * 70,
+                                child: SingleChildScrollView(
+                                    child: Text(
+                                  e.alternatives.last,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.headline5,
+                                )),
+                              ),
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _reflectionsLiked
+                                            .contains(e.alternatives.last)
+                                        ? SizedBox.shrink()
+                                        : LangameButton(FontAwesomeIcons.heart,
+                                            tooltip: 'Like the reflection',
+                                            layer: 1,
+                                            disableForFewMs: 5000,
+                                            disabled: _reflectionsLiked
+                                                .contains(e.alternatives.last),
+                                            onPressed: () {
+                                            if (_reflectionsLiked.contains(
+                                                e.alternatives.last)) return;
+
+                                            fp.firestore!
+                                                .collection('feedbacks')
+                                                .doc(fp.auth!.currentUser!.uid)
+                                                .set({
+                                              'likes': FieldValue.arrayUnion([
+                                                {
+                                                  'langame':
+                                                      widget.initialLangame.channelName,
+                                                  'reflection':
+                                                      e.toProto3Json(),
+                                                }
+                                              ])
+                                            }, SetOptions(merge: true));
+
+                                            setState(() {
+                                              _reflectionsLiked
+                                                  .add(e.alternatives.last);
+                                            });
+                                            cp.showSnackBar(
+                                                gratitudeMessages.pickAny()!);
+                                          }),
+                                  ]),
+                            ]),
+                          ],
+                          canBack: true,
+                          height: 40,
+                          title: Text('🤔',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline4),
+                        );
+                      })),
+                )
+                .toList(),
+      ),
+    );
+  }
 
   FloatingActionButton _buildSuggestionButton(
           ContextProvider cp, List<lg.Langame_Suggestion> suggestions) =>
@@ -498,22 +493,28 @@ class _State extends State<LangameTextView>
                   Container(
                     height: AppSize.safeBlockVertical * 40,
                     width: AppSize.safeBlockHorizontal * 70,
-                    child: ListView.separated(
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemCount: suggestions.length,
-                      separatorBuilder: (ctx, i) => Divider(),
-                      itemBuilder: (ctx, i) => LangameButton(
-                        FontAwesomeIcons.copy,
-                        text: suggestions[i].alternatives.last,
-                        labelMaxLines: null,
-                        layer: 1,
-                        onPressed: () {
-                          FlutterClipboard.copy(
-                              suggestions[i].alternatives.last);
-                        },
-                      ),
-                    ),
+                    child: suggestions.length > 0
+                        ? ListView.separated(
+                            physics: BouncingScrollPhysics(),
+                            scrollDirection: Axis.vertical,
+                            itemCount: suggestions.length,
+                            separatorBuilder: (ctx, i) => Divider(),
+                            itemBuilder: (ctx, i) => LangameButton(
+                              FontAwesomeIcons.copy,
+                              text: suggestions[i].alternatives.last,
+                              labelMaxLines: null,
+                              layer: 1,
+                              onPressed: () {
+                                FlutterClipboard.copy(
+                                    suggestions[i].alternatives.last);
+                              },
+                            ),
+                          )
+                        : Text(
+                            'We don\'t have anything interesting for you yet, keep talking 😉',
+                            style: Theme.of(context).textTheme.caption,
+                            textAlign: TextAlign.center,
+                          ),
                   ),
                   // Show a nice box with corners box rounded
                 ],
@@ -535,15 +536,14 @@ class _State extends State<LangameTextView>
 
       var mp = Provider.of<MessageProvider>(context, listen: false);
 
-      // TODO: feedback on response
-      mp.sendMessage(widget.langameChannelName, _currentText, other!.uid);
+      mp.sendMessage(widget.initialLangame.channelName, _currentText, other!.uid);
 
       setState(() {
         _currentText = '';
         _currentSentiment = null;
         _canSend = false;
       });
-      Future.delayed(Duration(milliseconds: 1000)).then((_) {
+      Future.delayed(Duration(milliseconds: 3000)).then((_) {
         if (!this.mounted) return;
         setState(() {
           _canSend = true;
