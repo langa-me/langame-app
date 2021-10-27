@@ -2772,6 +2772,9 @@ export namespace langame {
 
             /** Message analysis */
             analysis?: (langame.protobuf.Message.IAnalysis|null);
+
+            /** Message delivery */
+            delivery?: (langame.protobuf.Message.IDelivery|null);
         }
 
         /** Represents a Message. */
@@ -2809,6 +2812,9 @@ export namespace langame {
 
             /** Message analysis. */
             public analysis?: (langame.protobuf.Message.IAnalysis|null);
+
+            /** Message delivery. */
+            public delivery?: (langame.protobuf.Message.IDelivery|null);
 
             /**
              * Creates a new Message instance using the specified properties.
@@ -2882,6 +2888,114 @@ export namespace langame {
         }
 
         namespace Message {
+
+            /** Properties of a Delivery. */
+            interface IDelivery {
+
+                /** Delivery attempts */
+                attempts?: (number|null);
+
+                /** Delivery endTime */
+                endTime?: (google.protobuf.ITimestamp|null);
+
+                /** Delivery error */
+                error?: (string|null);
+
+                /** Delivery status */
+                status?: (string|null);
+            }
+
+            /** Represents a Delivery. */
+            class Delivery implements IDelivery {
+
+                /**
+                 * Constructs a new Delivery.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.Message.IDelivery);
+
+                /** Delivery attempts. */
+                public attempts: number;
+
+                /** Delivery endTime. */
+                public endTime?: (google.protobuf.ITimestamp|null);
+
+                /** Delivery error. */
+                public error: string;
+
+                /** Delivery status. */
+                public status: string;
+
+                /**
+                 * Creates a new Delivery instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Delivery instance
+                 */
+                public static create(properties?: langame.protobuf.Message.IDelivery): langame.protobuf.Message.Delivery;
+
+                /**
+                 * Encodes the specified Delivery message. Does not implicitly {@link langame.protobuf.Message.Delivery.verify|verify} messages.
+                 * @param message Delivery message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.Message.IDelivery, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Delivery message, length delimited. Does not implicitly {@link langame.protobuf.Message.Delivery.verify|verify} messages.
+                 * @param message Delivery message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.Message.IDelivery, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a Delivery message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Delivery
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.Message.Delivery;
+
+                /**
+                 * Decodes a Delivery message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Delivery
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.Message.Delivery;
+
+                /**
+                 * Verifies a Delivery message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a Delivery message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Delivery
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.Message.Delivery;
+
+                /**
+                 * Creates a plain object from a Delivery message. Also converts values to other types if specified.
+                 * @param message Delivery
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.Message.Delivery, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Delivery to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
 
             /** Type enum. */
             enum Type {

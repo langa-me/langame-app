@@ -70,40 +70,25 @@ platform :ios do
 
     delete_temp_keychain(keychain_name)
 
-    # TODO:
-    # firebase_app_distribution(
-    #   app: "1:388264600961:ios:cb9793dd455c23e50cf480",
-    #   firebase_cli_token: ENV["FIREBASE_CLI_TOKEN_DEV"],
-    #   ipa_path: "./Runner.ipa",
-    #   testers: "louis.beaumont@gmail.com",
-    # )
+    firebase_app_distribution(
+      app: "1:909899959016:ios:47d44be1ab94dfbfc0575d",
+      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
+      ipa_path: "./Runner.ipa",
+      testers: "louis.beaumont@gmail.com",
+    )
   end
   lane :beta_dev do
     begin
-      keychain_name = TEMP_KEYCHAIN_USER
-      keychain_password = TEMP_KEYCHAIN_PASSWORD
-      ensure_temp_keychain(keychain_name, keychain_password)
-  
-      match(
-        type: 'adhoc',
-        app_identifier: "me.langa.dev",
-        git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
-        readonly: true,
-        keychain_name: keychain_name,
-        keychain_password: keychain_password
-      )
-  
+      sync_code_signing
+      disable_automatic_code_signing(path: "Runner.xcodeproj")
       gym(
         configuration: "Release-dev",
         workspace: "Runner.xcworkspace",
         scheme: "dev",
         export_method: "ad-hoc",
-        export_options: {
-          provisioningProfiles: {
-              "me.langa.dev" => "match AdHoc me.langa.dev"
-          }
-        }
       )
+      enable_automatic_code_signing(path: "Runner.xcodeproj")
+
       firebase_app_distribution(
         app: "1:388264600961:ios:cb9793dd455c23e50cf480",
         firebase_cli_token: ENV["FIREBASE_CLI_TOKEN_DEV"],

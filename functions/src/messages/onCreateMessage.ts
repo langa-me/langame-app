@@ -8,15 +8,18 @@ import {html} from "../utils/html";
 import {shouldDrop} from "../utils/contexts";
 
 export const onCreateMessage = async (
-    snap: admin.firestore.DocumentSnapshot,
+    snap: admin.firestore.DocumentSnapshot<langame.protobuf.IMessage>,
     ctx: EventContext) => {
   try {
     functions.logger.log(ctx);
     if (!snap.exists) return;
     if (shouldDrop(ctx, {
-      eventMaxAgeMs: 120_000, // 2 minutes
+      eventMaxAgeMs: 60_000, // 1 minutes
     })) return;
-    if (snap.data()?.delivery?.attempts >= 3) {
+    if (
+      snap.data()?.delivery?.attempts &&
+      snap.data()!.delivery!.attempts! >= 3
+    ) {
       functions.logger.log(
           "delivery attempts >= 3, aborting"
       );
@@ -31,7 +34,7 @@ export const onCreateMessage = async (
     const db = admin.firestore();
     const from = await db
         .collection("users")
-        .doc(snap.data()!.fromUid)
+        .doc(snap.data()!.fromUid!)
         .get();
     await db.runTransaction(async (t) => {
       t.set(from.ref, {
@@ -42,13 +45,15 @@ export const onCreateMessage = async (
     });
     const to = await db
         .collection("users")
-        .doc(snap.data()!.toUid)
+        .doc(snap.data()!.toUid!)
         .get();
     if (!to.data() || !to.data()!.tokens) {
       const e = "No tokens for user " + to.id;
       await snap.ref.set({
         delivery: {
+          // @ts-ignore
           attempts: admin.firestore.FieldValue.increment(1),
+          // @ts-ignore
           endTime: admin.firestore.FieldValue.serverTimestamp(),
           error: e,
           status: "failed",
@@ -86,7 +91,7 @@ export const onCreateMessage = async (
         body: message.body,
         title: title,
         // Hack because messaging only take string
-        createdAt: snap.data()!.createdAt.toString(),
+        createdAt: snap.data()!.createdAt!.toString(),
       },
     };
     if (
@@ -156,7 +161,9 @@ export const onCreateMessage = async (
           } else {
             return snap.ref.set({
               delivery: {
+                // @ts-ignore
                 attempts: admin.firestore.FieldValue.increment(1),
+                // @ts-ignore
                 endTime: admin.firestore.FieldValue.serverTimestamp(),
                 error: null,
                 status: "success",
@@ -164,7 +171,6 @@ export const onCreateMessage = async (
             }, {merge: true});
           }
         }));
-    // TODO: compute reply suggestions
     return Promise.resolve();
   } catch (e: any) {
     await reportError(e,
@@ -173,7 +179,9 @@ export const onCreateMessage = async (
       } : undefined);
     await snap.ref.set({
       delivery: {
+        // @ts-ignore
         attempts: admin.firestore.FieldValue.increment(1),
+        // @ts-ignore
         endTime: admin.firestore.FieldValue.serverTimestamp(),
         error: e.toString(),
         status: "failed",

@@ -2300,6 +2300,97 @@ class Recording extends $pb.GeneratedMessage {
   void clearNote() => clearField(5);
 }
 
+class Message_Delivery extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Message.Delivery', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'attempts', $pb.PbFieldType.OU3)
+    ..aOM<$0.Timestamp>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'endTime', subBuilder: $0.Timestamp.create)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'error')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'status')
+    ..hasRequiredFields = false
+  ;
+
+  Message_Delivery._() : super();
+  factory Message_Delivery({
+    $core.int? attempts,
+    $0.Timestamp? endTime,
+    $core.String? error,
+    $core.String? status,
+  }) {
+    final _result = create();
+    if (attempts != null) {
+      _result.attempts = attempts;
+    }
+    if (endTime != null) {
+      _result.endTime = endTime;
+    }
+    if (error != null) {
+      _result.error = error;
+    }
+    if (status != null) {
+      _result.status = status;
+    }
+    return _result;
+  }
+  factory Message_Delivery.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Message_Delivery.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Message_Delivery clone() => Message_Delivery()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Message_Delivery copyWith(void Function(Message_Delivery) updates) => super.copyWith((message) => updates(message as Message_Delivery)) as Message_Delivery; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Message_Delivery create() => Message_Delivery._();
+  Message_Delivery createEmptyInstance() => create();
+  static $pb.PbList<Message_Delivery> createRepeated() => $pb.PbList<Message_Delivery>();
+  @$core.pragma('dart2js:noInline')
+  static Message_Delivery getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Message_Delivery>(create);
+  static Message_Delivery? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get attempts => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set attempts($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasAttempts() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAttempts() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $0.Timestamp get endTime => $_getN(1);
+  @$pb.TagNumber(2)
+  set endTime($0.Timestamp v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasEndTime() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearEndTime() => clearField(2);
+  @$pb.TagNumber(2)
+  $0.Timestamp ensureEndTime() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  $core.String get error => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set error($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasError() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearError() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get status => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set status($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasStatus() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearStatus() => clearField(4);
+}
+
 class Message_Analysis_Error extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Message.Analysis.Error', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'developerMessage')
@@ -2623,6 +2714,7 @@ class Message extends $pb.GeneratedMessage {
     ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'title')
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
     ..aOM<Message_Analysis>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'analysis', subBuilder: Message_Analysis.create)
+    ..aOM<Message_Delivery>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'delivery', subBuilder: Message_Delivery.create)
     ..hasRequiredFields = false
   ;
 
@@ -2637,6 +2729,7 @@ class Message extends $pb.GeneratedMessage {
     $core.String? title,
     $core.String? id,
     Message_Analysis? analysis,
+    Message_Delivery? delivery,
   }) {
     final _result = create();
     if (createdAt != null) {
@@ -2665,6 +2758,9 @@ class Message extends $pb.GeneratedMessage {
     }
     if (analysis != null) {
       _result.analysis = analysis;
+    }
+    if (delivery != null) {
+      _result.delivery = delivery;
     }
     return _result;
   }
@@ -2773,5 +2869,16 @@ class Message extends $pb.GeneratedMessage {
   void clearAnalysis() => clearField(12);
   @$pb.TagNumber(12)
   Message_Analysis ensureAnalysis() => $_ensure(8);
+
+  @$pb.TagNumber(13)
+  Message_Delivery get delivery => $_getN(9);
+  @$pb.TagNumber(13)
+  set delivery(Message_Delivery v) { setField(13, v); }
+  @$pb.TagNumber(13)
+  $core.bool hasDelivery() => $_has(9);
+  @$pb.TagNumber(13)
+  void clearDelivery() => clearField(13);
+  @$pb.TagNumber(13)
+  Message_Delivery ensureDelivery() => $_ensure(9);
 }
 

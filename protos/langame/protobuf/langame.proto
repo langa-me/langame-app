@@ -250,6 +250,13 @@ message Message {
   string title = 10;
   string id = 11;
   Analysis analysis = 12;
+  Delivery delivery = 13;
+  message Delivery {
+    uint32 attempts = 1;
+    google.protobuf.Timestamp end_time = 2;
+    string error = 3;
+    string status = 4;
+  }
   
   enum Type {
     INVITE = 0;

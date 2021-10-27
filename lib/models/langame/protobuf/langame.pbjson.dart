@@ -419,9 +419,21 @@ const Message$json = const {
     const {'1': 'title', '3': 10, '4': 1, '5': 9, '10': 'title'},
     const {'1': 'id', '3': 11, '4': 1, '5': 9, '10': 'id'},
     const {'1': 'analysis', '3': 12, '4': 1, '5': 11, '6': '.langame.protobuf.Message.Analysis', '10': 'analysis'},
+    const {'1': 'delivery', '3': 13, '4': 1, '5': 11, '6': '.langame.protobuf.Message.Delivery', '10': 'delivery'},
   ],
-  '3': const [Message_Analysis$json],
+  '3': const [Message_Delivery$json, Message_Analysis$json],
   '4': const [Message_Type$json],
+};
+
+@$core.Deprecated('Use messageDescriptor instead')
+const Message_Delivery$json = const {
+  '1': 'Delivery',
+  '2': const [
+    const {'1': 'attempts', '3': 1, '4': 1, '5': 13, '10': 'attempts'},
+    const {'1': 'end_time', '3': 2, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'endTime'},
+    const {'1': 'error', '3': 3, '4': 1, '5': 9, '10': 'error'},
+    const {'1': 'status', '3': 4, '4': 1, '5': 9, '10': 'status'},
+  ],
 };
 
 @$core.Deprecated('Use messageDescriptor instead')
@@ -477,4 +489,4 @@ const Message_Type$json = const {
 };
 
 /// Descriptor for `Message`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List messageDescriptor = $convert.base64Decode('CgdNZXNzYWdlEjkKCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGQoIZnJvbV91aWQYBCABKAlSB2Zyb21VaWQSFQoGdG9fdWlkGAUgASgJUgV0b1VpZBIhCgxjaGFubmVsX25hbWUYByABKAlSC2NoYW5uZWxOYW1lEjIKBHR5cGUYCCABKA4yHi5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuVHlwZVIEdHlwZRISCgRib2R5GAkgASgJUgRib2R5EhQKBXRpdGxlGAogASgJUgV0aXRsZRIOCgJpZBgLIAEoCVICaWQSPgoIYW5hbHlzaXMYDCABKAsyIi5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuQW5hbHlzaXNSCGFuYWx5c2lzGqwECghBbmFseXNpcxIWCgZ0b3BpY3MYASADKAlSBnRvcGljcxJMCgpzZW50aW1lbnRzGAIgAygLMiwubGFuZ2FtZS5wcm90b2J1Zi5NZXNzYWdlLkFuYWx5c2lzLlNlbnRpbWVudFIKc2VudGltZW50cxI+CgVlcnJvchgDIAEoCzIoLmxhbmdhbWUucHJvdG9idWYuTWVzc2FnZS5BbmFseXNpcy5FcnJvclIFZXJyb3ISNwoGZmlsdGVyGAQgASgOMh8ubGFuZ2FtZS5wcm90b2J1Zi5Db250ZW50RmlsdGVyUgZmaWx0ZXISPgoFdG9rZW4YBSADKAsyKC5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuQW5hbHlzaXMuVG9rZW5SBXRva2VuGkoKBUVycm9yEisKEWRldmVsb3Blcl9tZXNzYWdlGAEgASgJUhBkZXZlbG9wZXJNZXNzYWdlEhQKBXRyaWVzGAIgASgFUgV0cmllcxo3CglTZW50aW1lbnQSFAoFc2NvcmUYASABKAJSBXNjb3JlEhQKBWxhYmVsGAIgASgJUgVsYWJlbBp8CgVUb2tlbhIUCgVzdGFydBgBIAEoDVIFc3RhcnQSEAoDZW5kGAIgASgNUgNlbmQSEgoEd29yZBgDIAEoCVIEd29yZBIhCgxlbnRpdHlfZ3JvdXAYBCABKAlSC2VudGl0eUdyb3VwEhQKBXNjb3JlGAUgASgCUgVzY29yZSIfCgRUeXBlEgoKBklOVklURRAAEgsKB01FU1NBR0UQAQ==');
+final $typed_data.Uint8List messageDescriptor = $convert.base64Decode('CgdNZXNzYWdlEjkKCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGQoIZnJvbV91aWQYBCABKAlSB2Zyb21VaWQSFQoGdG9fdWlkGAUgASgJUgV0b1VpZBIhCgxjaGFubmVsX25hbWUYByABKAlSC2NoYW5uZWxOYW1lEjIKBHR5cGUYCCABKA4yHi5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuVHlwZVIEdHlwZRISCgRib2R5GAkgASgJUgRib2R5EhQKBXRpdGxlGAogASgJUgV0aXRsZRIOCgJpZBgLIAEoCVICaWQSPgoIYW5hbHlzaXMYDCABKAsyIi5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuQW5hbHlzaXNSCGFuYWx5c2lzEj4KCGRlbGl2ZXJ5GA0gASgLMiIubGFuZ2FtZS5wcm90b2J1Zi5NZXNzYWdlLkRlbGl2ZXJ5UghkZWxpdmVyeRqLAQoIRGVsaXZlcnkSGgoIYXR0ZW1wdHMYASABKA1SCGF0dGVtcHRzEjUKCGVuZF90aW1lGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIHZW5kVGltZRIUCgVlcnJvchgDIAEoCVIFZXJyb3ISFgoGc3RhdHVzGAQgASgJUgZzdGF0dXMarAQKCEFuYWx5c2lzEhYKBnRvcGljcxgBIAMoCVIGdG9waWNzEkwKCnNlbnRpbWVudHMYAiADKAsyLC5sYW5nYW1lLnByb3RvYnVmLk1lc3NhZ2UuQW5hbHlzaXMuU2VudGltZW50UgpzZW50aW1lbnRzEj4KBWVycm9yGAMgASgLMigubGFuZ2FtZS5wcm90b2J1Zi5NZXNzYWdlLkFuYWx5c2lzLkVycm9yUgVlcnJvchI3CgZmaWx0ZXIYBCABKA4yHy5sYW5nYW1lLnByb3RvYnVmLkNvbnRlbnRGaWx0ZXJSBmZpbHRlchI+CgV0b2tlbhgFIAMoCzIoLmxhbmdhbWUucHJvdG9idWYuTWVzc2FnZS5BbmFseXNpcy5Ub2tlblIFdG9rZW4aSgoFRXJyb3ISKwoRZGV2ZWxvcGVyX21lc3NhZ2UYASABKAlSEGRldmVsb3Blck1lc3NhZ2USFAoFdHJpZXMYAiABKAVSBXRyaWVzGjcKCVNlbnRpbWVudBIUCgVzY29yZRgBIAEoAlIFc2NvcmUSFAoFbGFiZWwYAiABKAlSBWxhYmVsGnwKBVRva2VuEhQKBXN0YXJ0GAEgASgNUgVzdGFydBIQCgNlbmQYAiABKA1SA2VuZBISCgR3b3JkGAMgASgJUgR3b3JkEiEKDGVudGl0eV9ncm91cBgEIAEoCVILZW50aXR5R3JvdXASFAoFc2NvcmUYBSABKAJSBXNjb3JlIh8KBFR5cGUSCgoGSU5WSVRFEAASCwoHTUVTU0FHRRAB');

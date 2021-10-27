@@ -9,7 +9,7 @@ import {shouldDrop} from "../utils/contexts";
 import {converter} from "../utils/firestore";
 
 export const onCreateMessageAnalysis = async (
-    snap: admin.firestore.DocumentSnapshot,
+    snap: admin.firestore.DocumentSnapshot<langame.protobuf.IMessage>,
     ctx: EventContext
 ) => {
   try {
@@ -21,9 +21,8 @@ export const onCreateMessageAnalysis = async (
     if (shouldDrop(ctx, {
       eventMaxAgeMs: 120_000, // 2 minutes
     })) return;
-    const messageData = snap.data() as langame.protobuf.Message;
-    if (messageData?.analysis?.error?.tries &&
-      messageData?.analysis?.error?.tries! > 3) {
+    if (snap.data()?.analysis?.error?.tries &&
+      snap.data()?.analysis?.error?.tries! > 3) {
       return Promise.reject(reportError(
           new Error("too many failures, aborting")));
     }
@@ -39,8 +38,8 @@ export const onCreateMessageAnalysis = async (
         .some((e) => e.lastMessageId === snap.id)) {
       const suggestions = await createSuggestion(
           api,
-        messageData!.channelName,
-        messageData!.fromUid,
+        snap.data()!.channelName!,
+        snap.data()!.fromUid!,
       );
       // Check that no suggestion with similar text appear
       if (suggestions &&
@@ -60,8 +59,8 @@ export const onCreateMessageAnalysis = async (
         .some((e) => e.lastMessageId === snap.id)) {
       const reflections = await createReflection(
           api,
-        messageData!.channelName,
-        messageData!.fromUid,
+        snap.data()!.channelName!,
+        snap.data()!.fromUid!,
       );
       // Check that no reflection with similar text appear
       if (reflections && (!lg.data()!.reflections || !lg.data()!.reflections
@@ -74,9 +73,9 @@ export const onCreateMessageAnalysis = async (
         }, {merge: true})));
       }
     }
-    if (!messageData!.analysis?.filter) {
+    if (!snap.data()!.analysis?.filter) {
       const filter = await api.filter({
-        prompt: messageData!.body,
+        prompt: snap.data()!.body!,
       });
       if (filter) {
         functions.logger.log("filter", filter);
@@ -97,6 +96,7 @@ export const onCreateMessageAnalysis = async (
       analysis: {
         error: {
           developerMessage: e.toString(),
+          // @ts-ignore
           tries: admin.firestore.FieldValue.increment(1),
         },
       },
