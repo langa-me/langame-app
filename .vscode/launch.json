@@ -128,10 +128,10 @@
             "args": [
                 "--flavor",
                 "dev",
-                // "--web-renderer=html",
+                "--web-renderer=html",
                 "--verbose",
                 "--web-port=5000",
-                // "--web-enable-expression-evaluation"
+                "--web-enable-expression-evaluation"
             ],
             // Set to run a Flutter app on a specific device, ignoring the device selected
             // in the status bar.
@@ -150,7 +150,7 @@
                 "--web-renderer=html",
                 "--verbose",
                 "--web-port=5000",
-                // "--web-enable-expression-evaluation"
+                "--web-enable-expression-evaluation"
             ],
             // Set to run a Flutter app on a specific device, ignoring the device selected
             // in the status bar.

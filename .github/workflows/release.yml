@@ -121,15 +121,30 @@ jobs:
   deploy_web:
     name: Deploy web version to Firebase hosting
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Checkout code from ref
+      - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Wait for build to succeed
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-ci
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: ci
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Abort when failed CI
+        if: steps.wait-for-build.outputs.conclusion == 'failure'
+        run: |
+          echo ${{ steps.check.outputs.status }}
+          exit 1
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
           flutter-version: 2.5.3
       - run: flutter pub get
+      - run: cp web_flavors/production/* web
       - run: flutter build web --release
       - name: Set up Firebase CLI
         run: curl -sL https://firebase.tools | bash

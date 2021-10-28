@@ -4,6 +4,7 @@ import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -16,7 +17,7 @@ class AdminProvider extends ChangeNotifier {
   Algolia? algolia;
 
   Future<List<String>> query(String value) async {
-    final i = algolia?.index('prod_topics');
+    final i = algolia?.index(AppConst.isDev ? 'dev_topics' : 'prod_topics');
     final o = await i?.query('$value').getObjects();
     if (o == null) return [];
     return o.hits

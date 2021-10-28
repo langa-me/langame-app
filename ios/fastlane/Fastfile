@@ -84,21 +84,26 @@ platform :ios do
       ensure_temp_keychain(keychain_name, keychain_password)
   
       match(
-        type: 'appstore',
-        app_identifier: "#{DEVELOPER_APP_IDENTIFIER}",
+        type: 'ad-hoc',
+        app_identifier: "me.langa.dev",
         git_basic_authorization: Base64.strict_encode64(ENV["GIT_AUTHORIZATION"]),
         readonly: true,
         keychain_name: keychain_name,
         keychain_password: keychain_password
       )
-      disable_automatic_code_signing(path: "Runner.xcodeproj")
+      
       gym(
         configuration: "Release-dev",
         workspace: "Runner.xcworkspace",
         scheme: "dev",
         export_method: "ad-hoc",
-      )
-      enable_automatic_code_signing(path: "Runner.xcodeproj")
+        export_options: {
+        provisioningProfiles: {
+            DEVELOPER_APP_ID => "match AdHoc me.langa.dev"
+        }
+      })
+
+      delete_temp_keychain(keychain_name)
 
       firebase_app_distribution(
         app: "1:388264600961:ios:cb9793dd455c23e50cf480",

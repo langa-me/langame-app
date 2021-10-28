@@ -99,6 +99,7 @@ jobs:
         with:
           flutter-version: 2.5.3
       - run: flutter pub get
+      - run: cp web_flavors/development/* web
       - run: flutter build web --release
       - name: Set up Firebase CLI
         run: curl -sL https://firebase.tools | bash

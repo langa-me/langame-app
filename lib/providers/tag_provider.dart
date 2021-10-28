@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:algolia/algolia.dart';
 import 'package:flutter/material.dart';
+import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
@@ -35,7 +36,7 @@ class TagProvider extends ChangeNotifier {
       return;
     }
 
-    final i = algolia?.index('prod_topics');
+    final i = algolia?.index(AppConst.isDev ? 'dev_topics' : 'prod_topics');
     final o = await i?.query('$value').getObjects();
     filteredTopicSearchHistory = o?.hits
         .map((e) => e.data['objectID'] as String)
