@@ -40,22 +40,19 @@ class _State extends State<LangameListView> {
       // Web does support audio yet
       langames.retainWhere((e) => e.isText);
     }
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: isLightThenDark(context, reverse: true),
-        resizeToAvoidBottomInset: false,
-        body: p.langames.length == 0
-            ? _noLangame()
-            : ListView.separated(
-                physics: BouncingScrollPhysics(),
-                itemBuilder: (_, int i) => langames[i].isText
-                    ? _buildTextCard(langames[i])
-                    : _buildAudioCard(langames[i]),
-                itemCount: langames.length,
-                separatorBuilder: (_, int i) => Divider(),
-              ),
-      ),
+    return Scaffold(
+      backgroundColor: isLightThenDark(context, reverse: true),
+      resizeToAvoidBottomInset: false,
+      body: p.langames.length == 0
+          ? _noLangame()
+          : ListView.separated(
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (_, int i) => langames[i].isText
+                  ? _buildTextCard(langames[i])
+                  : _buildAudioCard(langames[i]),
+              itemCount: langames.length,
+              separatorBuilder: (_, int i) => Divider(),
+            ),
     );
   }
 
@@ -72,8 +69,7 @@ class _State extends State<LangameListView> {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headline4),
             SizedBox(height: AppSize.safeBlockVertical * 5),
-            Text(
-                'After participating to a Langame, you will see it here',
+            Text('After participating to a Langame, you will see it here',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.caption),
           ],

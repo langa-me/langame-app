@@ -114,7 +114,7 @@ class LangameProvider extends ChangeNotifier {
       await _langameApi.notifyPresence(channelName);
       _cap.log('langame_provider:notifyPresence');
     } catch (e, s) {
-      _cap.log('langame_provider:failed to notifyPresence');
+      _cap.log('langame_provider:failed to notifyPresence $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -170,7 +170,7 @@ class LangameProvider extends ChangeNotifier {
       return LangameResponse(LangameStatus.succeed,
           result: ret.docs.first.reference.snapshots());
     } catch (e, s) {
-      _cap.log('langame_provider:failed to joinLangame $channelName');
+      _cap.log('langame_provider:failed to joinLangame $channelName $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -183,7 +183,7 @@ class LangameProvider extends ChangeNotifier {
       _cap.log('langame_provider:addNote $note');
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('langame_provider:failed to addNote $note');
+      _cap.log('langame_provider:failed to addNote $note $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -204,7 +204,7 @@ class LangameProvider extends ChangeNotifier {
       return LangameResponse(LangameStatus.succeed,
           result: notes.docs.map((e) => e.data()).toList());
     } catch (e, s) {
-      _cap.log('langame_provider:failed to getNotes in $channelName');
+      _cap.log('langame_provider:failed to getNotes in $channelName $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -239,7 +239,7 @@ class LangameProvider extends ChangeNotifier {
               .map((e) => e.data()!)
               .toList());
     } catch (e, s) {
-      _cap.log('langame_provider:failed to getUsers');
+      _cap.log('langame_provider:failed to getUsers $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -251,10 +251,10 @@ class LangameProvider extends ChangeNotifier {
           .collection(AppConst.firestoreLangamesCollection)
           .doc(langameId)
           .update({'link': link});
-      _cap.log('addLink $langameId $link');
+      _cap.log('langame_provider: addLink $langameId $link');
       return LangameResponse(LangameStatus.succeed);
     } catch (e, s) {
-      _cap.log('failed to addLink $langameId $link');
+      _cap.log('langame_provider: failed to addLink $langameId $link $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }
@@ -278,10 +278,10 @@ class LangameProvider extends ChangeNotifier {
         return LangameResponse(LangameStatus.failed);
       }
       await langame.reference.update({'isLocked': !langame.data()!.isLocked});
-      _cap.log('lock $lgId ${!langame.data()!.isLocked}');
+      _cap.log('langame_provider: lock $lgId ${!langame.data()!.isLocked}');
       _lockTimer = Timer(Duration(seconds: 5), () {});
     } catch (e, s) {
-      _cap.log('failed to notifyPresence');
+      _cap.log('langame_provider: failed to lock $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed, error: e);
     }

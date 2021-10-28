@@ -118,6 +118,23 @@ jobs:
           TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
           FIREBASE_CLI_TOKEN: '${{ secrets.FIREBASE_CLI_TOKEN }}'
 
-
-# TODO: might deploy firebase stuff automatically after both finished processing,
-# TODO: also updating remote config, langame_version for example
+  deploy_web:
+    name: Deploy web version to Firebase hosting
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout code from ref
+        uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: 2.5.3
+      - run: flutter pub get
+      - run: flutter build web --release
+      - name: Set up Firebase CLI
+        run: curl -sL https://firebase.tools | bash
+      - run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
+          chmod +x /usr/bin/yq
+      - name: Deploy to Firebase hosting "app.langa.me"
+        run: firebase deploy --only hosting:app-langa-me --token ${{ secrets.FIREBASE_CLI_TOKEN }}

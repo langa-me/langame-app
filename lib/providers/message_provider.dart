@@ -103,7 +103,6 @@ class MessageProvider extends ChangeNotifier {
 
           }),
           _messageStream.stream
-              // .distinct((a, b) => a.createdAt.nanos != b.createdAt.nanos)
               .listen((e) {
             // Somehow
             if (!e.hasCreatedAt()) return;

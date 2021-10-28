@@ -21,12 +21,19 @@ class _State extends State<NotificationSettingsView> {
 
     return Scaffold(
       appBar: buildAppBar(context, 'Notification settings'),
-      body: ListView(
+      body: buildNotificationPreferences(context, pp),
+    );
+  }
+}
+
+buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
+ListView(
+  physics: BouncingScrollPhysics(),
         children: [
           TextDivider('Messages'),
           ListTile(
             leading: Icon(
-              FontAwesomeIcons.keyboard,
+              FontAwesomeIcons.bell,
               color: getBlackAndWhite(context, 0),
             ),
             onTap: () {
@@ -43,10 +50,29 @@ class _State extends State<NotificationSettingsView> {
                   pp.refresh();
                 }),
           ),
+          ListTile(
+            leading: Icon(
+              FontAwesomeIcons.envelope,
+              color: getBlackAndWhite(context, 0),
+            ),
+            onTap: () {
+              pp.preference.notification.message.email =
+                  !pp.preference.notification.message.email;
+              pp.refresh();
+            },
+            title: Text('Email', style: Theme.of(context).textTheme.headline6),
+            trailing: Switch(
+                value: pp.preference.notification.message.email,
+                onChanged: (_) {
+                  pp.preference.notification.message.email =
+                      !pp.preference.notification.message.email;
+                  pp.refresh();
+                }),
+          ),
           TextDivider('Invitations'),
           ListTile(
             leading: Icon(
-              FontAwesomeIcons.calendar,
+              FontAwesomeIcons.bell,
               color: getBlackAndWhite(context, 0),
             ),
             onTap: () {
@@ -63,8 +89,24 @@ class _State extends State<NotificationSettingsView> {
                   pp.refresh();
                 }),
           ),
+          ListTile(
+            leading: Icon(
+              FontAwesomeIcons.envelope,
+              color: getBlackAndWhite(context, 0),
+            ),
+            onTap: () {
+              pp.preference.notification.invite.email =
+                  !pp.preference.notification.invite.email;
+              pp.refresh();
+            },
+            title: Text('Email', style: Theme.of(context).textTheme.headline6),
+            trailing: Switch(
+                value: pp.preference.notification.invite.email,
+                onChanged: (_) {
+                  pp.preference.notification.invite.email =
+                      !pp.preference.notification.invite.email;
+                  pp.refresh();
+                }),
+          ),
         ],
-      ),
-    );
-  }
-}
+      );
