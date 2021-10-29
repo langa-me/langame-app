@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/random.dart';
-import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
 class TopicSearchWidget extends StatefulWidget {
-  TopicSearchWidget();
+  final void Function(String) onTopicSelected;
+  TopicSearchWidget({required this.onTopicSelected});
 
   @override
   _State createState() => _State();
@@ -24,7 +24,8 @@ class _State extends State<TopicSearchWidget> {
   @override
   Widget build(BuildContext context) {
     // Fucked up on web
-    if (!kIsWeb && WidgetsBinding.instance!.window.viewInsets.bottom == 0.0 &&
+    if (!kIsWeb &&
+        WidgetsBinding.instance!.window.viewInsets.bottom == 0.0 &&
         !_searchBarController.isClosed) {
       //Keyboard is not visible, so we can close the search bar.
       _searchBarController.close();
@@ -39,6 +40,7 @@ class _State extends State<TopicSearchWidget> {
     }
 
     return FloatingSearchBar(
+      automaticallyImplyBackButton: false,
       controller: _searchBarController,
       hint: 'Try $searchTopicExample...',
       queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
@@ -96,12 +98,12 @@ class _State extends State<TopicSearchWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SvgPicture.asset(
-                        isLight(context)
-                            ? 'images/search-by-algolia-light-background.svg'
-                            : 'images/search-by-algolia-dark-background.svg',
-                        width: AppSize.safeBlockHorizontal * 10,
-                        height: AppSize.safeBlockVertical * 3,
-                        ),
+                      isLight(context)
+                          ? 'images/search-by-algolia-light-background.svg'
+                          : 'images/search-by-algolia-dark-background.svg',
+                      width: AppSize.safeBlockHorizontal * 10,
+                      height: AppSize.safeBlockVertical * 3,
+                    ),
                   ]),
             );
           } else if (tp.filteredTopicSearchHistory.isEmpty) {
@@ -128,12 +130,7 @@ class _State extends State<TopicSearchWidget> {
                                       reverse: false)))),
                       onTap: () {
                         _searchBarController.close();
-                        if (tp.selectedTopics.length >= 3) {
-                          Provider.of<ContextProvider>(context, listen: false)
-                              .showSnackBar('Three topics at most is allowed');
-                          return;
-                        }
-                        tp.addToSelectedTopic(topic);
+                        widget.onTopicSelected(topic);
                       },
                     ),
                   )

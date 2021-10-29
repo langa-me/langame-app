@@ -64,7 +64,7 @@ class PreferenceProvider extends ChangeNotifier {
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
         'shakeToFeedback': preference.shakeToFeedback,
         'hasDoneOnBoarding': preference.hasDoneOnBoarding,
-        'userRecommendations': preference.userRecommendations.value,
+        'userRecommendations': preference.userRecommendations,
         'themeIndex': preference.themeIndex,
       });
       _cap.log('preference_provider: save preference');
@@ -77,6 +77,7 @@ class PreferenceProvider extends ChangeNotifier {
   }
 
   addFavoriteTopic(String topic) {
+    if (_preference.favoriteTopics.contains(topic)) return;
     _cap.sendClickTopic(topic);
     _preference.favoriteTopics.add(topic);
     notifyListeners();
@@ -99,7 +100,7 @@ class PreferenceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setRecommendations(lg.UserPreference_RecommendationType v) {
+  void setRecommendations(bool v) {
     _preference.userRecommendations = v;
     notifyListeners();
   }

@@ -40,6 +40,7 @@ export const onCreateAuthentication = async (user: UserRecord,
     delete clone.photoURL;
     clone.photoUrl = photo;
     clone.credits = 5;
+    clone.human = true;
     await db.runTransaction(async (t) => {
       return t.set(db.collection(kUsersCollection).doc(user.uid), clone, {merge: true});
     });

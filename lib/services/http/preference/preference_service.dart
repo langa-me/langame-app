@@ -5,7 +5,7 @@ import '../firebase.dart';
 abstract class PreferenceService {
   static const sharedPrefPrefKey = 'pref_key';
   static final lg.UserPreference defaultPreference = lg.UserPreference(
-    userRecommendations: lg.UserPreference_RecommendationType.NONE,
+    userRecommendations: true,
     themeIndex: 0, // System
     hasDoneOnBoarding: false,
     userSearchHistory: [],
@@ -14,7 +14,7 @@ abstract class PreferenceService {
     notification: lg.UserPreference_Notification(
       invite: lg.UserPreference_Notification_Invite(email: true, push: true),
       message:
-          lg.UserPreference_Notification_Message(email: false, push: false),
+          lg.UserPreference_Notification_Message(email: true, push: true),
     ),
   );
   final FirebaseApi firebase;

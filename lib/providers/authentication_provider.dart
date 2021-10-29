@@ -177,7 +177,7 @@ class AuthenticationProvider extends ChangeNotifier {
           .collection(AppConst.firestoreUsersCollection)
           .doc(uc.user!.uid)
           .update({
-        'lastSignInTime': DateTime.now(),
+        'lastLogin': DateTime.now(),
       });
       firebase.analytics?.logLogin();
       _cap.log('authentication_provider:loginWith');
@@ -366,7 +366,7 @@ class AuthenticationProvider extends ChangeNotifier {
           : user!.apple
               ? _authenticationApi.loginWithApple()
               : _authenticationApi.loginWithEmail(null, null));
-      firebase.auth!.currentUser!.reauthenticateWithCredential(cred.oAuthCrendential!);
+      await firebase.auth!.currentUser!.reauthenticateWithCredential(cred.oAuthCrendential!);
       await firebase.auth!.currentUser!.delete();
       _cap.log('purging local storage');
       var i = await SharedPreferences.getInstance();

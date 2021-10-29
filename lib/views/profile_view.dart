@@ -7,6 +7,8 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/views/colors/colors.dart';
+import 'package:langame/views/texts/texts.dart';
+import 'package:langame/views/topics/favorite_topics_widget.dart';
 import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
@@ -20,54 +22,37 @@ class _State extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: isLightThenDark(context, reverse: true),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(
-    color: getBlackAndWhite(context, 0), //change your color here
-  ),
+          color: getBlackAndWhite(context, 0), //change your color here
+        ),
       ),
       body: ListView(
+        physics: BouncingScrollPhysics(),
         children: [
           _buildProfileImage(),
           _buildTagForm(),
-          // Container(
-          //   padding: EdgeInsets.all(24),
-          //   height: AppSize.safeBlockVertical * 40,
-          //   width: AppSize.safeBlockHorizontal * 50,
-          //   color: getBlackAndWhite(context, 1, reverse: true),
-          //   child: Consumer2<TagProvider, PreferenceProvider>(
-          //       builder: (ctx, tp, pp, _) => ListView(
-          //             children: tp.topics.values
-          //                 .map((e) => Align(
-          //                       child: ToggleButton(
-          //                           initialLayer: 2,
-          //                           width: AppSize.safeBlockHorizontal *
-          //                               40 *
-          //                               (AppSize.isLargeWidth ? 1 : 2),
-          //                           selected: pp.preference != null &&
-          //                               pp.preference!.favoriteTopics
-          //                                   .contains(e.topic.content),
-          //                           onChange: (bool selected) {
-          //                             if (selected)
-          //                               pp.addFavoriteTopic(e.topic.content);
-          //                             else
-          //                               pp.removeFavoriteTopic(e.topic.content);
-          //                           },
-          //                           textUnselected:
-          //                               '${e.topic.emojis.join('')}\n${e.topic.content}',
-          //                           textSelected:
-          //                               '${e.topic.emojis.join('')}\n${e.topic.content}'),
-          //                     ))
-          //                 .toList(),
-          //           )),
-          // ),
-          SizedBox(height: AppSize.safeBlockVertical * 15)
+          TextDivider(
+            'Interests',
+            height: AppSize.safeBlockVertical*10,
+          ),
+          Container(
+            child: FavoriteTopicsWidget(),
+            height: AppSize.safeBlockVertical * 40,
+            width: AppSize.safeBlockHorizontal * 80,
+          ),
+          SizedBox(
+            height: AppSize.safeBlockVertical * 30,
+          ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildProfileImage() {

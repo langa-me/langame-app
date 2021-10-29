@@ -6,6 +6,7 @@ import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
 import {html} from "../utils/html";
 import {shouldDrop} from "../utils/contexts";
+import {onSendMessageToBot} from "./onSendMessageToBot";
 
 export const onCreateMessage = async (
     snap: admin.firestore.DocumentSnapshot<langame.protobuf.IMessage>,
@@ -47,6 +48,9 @@ export const onCreateMessage = async (
         .collection("users")
         .doc(snap.data()!.toUid!)
         .get();
+    if (to.data()!.human === false) {
+      return onSendMessageToBot(snap);
+    }
     if (!to.data() || !to.data()!.tokens) {
       const e = "No tokens for user " + to.id;
       await snap.ref.set({
@@ -72,10 +76,7 @@ export const onCreateMessage = async (
 
     // Build a title ourselves if it's not set. (message)
     if (message.type !== langame.protobuf.Message.Type.INVITE) {
-      const notificationSubjectClipSize = 30;
-      const bodyClipped = message.body!.substr(0, notificationSubjectClipSize) +
-        (message.body!.length > notificationSubjectClipSize ? "..." : "");
-      title = `${from.data()!.tag} says: ${bodyClipped}...`;
+      title = `${from.data()!.tag}`;
     }
     const toPreferences = await db
         .collection("preferences")
@@ -107,7 +108,7 @@ export const onCreateMessage = async (
         title: title!,
       };
     }
-    functions.logger.log("onWriteMessage", "sending message",
+    functions.logger.log("sending message",
       "data" in payload ? "silently, as user has push notification off": "");
     const messagingResponse = await admin.messaging().sendToDevice(
       to.data()!.tokens!,

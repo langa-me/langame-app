@@ -86,7 +86,7 @@ enum InteractionLevel {
 message UserPreference {
   string user_id = 2;
   // Do I want to be recommended like-minded new people?
-  RecommendationType user_recommendations = 3;
+  bool user_recommendations = 3;
   int32 theme_index = 4;
   bool has_done_on_boarding = 5;
   // Searched user tags
@@ -111,12 +111,6 @@ message UserPreference {
       bool email = 1;
       bool push = 2;
     }
-  }
-  enum RecommendationType {
-    NONE = 0;
-    NEW = 1;
-    COMPOUND = 2;
-    ALL = 3;
   }
 }
 

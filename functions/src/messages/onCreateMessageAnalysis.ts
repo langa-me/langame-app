@@ -1,9 +1,10 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {EventContext} from "firebase-functions";
-import {Api} from "../aiApi/aiApi";
+import {Api, OpenaiCompletionParameters} from "../aiApi/aiApi";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {reportError} from "../errors";
+import {FunctionConfig} from "../functionConfig/config";
 import {langame} from "../langame/protobuf/langame";
 import {shouldDrop} from "../utils/contexts";
 import {converter} from "../utils/firestore";
@@ -29,6 +30,9 @@ export const onCreateMessageAnalysis = async (
     const lg = (await admin.firestore().collection("langames")
         .where("channelName", "==", snap.data()?.channelName)
         .withConverter(converter<langame.protobuf.Langame>()).get()).docs[0];
+    const config = await admin.firestore().collection("configs").doc("default")
+        .withConverter(converter<FunctionConfig>())
+        .get();
     const api = new ImplAiApi();
     const db = admin.firestore();
     const promises = [];
@@ -40,6 +44,7 @@ export const onCreateMessageAnalysis = async (
           api,
         snap.data()!.channelName!,
         snap.data()!.fromUid!,
+        config.data()!.suggestion!,
       );
       // Check that no suggestion with similar text appear
       if (suggestions &&
@@ -61,6 +66,7 @@ export const onCreateMessageAnalysis = async (
           api,
         snap.data()!.channelName!,
         snap.data()!.fromUid!,
+        config.data()!.reflection!
       );
       // Check that no reflection with similar text appear
       if (reflections && (!lg.data()!.reflections || !lg.data()!.reflections
@@ -108,13 +114,12 @@ export const onCreateMessageAnalysis = async (
 export const createSuggestion = async (
     api: Api,
     channelName: string,
-    fromUid: string
+    fromUid: string,
+    config: OpenaiCompletionParameters,
 ): Promise<langame.protobuf.Langame.ISuggestion | undefined> => {
   // Get all messages between these two
   const messages = await admin.firestore()
       .collection("messages")
-  // .where("fromUid", "==", change.after.data()!.fromUid)
-  // .where("toUid", "==", change.after.data()!.toUid)
       .where("channelName", "==", channelName)
       .orderBy("createdAt", "asc")
       .limitToLast(10)
@@ -130,11 +135,8 @@ export const createSuggestion = async (
     fromUid ? "Me: " : "You: ") +
     e.data()!.body).join("\n") +
     "\nSuggestion:";
-  // const alternative = await api.hfCompletion(prompt, {
-  //   maxNewTokens: 100,
-  //   repetitionPenalty: 20.1,
-  // });
   const alternative = await api.openaiCompletion({
+    ...config,
     prompt:
       "This is a suggestion of answer given to the user in a conversation " +
       "to help him have more meaningful exchanges, think " +
@@ -144,12 +146,6 @@ export const createSuggestion = async (
       "You: Can't we be better than other animals?\n\n" +
       "Suggestion: Thank you for changing my opinion on this.\n###\n" +
       prompt,
-    maxTokens: 300,
-    frequencyPenalty: 0.3,
-    presencePenalty: 0.3,
-    temperature: 0.7,
-    stop: ["###", "\n", "Me:", "You:"],
-    model: "davinci-codex",
   });
   if (!alternative) return Promise.resolve(undefined);
   const filter = await api.filter({prompt: alternative});
@@ -168,7 +164,8 @@ export const createSuggestion = async (
 export const createReflection = async (
     api: Api,
     channelName: string,
-    fromUid: string
+    fromUid: string,
+    config: OpenaiCompletionParameters,
 ): Promise<langame.protobuf.Langame.IReflection | undefined> => {
   // Get all messages between these two
   const messages = await admin.firestore()
@@ -195,6 +192,7 @@ export const createReflection = async (
   //   repetitionPenalty: 20.1,
   // });
   const alternative = await api.openaiCompletion({
+    ...config,
     prompt:
       "This is a reflection given to the user in a conversation " +
       "to help him have more meaningful exchanges, think " +
@@ -204,12 +202,6 @@ export const createReflection = async (
       "You: Can't we be better than other animals?\n\n" +
       "Reflection: What are your ethical principles?\n###\n" +
       prompt,
-    maxTokens: 300,
-    frequencyPenalty: 0.4,
-    presencePenalty: 0.3,
-    temperature: 0.7,
-    stop: ["###", "\n", "Me:", "You:"],
-    model: "davinci-codex",
   });
   if (!alternative) return Promise.resolve(undefined);
   const filter = await api.filter({prompt: alternative});

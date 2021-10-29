@@ -43,6 +43,7 @@ class TagProvider extends ChangeNotifier {
         .toList()
         .reversed
         .toList();
+    debugPrint('filteredTopicSearchHistory: $value $filteredTopicSearchHistory');
   }
 
   List<String> _filteredTopicSearchHistory = [];

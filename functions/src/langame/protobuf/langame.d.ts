@@ -833,7 +833,7 @@ export namespace langame {
             userId?: (string|null);
 
             /** UserPreference userRecommendations */
-            userRecommendations?: (langame.protobuf.UserPreference.RecommendationType|null);
+            userRecommendations?: (boolean|null);
 
             /** UserPreference themeIndex */
             themeIndex?: (number|null);
@@ -882,7 +882,7 @@ export namespace langame {
             public userId: string;
 
             /** UserPreference userRecommendations. */
-            public userRecommendations: langame.protobuf.UserPreference.RecommendationType;
+            public userRecommendations: boolean;
 
             /** UserPreference themeIndex. */
             public themeIndex: number;
@@ -1279,14 +1279,6 @@ export namespace langame {
                      */
                     public toJSON(): { [k: string]: any };
                 }
-            }
-
-            /** RecommendationType enum. */
-            enum RecommendationType {
-                NONE = 0,
-                NEW = 1,
-                COMPOUND = 2,
-                ALL = 3
             }
         }
 

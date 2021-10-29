@@ -16,7 +16,6 @@ import {onUpdateLangame} from "./onUpdateLangame";
 import {onCreateAuthentication} from "./users/onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
 import {setLangamesDone} from "./setLangamesDone";
-import {setUserRecommendation} from "./users/setUserRecommendation";
 import {resetCredits} from "./users/resetCredits";
 import {getMemes} from "./memes/getMemes";
 import * as Sentry from "@sentry/node";
@@ -26,6 +25,7 @@ import {onWriteUser} from "./users/onWriteUser";
 import {onWriteMeme} from "./memes/onWriteMeme";
 import {onCreateMessage} from "./messages/onCreateMessage";
 import {onCreateMessageAnalysis} from "./messages/onCreateMessageAnalysis";
+import {onWritePreference} from "./users/onWritePreference";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -50,14 +50,6 @@ exports.versionCheck = functions
     .runWith(runtimeOpts)
     .https
     .onCall(versionCheck);
-
-
-exports.setUserRecommendation = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .pubsub
-    .schedule("1 * * * *")
-    .onRun(setUserRecommendation);
 
 exports.setLangamesDone = functions
     .region(region)
@@ -132,8 +124,17 @@ exports.onCreateAuthentication = functions
 exports.onWriteUser = functions
     .region(region)
     .runWith(runtimeOpts)
-    .firestore.document("users/{userId}")
+    .firestore
+    .document("users/{userId}")
     .onWrite(onWriteUser);
+
+exports.onWritePreference = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
+    .document("preferences/{preferenceId}")
+    .onWrite(onWritePreference);
+
 
 // Meme //
 

@@ -10,21 +10,21 @@ class Profile extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-      _user.hasPhotoUrl() ? Text(
-        _user.tag,
-        style: theme.textTheme.headline6,
-        textAlign: TextAlign.center,
-      ) : SizedBox.shrink(),
+    return Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
       _user.hasPhotoUrl()
-                                      ? CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              _user.photoUrl),
-                                        )
-                                      : CircleAvatar(
-                                          child: Text(_user.tag),
-                                        ),
+          ? Text(
+              _user.tag,
+              style: theme.textTheme.headline6,
+              textAlign: TextAlign.center,
+            )
+          : SizedBox.shrink(),
+      _user.hasPhotoUrl()
+          ? CircleAvatar(
+              backgroundImage: NetworkImage(_user.photoUrl),
+            )
+          : CircleAvatar(
+              child: Text(_user.tag),
+            ),
     ]);
   }
 }

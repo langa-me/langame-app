@@ -14,7 +14,6 @@ import 'package:langame/views/language/language_settings.dart';
 import 'package:langame/views/notifications/notification_view.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
@@ -73,6 +72,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
       ),
       body: Container(
         child: ListView(
+          physics: BouncingScrollPhysics(),
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(12),
@@ -106,15 +106,17 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title:
                   Text('Profile', style: Theme.of(context).textTheme.headline6),
             ),
-            pp.preference.previewMode ? ListTile(
-              onTap: () {
-                cp.push(LanguageSettingsView());
-              },
-              leading: Icon(FontAwesomeIcons.language,
-                  color: isLightThenDark(context)),
-              title: Text('Language',
-                  style: Theme.of(context).textTheme.headline6),
-            ) : SizedBox.shrink(),
+            pp.preference.previewMode
+                ? ListTile(
+                    onTap: () {
+                      cp.push(LanguageSettingsView());
+                    },
+                    leading: Icon(FontAwesomeIcons.language,
+                        color: isLightThenDark(context)),
+                    title: Text('Language',
+                        style: Theme.of(context).textTheme.headline6),
+                  )
+                : SizedBox.shrink(),
             ListTile(
               onTap: () {
                 cp.push(NotificationSettingsView());
@@ -126,6 +128,8 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title: Text('Notification',
                   style: Theme.of(context).textTheme.headline6),
             ),
+            buildRecommendationSetting(context, pp),
+            
             ListTile(
               leading: Beta(
                 Icon(FontAwesomeIcons.flask,
@@ -145,66 +149,32 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                     pp.refresh();
                   }),
             ),
-            previewModeOrInvisible(pp, ExpansionTile(
-                leading: Beta(
-                    Icon(FontAwesomeIcons.brain,
-                        color: isLightThenDark(context)),
-                    type: BetaType.NEW),
-                title: Text('User recommendations',
-                    style: Theme.of(context).textTheme.headline6),
-                children: [
-                  ListTile(
+            previewModeOrInvisible(
+                pp,
+                ExpansionTile(
+                    onExpansionChanged: (_) {
+                      cap.logNewFeatureClick('settings_integration');
+                    },
                     leading: Beta(
-                      Icon(FontAwesomeIcons.cartPlus,
-                          color: getBlackAndWhite(context, 0)),
-                      type: BetaType.SOON,
-                    ),
-                    title: Text('New relationships',
+                        Icon(FontAwesomeIcons.brain,
+                            color: isLightThenDark(context)),
+                        type: BetaType.SOON),
+                    title: Text('Integration',
                         style: Theme.of(context).textTheme.headline6),
-                    trailing: Switch(value: false, onChanged: (_) {}),
-                  ),
-                  ListTile(
-                    onTap: () => pp.setRecommendations(
-                        pp.preference.userRecommendations ==
-                                lg.UserPreference_RecommendationType.COMPOUND
-                            ? lg.UserPreference_RecommendationType.NONE
-                            : lg.UserPreference_RecommendationType.COMPOUND),
-                    leading: Icon(FontAwesomeIcons.layerGroup,
-                        color: getBlackAndWhite(context, 0)),
-                    title: Text('Compound relationships',
-                        style: Theme.of(context).textTheme.headline6),
-                    trailing: Switch(
-                        value: pp.preference.userRecommendations ==
-                            lg.UserPreference_RecommendationType.COMPOUND,
-                        onChanged: (v) => pp.setRecommendations(v
-                            ? lg.UserPreference_RecommendationType.COMPOUND
-                            : lg.UserPreference_RecommendationType.NONE)),
-                  ),
-                ])),
-            previewModeOrInvisible(pp, ExpansionTile(
-                onExpansionChanged: (_) {
-                  cap.logNewFeatureClick('settings_integration');
-                },
-                leading: Beta(
-                    Icon(FontAwesomeIcons.brain,
-                        color: isLightThenDark(context)),
-                    type: BetaType.SOON),
-                title: Text('Integration',
-                    style: Theme.of(context).textTheme.headline6),
-                children: !AppConst.isDev
-                    ? []
-                    : [
-                        ListTile(
-                          onTap: () {
-                            if (!AppConst.isDev) return;
-                            cp.push(ReadwiseView());
-                          },
-                          leading: Icon(FontAwesomeIcons.bookOpen,
-                              color: isLightThenDark(context)),
-                          title: Text('Readwise',
-                              style: Theme.of(context).textTheme.headline6),
-                        )
-                      ])),
+                    children: !AppConst.isDev
+                        ? []
+                        : [
+                            ListTile(
+                              onTap: () {
+                                if (!AppConst.isDev) return;
+                                cp.push(ReadwiseView());
+                              },
+                              leading: Icon(FontAwesomeIcons.bookOpen,
+                                  color: isLightThenDark(context)),
+                              title: Text('Readwise',
+                                  style: Theme.of(context).textTheme.headline6),
+                            )
+                          ])),
             Divider(),
             ExpansionTile(
                 leading:
@@ -286,3 +256,23 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
     });
   }
 }
+
+Widget buildRecommendationSetting(
+        BuildContext context, PreferenceProvider pp) =>
+    ListTile(
+      onTap: () => pp.setRecommendations(!pp.preference.userRecommendations),
+      leading: Icon(FontAwesomeIcons.userFriends,
+          color: getBlackAndWhite(context, 0)),
+      title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text('User recommendations',
+            style: Theme.of(context).textTheme.headline6),
+        Tooltip(
+            message:
+                'Get recommended people with similar conversation interests',
+            child: Icon(FontAwesomeIcons.questionCircle,
+                color: getBlackAndWhite(context, 0))),
+      ]),
+      trailing: Switch(
+          value: pp.preference.userRecommendations,
+          onChanged: (v) => pp.setRecommendations(v)),
+    );

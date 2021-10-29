@@ -15,7 +15,7 @@ import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/recording_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
-import 'package:langame/views/memes/topic_search_bar.dart';
+import 'package:langame/views/topics/topic_search_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 
@@ -37,7 +37,6 @@ final _couldNotHear = [
   'Could you say that again? 🤨',
   'Can you say that again, please? 🤨',
 ];
-
 
 class PhysicalLangamePageView extends StatefulWidget {
   final void Function(int, {Curve? curve}) _goToPage;
@@ -91,7 +90,16 @@ class _State extends State<PhysicalLangamePageView>
           children: [
             Container(
                 height: AppSize.safeBlockVertical * 20,
-                child: TopicSearchWidget()),
+                child: TopicSearchWidget(
+                  onTopicSelected: (topic) {
+                    if (tp.selectedTopics.length >= 3) {
+                      Provider.of<ContextProvider>(context, listen: false)
+                          .showSnackBar('Three topics at most is allowed');
+                      return;
+                    }
+                    tp.addToSelectedTopic(topic);
+                  },
+                )),
             Positioned(
                 top: 0,
                 right: AppSize.safeBlockHorizontal * 5,
@@ -230,7 +238,9 @@ class _State extends State<PhysicalLangamePageView>
                       'meme': getMeme(plp),
                       'context': 'face-to-face',
                       'language': _languageSelected,
-                      'topics': plp.memes[plp.currentMeme].topics.map((e) => '#$e').join(' '),
+                      'topics': plp.memes[plp.currentMeme].topics
+                          .map((e) => '#$e')
+                          .join(' '),
                     });
                     if (txt.result == '') {
                       cp.showSnackBar(_couldNotHear.pickAny()!);

@@ -188,15 +188,18 @@ class ToggleButton extends StatefulWidget {
   /// Whether to trigger the toggle on long press instead of simple tap
   final bool onLongPress;
   final int initialLayer;
+  final bool selectable;
 
-  ToggleButton(
-      {this.textSelected = '',
-      this.textUnselected = '',
-      this.selected = false,
-      this.onChange,
-      this.width = 100,
-      this.onLongPress = false,
-      this.initialLayer = 1});
+  ToggleButton({
+    this.textSelected = '',
+    this.textUnselected = '',
+    this.selected = false,
+    this.onChange,
+    this.width = 100,
+    this.onLongPress = false,
+    this.initialLayer = 1,
+    this.selectable = true,
+  });
 
   @override
   _ToggleButtonState createState() => _ToggleButtonState(selected: selected);
@@ -234,8 +237,8 @@ class _ToggleButtonState extends State<ToggleButton> {
           child: Text(widget.textSelected,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18, color: fg)),
-          onPressed: widget.onLongPress ? null : _onFirstChildChange,
-          onLongPress: widget.onLongPress ? _onFirstChildChange : null,
+          onPressed: !widget.selectable ? null : widget.onLongPress ? null : _onFirstChildChange,
+          onLongPress: !widget.selectable ? null : widget.onLongPress ? _onFirstChildChange : null,
         ),
       ),
       secondChild: Container(
@@ -246,24 +249,26 @@ class _ToggleButtonState extends State<ToggleButton> {
           child: Text(widget.textUnselected,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18, color: fg)),
-          onPressed: widget.onLongPress ? null : _onSecondChildChange,
-          onLongPress: widget.onLongPress ? _onSecondChildChange : null,
+          onPressed: !widget.selectable ? null : widget.onLongPress ? null : _onSecondChildChange,
+          onLongPress: !widget.selectable ? null : widget.onLongPress ? _onSecondChildChange : null,
         ),
       ),
     );
   }
 
   _onFirstChildChange() {
+    if (widget.onChange != null) widget.onChange!(false);
+
     setState(() {
       selected = !selected;
     });
-    if (widget.onChange != null) widget.onChange!(false);
   }
 
   _onSecondChildChange() {
+    if (widget.onChange != null) widget.onChange!(true);
+
     setState(() {
       selected = !selected;
     });
-    if (widget.onChange != null) widget.onChange!(true);
   }
 }

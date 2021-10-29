@@ -1,16 +1,41 @@
 import {expect} from "chai";
-import {internalSetUserRecommendation} from "./setUserRecommendation";
 import * as admin from "firebase-admin";
 import {initFirebaseTest} from "../utils/firestore.spec";
 import {ImplAiApi} from "../aiApi/implAiApi";
+import {setRecommendations} from "./onWriteUser";
+import {converter} from "../utils/firestore";
+import {langame} from "../langame/protobuf/langame";
+import {onboardUserWithBot} from "./bot";
 
 
-describe.skip("user", () => {
+describe("user", () => {
   initFirebaseTest({isDev: true});
 
   it("test recommendations", async () => {
-    await internalSetUserRecommendation(admin.firestore());
+    const me = (await admin.firestore().collection("users")
+        .withConverter(converter<langame.protobuf.IUser>())
+        .where("tag", "==", "epi").get()).docs[0];
+    const mePref = await admin.firestore().collection("preferences").
+        doc(me.id)
+        .withConverter(converter<langame.protobuf.IUserPreference>())
+        .get();
+    await setRecommendations(
+        admin.firestore(),
+        me,
+        mePref,
+    );
     expect(true).to.be.true;
+  });
+
+  it("onBoardUserWithBot", async () => {
+    const me = (await admin.firestore().collection("users")
+        .withConverter(converter<langame.protobuf.IUser>())
+        .where("tag", "==", "lou").get()).docs[0];
+    const mePref = await admin.firestore().collection("preferences").
+        doc(me.id)
+        .withConverter(converter<langame.protobuf.IUserPreference>())
+        .get();
+    await onboardUserWithBot(mePref);
   });
 });
 
@@ -34,3 +59,4 @@ it("hack", async () => {
     }
   }
 });
+

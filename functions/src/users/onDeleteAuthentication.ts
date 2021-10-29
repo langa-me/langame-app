@@ -119,6 +119,9 @@ export const onDeleteAuthentication = async (user: UserRecord,
     batch.delete(db.collection("recommendations").doc(user.uid));
     batch.delete(db.collection("seenMemes").doc(user.uid));
 
+    // In case it's a bot, delete the bot's data
+    batch.delete(db.collection("bots").doc(user.uid));
+
     functions.logger.info(
         "preparing interactions, preferences, " +
         "recommendations, seenMemes, user deletion"

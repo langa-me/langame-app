@@ -7,24 +7,30 @@ import * as admin from "firebase-admin";
 import {expect} from "chai";
 import * as sinon from "sinon";
 import {langame} from "../langame/protobuf/langame";
+import {converter} from "../utils/firestore";
+import {onSendMessageToBot} from "./onSendMessageToBot";
+import {getConfig} from "../functionConfig/config";
 it("suggest", async () => {
   initFirebaseTest({isDev: true});
-
+  const conf = await getConfig();
   const completion = await createSuggestion(
       new ImplAiApi(),
       "775b19ed",
       "qpbGMze6PHb1PPDhnrCVoObosGj2",
+      conf.suggestion,
   );
   console.log(completion);
 });
 
 it("reflect", async () => {
   initFirebaseTest({isDev: true});
+  const conf = await getConfig();
 
   const completion = await createReflection(
       new ImplAiApi(),
       "775b19ed",
       "qpbGMze6PHb1PPDhnrCVoObosGj2",
+      conf.reflection
   );
   console.log(completion);
 });
@@ -65,4 +71,16 @@ it("onWriteMessageAnalysis should properly add some intelligence to message and 
   let err = null;
   (await wrapped(snap) as Promise<any>).catch((e) => err = e);
   expect(err).to.be.not.null;
+});
+
+it("onSendMessageToBot", async () => {
+  initFirebaseTest({isDev: true});
+  const botSnap = (await admin.firestore().collection("users")
+      .withConverter(converter<langame.protobuf.IUser>())
+      .where("human", "==", false).get()).docs[0];
+  expect(botSnap).to.be.not.undefined;
+  const messageSnap = (await admin.firestore().collection("messages")
+      .withConverter(converter<langame.protobuf.IMessage>())
+      .where("toUid", "==", botSnap.id).get()).docs[0];
+  await onSendMessageToBot((await messageSnap.ref.get()));
 });

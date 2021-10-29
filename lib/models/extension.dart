@@ -110,9 +110,7 @@ class UserPreferenceExt {
     var m = o as Map<String, dynamic>;
     return lg.UserPreference(
       userId: m['userId'],
-      userRecommendations: lg.UserPreference_RecommendationType.values
-          .firstWhere(
-              (e) => e.toString() == m['userRecommendations'].toString()),
+      userRecommendations: m['userRecommendations'] is bool ? m['userRecommendations'] : true,
       themeIndex: m['themeIndex'],
       hasDoneOnBoarding: m['hasDoneOnBoarding'],
       userSearchHistory:

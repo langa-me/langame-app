@@ -108,18 +108,19 @@ class _State extends State<LangameTextView>
                     .toList())
             : null,
         appBar: AppBar(
+          titleSpacing: 0,
+          centerTitle: false,
           title: other != null
               ? Text(
                   other!.tag,
                   style: Theme.of(context).textTheme.headline6,
-                  textAlign: TextAlign.center,
                 )
               : null,
           iconTheme: IconThemeData(
             color: getBlackAndWhite(context, 0), //change your color here
           ),
           backgroundColor: Colors.transparent,
-          actions: actions,
+          actions: [buildPopupMenuWithHelpAndFeedback(context)],
         ),
         body: langame.memes.isEmpty || messages == null
             ? Column(
@@ -307,7 +308,7 @@ class _State extends State<LangameTextView>
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                f.format(m.createdAt.toDateTime()),
+                                f.format(m.createdAt.toDateTime().toLocal()),
                                 style:
                                     Theme.of(context).textTheme.caption!.merge(
                                           TextStyle(
@@ -439,8 +440,9 @@ class _State extends State<LangameTextView>
                                                 .set({
                                               'likes': FieldValue.arrayUnion([
                                                 {
-                                                  'langame':
-                                                      widget.initialLangame.channelName,
+                                                  'langame': widget
+                                                      .initialLangame
+                                                      .channelName,
                                                   'reflection':
                                                       e.toProto3Json(),
                                                 }
@@ -476,7 +478,7 @@ class _State extends State<LangameTextView>
           child: Badge(
             position: BadgePosition.topEnd(top: -20, end: -20),
             badgeColor: getBlackAndWhite(context, 0),
-            child: Icon(FontAwesomeIcons.brain),
+            child: Icon(FontAwesomeIcons.comment),
             badgeContent: Text(
               (suggestions.length - _seenSuggestions).toString(),
               style: Theme.of(context).textTheme.headline6!.merge(TextStyle(
@@ -500,20 +502,24 @@ class _State extends State<LangameTextView>
                             itemCount: suggestions.length,
                             separatorBuilder: (ctx, i) => Divider(),
                             itemBuilder: (ctx, i) => LangameButton(
-                              FontAwesomeIcons.copy,
+                              FontAwesomeIcons.keyboard,
                               text: suggestions[i].alternatives.last,
                               labelMaxLines: null,
                               layer: 1,
                               onPressed: () {
-                                FlutterClipboard.copy(
-                                    suggestions[i].alternatives.last);
+                                setState(() {
+                                  _textEditingController.text =
+                                      suggestions[i].alternatives.last;
+                                  _currentText =
+                                      suggestions[i].alternatives.last;
+                                });
                               },
                             ),
                           )
                         : Text(
                             'We don\'t have anything interesting for you yet, keep talking 😉',
                             style: Theme.of(context).textTheme.caption,
-                            textAlign: TextAlign.center,
+                            textAlign: TextAlign.left,
                           ),
                   ),
                   // Show a nice box with corners box rounded
@@ -536,7 +542,8 @@ class _State extends State<LangameTextView>
 
       var mp = Provider.of<MessageProvider>(context, listen: false);
 
-      mp.sendMessage(widget.initialLangame.channelName, _currentText, other!.uid);
+      mp.sendMessage(
+          widget.initialLangame.channelName, _currentText, other!.uid);
 
       setState(() {
         _currentText = '';

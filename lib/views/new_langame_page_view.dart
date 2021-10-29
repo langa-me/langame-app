@@ -20,7 +20,7 @@ import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/langames/langame_audio.dart';
 import 'package:langame/views/langames/langame_text.dart';
-import 'package:langame/views/memes/topic_search_bar.dart';
+import 'package:langame/views/topics/topic_search_bar.dart';
 import 'package:langame/views/langame_list_view.dart';
 import 'package:langame/views/search_page_view.dart';
 import 'package:provider/provider.dart';
@@ -67,7 +67,14 @@ class _SendLangameState extends State<NewLangamePageView>
             children: [
               Container(
                   height: AppSize.safeBlockVertical * 20,
-                  child: TopicSearchWidget()),
+                  child: TopicSearchWidget(onTopicSelected: (topic) {
+                    if (tp.selectedTopics.length >= 3) {
+                          Provider.of<ContextProvider>(context, listen: false)
+                              .showSnackBar('Three topics at most is allowed');
+                          return;
+                        }
+                        tp.addToSelectedTopic(topic);
+                  })),
               Positioned(
                   top: 0,
                   right: AppSize.safeBlockHorizontal * 5,

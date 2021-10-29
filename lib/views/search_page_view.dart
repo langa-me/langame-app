@@ -2,7 +2,6 @@ import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
@@ -42,8 +41,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
     return Consumer2<PreferenceProvider, NewLangameProvider>(
         builder: (c, p, lp, _) {
       if (p.selectedUser == null) {
-        return p.preference.userRecommendations !=
-                lg.UserPreference_RecommendationType.NONE
+        return p.preference.userRecommendations
             ? Column(
                 children: [
                   Text('Recommendations',

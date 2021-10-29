@@ -73,7 +73,7 @@ export const handleError = (
     snap: admin.firestore.DocumentReference | null | QueryDocumentSnapshot,
     options: ErrorOptions
 ): Promise<any>[] => {
-  const e = Error(options.developerMessage);
+  const e = Error(JSON.stringify(options.developerMessage));
   const p1 = snap ?
   (
     snap instanceof admin.firestore.DocumentReference ?

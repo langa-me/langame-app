@@ -913,7 +913,7 @@ class UserPreference_Notification extends $pb.GeneratedMessage {
 class UserPreference extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserPreference', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userId')
-    ..e<UserPreference_RecommendationType>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userRecommendations', $pb.PbFieldType.OE, defaultOrMaker: UserPreference_RecommendationType.NONE, valueOf: UserPreference_RecommendationType.valueOf, enumValues: UserPreference_RecommendationType.values)
+    ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userRecommendations')
     ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'themeIndex', $pb.PbFieldType.O3)
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'hasDoneOnBoarding')
     ..pPS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userSearchHistory')
@@ -931,7 +931,7 @@ class UserPreference extends $pb.GeneratedMessage {
   UserPreference._() : super();
   factory UserPreference({
     $core.String? userId,
-    UserPreference_RecommendationType? userRecommendations,
+    $core.bool? userRecommendations,
     $core.int? themeIndex,
     $core.bool? hasDoneOnBoarding,
     $core.Iterable<$core.String>? userSearchHistory,
@@ -1017,9 +1017,9 @@ class UserPreference extends $pb.GeneratedMessage {
   void clearUserId() => clearField(2);
 
   @$pb.TagNumber(3)
-  UserPreference_RecommendationType get userRecommendations => $_getN(1);
+  $core.bool get userRecommendations => $_getBF(1);
   @$pb.TagNumber(3)
-  set userRecommendations(UserPreference_RecommendationType v) { setField(3, v); }
+  set userRecommendations($core.bool v) { $_setBool(1, v); }
   @$pb.TagNumber(3)
   $core.bool hasUserRecommendations() => $_has(1);
   @$pb.TagNumber(3)

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,8 +59,9 @@ class _LoginViewState extends State<LoginView> {
         // Wait until internet then
         await Connectivity().onConnectivityChanged.first;
       }
+      StreamSubscription<UserChange>? sub;
       // Bunch of spaghetti code to check if it is a new user or already authenticated
-      ap.userStream.listen((user) async {
+      sub = ap.userStream.listen((user) async {
         if (!this.mounted) return;
         // 10 seconds
         await waitUntil(() => _isVersionCheckOk == true, maxIterations: 10000);
@@ -79,6 +82,7 @@ class _LoginViewState extends State<LoginView> {
             .timeout(Duration(milliseconds: 500))
             .catchError((_) => lg.UserPreference());
 
+        sub?.cancel();
         if (pp.preference.hasDoneOnBoarding) {
           // Probably logged-out, skip message api init
           await waitUntil(() => mp.isReady == true, maxIterations: 10000)
@@ -218,17 +222,18 @@ class _LoginViewState extends State<LoginView> {
           padding: EdgeInsets.all(12),
         );
     var logins = [
-     !UniversalPlatform.isWeb
+      !UniversalPlatform.isWeb
           ? _buildButtonParent(LangameButton(
-        FontAwesomeIcons.google,
-        fixedSize: Size(
-            AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
-        onPressed: () async {
-          if (isAuthenticating) return;
-          await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
-        },
-        layer: 1,
-      )) : SizedBox.shrink(),
+              FontAwesomeIcons.google,
+              fixedSize: Size(AppSize.safeBlockHorizontal * 20,
+                  AppSize.safeBlockVertical * 5),
+              onPressed: () async {
+                if (isAuthenticating) return;
+                await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
+              },
+              layer: 1,
+            ))
+          : SizedBox.shrink(),
       UniversalPlatform.isIOS
           ? _buildButtonParent(
               LangameButton(

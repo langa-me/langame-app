@@ -45,25 +45,6 @@ class ContentFilter extends $pb.ProtobufEnum {
   const ContentFilter._($core.int v, $core.String n) : super(v, n);
 }
 
-class UserPreference_RecommendationType extends $pb.ProtobufEnum {
-  static const UserPreference_RecommendationType NONE = UserPreference_RecommendationType._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'NONE');
-  static const UserPreference_RecommendationType NEW = UserPreference_RecommendationType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'NEW');
-  static const UserPreference_RecommendationType COMPOUND = UserPreference_RecommendationType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'COMPOUND');
-  static const UserPreference_RecommendationType ALL = UserPreference_RecommendationType._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ALL');
-
-  static const $core.List<UserPreference_RecommendationType> values = <UserPreference_RecommendationType> [
-    NONE,
-    NEW,
-    COMPOUND,
-    ALL,
-  ];
-
-  static final $core.Map<$core.int, UserPreference_RecommendationType> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static UserPreference_RecommendationType? valueOf($core.int value) => _byValue[value];
-
-  const UserPreference_RecommendationType._($core.int v, $core.String n) : super(v, n);
-}
-
 class FunctionResponse_VersionCheck_UpdateRequired extends $pb.ProtobufEnum {
   static const FunctionResponse_VersionCheck_UpdateRequired OK = FunctionResponse_VersionCheck_UpdateRequired._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OK');
   static const FunctionResponse_VersionCheck_UpdateRequired REQUIRED = FunctionResponse_VersionCheck_UpdateRequired._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'REQUIRED');

@@ -67,6 +67,11 @@ void main() async {
     FirebaseAppCheck.instance.activate();
     crashlytics = FirebaseCrashlytics.instance;
     await crashlytics.setCrashlyticsCollectionEnabled(kReleaseMode);
+    crashlytics.setCustomKey(
+        'environment',
+        Firebase.apps[0].options.projectId.contains('dev')
+            ? 'devevelopment'
+            : 'production');
     // Pass all uncaught errors from the framework to Crashlytics.
     FlutterError.onError = crashlytics.recordFlutterError;
     Isolate.current.addErrorListener(RawReceivePort((pair) async {

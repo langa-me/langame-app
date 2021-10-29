@@ -7,19 +7,18 @@ import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
-import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/colors/colors.dart';
+import 'package:langame/views/settings_view.dart';
+import 'package:langame/views/topics/favorite_topics_widget.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
-import 'feature_preview/beta.dart';
 import 'main_view.dart';
 import 'notifications/notification_view.dart';
 
@@ -45,6 +44,8 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IntroductionScreen(
+        globalBackgroundColor: getBlackAndWhite(context, 0, reverse: true),
+        color: getBlackAndWhite(context, 0),
         done: Icon(FontAwesomeIcons.check,
             color: Theme.of(context).colorScheme.secondary),
         next: Icon(FontAwesomeIcons.arrowRight,
@@ -88,44 +89,13 @@ class _OnBoardingState extends State with AfterLayoutMixin {
       PageViewModel(
         titleWidget: Text('What are your interests?',
             style: Theme.of(context).textTheme.headline5),
-            footer: Text('We will use it to customize your first experiences.',
-                style: Theme.of(context).textTheme.caption),
+        footer: Text('We will use it to customize your first experiences.',
+            style: Theme.of(context).textTheme.caption),
         bodyWidget: Container(
-            height: AppSize.safeBlockVertical * 70,
-            width: AppSize.safeBlockHorizontal *
-                45 *
-                (AppSize.isLargeWidth ? 1 : 2),
-            child: Consumer2<PreferenceProvider, TagProvider>(
-              builder: (context, pp, tp, child) => Container(
-                  height: AppSize.safeBlockVertical * 70,
-                  width: AppSize.safeBlockHorizontal *
-                      45 *
-                      (AppSize.isLargeWidth ? 1 : 2),
-                  alignment: Alignment.center,
-                  child: ListView(
-                    physics: BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(20.0),
-                    children: tp.availableTopics
-                        .map(
-                          (e) => ToggleButton(
-                              width: AppSize.safeBlockHorizontal *
-                                  45 *
-                                  (AppSize.isLargeWidth ? 1 : 2),
-                              selected:
-                                  pp.preference.favoriteTopics.contains(e),
-                              onChange: (bool selected) {
-                                if (selected)
-                                  pp.addFavoriteTopic(e);
-                                else
-                                  pp.removeFavoriteTopic(e);
-                              },
-                              textUnselected: e,
-                              textSelected: e),
-                        )
-                        .toList(),
-                  )),
-            )),
+            child: FavoriteTopicsWidget(),
+            height: AppSize.safeBlockVertical * 40,
+            width: AppSize.safeBlockHorizontal * 80,
+          ),
       ),
       PageViewModel(
         titleWidget: Text('Get user recommendations?',
@@ -134,33 +104,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           builder: (context, p, child) => Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ListTile(
-                leading: Beta(
-                  Icon(FontAwesomeIcons.cartPlus,
-                      color: getBlackAndWhite(context, 0)),
-                  type: BetaType.SOON,
-                ),
-                title: Text('New relationships',
-                    style: Theme.of(context).textTheme.headline6),
-                trailing: Switch(value: false, onChanged: (_) {}),
-              ),
-              ListTile(
-                onTap: () => p.setRecommendations(
-                    p.preference.userRecommendations ==
-                            lg.UserPreference_RecommendationType.COMPOUND
-                        ? lg.UserPreference_RecommendationType.NONE
-                        : lg.UserPreference_RecommendationType.COMPOUND),
-                leading: Icon(FontAwesomeIcons.layerGroup,
-                    color: getBlackAndWhite(context, 0)),
-                title: Text('Compound relationships',
-                    style: Theme.of(context).textTheme.headline6),
-                trailing: Switch(
-                    value: p.preference.userRecommendations ==
-                        lg.UserPreference_RecommendationType.COMPOUND,
-                    onChanged: (v) => p.setRecommendations(v
-                        ? lg.UserPreference_RecommendationType.COMPOUND
-                        : lg.UserPreference_RecommendationType.NONE)),
-              ),
+              buildRecommendationSetting(context, p),
               !kIsWeb
                   ? Lottie.asset(
                       'animations/recommendations.json',
