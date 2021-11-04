@@ -17,20 +17,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Wait for build to succeed
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        id: wait-for-ci
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: ci
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Abort when failed CI
-        if: steps.wait-for-build.outputs.conclusion == 'failure'
-        run: |
-          echo ${{ steps.check.outputs.status }}
-          exit 1
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
