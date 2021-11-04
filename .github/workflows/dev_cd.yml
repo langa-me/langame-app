@@ -109,4 +109,4 @@ jobs:
       - name: Deploy to Firebase hosting channel
         run: firebase hosting:channel:deploy $(cat pubspec.yaml | yq e '.version' - | sed 's/+/./g') --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --expires 7d
       - name: Deploy to Firebase hosting "dev.langa.me"
-        run: firebase deploy --only hosting --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }}
+        run: firebase deploy --only hosting:dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }}

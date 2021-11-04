@@ -2,7 +2,7 @@ import {Logging} from "@google-cloud/logging";
 import * as functions from "firebase-functions";
 import * as Sentry from "@sentry/node";
 import * as admin from "firebase-admin";
-import {QueryDocumentSnapshot}
+import {DocumentSnapshot, QueryDocumentSnapshot}
   from "firebase-functions/lib/providers/firestore";
 
 
@@ -70,7 +70,10 @@ interface ErrorOptions {
 }
 
 export const handleError = (
-    snap: admin.firestore.DocumentReference | null | QueryDocumentSnapshot,
+    snap: admin.firestore.DocumentReference |
+    null |
+    QueryDocumentSnapshot |
+    DocumentSnapshot,
     options: ErrorOptions
 ): Promise<any>[] => {
   const e = Error(JSON.stringify(options.developerMessage));

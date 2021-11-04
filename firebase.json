@@ -37,11 +37,22 @@
   "storage": {
     "rules": "storage.rules"
   },
-  "hosting": {
-    "public": "build/web",
-    "ignore": [
-      "firebase.json",
-      "**/.*"
-    ]
-  }
+  "hosting": [
+    {
+      "target": "prod-app",
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*"
+      ]
+    },
+    {
+      "target": "dev-app",
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*"
+      ]
+    }
+  ]
 }

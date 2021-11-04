@@ -1,14 +1,13 @@
 /* eslint-disable max-len */
-import "mocha";
-
 import * as admin from "firebase-admin";
+import "mocha";
 // import * as functions from "firebase-functions";
 import {ImplAiApi} from "./aiApi/implAiApi";
 import {initFirebaseTest} from "./utils/firestore.spec";
 
 
 it.skip("meme to algolia", async () => {
-  initFirebaseTest({isDev: false});
+  initFirebaseTest("dev");
 
   const api = new ImplAiApi();
   const memeDocs = await Promise.all((await admin.firestore().collection("memes").listDocuments())
@@ -26,7 +25,7 @@ it.skip("meme to algolia", async () => {
   }));
 });
 it.skip("rr", async () => {
-  initFirebaseTest({isDev: true});
+  initFirebaseTest("dev");
   const d = await admin.firestore().collection("users").limit(1).get();
   console.log("yolo", d.docs[0].data());
 

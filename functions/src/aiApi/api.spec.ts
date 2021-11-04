@@ -5,6 +5,8 @@ import {ImplAiApi, openAiEndpoint} from "./implAiApi";
 import {offlineMemeSearch} from "../memes/memes";
 import {FakeAiApi} from "./fakeAiApi";
 import {parseHrtimeToSeconds} from "../utils/time";
+import {initFirebaseTest} from "../utils/firestore.spec";
+import * as admin from "firebase-admin";
 
 
 it.skip("create Github issue", async () => {
@@ -117,9 +119,10 @@ it("sentiment", async () => {
 it("hfCompletion", async () => {
   const api = new ImplAiApi();
   const completion =
-    await api.hfCompletion(
+    await api.huggingFaceCompletion(
         "The cat is running after a mice because he is", {
           maxNewTokens: 2,
+          model: "bigscience/T0pp",
         }
     );
   console.log(completion);
@@ -129,7 +132,7 @@ it("hfCompletion", async () => {
 it("hfCompletion fake", async () => {
   const api = new FakeAiApi();
   const completion =
-    await api.hfCompletion(
+    await api.huggingFaceCompletion(
         "The cat is running after a mice because he is", {
           maxNewTokens: 2,
         }
@@ -255,4 +258,38 @@ describe("Completion1", () => {
     expect(completion).to.be.not.undefined;
     expect(completion).to.be.equal("bar");
   });
+});
+
+it("conversational", async () => {
+  const api = new ImplAiApi();
+  const res = await api.conversational(
+      ["Hi I'm from mars", "How are you?"],
+      ["Hello I'm from moon", "I'm fine"],
+      "How old are you?",
+  );
+  console.log(res);
+});
+
+it("conversational2", async () => {
+  initFirebaseTest("prod");
+  const messages = await admin.firestore()
+      .collection("messages")
+      .where("channelName", "==", "caba1d37")
+      .orderBy("createdAt", "asc")
+      .limitToLast(10)
+      .get();
+  const lastMessage = messages.docs[0];
+  const api = new ImplAiApi();
+  const pastUserInputs = messages.docs
+      .filter((e) => e.data()!.toUid === lastMessage.data()!.fromUid)
+      .map((e) => e.data()!.body);
+  const generatedResponses = messages.docs
+      .filter((e) => e.data()!.toUid === lastMessage.data()!.toUid)
+      .map((e) => e.data()!.body);
+  const alternative = await api.conversational(
+      pastUserInputs,
+      generatedResponses,
+      lastMessage.data()!.body!,
+  );
+  console.log(alternative);
 });

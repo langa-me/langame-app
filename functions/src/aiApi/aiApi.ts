@@ -63,6 +63,30 @@ export type OpenaiModel = "babbage" | "ada" | "curie" |
   "davinci" | "davinci-codex";
 export const isFineTunedModel = (model: string): model is OpenaiModel =>
   (model as OpenaiModel).length === 0;
+
+/**
+ * https://api-inference.huggingface.co/docs/python/html/detailed_parameters.html#id23
+ */
+export interface ConversationalParameters {
+  minLength?: number;
+  maxLength?: number;
+  topK?: number;
+  topP?: number;
+  temperature?: number;
+  repetitionPenalty?: number;
+  maxTime?: number;
+}
+export interface HuggingFaceCompletionParameters {
+  topK?: number;
+  topP?: number;
+  temperature?: number;
+  repetitionPenalty?: number;
+  maxNewTokens?: number;
+  maxTimeSteps?: number;
+  returnFullText?: boolean;
+  numReturnSequences?: number;
+  model?: "EleutherAI/gpt-j-6B" | "bigscience/T0pp";
+}
 export interface Api {
   save(indexName: string, objects: { object: any, id: string }[]): Promise<any>;
   getIndex(indexName: string): SearchIndex;
@@ -93,9 +117,15 @@ export interface Api {
   sentiment(
     content: string,
   ): Promise<any | undefined>;
-  hfCompletion(
+  huggingFaceCompletion(
     content: string,
-    parameters: any,
+    parameters: HuggingFaceCompletionParameters,
+  ): Promise<string | undefined>;
+  conversational(
+    pastUserInputs: string[],
+    generatedResponses: string[],
+    text: string,
+    parameters?: ConversationalParameters
   ): Promise<string | undefined>;
 }
 

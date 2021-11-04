@@ -117,39 +117,3 @@ jobs:
           TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
           TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
           FIREBASE_CLI_TOKEN: '${{ secrets.FIREBASE_CLI_TOKEN }}'
-
-  deploy_web:
-    name: Deploy web version to Firebase hosting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Wait for build to succeed
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        id: wait-for-ci
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: ci
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Abort when failed CI
-        if: steps.wait-for-build.outputs.conclusion == 'failure'
-        run: |
-          echo ${{ steps.check.outputs.status }}
-          exit 1
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          flutter-version: 2.5.3
-      - run: flutter pub get
-      - run: cp web/web_flavors/production/* web
-      - run: flutter build web --release
-      - name: Set up Firebase CLI
-        run: curl -sL https://firebase.tools | bash
-      - run: |
-          wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
-          chmod +x /usr/bin/yq
-      - name: Deploy to Firebase hosting "app.langa.me"
-        run: firebase deploy --only hosting:app-langa-me --token ${{ secrets.FIREBASE_CLI_TOKEN }}

@@ -2,6 +2,7 @@ import {
   algoliaId, algoliaKey, Api,
   huggingfaceKey, isFineTunedModel, OpenaiCompletionParameters,
   OpenaiCompletionOptions, openAiKey,
+  ConversationalParameters, HuggingFaceCompletionParameters,
 } from "./aiApi";
 import algoliasearch, {SearchClient, SearchIndex} from "algoliasearch";
 import {sleep} from "../utils/time";
@@ -58,7 +59,6 @@ export class ImplAiApi implements Api {
       new Translate({keyFilename: this.keyFileName}) :
       new Translate();
   }
-
 
   /**
    *
@@ -310,27 +310,83 @@ export class ImplAiApi implements Api {
    * @param{any} parameters see https://api-inference.huggingface.co/docs/python/html/detailed_parameters.html#text-generation-task
    * @return{Promise}
    */
-  async hfCompletion(
+  async huggingFaceCompletion(
       content: string,
-      parameters: any
+      parameters: HuggingFaceCompletionParameters,
+  ): Promise<string | undefined> {
+    let body = {
+      inputs: [content],
+      parameters: {
+        top_k: parameters.topK || undefined,
+        top_p: parameters.topP || undefined,
+        temperature: parameters.temperature || 1.1,
+        repetition_penalty: parameters.repetitionPenalty || undefined,
+        max_new_tokens: parameters.maxNewTokens || undefined,
+        max_time_steps: parameters.maxTimeSteps || undefined,
+        return_full_text: parameters.returnFullText || false,
+        num_return_sequences: parameters.numReturnSequences || 1,
+      },
+      options: {
+        wait_for_model: true,
+      },
+    };
+    // HACK T0 does not take parameters
+    if (parameters.model === "bigscience/T0pp") {
+      body = {
+        // @ts-ignore
+        inputs: content,
+      };
+    }
+    const response = await fetch(
+        `${huggingfaceEndpoint}/${parameters.model || "bigscience/T0pp"}`,
+        {
+          headers: {Authorization: `Bearer ${huggingfaceKey()}`},
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+    const result = await response.json();
+    if (result.error) throw new Error(result.error);
+    if (parameters.model === "bigscience/T0pp") {
+      return result[0].generated_text;
+    }
+    return result.length === 0 || result[0].length === 0 ?
+      undefined : result[0][0].generated_text;
+  }
+
+  // eslint-disable-next-line valid-jsdoc
+  /**
+   *
+   * @param pastUserInputs
+   * @param generateResponses
+   * @param text
+   * @param parameters
+   * @returns
+   */
+  async conversational(
+      pastUserInputs: string[],
+      generatedResponses: string[],
+      text: string,
+      parameters?: ConversationalParameters
   ): Promise<string | undefined> {
     const response = await fetch(
-        `${huggingfaceEndpoint}/EleutherAI/gpt-j-6B`,
+        `${huggingfaceEndpoint}/facebook/blenderbot-3B`,
         {
           headers: {Authorization: `Bearer ${huggingfaceKey()}`},
           method: "POST",
           body: JSON.stringify({
-            inputs: [content],
+            inputs: {
+              past_user_inputs: pastUserInputs,
+              generated_responses: generatedResponses,
+              text,
+            },
             parameters: {
-              top_k: parameters.topK || undefined,
-              top_p: parameters.topP || undefined,
-              temperature: parameters.temperature || 1.1,
-              repetition_penalty: parameters.repetitionPenalty || undefined,
-              max_new_tokens: parameters.maxNewTokens || undefined,
-              max_time_steps: parameters.maxTimeSteps || undefined,
-              return_full_text: parameters.returnFullText || false,
-              num_return_sequences: parameters.numReturnSequences || 1,
-              stop: parameters.stop || undefined,
+              min_length: parameters?.minLength || undefined,
+              max_length: parameters?.maxLength || undefined,
+              top_k: parameters?.topK || undefined,
+              top_p: parameters?.topP || undefined,
+              temperature: parameters?.temperature || undefined,
+              repetition_penalty: parameters?.repetitionPenalty || undefined,
+              max_time: parameters?.maxTime || undefined,
             },
             options: {
               wait_for_model: true,
@@ -339,7 +395,6 @@ export class ImplAiApi implements Api {
         });
     const result = await response.json();
     if (result.error) throw new Error(result.error);
-    return result.length === 0 || result[0].length === 0 ?
-      undefined : result[0][0].generated_text;
+    return result.generated_text;
   }
 }

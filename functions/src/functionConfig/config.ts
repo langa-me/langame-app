@@ -4,16 +4,17 @@
 
 
 import * as admin from "firebase-admin";
-import {OpenaiCompletionParameters} from "../aiApi/aiApi";
+import {HuggingFaceCompletionParameters,
+  OpenaiCompletionParameters} from "../aiApi/aiApi";
 import {converter} from "../utils/firestore";
 
 export interface FunctionConfig {
-    reflection: OpenaiCompletionParameters,
-    suggestion: OpenaiCompletionParameters,
+    reflection: OpenaiCompletionParameters | HuggingFaceCompletionParameters,
+    suggestion: OpenaiCompletionParameters | HuggingFaceCompletionParameters,
 }
 
-export const getConfig = async (
-): Promise<FunctionConfig> => {
+// type ConfigType = "reflection" | "suggestion" | "reply";
+export const getConfig = async (): Promise<FunctionConfig> => {
   const snap = await admin.firestore().collection("configs")
       .withConverter(converter<FunctionConfig>())
       .doc("default").get();

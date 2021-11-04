@@ -9,7 +9,7 @@ import {onboardUserWithBot} from "./bot";
 
 
 describe("user", () => {
-  initFirebaseTest({isDev: true});
+  initFirebaseTest("dev");
 
   it("test recommendations", async () => {
     const me = (await admin.firestore().collection("users")
@@ -51,12 +51,12 @@ it("search", async () => {
 
 
 it("hack", async () => {
-  initFirebaseTest({isDev: false});
-  const users = await admin.firestore().collection("users").get();
-  for (const user of users.docs) {
-    if (!user.data()!.tag) {
-      console.log(user.id, user.data()!.email, "has no tag");
-    }
-  }
+  initFirebaseTest("prod");
+  const users = await admin.firestore().collection("preferences")
+      .withConverter(converter<langame.protobuf.IUserPreference>())
+      .get();
+  await Promise.all(users.docs.map((e) => e.ref.update({
+    hasDoneOnBoarding: false,
+  })));
 });
 

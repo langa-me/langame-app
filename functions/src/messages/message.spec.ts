@@ -1,17 +1,16 @@
-import {createReflection, createSuggestion}
-  from "./onCreateMessageAnalysis";
-import "mocha";
-import {initFirebaseTest} from "../utils/firestore.spec";
-import {ImplAiApi} from "../aiApi/implAiApi";
-import * as admin from "firebase-admin";
 import {expect} from "chai";
+import * as admin from "firebase-admin";
+import "mocha";
 import * as sinon from "sinon";
+import {ImplAiApi} from "../aiApi/implAiApi";
+import {getConfig} from "../functionConfig/config";
 import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
+import {initFirebaseTest} from "../utils/firestore.spec";
+import {createReflection, createSuggestion} from "./onCreateMessageAnalysis";
 import {onSendMessageToBot} from "./onSendMessageToBot";
-import {getConfig} from "../functionConfig/config";
 it("suggest", async () => {
-  initFirebaseTest({isDev: true});
+  initFirebaseTest("dev");
   const conf = await getConfig();
   const completion = await createSuggestion(
       new ImplAiApi(),
@@ -23,14 +22,15 @@ it("suggest", async () => {
 });
 
 it("reflect", async () => {
-  initFirebaseTest({isDev: true});
-  const conf = await getConfig();
-
+  initFirebaseTest("dev");
   const completion = await createReflection(
       new ImplAiApi(),
-      "775b19ed",
-      "qpbGMze6PHb1PPDhnrCVoObosGj2",
-      conf.reflection
+      "edadfcd2",
+      "cpTqkDjLtoX926OZXpcLyv3bzWA2",
+      {
+        maxNewTokens: 200,
+        model: "bigscience/T0pp",
+      }
   );
   console.log(completion);
 });
@@ -74,7 +74,7 @@ it("onWriteMessageAnalysis should properly add some intelligence to message and 
 });
 
 it("onSendMessageToBot", async () => {
-  initFirebaseTest({isDev: true});
+  initFirebaseTest("dev");
   const botSnap = (await admin.firestore().collection("users")
       .withConverter(converter<langame.protobuf.IUser>())
       .where("human", "==", false).get()).docs[0];

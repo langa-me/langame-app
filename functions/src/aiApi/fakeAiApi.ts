@@ -2,7 +2,7 @@
 /* eslint-disable require-jsdoc */
 import {SearchIndex} from "algoliasearch";
 import {langame} from "../langame/protobuf/langame";
-import {Api, OpenaiCompletionOptions, OpenaiCompletionParameters} from "./aiApi";
+import {Api, ConversationalParameters, HuggingFaceCompletionParameters, OpenaiCompletionOptions, OpenaiCompletionParameters} from "./aiApi";
 
 /**
  *
@@ -53,7 +53,11 @@ export class FakeAiApi implements Api {
         },
       ]);
     }
-    hfCompletion(content: string, parameters: any): Promise<string | undefined> {
+    huggingFaceCompletion(content: string,
+        parameters: HuggingFaceCompletionParameters): Promise<string | undefined> {
       return Promise.resolve(this.faker.lorem.sentence());
+    }
+    conversational(pastUserInputs: string[], generatedResponses: string[], text: string, parameters?: ConversationalParameters): Promise<string | undefined> {
+      throw new Error("Method not implemented.");
     }
 }
