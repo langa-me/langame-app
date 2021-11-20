@@ -48,36 +48,6 @@ export const onSendMessageToBot = async (
         snap.data()!.body!,
     );
 
-    // Now we want to give suggestions to the user based on this conversation
-    // Using GPT completion
-    // Prompt should look like:
-    // Me: Hello Bob I am Louis
-    // You: Hello Louis, how are you?
-    // ...
-    // TODO: when it's "Topics: X, Y..." GPT3 does shit, fix it
-    // const prompt = messages.docs
-    //     .map((e) => (e.data()!.toUid ===
-    //     snap.data()!.toUid ? "Me: " : "You: ") +
-    //     e.data()!.body).join("\n") +
-    //   "\nMe:";
-    // const alternative = await api.openaiCompletion({
-    //   prompt:
-    //     "This is an open ended answer given in a conversation " +
-    //     "which leads to meaningful, reciprocal exchanges, " +
-    //     "and overall great conversation.\n\n" +
-    //     "You: Do you think we should all become vegan?\n\n" +
-    //     "Me: Why? After all other animals eat eachother\n\n" +
-    //     "You: Can't we be better than other animals?\n\n" +
-    //     "Me: Thank you for changing my opinion on this, " +
-    //     "you are very intelligent\n###\n" +
-    //     prompt,
-    //   maxTokens: 300,
-    //   frequencyPenalty: 0.5,
-    //   presencePenalty: 0,
-    //   temperature: 0.5,
-    //   stop: ["###", "\n", "Me:", "You:"],
-    //   model: "davinci-codex",
-    // });
     if (!alternative) return Promise.resolve(undefined);
     const filter = await api.filter({prompt: alternative});
     if (filter === undefined) return Promise.resolve(undefined);

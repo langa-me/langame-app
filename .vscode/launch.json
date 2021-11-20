@@ -128,9 +128,12 @@
             "args": [
                 "--flavor",
                 "dev",
-                "--web-renderer=html",
-                "--verbose",
-                "--web-port=5000",
+                "--web-renderer",
+                "canvaskit",
+                "--web-port",
+                "5000",
+                "--dart-define",
+                "FLUTTER_WEB_USE_SKIA=true",
                 "--web-enable-expression-evaluation"
             ],
             // Set to run a Flutter app on a specific device, ignoring the device selected
@@ -146,10 +149,13 @@
             "program": "lib/main.dart",
             "args": [
                 "--flavor",
-                "prod",
-                "--web-renderer=html",
-                "--verbose",
-                "--web-port=5000",
+                "dev",
+                "--web-renderer",
+                "canvaskit",
+                "--web-port",
+                "5000",
+                "--dart-define",
+                "FLUTTER_WEB_USE_SKIA=true",
                 "--web-enable-expression-evaluation"
             ],
             // Set to run a Flutter app on a specific device, ignoring the device selected

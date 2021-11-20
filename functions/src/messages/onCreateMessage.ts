@@ -15,7 +15,7 @@ export const onCreateMessage = async (
     functions.logger.log(ctx);
     if (!snap.exists) return;
     if (shouldDrop(ctx, {
-      eventMaxAgeMs: 60_000, // 1 minutes
+      eventMaxAgeMs: 180_000, // 2 minutes
     })) return;
     if (
       snap.data()?.delivery?.attempts &&
@@ -83,34 +83,36 @@ export const onCreateMessage = async (
         .withConverter(converter<langame.protobuf.UserPreference>())
         .doc(message.toUid)
         .get();
-    const payload: admin.messaging.MessagingPayload = {
-      data: {
-        fromUid: message.fromUid,
-        toUid: message.toUid,
-        channelName: message.channelName,
-        type: message.type.toString(),
-        body: message.body,
-        title: title,
-        // Hack because messaging only take string
-        createdAt: snap.data()!.createdAt!.toString(),
-      },
-    };
-    if (
-      message.type === langame.protobuf.Message.Type.INVITE &&
+    let messagingResponse: admin.messaging.MessagingDevicesResponse | undefined;
+    if (to.data()!.tokens && to.data()!.tokens.length > 0) {
+      const payload: admin.messaging.MessagingPayload = {
+        data: {
+          fromUid: message.fromUid,
+          toUid: message.toUid,
+          channelName: message.channelName,
+          type: message.type.toString(),
+          body: message.body,
+          title: title,
+          // Hack because messaging only take string
+          createdAt: snap.data()!.createdAt!.toString(),
+        },
+      };
+      if (
+        message.type === langame.protobuf.Message.Type.INVITE &&
       toPreferences.data()!.notification?.invite?.push === true ||
       message.type === langame.protobuf.Message.Type.MESSAGE &&
       toPreferences.data()!.notification?.message?.push === true
-    ) {
-      payload.notification = {
+      ) {
+        payload.notification = {
         // I think tag is used to group notifications
-        tag: message.fromUid,
-        body: message!.body!,
-        title: title!,
-      };
-    }
-    functions.logger.log("sending message",
+          tag: message.fromUid,
+          body: message!.body!,
+          title: title!,
+        };
+      }
+      functions.logger.log("sending message",
       "data" in payload ? "silently, as user has push notification off": "");
-    const messagingResponse = await admin.messaging().sendToDevice(
+      messagingResponse = await admin.messaging().sendToDevice(
       to.data()!.tokens!,
       payload,
       {
@@ -119,7 +121,10 @@ export const onCreateMessage = async (
         // Required for background data-only messages on Android
         priority: "high",
       }
-    );
+      );
+    } else {
+      functions.logger.log("no tokens for user", to.id);
+    }
     // TODO: parallelize
     if (
       message.type === langame.protobuf.Message.Type.INVITE &&
@@ -139,6 +144,7 @@ export const onCreateMessage = async (
       });
     }
 
+    if (!messagingResponse) return Promise.resolve();
     await Promise.all<any>(
         messagingResponse.results.map((messagingResult, i) => {
           const t = to.data()!.tokens![i];

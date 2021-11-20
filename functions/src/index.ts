@@ -173,6 +173,7 @@ exports.onCreateMessage = functions
     .runWith({
       ...runtimeOpts,
       failurePolicy: true,
+      timeoutSeconds: 300,
     })
     .firestore.document("messages/{messageId}")
     .onCreate(onCreateMessage);

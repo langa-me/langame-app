@@ -222,7 +222,7 @@ class _LoginViewState extends State<LoginView> {
           padding: EdgeInsets.all(12),
         );
     var logins = [
-      !UniversalPlatform.isWeb
+      true // !UniversalPlatform.isWeb
           ? _buildButtonParent(LangameButton(
               FontAwesomeIcons.google,
               fixedSize: Size(AppSize.safeBlockHorizontal * 20,

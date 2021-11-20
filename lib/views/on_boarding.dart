@@ -1,6 +1,5 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -14,7 +13,6 @@ import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/colors/colors.dart';
-import 'package:langame/views/settings_view.dart';
 import 'package:langame/views/topics/favorite_topics_widget.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -69,14 +67,12 @@ class _OnBoardingState extends State with AfterLayoutMixin {
             Container(
                 height: AppSize.safeBlockVertical * 40,
                 child: buildNotificationPreferences(context, p)),
-            !kIsWeb
-                ? Lottie.asset(
-                    'animations/notification.json',
-                    height: AppSize.safeBlockVertical * 40,
-                    width: AppSize.safeBlockHorizontal * 40,
-                    alignment: Alignment.center,
-                  )
-                : SizedBox.shrink(),
+            Lottie.asset(
+              'animations/notification.json',
+              height: AppSize.safeBlockVertical * 40,
+              width: AppSize.safeBlockHorizontal * 40,
+              alignment: Alignment.center,
+            )
           ],
         ),
       ),
@@ -92,31 +88,29 @@ class _OnBoardingState extends State with AfterLayoutMixin {
         footer: Text('We will use it to customize your first experiences.',
             style: Theme.of(context).textTheme.caption),
         bodyWidget: Container(
-            child: FavoriteTopicsWidget(),
-            height: AppSize.safeBlockVertical * 40,
-            width: AppSize.safeBlockHorizontal * 80,
-          ),
-      ),
-      PageViewModel(
-        titleWidget: Text('Get user recommendations?',
-            style: Theme.of(context).textTheme.headline5),
-        bodyWidget: Consumer<PreferenceProvider>(
-          builder: (context, p, child) => Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              buildRecommendationSetting(context, p),
-              !kIsWeb
-                  ? Lottie.asset(
-                      'animations/recommendations.json',
-                      height: AppSize.safeBlockVertical * 70,
-                      width: AppSize.safeBlockHorizontal * 70,
-                      alignment: Alignment.center,
-                    )
-                  : SizedBox.shrink(),
-            ],
-          ),
+          child: FavoriteTopicsWidget(),
+          height: AppSize.safeBlockVertical * 40,
+          width: AppSize.safeBlockHorizontal * 80,
         ),
       ),
+      // PageViewModel(
+      //   titleWidget: Text('Get user recommendations?',
+      //       style: Theme.of(context).textTheme.headline5),
+      //   bodyWidget: Consumer<PreferenceProvider>(
+      //     builder: (context, p, child) => Column(
+      //       mainAxisAlignment: MainAxisAlignment.center,
+      //       children: [
+      //         buildRecommendationSetting(context, p),
+      //             Lottie.asset(
+      //                 'animations/recommendations.json',
+      //                 height: AppSize.safeBlockVertical * 70,
+      //                 width: AppSize.safeBlockHorizontal * 70,
+      //                 alignment: Alignment.center,
+      //               )
+      //       ],
+      //     ),
+      //   ),
+      // ),
       _buildNotificationPreferences(),
       PageViewModel(
         titleWidget:
@@ -131,14 +125,12 @@ class _OnBoardingState extends State with AfterLayoutMixin {
       titleWidget:
           Text('Why Langame?', style: Theme.of(context).textTheme.headline5),
       bodyWidget: Column(children: [
-        !kIsWeb
-            ? Lottie.asset(
-                'animations/conversation.json',
-                height: AppSize.safeBlockVertical * 40,
-                width: AppSize.safeBlockHorizontal * 70,
-                alignment: Alignment.center,
-              )
-            : SizedBox.shrink(),
+        Lottie.asset(
+          'animations/conversation.json',
+          height: AppSize.safeBlockVertical * 40,
+          width: AppSize.safeBlockHorizontal * 70,
+          alignment: Alignment.center,
+        ),
         // This is a rounded box containing text highlighting the benefit of this application
         Container(
           width:
