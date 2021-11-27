@@ -453,6 +453,7 @@ class _State extends State<LangameTextView>
                                               _reflectionsLiked
                                                   .add(e.alternatives.last);
                                             });
+                                            cp.dialogComplete();
                                             cp.showSnackBar(
                                                 gratitudeMessages.pickAny()!);
                                           }),

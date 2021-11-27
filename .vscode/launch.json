@@ -121,6 +121,7 @@
             "flutterMode": "debug",
         },
         {
+            "preLaunchTask": "dev-web",
             "name": "dev-web",
             "type": "dart",
             "request": "launch",
@@ -143,6 +144,7 @@
             "flutterMode": "debug",
         },
         {
+            "preLaunchTask": "prod-web",
             "name": "prod-web",
             "type": "dart",
             "request": "launch",

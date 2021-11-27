@@ -25,6 +25,18 @@ export const chunkItems = <T>(items: T[], n: number): T[][] =>
   }, []);
 
 /**
+ * Chunks generator an array into smaller arrays of a specified size.
+ * @param {T[]} arr
+ * @param {number} n
+ */
+export function* chunks<T>(arr: T[], n: number) {
+  for (let i = 0; i < arr.length; i += n) {
+    yield arr.slice(i, i + n);
+  }
+}
+
+
+/**
  * sample from array
  * @param{Array<T>} array
  * @return{T}

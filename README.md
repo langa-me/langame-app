@@ -6,23 +6,21 @@
 
 ## Development
 
-### Running
+### Prerequisites
 
-You should use **Idea IntelliJ** and create at least these configurations:
-- Flutter with flavor "dev"
-- Flutter with flavor "prod" (but you should not develop in production)
+- Please use VSCode (and GitHub Copilot, it increases productivity a lot)
+- Firebase CLI
+- Google Cloud SDK
+- Flutter for Android, iOS, Web
+- protoc, protoc-gen-dart, protobufjs
 
-Using CLI:
-```bash
-flutter devices
-```
-```bash
-flutter run --flavor dev -d [MY_DEVICE]
-flutter run --flavor prod -d [MY_DEVICE]
-```
+### Usage
 
+See `.vscode/launch.json`
 
-### Indexes
+#### Operations
+
+##### Indexes
 
 https://firebase.google.com/docs/firestore/query-data/index-overview?authuser=0#composite_indexes
 
@@ -36,11 +34,12 @@ gcloud firestore operations describe [OPERATION_NAME]
 firebase firestore:indexes > ../firestore.indexes.json
 ```
 
-### Data transfer
+##### Data transfer
 
 See https://louis030195/firebase-data
 
 
+<!--
 ### Stripe
 
 ```bash
@@ -72,8 +71,9 @@ stripe prices create \
 -d currency=usd \
 -d "recurring[interval]"=month
 ```
+-->
 
-### Proto gen
+##### Proto gen
 
 ```bash
 npm install protobufjs -g
@@ -92,7 +92,7 @@ wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/googl
 make proto
 ```
 
-### Upgrades
+##### Upgrades
 
 ```bash
 flutter upgrade

@@ -1,0 +1,2 @@
+- Text mode
+- Improved user recommendations, based on your personality
