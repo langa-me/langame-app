@@ -1,0 +1,56 @@
+tasks:
+  - name: Secrets & configurations
+    command: |
+      eval $(gp env -e)
+      echo "$LANGAME_SVC_PROD" > svc.prod.json
+      echo "$LANGAME_SVC_DEV" > svc.dev.json
+      cd functions
+      echo "Installing dependencies..."
+      npm i
+      export GOOGLE_APPLICATION_CREDENTIALS=./svc.dev.json
+      echo "Writing function configuration locally for emulator usage..."
+      firebase functions:config:get > .runtimeconfig.json
+      echo "Setting up to Firebase development project..."
+      npm run set-dev
+      echo "Setting up Docker for Google Cloud..."
+      mkdir -p ~/.docker
+      cat >~/.docker/config.json <<EOL
+       {
+        "credHelpers": {
+          "gcr.io": "gcloud",
+          "us.gcr.io": "gcloud",
+          "eu.gcr.io": "gcloud",
+          "asia.gcr.io": "gcloud",
+          "staging-k8s.gcr.io": "gcloud",
+          "marketplace.gcr.io": "gcloud"
+        }
+      }
+      EOL
+image:
+  file: .gitpod.Dockerfile
+
+vscode:
+  extensions:
+    - aaron-bond.better-comments
+    - GitHub.copilot
+    - gitpod.gitpod-desktop
+    - googlecloudtools.cloudcode
+    - k--kato.intellij-idea-keybindings
+    - mechatroner.rainbow-csv
+    - ms-azuretools.vscode-docker
+    - ms-kubernetes-tools.vscode-kubernetes-tools
+    - ms-vscode-remote.remote-containers
+    - ms-vscode-remote.remote-ssh
+    - ms-vscode-remote.remote-ssh-edit
+    - mushan.vscode-paste-image
+    - Perkovec.emoji
+    - RandomFractalsInc.vscode-data-preview
+    - redhat.vscode-yaml
+    - toba.vsfire
+    - wix.vscode-import-cost
+    - zxh404.vscode-proto3
+    # JS
+    - christian-kohler.npm-intellisense
+    - dbaeumer.vscode-eslint
+    - hbenl.vscode-mocha-test-adapter
+    - eg2.vscode-npm-script

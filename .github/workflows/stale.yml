@@ -13,7 +13,3 @@ jobs:
           stale-pr-message: "This PR is stale and will be closed in 5 days."
           days-before-stale: 15
           days-before-close: 5
-          any-of-labels: "waiting-feedback"
-          exempt-all-milestones: true
-          debug-only: false
-          enable-statistics: true
