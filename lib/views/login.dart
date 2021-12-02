@@ -251,7 +251,8 @@ class _LoginViewState extends State<LoginView> {
           : SizedBox.shrink()
     ];
 
-    if (UniversalPlatform.isWeb) {
+    // Email auth is web & dev-only
+    if (UniversalPlatform.isWeb && AppConst.isDev) {
       logins.addAll([
         _buildButtonParent(LangameButton(
           FontAwesomeIcons.envelope,
