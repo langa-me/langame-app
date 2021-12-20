@@ -61,10 +61,7 @@ class _State extends State<TopicSearchWidget> {
           ? AppSize.safeBlockHorizontal * 48
           : AppSize.safeBlockHorizontal * 38,
       debounceDelay: const Duration(milliseconds: 500),
-      onQueryChanged: (query) {
-        // Call your model, bloc, controller here.
-        tp.query(query);
-      },
+      onQueryChanged: tp.query,
       onFocusChanged: (focused) =>
           !focused ? _searchBarController.close() : null,
       onSubmitted: (_) => _searchBarController.close(),

@@ -38,41 +38,6 @@ firebase firestore:indexes > ../firestore.indexes.json
 
 See https://louis030195/firebase-data
 
-
-<!--
-### Stripe
-
-```bash
-brew install stripe/stripe-cli/stripe
-```
-
-```bash
-# Premium product
-stripe products create \
-  --name="Billing Guide: Premium Service" \
-  --description="Premium service with extra features"
-
-# Basic product
-stripe products create \
-  --name="Billing Guide: Basic Service" \
-  --description="Basic service with minimum features"
-
-# Premium price
-stripe prices create \
--d product=prod_JV1FPZFW99R0Ol \
--d unit_amount=1000 \
--d currency=usd \
--d "recurring[interval]"=month
-
-# Basic price
-stripe prices create \
--d product=prod_HGd6W1VUqqXGvr \
--d unit_amount=500 \
--d currency=usd \
--d "recurring[interval]"=month
-```
--->
-
 ##### Proto gen
 
 ```bash
@@ -81,12 +46,6 @@ npm install protobufjs -g
 ```
 
 ```bash
-cd ..
-git clone org-856813@github.com:stripe/openapi.git
-go get -u github.com/NYTimes/openapi2proto/cmd/openapi2proto
-cd langame-app
-mkdir -p protos/stripe/protobuf
-openapi2proto -spec ../openapi/openapi/spec3.json -out protos/stripe.proto
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/empty.proto -P protos/google/protobuf
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/master/src/google/protobuf/timestamp.proto -P protos/google/protobuf
 make proto
@@ -95,9 +54,14 @@ make proto
 ##### Upgrades
 
 ```bash
+# Upgrade Flutter
 flutter upgrade
 # then cmd + shift + r "flutter-version: 2.x.x"
 flutter pub global activate protoc_plugin
+# Dependencies
+flutter pub outdated
+# Install
+flutter pub upgrade
 ```
 
 ### How to release

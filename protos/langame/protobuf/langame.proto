@@ -2,7 +2,6 @@ syntax = "proto3";
 package langame.protobuf;
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/any.proto";
 
 // Note: models ids are usually not stored in Firestore since it already use id to index them
 // it is mostly used within the logic of the front-end / services
@@ -69,18 +68,12 @@ message User {
   int32 credits = 20;
   // user or admin
   string role = 21;
+  bool bot = 22;
 
   message Device {
     string langame_version = 1;
     string device_info = 2;
   }
-}
-
-enum InteractionLevel {
-  BAD = 0;
-  AVERAGE = 1;
-  GREAT = 2;
-  LOVE = 3;
 }
 
 message UserPreference {
@@ -91,11 +84,9 @@ message UserPreference {
   bool has_done_on_boarding = 5;
   // Searched user tags
   repeated string user_search_history = 6;
-  bool shake_to_feedback = 7;
   repeated string favorite_topics = 8;
   repeated string topic_search_history = 9;
   repeated Error errors = 10;
-  string speech_to_text_locale = 11;
   bool saw_whats_new = 13;
   Notification notification = 14;
   bool preview_mode = 15;
@@ -115,88 +106,39 @@ message UserPreference {
 }
 
 message Langame {
-  string channel_name = 1;
-  // Players is a (Firestore) collection of Player
-  repeated string players = 2;
+  string id = 1;
+  repeated Player players = 2;
   repeated string topics = 3;
-  // Memes
-  repeated Meme memes = 4;
   // Who started this
   string initiator = 5;
   // Over, finished, nobody, can join anymore
   google.protobuf.Timestamp done = 7;
-  int32 current_meme = 8;
   // Initial date planned
-  google.protobuf.Timestamp date = 9;
+  google.protobuf.Timestamp created_at = 9;
   repeated Error errors = 10;
-  google.protobuf.Timestamp started = 11;
-  // When the players can go next meme
-  google.protobuf.Timestamp next_meme = 13;
-  int32 memes_seen = 14;
-  google.protobuf.Timestamp meme_changed = 15;
-  // Link to the Langame
-  string link = 16;
-  // Players that have reserved spots
-  repeated string reserved_spots = 18;
-  // Server-set simple discrete property to know whether the Langame is locked or not
-  bool is_locked = 19;
-  bool is_text = 20;
   repeated Reflection reflections = 21;
-  repeated Suggestion suggestions = 22;
+  repeated string tags = 23;
+
+  message Player {
+    string id = 1;
+    string tag = 2;
+    string photo_url = 4;
+    bool bot = 5;
+    string locale = 10;
+    string email = 12;
+  }
 
   message Reflection {
     string user_id = 1;
-    // Whatever is the last message, from me or you
+    // Whatever is the last message id
     string last_message_id = 2;
     repeated string alternatives = 3;
     google.protobuf.Timestamp created_at = 4;
     ContentFilter content_filter = 5;
     map<string, uint32> userFeedbacks = 6;
   }
-  message Suggestion {
-    string user_id = 1;
-    // Whatever is the last message, from me or you
-    string last_message_id = 2;
-    repeated string alternatives = 3;
-    google.protobuf.Timestamp created_at = 4;
-    ContentFilter content_filter = 5;
-  }
 }
 
-message Player {
-  string user_id = 1;
-  // Timestamp of the arrival in the Langame
-  google.protobuf.Timestamp time_in = 2;
-  // Timestamp of the departure in the Langame
-  google.protobuf.Timestamp time_out = 3;
-  repeated Note notes = 4;
-  // Necessary for Agora...
-  int32 audio_id = 5;
-  string audio_token = 6;
-  repeated Error errors = 7;
-}
-message Note {
-  google.protobuf.Timestamp created_at = 1;
-  oneof type {
-    Generic generic = 2;
-    Goal goal = 3;
-    Definition definition = 4;
-  }
-
-  message Generic {
-    string content = 1;
-  }
-  message Goal {
-    string content = 1;
-  }
-  message Definition {
-    string content = 1;
-  }
-}
-
-message Subscription {
-  string status = 1;
-}
 
 message FunctionResponse {
   oneof type {
@@ -213,38 +155,52 @@ message FunctionResponse {
   }
 }
 
-message Prompt {
-  // Type corresponds to the Input.type name
-  string type = 1;
-  // i.e. "This is a conversation starter on [TOPIC]"
-  string template = 2;
-  string id = 4;
-  google.protobuf.Any parameters = 5;
-}
-
-
-message Recording {
-  google.protobuf.Timestamp created_at = 1;
-  string text = 2;
-  string user_id = 3;
-  map<string, string> metadata = 4;
-  string note = 5;
-}
-
-
-
+// Take inspiration from https://discord.com/developers/docs/resources/channel#message-object
 message Message {
   google.protobuf.Timestamp created_at = 3;
-  string from_uid = 4;
-  string to_uid = 5;
-  // Langame channel name?
-  string channel_name = 7;
+  Author author = 4;
+  string langame_id = 7;
   Type type = 8;
   string body = 9;
   string title = 10;
   string id = 11;
   Analysis analysis = 12;
   Delivery delivery = 13;
+  repeated Component components = 14;
+
+  // https://discord.com/developers/docs/resources/user#user-object
+  message Author {
+    string id = 1;
+    string tag = 2;
+    string photo_url = 4;
+    bool bot = 5;
+    string locale = 10;
+    string email = 12;
+  }
+
+  // https://discord.com/developers/docs/interactions/message-components#component-object
+  message Component {
+    uint32 type = 1;
+    string custom_id = 2;
+    bool disabled = 3;
+    uint32 style = 4;
+    string label = 5;
+    string emoji = 6;
+    string url = 7;
+    repeated Option options = 8;
+    string placeholder = 9;
+    int32 min_values = 10;
+    int32 max_values = 11;
+    repeated Component components = 12;
+    // https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
+    message Option {
+      string label = 1;
+      string value = 2;
+      string description = 3;
+      string emoji = 4;
+      bool default = 5;
+    }
+  }
   message Delivery {
     uint32 attempts = 1;
     google.protobuf.Timestamp end_time = 2;

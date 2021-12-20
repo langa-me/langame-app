@@ -182,13 +182,6 @@ class ImplMessageApi extends MessageApi {
     if (_onNonTerminatedOpened != null)
       futures.add(_onNonTerminatedOpened!.cancel());
     futures.add(firebase.messaging!.deleteToken().catchError((_) {}));
-    // TODO:
-    /*
-     FLTFirebaseMessaging: An error occurred while calling method Messaging#deleteToken, errorOrNil => {
-      NSLocalizedFailureReason = "Failed to checkin before token registration.";
-     }
-    [VERBOSE-2:ui_dart_state.cc(199)] Unhandled Exception: [firebase_messaging/unknown] An unknown error has occurred.
-     */
     return Future.wait<void>(futures);
   }
 

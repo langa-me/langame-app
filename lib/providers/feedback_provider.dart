@@ -161,7 +161,6 @@ class FeedbackProvider extends ChangeNotifier {
           action: SnackBarAction(
             label: 'Disable shaking',
             onPressed: () {
-              _preferenceProvider.setShakeToFeedback(false);
               final snackBar = SnackBar(
                   content:
                       Text('Understood, you can enable it again in settings'));

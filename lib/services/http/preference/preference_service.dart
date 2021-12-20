@@ -9,7 +9,6 @@ abstract class PreferenceService {
     themeIndex: 0, // System
     hasDoneOnBoarding: false,
     userSearchHistory: [],
-    shakeToFeedback: false,
     previewMode: false,
     notification: lg.UserPreference_Notification(
       invite: lg.UserPreference_Notification_Invite(email: true, push: true),

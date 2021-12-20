@@ -62,7 +62,6 @@ class PreferenceProvider extends ChangeNotifier {
       if (_ap.user == null) return LangameResponse(LangameStatus.succeed);
       await _api.savePreference(_ap.user!.uid, _preference);
       firebase.analytics?.logEvent(name: 'save_preference', parameters: {
-        'shakeToFeedback': preference.shakeToFeedback,
         'hasDoneOnBoarding': preference.hasDoneOnBoarding,
         'userRecommendations': preference.userRecommendations,
         'themeIndex': preference.themeIndex,
@@ -94,12 +93,6 @@ class PreferenceProvider extends ChangeNotifier {
     _preference.themeIndex = t.index;
     notifyListeners();
   }
-
-  void setShakeToFeedback(bool value) {
-    _preference.shakeToFeedback = value;
-    notifyListeners();
-  }
-
   void setRecommendations(bool v) {
     _preference.userRecommendations = v;
     notifyListeners();

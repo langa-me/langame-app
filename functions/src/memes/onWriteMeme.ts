@@ -34,7 +34,8 @@ export const onWriteMeme = async (
 
     if (
       // Changed tweet from null or false to true
-      (!change.before.data()!.tweet ||
+      (!change.before.exists ||
+        !change.before.data()!.tweet ||
         change.before.data()!.tweet === false) &&
       change.after.data()!.tweet === true) {
       const twitterClient = new TwitterApi({
@@ -48,8 +49,10 @@ export const onWriteMeme = async (
       await twitterClient.v1.tweet(tweet);
       functions.logger.log("tweeted", tweet);
     }
+    return Promise.resolve();
   } catch (e: any) {
     await Promise.all(handleError(
         change.after.ref.parent.parent, {developerMessage: e}));
+    return Promise.reject(e);
   }
 };

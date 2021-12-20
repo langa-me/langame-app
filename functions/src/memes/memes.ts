@@ -19,7 +19,7 @@ export const offlineMemeSearch =
         objectIDsFilteredOut: string[],
         useRandomIfEmpty: boolean = false
     ):
-        Promise<admin.firestore.DocumentSnapshot<langame.protobuf.Meme>[]> => {
+        Promise<admin.firestore.DocumentSnapshot<langame.protobuf.IMeme>[]> => {
       topics = topics.map((t) => t.toLowerCase());
       if (topics.length === 0) topics = [""];
       // eslint-disable-next-line max-len
@@ -53,7 +53,7 @@ export const offlineMemeSearch =
         return Promise.all(r.hits.map(async (e) =>
           admin.firestore().collection("memes")
               .doc(e.objectID)
-              .withConverter(converter<langame.protobuf.Meme>())
+              .withConverter(converter<langame.protobuf.IMeme>())
               .get()
         ));
       }));
@@ -63,7 +63,7 @@ export const offlineMemeSearch =
         memes = await call();
       }
       const flattennedAndEnabled = memes.reduce((p, c) => p.concat(c))
-          .filter((e) => !e.data()!.disabled);
+          .filter((e) => e.data() && !e.data()!.disabled);
 
 
       // flatten array

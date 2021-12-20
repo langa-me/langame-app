@@ -100,17 +100,9 @@ export const onDeleteAuthentication = async (user: UserRecord,
       }
     }
 
-    const messagesReceived = await db
-        .collection("messages")
-        .where("toUid", "==", user.uid).get();
-
     const messagesSent = await db
         .collection("messages")
-        .where("fromUid", "==", user.uid).get();
-
-    for (const message of messagesReceived.docs) {
-      batch.delete(message.ref);
-    }
+        .where("author.id", "==", user.uid).get();
 
     for (const message of messagesSent.docs) {
       batch.delete(message.ref);
