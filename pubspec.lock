@@ -15,19 +15,14 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
-  agora_rtc_engine:
-    dependency: "direct main"
-    description:
-      name: agora_rtc_engine
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.7"
   algolia:
     dependency: "direct main"
     description:
-      name: algolia
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: a54e366060cc35bf5f9e2ec93888f267cd56b045
+      url: "https://github.com/aemelyanovff/dart_algolia.git"
+    source: git
     version: "1.0.4"
   analyzer:
     dependency: transitive
@@ -50,13 +45,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.3.0"
-  asn1lib:
-    dependency: transitive
-    description:
-      name: asn1lib
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.3"
   async:
     dependency: "direct main"
     description:
@@ -134,13 +122,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "8.1.3"
-  cbor:
-    dependency: transitive
-    description:
-      name: cbor
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.1.0"
   change_app_package_name:
     dependency: "direct dev"
     description:
@@ -358,13 +339,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  encrypt:
-    dependency: transitive
-    description:
-      name: encrypt
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "5.0.1"
   equatable:
     dependency: transitive
     description:
@@ -655,13 +629,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.1"
-  flutter_stripe:
-    dependency: "direct main"
-    description:
-      name: flutter_stripe
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.3.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -695,20 +662,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.2.0"
-  form_data:
-    dependency: transitive
-    description:
-      name: form_data
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0-nullsafety.1"
-  freezed_annotation:
-    dependency: transitive
-    description:
-      name: freezed_annotation
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.14.3"
   frontend_server_client:
     dependency: transitive
     description:
@@ -1080,13 +1033,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
-  pointycastle:
-    dependency: transitive
-    description:
-      name: pointycastle
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.4.0"
   pool:
     dependency: transitive
     description:
@@ -1129,13 +1075,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
-  pubnub:
-    dependency: "direct main"
-    description:
-      name: pubnub
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.1.0"
   pubspec_parse:
     dependency: transitive
     description:
@@ -1407,27 +1346,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
-  stripe_android:
-    dependency: transitive
-    description:
-      name: stripe_android
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.3.0"
-  stripe_ios:
-    dependency: transitive
-    description:
-      name: stripe_ios
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.3.0"
-  stripe_platform_interface:
-    dependency: transitive
-    description:
-      name: stripe_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.3.0"
   supercharged:
     dependency: "direct main"
     description:

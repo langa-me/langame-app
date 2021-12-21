@@ -61,7 +61,9 @@ class _State extends State<TopicSearchWidget> {
           ? AppSize.safeBlockHorizontal * 48
           : AppSize.safeBlockHorizontal * 38,
       debounceDelay: const Duration(milliseconds: 500),
-      onQueryChanged: tp.query,
+      onQueryChanged: (query){
+        tp.query(query);
+      },
       onFocusChanged: (focused) =>
           !focused ? _searchBarController.close() : null,
       onSubmitted: (_) => _searchBarController.close(),
@@ -91,6 +93,7 @@ class _State extends State<TopicSearchWidget> {
               height: AppSize.safeBlockVertical * 10,
               width: double.infinity,
               alignment: Alignment.center,
+              padding: EdgeInsets.all(12),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [

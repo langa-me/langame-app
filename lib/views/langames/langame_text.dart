@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/messages.dart';
 import 'package:langame/helpers/random.dart';
+import 'package:langame/helpers/widget.dart';
 import 'package:langame/models/djinn/djinn.pbgrpc.dart';
 import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
@@ -46,6 +47,8 @@ class _State extends State<LangameTextView>
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .setCurrentScreen('langame_text_view');
+
+    postFrameCallback((_) => setState(() {}));
   }
 
   @override
@@ -88,10 +91,11 @@ class _State extends State<LangameTextView>
                     fromFirestore: (s, _) => MessageExt.fromObject(s.data()!),
                     toFirestore: (s, _) => s.toMapStringDynamic(),
                   )
-                  .where('langameId', isEqualTo: langame.id)
+                  .where('langameId', isEqualTo: widget.initialLangame.id)
                   .orderBy('createdAt', descending: false)
                   .snapshots(),
-          builder: (context, snapshot) => !snapshot.hasData
+          builder: (context, snapshot) => !snapshot.hasData ||
+                  (snapshot.data != null && snapshot.data!.docs.isEmpty)
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [Center(child: cp.buildLoadingWidget(last: true))])
@@ -102,8 +106,8 @@ class _State extends State<LangameTextView>
                       // height: AppSize.safeBlockVertical * 70,
                       child: ListView.builder(
                         controller: _scrollController,
-                        itemBuilder: (context, i) =>
-                            _buildMessageBox(myUid, snapshot.data!.docs[i].data()),
+                        itemBuilder: (context, i) => _buildMessageBox(
+                            myUid, snapshot.data!.docs[i].data()),
                         itemCount: snapshot.data!.size,
                         physics: BouncingScrollPhysics(),
                       ),

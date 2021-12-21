@@ -135,6 +135,7 @@ class _State extends State<SearchPageView>
               height: AppSize.safeBlockVertical * 10,
               width: double.infinity,
               alignment: Alignment.center,
+              padding: EdgeInsets.all(12),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -228,6 +229,7 @@ class _State extends State<SearchPageView>
               decorationColor: getBlackAndWhite(context, 1, reverse: true),
               backgroundColor: getBlackAndWhite(context, 1, reverse: true),
               color: getBlackAndWhite(context, 0))),
+          clearQueryOnClose: false,
           width: AppSize.safeBlockHorizontal * (AppSize.isLargeWidth ? 40 : 80),
           backdropColor: getBlackAndWhite(context, 0, reverse: true),
           backgroundColor: getBlackAndWhite(context, 1, reverse: true),

@@ -173,6 +173,7 @@ class _SendLangameState extends State<NewLangamePageView>
 
     var snap = createLangame.result!.data()!;
     cp.dialogComplete();
+    snap.id = createLangame.result!.id;
     cp.push(LangameTextView(snap));
   }
 }

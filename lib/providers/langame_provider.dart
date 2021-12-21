@@ -17,7 +17,7 @@ class LangameProvider extends ChangeNotifier {
   final FirebaseApi _firebase;
   final CrashAnalyticsProvider _cap;
   final AuthenticationProvider _ap;
-  Algolia? algolia;
+  Algolia algolia;
   bool _isSearching = false;
   bool get isSearching => _isSearching;
   List<String> _filteredLangameSearchHistory = [];
@@ -140,7 +140,7 @@ class LangameProvider extends ChangeNotifier {
           .snapshots()
           .firstWhere(
               (e) => e.exists && e.data() != null && e.data()!.errors.isEmpty)
-          .timeout(Duration(seconds: 20));
+          .timeout(Duration(seconds: 10));
 
       _cap.log(
           'langame_provider:created langame with topics ${topics.join(',')}');
@@ -159,17 +159,22 @@ class LangameProvider extends ChangeNotifier {
       return;
     }
 
-    final i = algolia?.index(AppConst.isDev ? 'dev_langames' : 'prod_langames');
-    _isSearching = true;
-    notifyListeners();
-    final o = await i?.query('$value').getObjects();
-    filteredLangameSearchHistory = o?.hits
-            .map((e) => e.data['objectID'] as String)
-            .toList()
-            .reversed
-            .toList() ??
-        [];
-    _isSearching = false;
-    notifyListeners();
+    try {
+      final i =
+          algolia.index(AppConst.isDev ? 'dev_langames' : 'prod_langames');
+      _isSearching = true;
+      notifyListeners();
+      final o = await i.query('$value').getObjects();
+      filteredLangameSearchHistory = o.hits
+              .map((e) => e.data['objectID'] as String)
+              .toList()
+              .reversed
+              .toList();
+      _isSearching = false;
+      notifyListeners();
+    } catch (e, s) {
+      _cap.log('langame_provider:failed to search langames');
+      _cap.recordError(e, s);
+    }
   }
 }

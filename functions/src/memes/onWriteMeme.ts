@@ -5,9 +5,10 @@ import {ImplAiApi} from "../aiApi/implAiApi";
 import {handleError} from "../errors";
 import {isDev} from "../helpers";
 import {TwitterApi} from "twitter-api-v2";
+import {langame} from "../langame/protobuf/langame";
 
 export const onWriteMeme = async (
-    change: Change<admin.firestore.DocumentSnapshot>,
+    change: Change<admin.firestore.DocumentSnapshot<langame.protobuf.IMeme>>,
     ctx: EventContext) => {
   const api = new ImplAiApi();
   try {
@@ -17,6 +18,11 @@ export const onWriteMeme = async (
     if (!change.after.exists) {
       await i.deleteObject(change.after.id);
       functions.logger.log("deleted", change.after.id);
+      return;
+    }
+
+    if (!change.after.data()!.disabled === true) {
+      functions.logger.log("this memes is disabled, skipping", change.after.id);
       return;
     }
 

@@ -36,7 +36,7 @@ deploy_web: ## [Local development] Manually deploy Firebase hosting dev.
 	firebase use langame-dev
 	$(eval VERSION=$(shell sh -c "cat pubspec.yaml | yq e '.version' -" | sed 's/+/./g'))
 	flutter build web --release
-	firebase hosting:channel:deploy "${VERSION}" --expires 7d
+	firebase hosting:channel:deploy "${VERSION}" --expires 7d --only dev-app
 
 
 .PHONY: help

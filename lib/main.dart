@@ -101,7 +101,8 @@ void main() async {
     dynamicLinks: dynamicLinks,
     useEmulator: useEmulator,
   );
-
+Algolia algolia = Algolia.init(
+      applicationId: 'B1SU8TE6UY', apiKey: 'a2c82fa22a5c4683b3caf14fadf78a33');
   var navigationKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
   var scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>(debugLabel: 'scaffoldKey');
@@ -112,7 +113,7 @@ void main() async {
       firebase.crashlytics, firebase.analytics!, remoteConfig, firebase);
   var authenticationApi = ImplAuthenticationApi(firebase);
   var authenticationProvider = AuthenticationProvider(
-      firebase, authenticationApi, crashAnalyticsProvider, null);
+      firebase, authenticationApi, crashAnalyticsProvider, algolia);
   // Cloud messaging is fucked-up with emulator
   // (something with, messaging stuff have to happen on Google infra)
   // So using fake api when using emulator
@@ -130,8 +131,9 @@ void main() async {
           //   );
           // }
         });
+  
   var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
-      authenticationProvider, null);
+      authenticationProvider, algolia);
   var messageProvider = MessageProvider(
     firebase,
     messageApi,
@@ -148,16 +150,11 @@ void main() async {
   var newLangameProvider = NewLangameProvider(
       crashAnalyticsProvider, authenticationProvider, firebase);
   var tagProvider =
-      TagProvider(firebase, crashAnalyticsProvider, null, preferenceProvider);
+      TagProvider(firebase, crashAnalyticsProvider, algolia, preferenceProvider);
   var physicalLangameProvider =
-      PhysicalLangameProvider(firebase, crashAnalyticsProvider, null);
-  Algolia algolia = Algolia.init(
-      applicationId: 'B1SU8TE6UY', apiKey: 'a2c82fa22a5c4683b3caf14fadf78a33');
+      PhysicalLangameProvider(firebase, crashAnalyticsProvider, algolia);
+  
   remoteConfig?.ensureInitialized();
-  authenticationProvider.algolia = algolia;
-  tagProvider.algolia = algolia;
-  physicalLangameProvider.algolia = algolia;
-  langameProvider.algolia = algolia;
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(

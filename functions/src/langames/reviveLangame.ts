@@ -79,6 +79,7 @@ export const reviveLangame =
           //       }
           //     }));
 
+          // TODO: might also offline search
           // TODO: maybe option to use something else than a conversation starter
           // TODO: maybe something related to conversation?
           // pick random opening
