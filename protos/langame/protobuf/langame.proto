@@ -32,6 +32,7 @@ message Meme {
   map<string, string> translated = 6;
   string id = 7;
   bool disabled = 8;
+  bool tweet = 9;
 }
 
 message User {

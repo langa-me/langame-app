@@ -268,6 +268,7 @@ class Meme extends $pb.GeneratedMessage {
     ..m<$core.String, $core.String>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'translated', entryClassName: 'Meme.TranslatedEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('langame.protobuf'))
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
     ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disabled')
+    ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tweet')
     ..hasRequiredFields = false
   ;
 
@@ -280,6 +281,7 @@ class Meme extends $pb.GeneratedMessage {
     $core.Map<$core.String, $core.String>? translated,
     $core.String? id,
     $core.bool? disabled,
+    $core.bool? tweet,
   }) {
     final _result = create();
     if (createdAt != null) {
@@ -302,6 +304,9 @@ class Meme extends $pb.GeneratedMessage {
     }
     if (disabled != null) {
       _result.disabled = disabled;
+    }
+    if (tweet != null) {
+      _result.tweet = tweet;
     }
     return _result;
   }
@@ -378,6 +383,15 @@ class Meme extends $pb.GeneratedMessage {
   $core.bool hasDisabled() => $_has(6);
   @$pb.TagNumber(8)
   void clearDisabled() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.bool get tweet => $_getBF(7);
+  @$pb.TagNumber(9)
+  set tweet($core.bool v) { $_setBool(7, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasTweet() => $_has(7);
+  @$pb.TagNumber(9)
+  void clearTweet() => clearField(9);
 }
 
 class User_Device extends $pb.GeneratedMessage {

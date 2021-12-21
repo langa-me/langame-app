@@ -26,6 +26,10 @@ export const onWriteMeme = async (
       return;
     }
 
+    if (!change.after.data()!.topics) {
+      throw new Error("topics is not defined");
+    }
+
     await i.saveObject({
       ...change.after.data(),
       objectID: change.after.id,
@@ -34,7 +38,7 @@ export const onWriteMeme = async (
 
     functions.logger.log(`Updated meme ${change.after.id}`,
         change.after.data());
-    const topics = change.after.data()!.topics;
+    const topics = change.after.data()!.topics!;
     await Promise.all(topics.map((t: string) =>
       admin.firestore().collection("topics").doc(t).set({})));
 
@@ -51,7 +55,7 @@ export const onWriteMeme = async (
         accessSecret: functions.config().twitter.access_secret,
       });
       // eslint-disable-next-line max-len
-      const tweet = `${change.after.data()!.content} ${change.after.data()!.topics.map((e: string) => "#"+e.replace(/\s/g, "")).join(" ")}`;
+      const tweet = `${change.after.data()!.content} ${topics.map((e: string) => "#"+e.replace(/\s/g, "")).join(" ")}`;
       await twitterClient.v1.tweet(tweet);
       functions.logger.log("tweeted", tweet);
     }

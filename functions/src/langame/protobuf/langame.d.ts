@@ -418,6 +418,9 @@ export namespace langame {
 
             /** Meme disabled */
             disabled?: (boolean|null);
+
+            /** Meme tweet */
+            tweet?: (boolean|null);
         }
 
         /** Represents a Meme. */
@@ -449,6 +452,9 @@ export namespace langame {
 
             /** Meme disabled. */
             public disabled: boolean;
+
+            /** Meme tweet. */
+            public tweet: boolean;
 
             /**
              * Creates a new Meme instance using the specified properties.

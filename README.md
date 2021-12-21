@@ -58,6 +58,7 @@ make proto
 flutter upgrade
 # then cmd + shift + r "flutter-version: 2.x.x"
 flutter pub global activate protoc_plugin
+# sometimes fail and need to use dart `pub global activate protoc_plugin`
 # Dependencies
 flutter pub outdated
 # Install
