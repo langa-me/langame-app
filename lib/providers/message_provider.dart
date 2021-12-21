@@ -14,15 +14,16 @@ import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/services/http/firebase.dart';
 import 'package:langame/services/http/message_api.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
-import 'package:sortedmap/sortedmap.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'authentication_provider.dart';
+import 'langame_provider.dart';
 
 class MessageProvider extends ChangeNotifier {
   FirebaseApi firebase;
   CrashAnalyticsProvider _cap;
   // ignore: unused_field
   AuthenticationProvider _ap;
+  LangameProvider _lp;
   ContextProvider _cp;
   bool _isReady = false;
   bool get isReady => _isReady;
@@ -36,93 +37,34 @@ class MessageProvider extends ChangeNotifier {
   /// Messages, notifications ///
   ///
 
-  StreamController<lg.Message> _messageStream = StreamController<lg.Message>();
-  Map<String, SortedMap<int, lg.Message>> _messages = {};
-  Map<String, SortedMap<int, lg.Message>> get messages => _messages;
-
   MessageApi _messageApi;
 
   /// Create an authentication provider, and
   MessageProvider(
-      this.firebase, this._messageApi, this._cap, this._ap, this._cp,
+      this.firebase, this._messageApi, this._cap, this._ap, this._cp, this._lp,
       {bool isLocalConversationApi = false}) {
     _ap.userStream.listen((e) async {
       if (e.type == UserChangeType.NewAuthentication) {
         await _messageApi.cancel();
-        await _messageApi.initializePermissions();
-        await _messageApi.listen(null);
+        try {
+          await _messageApi.initializePermissions();
+          await _messageApi.listen(null);
+        } catch (e, s) {
+          _cap.log(
+              'message_provider initializePermissions failed to initialize permissions');
+          _cap.recordError(e, s);
+        }
         _isReady = true;
         notifyListeners();
         _cap.log('message_provider:initialize');
-        _messageApi.getInitialMessage().then((e) async {
-          // TODO
-          // Leave some time for UI
-          // await Future.delayed(Duration(seconds: 1));
-          // // Note that we ignore failures in dynamic link initialization
-          // if (e != null &&
-          //     e.channelName.isNotEmpty &&
-          //     e.type == lg.Message_Type.INVITE) {
-          //   _cp.pushReplacement(LangameAudioView(e.channelName, false));
-          // } else if (e != null &&
-          //     e.channelName.isNotEmpty &&
-          //     e.type == lg.Message_Type.MESSAGE) {
-          //   // On opening text notification, go to text view
-          //   _cp.pushReplacement(LangameTextView(e.channelName));
-          // }
-        }).catchError((e, s) {
+        _messageApi.getInitialMessage().then((e) async {}).catchError((e, s) {
           _cap.log('message_provider:failed to get initial messages');
           _cap.recordError(e, s);
         });
-        var subs = [
-          firebase.firestore!
-              .collection('messages')
-              .where('fromUid', isEqualTo: _ap.user!.uid)
-              // .orderBy('createdAt', descending: false)
-              .withConverter<lg.Message>(
-                fromFirestore: (s, _) => MessageExt.fromObject(s.data()!),
-                toFirestore: (e, _) => e.toMapStringDynamic(),
-              )
-              .snapshots()
-              .listen((e) {
-            e.docs.forEach((b) => _messageStream.add(b.data()));
-            notifyListeners();
 
-          }),
-          firebase.firestore!
-              .collection('messages')
-              .where('toUid', isEqualTo: _ap.user!.uid)
-              // .orderBy('createdAt', descending: false)
-              .withConverter<lg.Message>(
-                fromFirestore: (s, _) => MessageExt.fromObject(s.data()!),
-                toFirestore: (e, _) => e.toMapStringDynamic(),
-              )
-              .snapshots()
-              .listen((e) {
-            e.docs.forEach((b) => _messageStream.add(b.data()));
-            notifyListeners();
-
-          }),
-          _messageStream.stream
-              .listen((e) {
-            // Somehow
-            if (!e.hasCreatedAt()) return;
-
-            if (_messages[e.channelName] == null) {
-              _messages[e.channelName] = SortedMap(Ordering.byKey());
-            }
-            final key = e.createdAt.toDateTime().millisecondsSinceEpoch;
-            final exists = _messages.containsKey(key);
-            _messages[e.channelName]!.addAll({key: e});
-            if (exists) return;
-            // _cap.log('message_provider: received message ${e.body}');
-            notifyListeners();
-          })
-        ];
-        _messageStream.onCancel = () => subs.forEach((e) => e.cancel());
-        initializateConversationApi(local: isLocalConversationApi);
+        // initializateConversationApi(local: isLocalConversationApi);
       } else if (e.type == UserChangeType.Disconnection) {
         _messageApi.cancel();
-        _messageStream.close();
         terminateConversationClient();
       }
     });
@@ -190,16 +132,21 @@ class MessageProvider extends ChangeNotifier {
   }
 
   Future<LangameResponse<void>> sendMessage(
-      String channelName, String message, String to) async {
+      String langameId, String message) async {
     try {
-      _cap.log('message_provider:send message to channel $channelName');
+      _cap.log('message_provider:send message to channel $langameId');
       final data = {
         'body': message,
         'type': lg.Message_Type.MESSAGE.value,
         'createdAt': FieldValue.serverTimestamp(),
-        'fromUid': firebase.auth!.currentUser!.uid,
-        'toUid': to,
-        'channelName': channelName,
+        'author': lg.Langame_Player(
+          id: _ap.user!.uid,
+          tag: _ap.user!.tag,
+          photoUrl: _ap.user!.photoUrl,
+          bot: _ap.user!.bot,
+          email: _ap.user!.email,
+        ).toMapStringDynamic(),
+        'langameId': langameId,
       };
       firebase.firestore!.collection('messages').add(data);
       return LangameResponse(LangameStatus.succeed);

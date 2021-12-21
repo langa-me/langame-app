@@ -25,7 +25,7 @@ class TagProvider extends ChangeNotifier {
   }
   final FirebaseApi firebase;
   final CrashAnalyticsProvider _cap;
-  Algolia? algolia;
+  Algolia algolia;
   final PreferenceProvider _pp;
   List<String> _availableTopics = [];
   List<String> get availableTopics => _availableTopics;
@@ -36,19 +36,26 @@ class TagProvider extends ChangeNotifier {
       return;
     }
 
-    final i = algolia?.index(AppConst.isDev ? 'dev_topics' : 'prod_topics');
-    final o = await i?.query('$value').getObjects();
-    filteredTopicSearchHistory = o?.hits
-        .map((e) => e.data['objectID'] as String)
-        .toList()
-        .reversed
-        .toList();
-    debugPrint('filteredTopicSearchHistory: $value $filteredTopicSearchHistory');
+    try {
+      final i = algolia.index(AppConst.isDev ? 'dev_topics' : 'prod_topics');
+      final o = await i.query('$value').getObjects();
+      filteredTopicSearchHistory = o.hits
+          .map((e) => e.data['objectID'] as String)
+          .toList()
+          .reversed
+          .toList();
+      _cap.log(
+          'filteredTopicSearchHistory: $value $filteredTopicSearchHistory');
+      notifyListeners();
+    } catch (e, s) {
+      _cap.log('tag_provider: query error: $e $s');
+      _cap.recordError(e, s);
+    }
   }
 
   List<String> _filteredTopicSearchHistory = [];
   List<String> get filteredTopicSearchHistory => _filteredTopicSearchHistory;
-  set filteredTopicSearchHistory(v) {
+  set filteredTopicSearchHistory(List<String> v) {
     _filteredTopicSearchHistory = v;
     notifyListeners();
   }

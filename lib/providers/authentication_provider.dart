@@ -37,7 +37,7 @@ class UserChange {
 class AuthenticationProvider extends ChangeNotifier {
   FirebaseApi firebase;
   CrashAnalyticsProvider _cap;
-  Algolia? algolia;
+  Algolia algolia;
 
   /// Authentication, relations, users ///
 
@@ -214,7 +214,8 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<LangameResponse<void>> loginWithEmail(String email, String password) async {
+  Future<LangameResponse<void>> loginWithEmail(
+      String email, String password) async {
     try {
       final res = await _authenticationApi.loginWithEmail(email, password);
       _cap.log('authentication_provider:loginWithEmail');
@@ -257,15 +258,14 @@ class AuthenticationProvider extends ChangeNotifier {
       _cap.log('authentication_provider:getUserTag $tag',
           analyticsMessage: 'get_user_by_tag');
 
-      if (algolia == null)
-        return LangameResponse(LangameStatus.succeed, result: []);
-      final objects = await algolia!
+      final objects = await algolia
           .index(AppConst.isDev ? "dev_users" : "prod_users")
           // .filters(tag)
           .query(tag)
           // .query('tag:$tag')
           .getObjects();
-      _cap.log('authentication_provider:getUserTag ${objects.hits.length} hits');
+      _cap.log(
+          'authentication_provider:getUserTag ${objects.hits.length} hits');
 
       return LangameResponse(LangameStatus.succeed,
           result: objects.hits
@@ -366,7 +366,8 @@ class AuthenticationProvider extends ChangeNotifier {
           : user!.apple
               ? _authenticationApi.loginWithApple()
               : _authenticationApi.loginWithEmail(null, null));
-      await firebase.auth!.currentUser!.reauthenticateWithCredential(cred.oAuthCrendential!);
+      await firebase.auth!.currentUser!
+          .reauthenticateWithCredential(cred.oAuthCrendential!);
       await firebase.auth!.currentUser!.delete();
       _cap.log('purging local storage');
       var i = await SharedPreferences.getInstance();

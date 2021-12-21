@@ -10,22 +10,20 @@ import {
   isDev,
   kLangamesCollection,
 } from "./helpers";
-import {onCreateLangame} from "./onCreateLangame";
-import {onUpdateLangamePlayers} from "./onUpdateLangamePlayers";
-import {onUpdateLangame} from "./onUpdateLangame";
 import {onCreateAuthentication} from "./users/onCreateAuthentication";
 import {versionCheck} from "./versionCheck";
-import {setLangamesDone} from "./setLangamesDone";
 import {resetCredits} from "./users/resetCredits";
 import {getMemes} from "./memes/getMemes";
 import * as Sentry from "@sentry/node";
-import {createMemes} from "./memes/createMemes";
 import {onWriteTopic} from "./memes/onWriteTopic";
 import {onWriteUser} from "./users/onWriteUser";
 import {onWriteMeme} from "./memes/onWriteMeme";
 import {onCreateMessage} from "./messages/onCreateMessage";
 import {onCreateMessageAnalysis} from "./messages/onCreateMessageAnalysis";
 import {onWritePreference} from "./users/onWritePreference";
+import {reviveLangame} from "./langames/reviveLangame";
+import {setTagsLangame} from "./langames/setTagsLangame";
+import {onWriteLangame} from "./langames/onWriteLangame";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -51,19 +49,26 @@ exports.versionCheck = functions
     .https
     .onCall(versionCheck);
 
-exports.setLangamesDone = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .pubsub
-    .schedule("1 * * * *")
-    .onRun(setLangamesDone);
-
 exports.resetCredits = functions
     .region(region)
     .runWith(runtimeOpts)
     .pubsub
     .schedule("0 1 * * *") // 1 am every day
     .onRun(resetCredits);
+
+exports.reviveLangame = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .pubsub
+    .schedule("0 18 * * *")
+    .onRun(reviveLangame);
+
+exports.setTagsLangame = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .pubsub
+    .schedule("0 1 * * *")
+    .onRun(setTagsLangame);
 
 // https://firebase.google.com/docs/functions/gcp-storage-events
 exports.onFeedback = functions
@@ -78,32 +83,17 @@ exports.onFeedback = functions
       }
       functions.logger.info("new feedback", JSON.stringify(object));
       await newFeedback(object.mediaLink, object.metadata);
-    }
-    );
+    });
 
 
 // Langame //
 
-exports.onCreateLangame = functions
+exports.onWriteLangame = functions
     .region(region)
     .runWith(runtimeOpts)
     .firestore
     .document(`${kLangamesCollection}/{pushId}`)
-    .onCreate(onCreateLangame);
-
-exports.onUpdateLangame = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .firestore
-    .document(`${kLangamesCollection}/{langameId}`)
-    .onUpdate(onUpdateLangame);
-
-exports.onUpdateLangamePlayers = functions
-    .region(region)
-    .runWith(runtimeOpts)
-    .firestore
-    .document(`${kLangamesCollection}/{langameId}/players/{playerId}`)
-    .onWrite(onUpdateLangamePlayers);
+    .onWrite(onWriteLangame);
 
 // User //
 
@@ -145,16 +135,6 @@ exports.getMemes = functions
     .https
     .onCall(getMemes);
 
-exports.createMemes = functions
-    .region(region)
-    .runWith({
-      timeoutSeconds: 300,
-      ...runtimeOpts,
-    })
-    .https
-    .onCall(createMemes);
-
-
 exports.onWriteMeme = functions
     .region(region)
     .runWith(runtimeOpts)
@@ -167,12 +147,13 @@ exports.onWriteTopic = functions
     .firestore.document("topics/{topicId}")
     .onWrite(onWriteTopic);
 
+// Messages //
 
 exports.onCreateMessage = functions
     .region(region)
     .runWith({
       ...runtimeOpts,
-      failurePolicy: true,
+      failurePolicy: false,
       timeoutSeconds: 300,
     })
     .firestore.document("messages/{messageId}")
@@ -183,7 +164,7 @@ exports.onCreateMessageAnalysis = functions
     .region(region)
     .runWith({
       ...runtimeOpts,
-      failurePolicy: true,
+      failurePolicy: false,
     })
     .firestore.document("messages/{messageId}")
     .onCreate(onCreateMessageAnalysis);

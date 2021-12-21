@@ -28,34 +28,13 @@ export const onCreateMessageAnalysis = async (
       return Promise.reject(reportError(
           new Error("too many failures, aborting")));
     }
-    const lg = (await admin.firestore().collection("langames")
-        .where("channelName", "==", snap.data()?.channelName)
-        .withConverter(converter<langame.protobuf.Langame>()).get()).docs[0];
+    const lg = await admin.firestore().collection("langames")
+        .doc(snap.data()!.langameId!)
+        .withConverter(converter<langame.protobuf.Langame>()).get();
     const config = await getConfig();
     const api = new ImplAiApi();
     const db = admin.firestore();
     const promises = [];
-    // Here we want to give message suggestions based on previous user messages
-    // Only when a suggestions has not already been made
-    if (!lg.data()!.suggestions || !lg.data()!.suggestions
-        .some((e) => e.lastMessageId === snap.id)) {
-      const suggestions = await createSuggestion(
-          api,
-        snap.data()!.channelName!,
-        snap.data()!.fromUid!,
-        config.suggestion!,
-      );
-      // Check that no suggestion with similar text appear
-      if (suggestions &&
-        (!lg.data()!.suggestions || !lg.data()!.suggestions!.some((e) =>
-          e.alternatives![0] === suggestions!.alternatives![0]))) {
-        functions.logger.log("suggestions", suggestions);
-        promises.push(db.runTransaction(async (t) => t.set(lg.ref, {
-          // @ts-ignore
-          suggestions: admin.firestore.FieldValue.arrayUnion(suggestions),
-        }, {merge: true})));
-      }
-    }
     // Here we want to make the user think further about his conversations
     // based on previous user messages
     // Only when a reflection has not already been made
@@ -63,8 +42,8 @@ export const onCreateMessageAnalysis = async (
         .some((e) => e.lastMessageId === snap.id)) {
       const reflections = await createReflection(
           api,
-        snap.data()!.channelName!,
-        snap.data()!.fromUid!,
+        snap.data()!.langameId!,
+        snap.data()!.author!.id!,
         config.reflection!
       );
       // Check that no reflection with similar text appear
@@ -94,8 +73,8 @@ export const onCreateMessageAnalysis = async (
     return Promise.all(promises);
   } catch (e: any) {
     const p1 = reportError(e,
-      snap.data()!.fromUid ? {
-        user: snap.data()!.fromUid,
+      snap.data()!.author!.id! ? {
+        user: snap.data()!.author!.id!,
       } : undefined);
     const p2 = snap.ref.set({
       analysis: {
@@ -110,69 +89,17 @@ export const onCreateMessageAnalysis = async (
   }
 };
 
-export const createSuggestion = async (
-    api: Api,
-    channelName: string,
-    fromUid: string,
-    config: OpenaiCompletionParameters | HuggingFaceCompletionParameters,
-): Promise<langame.protobuf.Langame.ISuggestion | undefined> => {
-  // Get all messages between these two
-  const messages = await admin.firestore()
-      .collection("messages")
-      .where("channelName", "==", channelName)
-      .orderBy("createdAt", "asc")
-      .limitToLast(10)
-      .get();
-
-  // Now we want to give suggestions to the user based on this conversation
-  // Using GPT completion
-  // Prompt should look like:
-  // Me: Hello Bob I am Louis
-  // You: Hello Louis, how are you?
-  // ...
-  const prompt =
-      "This is a suggestion of answer given to the user in a conversation " +
-      "to help him have more meaningful exchanges, think " +
-      "further before talking and overall having better conversations.\n\n" +
-      "You: Do you think we should all become vegan?\n\n" +
-      "Me: Why? After all other animals eat eachother\n\n" +
-      "You: Can't we be better than other animals?\n\n" +
-      "Suggestion: Thank you for changing my opinion on this.\n###\n" +
-  messages.docs.map((e) => (e.data()!.fromUid ===
-    fromUid ? "Me: " : "You: ") +
-    e.data()!.body).join("\n") +
-    "\nSuggestion:";
-  const alternative = await ("stream" in config ? api.openaiCompletion({
-    ...config as OpenaiCompletionParameters,
-    prompt: prompt,
-  }) : api.huggingFaceCompletion(
-      prompt,
-      config as HuggingFaceCompletionParameters,
-  ));
-  if (!alternative) return Promise.resolve(undefined);
-  const filter = await api.filter({prompt: alternative});
-  if (filter === undefined) return Promise.resolve(undefined);
-  // TODO: classification, further quality filtering
-  return {
-    userId: fromUid,
-    lastMessageId: messages.docs[messages.size - 1].id,
-    alternatives: [alternative],
-    contentFilter: filter,
-    // @ts-ignore
-    createdAt: new Date(),
-  };
-};
-
 export const createReflection = async (
     api: Api,
-    channelName: string,
-    fromUid: string,
+    langameId: string,
+    authorId: string,
     config: OpenaiCompletionParameters | HuggingFaceCompletionParameters,
 ): Promise<langame.protobuf.Langame.IReflection | undefined> => {
   // Get all messages between these two
   const messages = await admin.firestore()
       .collection("messages")
-      .where("channelName", "==", channelName)
+      .where("langameId", "==", langameId)
+      .withConverter(converter<langame.protobuf.IMessage>())
       .orderBy("createdAt", "asc")
       .limitToLast(10)
       .get();
@@ -191,25 +118,33 @@ export const createReflection = async (
       "Me: Why? After all other animals eat eachother\n\n" +
       "You: Can't we be better than other animals?\n\n" +
       "Reflection: What are your ethical principles?\n###\n" +
-  messages.docs.map((e) => (e.data()!.fromUid ===
-    fromUid ? "Me: " : "You: ") +
+  messages.docs.map((e) => (e.data()!.author!.id ===
+    authorId ? "Me: " : "You: ") +
     e.data()!.body).join("\n") +
     "\nReflection:";
 
-  const alternative = await ("stream" in config ? api.openaiCompletion({
-    ...config as OpenaiCompletionParameters,
-    prompt: prompt,
-  }) : api.huggingFaceCompletion(
-      prompt,
+  const alternative = await (
+    "stream" in config ||
+    config.model === "davinci-codex" ?
+     api.openaiCompletion({
+       ...config as OpenaiCompletionParameters,
+       prompt: prompt,
+     }) :
+     api.huggingFaceCompletion(
+         prompt,
       config as HuggingFaceCompletionParameters,
-  ));
+     ));
 
   if (!alternative) return Promise.resolve(undefined);
   const filter = await api.filter({prompt: alternative});
   if (filter === undefined) return Promise.resolve(undefined);
+  if (alternative.includes("What are your ethical principles")) {
+    return Promise.resolve(undefined);
+  }
+
   // TODO: classification, further quality filtering
   return {
-    userId: fromUid,
+    userId: authorId,
     lastMessageId: messages.docs[messages.size - 1].id,
     alternatives: [alternative],
     contentFilter: filter,

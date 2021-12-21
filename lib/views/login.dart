@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity/connectivity.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -223,7 +224,7 @@ class _LoginViewState extends State<LoginView> {
         );
     var logins = [
       // We disable Google Auth on Langame Web dev, since it's internal only
-      UniversalPlatform.isWeb && AppConst.isDev
+      UniversalPlatform.isWeb && AppConst.isDev && kReleaseMode
           ? SizedBox.shrink()
           : _buildButtonParent(LangameButton(
               FontAwesomeIcons.google,
@@ -318,7 +319,7 @@ class _LoginViewState extends State<LoginView> {
           layer: 1,
         )),
         Text(
-          '⚠️ Langame web is very experimental and currently used for fast internal product design and many features does not work yet ⚠️',
+          '⚠️ Nice try, but this is an internal tool ⚠️',
           style: Theme.of(context).textTheme.caption,
           textAlign: TextAlign.center,
         ),

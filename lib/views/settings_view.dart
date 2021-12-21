@@ -7,10 +7,6 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
-import 'package:langame/views/feature_preview/preview_or_sized_box_shrink.dart';
-import 'package:langame/views/hack.dart';
-import 'package:langame/views/integrations/readwise/readwise_settings.dart';
-import 'package:langame/views/language/language_settings.dart';
 import 'package:langame/views/notifications/notification_view.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -85,18 +81,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 flexSchemeData: flexSchemeData,
               ),
             ),
-            Consumer<AuthenticationProvider>(
-                builder: (ctx, p, c) => p.user?.role == 'admin'
-                    ? ListTile(
-                        onTap: () {
-                          cp.push(HackView());
-                        },
-                        leading: Icon(FontAwesomeIcons.dharmachakra,
-                            color: isLightThenDark(context)),
-                        title: Text('Hack',
-                            style: Theme.of(context).textTheme.headline6),
-                      )
-                    : SizedBox.shrink()),
             ListTile(
               onTap: () {
                 cp.push(ProfileView());
@@ -106,17 +90,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               title:
                   Text('Profile', style: Theme.of(context).textTheme.headline6),
             ),
-            pp.preference.previewMode
-                ? ListTile(
-                    onTap: () {
-                      cp.push(LanguageSettingsView());
-                    },
-                    leading: Icon(FontAwesomeIcons.language,
-                        color: isLightThenDark(context)),
-                    title: Text('Language',
-                        style: Theme.of(context).textTheme.headline6),
-                  )
-                : SizedBox.shrink(),
             ListTile(
               onTap: () {
                 cp.push(NotificationSettingsView());
@@ -129,52 +102,25 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   style: Theme.of(context).textTheme.headline6),
             ),
             buildRecommendationSetting(context, pp),
-            
-            ListTile(
-              leading: Beta(
-                Icon(FontAwesomeIcons.flask,
-                    color: getBlackAndWhite(context, 0)),
-                type: BetaType.NEW,
-              ),
-              title: Text('Enable preview features',
-                  style: Theme.of(context).textTheme.headline6),
-              onTap: () {
-                pp.preference.previewMode = !pp.preference.previewMode;
-                pp.refresh();
-              },
-              trailing: Switch(
-                  value: pp.preference.previewMode,
-                  onChanged: (_) {
-                    pp.preference.previewMode = !pp.preference.previewMode;
-                    pp.refresh();
-                  }),
-            ),
-            previewModeOrInvisible(
-                pp,
-                ExpansionTile(
-                    onExpansionChanged: (_) {
-                      cap.logNewFeatureClick('settings_integration');
-                    },
-                    leading: Beta(
-                        Icon(FontAwesomeIcons.brain,
-                            color: isLightThenDark(context)),
-                        type: BetaType.SOON),
-                    title: Text('Integration',
-                        style: Theme.of(context).textTheme.headline6),
-                    children: !AppConst.isDev
-                        ? []
-                        : [
-                            ListTile(
-                              onTap: () {
-                                if (!AppConst.isDev) return;
-                                cp.push(ReadwiseView());
-                              },
-                              leading: Icon(FontAwesomeIcons.bookOpen,
-                                  color: isLightThenDark(context)),
-                              title: Text('Readwise',
-                                  style: Theme.of(context).textTheme.headline6),
-                            )
-                          ])),
+            // ListTile(
+            //   leading: Beta(
+            //     Icon(FontAwesomeIcons.flask,
+            //         color: getBlackAndWhite(context, 0)),
+            //     type: BetaType.NEW,
+            //   ),
+            //   title: Text('Enable preview features',
+            //       style: Theme.of(context).textTheme.headline6),
+            //   onTap: () {
+            //     pp.preference.previewMode = !pp.preference.previewMode;
+            //     pp.refresh();
+            //   },
+            //   trailing: Switch(
+            //       value: pp.preference.previewMode,
+            //       onChanged: (_) {
+            //         pp.preference.previewMode = !pp.preference.previewMode;
+            //         pp.refresh();
+            //       }),
+            // ),
             Divider(),
             ExpansionTile(
                 leading:

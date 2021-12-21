@@ -12,7 +12,6 @@ import 'package:langame/services/context/dialog_service.dart';
 import 'package:langame/services/context/navigation_service.dart';
 import 'package:langame/services/context/snack_bar_service.dart';
 import 'package:langame/views/colors/colors.dart';
-import 'package:langame/views/langames/langame_audio.dart';
 import 'package:langame/views/login.dart';
 import 'package:lottie/lottie.dart';
 
@@ -94,9 +93,7 @@ class ContextProvider extends ChangeNotifier {
   void dialogComplete() => _dialogService.dialogComplete();
 
   _updateRoute(Widget route) {
-    if (Widget is LangameAudioView) {
-      _route = LangameRoute.LangameView;
-    } else if (Widget is LoginView) {
+    if (Widget is LoginView) {
       _route = LangameRoute.LoginView;
     } else {
       _route = LangameRoute.MainView;

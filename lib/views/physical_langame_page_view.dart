@@ -12,7 +12,6 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
-import 'package:langame/providers/recording_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/topics/topic_search_bar.dart';
@@ -70,7 +69,6 @@ class _State extends State<PhysicalLangamePageView>
     var plp = Provider.of<PhysicalLangameProvider>(context);
     var ap = Provider.of<AuthenticationProvider>(context);
     var tp = Provider.of<TagProvider>(context);
-    var rp = Provider.of<RecordingProvider>(context);
     var cp = Provider.of<ContextProvider>(context);
 
     if (_getMemes != null) {
@@ -206,51 +204,7 @@ class _State extends State<PhysicalLangamePageView>
                   ),
                 ),
               ),
-        plp.memes.length > 0
-            ? LangameButton(
-                FontAwesomeIcons.microphoneAlt,
-                disableForFewMs: 5000,
-                highlighted: _isRecording,
-                onPressed: () async {
-                  setState(() {
-                    _isRecording = !_isRecording;
-                  });
-                  if (_isRecording) {
-                    var r = await rp.start();
-                    if (r.status == LangameStatus.failed) {
-                      cp.showFailureDialog(null);
-                      Future.delayed(Duration(seconds: 2))
-                          .whenComplete(() => cp.dialogComplete());
-                      setState(() {
-                        _isRecording = false;
-                      });
-                    } else if (r.status == LangameStatus.cancelled) {
-                      cp.showFailureDialog(
-                          'you need to allow recording audio!');
-                      Future.delayed(Duration(seconds: 2))
-                          .whenComplete(() => cp.dialogComplete());
-                      setState(() {
-                        _isRecording = false;
-                      });
-                    }
-                  } else {
-                    var txt = await rp.stop(metadata: {
-                      'meme': getMeme(plp),
-                      'context': 'face-to-face',
-                      'language': _languageSelected,
-                      'topics': plp.memes[plp.currentMeme].topics
-                          .map((e) => '#$e')
-                          .join(' '),
-                    });
-                    if (txt.result == '') {
-                      cp.showSnackBar(_couldNotHear.pickAny()!);
-                    } else {
-                      cp.showSnackBar('Recorded 😇');
-                    }
-                  }
-                },
-              )
-            : SizedBox.shrink(),
+        
         plp.memes.length > 0
             ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 LangameButton(
@@ -293,7 +247,7 @@ class _State extends State<PhysicalLangamePageView>
               Positioned(
                   right: AppSize.safeBlockHorizontal * 5,
                   child: Tooltip(
-                      message: 'You are given 5 credits a day',
+                      message: 'You are given 10 credits a day',
                       child: Row(children: [
                         Text('${ap.user != null ? ap.user!.credits : 0}',
                             style: Theme.of(context).textTheme.caption),

@@ -5,14 +5,9 @@ tasks:
       echo "$LANGAME_SVC_PROD" > svc.prod.json
       echo "$LANGAME_SVC_DEV" > svc.dev.json
       cd functions
-      echo "Installing dependencies..."
       npm i
-      export GOOGLE_APPLICATION_CREDENTIALS=./svc.dev.json
-      echo "Writing function configuration locally for emulator usage..."
-      firebase functions:config:get > .runtimeconfig.json
-      echo "Setting up to Firebase development project..."
+      export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/svc.dev.json
       npm run set-dev
-      echo "Setting up Docker for Google Cloud..."
       mkdir -p ~/.docker
       cat >~/.docker/config.json <<EOL
        {
@@ -26,6 +21,8 @@ tasks:
         }
       }
       EOL
+      firebase login --no-localhost
+      firebase functions:config:get > .runtimeconfig.json
 image:
   file: .gitpod.Dockerfile
 

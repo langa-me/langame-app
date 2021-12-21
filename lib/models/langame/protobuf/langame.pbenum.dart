@@ -9,25 +9,6 @@
 import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-class InteractionLevel extends $pb.ProtobufEnum {
-  static const InteractionLevel BAD = InteractionLevel._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'BAD');
-  static const InteractionLevel AVERAGE = InteractionLevel._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'AVERAGE');
-  static const InteractionLevel GREAT = InteractionLevel._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'GREAT');
-  static const InteractionLevel LOVE = InteractionLevel._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'LOVE');
-
-  static const $core.List<InteractionLevel> values = <InteractionLevel> [
-    BAD,
-    AVERAGE,
-    GREAT,
-    LOVE,
-  ];
-
-  static final $core.Map<$core.int, InteractionLevel> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static InteractionLevel? valueOf($core.int value) => _byValue[value];
-
-  const InteractionLevel._($core.int v, $core.String n) : super(v, n);
-}
-
 class ContentFilter extends $pb.ProtobufEnum {
   static const ContentFilter Safe = ContentFilter._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Safe');
   static const ContentFilter Sensitive = ContentFilter._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'Sensitive');

@@ -1,4 +1,3 @@
-
 name: Flutter release CI/CD
 
 on:
@@ -21,7 +20,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.5.3
+          flutter-version: 2.8.1
       - run: flutter pub get
       - run: cp web/web_flavors/production/* web
       - run: flutter build web --release
@@ -68,20 +67,20 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.5.3
+          flutter-version: 2.8.1
       - name: Install Flutter dependencies
         run: flutter pub get
       - run: flutter build apk --release --flavor prod
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7.2'
+          ruby-version: "2.7.2"
       - name: Deploy to Google Play open and internal testers
         uses: maierj/fastlane-action@v2.0.1
         with:
           lane: beta_prod
           subdirectory: android
         env:
-          FIREBASE_CLI_TOKEN: '${{ secrets.FIREBASE_CLI_TOKEN }}'
+          FIREBASE_CLI_TOKEN: "${{ secrets.FIREBASE_CLI_TOKEN }}"
           ANDROID_PACKAGE_NAME: "me.langa"
 
   deploy_ios:
@@ -113,12 +112,12 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.5.3
+          flutter-version: 2.8.1
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign --flavor prod
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7.2'
+          ruby-version: "2.7.2"
       - name: Deploy iOS Beta to TestFlight via Fastlane
         uses: maierj/fastlane-action@v2.0.1
         continue-on-error: true
@@ -127,15 +126,15 @@ jobs:
           subdirectory: ios
           skip-tracking: true
         env:
-          APP_STORE_CONNECT_TEAM_ID: '${{ secrets.APP_STORE_CONNECT_TEAM_ID }}'
-          DEVELOPER_APP_ID: '${{ secrets.DEVELOPER_APP_ID }}'
-          DEVELOPER_APP_IDENTIFIER: '${{ secrets.DEVELOPER_APP_IDENTIFIER }}'
-          DEVELOPER_PORTAL_TEAM_ID: '${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}'
-          FASTLANE_APPLE_ID: '${{ secrets.FASTLANE_APPLE_ID }}'
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: '${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}'
-          MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
-          GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
-          PROVISIONING_PROFILE_SPECIFIER: '${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}'
-          TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
-          TEMP_KEYCHAIN_USER: '${{ secrets.TEMP_KEYCHAIN_USER }}'
-          FIREBASE_CLI_TOKEN: '${{ secrets.FIREBASE_CLI_TOKEN }}'
+          APP_STORE_CONNECT_TEAM_ID: "${{ secrets.APP_STORE_CONNECT_TEAM_ID }}"
+          DEVELOPER_APP_ID: "${{ secrets.DEVELOPER_APP_ID }}"
+          DEVELOPER_APP_IDENTIFIER: "${{ secrets.DEVELOPER_APP_IDENTIFIER }}"
+          DEVELOPER_PORTAL_TEAM_ID: "${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}"
+          FASTLANE_APPLE_ID: "${{ secrets.FASTLANE_APPLE_ID }}"
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: "${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}"
+          MATCH_PASSWORD: "${{ secrets.MATCH_PASSWORD }}"
+          GIT_AUTHORIZATION: "${{ secrets.GIT_AUTHORIZATION }}"
+          PROVISIONING_PROFILE_SPECIFIER: "${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}"
+          TEMP_KEYCHAIN_PASSWORD: "${{ secrets.TEMP_KEYCHAIN_PASSWORD }}"
+          TEMP_KEYCHAIN_USER: "${{ secrets.TEMP_KEYCHAIN_USER }}"
+          FIREBASE_CLI_TOKEN: "${{ secrets.FIREBASE_CLI_TOKEN }}"

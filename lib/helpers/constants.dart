@@ -15,17 +15,13 @@ class AppConst {
   // When I build a new public version I just make sure to update this info
   // before building them.
   static const String appName = 'Langame';
-  static const String author = 'Louis Beaumont';
+  static const String author = 'Langame';
 
   // Whether to log debug settings events
   static const bool debugSettings = false;
 
   /// Define App ID and Token
   static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
-
-  static const String notifyPresenceFunction = 'notifyPresence';
-  static const String createStripeSubscriptionFunction =
-      'createStripeSubscription';
 
   static const String firestoreUsersCollection = 'users';
   static const String firestoreLangamesCollection = 'langames';

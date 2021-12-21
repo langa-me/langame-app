@@ -9,40 +9,20 @@ export const onSendMessageToBot = async (
   // Get all messages between these two
   const messages = await admin.firestore()
       .collection("messages")
-      .where("channelName", "==", snap.data()!.channelName)
+      .where("langameId", "==", snap.data()!.langameId)
       .orderBy("createdAt", "asc")
+      .withConverter(converter<langame.protobuf.IMessage>())
       .limitToLast(4) // Tune according to model
       .get();
 
-  const currentLg = (await admin.firestore().collection("langames")
-      .where("channelName", "==", snap.data()!.channelName)
-      .get()).docs[0];
-
-  // const config = await getConfig();
-
-  const botPlayer = await currentLg.ref.collection("players")
-      .doc(snap.data()!.toUid!)
-      .withConverter(converter<langame.protobuf.IPlayer>())
-      .get();
-
-  if (!botPlayer.exists) {
-    const p = {
-      userId: snap.data()!.toUid,
-      audioId: -1,
-    };
-    botPlayer.ref.set(
-        p,
-        {merge: true},
-    );
-  }
   const api = new ImplAiApi();
   const alternative = await api.conversational(
       messages.docs
-          .filter((e) => e.data()!.toUid === snap.data()!.fromUid)
-          .map((e) => e.data()!.body),
+          .filter((e) => e.data()!.author!.bot! == false)
+          .map((e) => e.data()!.body!),
       messages.docs
-          .filter((e) => e.data()!.toUid === snap.data()!.toUid)
-          .map((e) => e.data()!.body),
+          .filter((e) => e.data()!.author!.bot! == true)
+          .map((e) => e.data()!.body!),
         snap.data()!.body!,
   );
 
@@ -54,9 +34,10 @@ export const onSendMessageToBot = async (
     type: langame.protobuf.Message.Type.MESSAGE,
     // @ts-ignore
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    fromUid: snap.data()!.toUid,
-    toUid: snap.data()!.fromUid,
-    channelName: snap.data()!.channelName,
+    author: {
+      id: snap.data()!.author!.id!,
+    },
+    langameId: snap.data()!.langameId,
   };
   return admin.firestore().collection("messages")
       .withConverter(converter<langame.protobuf.IMessage>())

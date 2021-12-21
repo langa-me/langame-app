@@ -11,7 +11,7 @@ import 'crash_analytics_provider.dart';
 
 class PhysicalLangameProvider extends ChangeNotifier {
   FirebaseApi _firebase;
-  Algolia? algolia;
+  Algolia algolia;
   CrashAnalyticsProvider _cap;
   PhysicalLangameProvider(this._firebase, this._cap, this.algolia);
 
@@ -65,9 +65,7 @@ class PhysicalLangameProvider extends ChangeNotifier {
 
   Future<LangameResponse<List<String>>> topicSearch(String value) async {
     try {
-      if (algolia == null)
-        return LangameResponse(LangameStatus.succeed, result: []);
-      final objects = await algolia!
+      final objects = await algolia
           .index(AppConst.isDev ? "dev_topics" : "prod_topics")
           .query(value)
           .getObjects();

@@ -32,7 +32,6 @@ export const versionCheck = async (
   const t = await admin.remoteConfig().getTemplate();
   // @ts-ignore
   const langameVersion = t.parameters.langame_version.defaultValue.value;
-  // TODO: test
   if (!satisfies(data.version, langameVersion)) {
     return new langame.protobuf.FunctionResponse({
       versionCheck: new langame.protobuf.FunctionResponse.VersionCheck({

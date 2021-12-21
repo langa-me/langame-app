@@ -3,23 +3,11 @@ import * as admin from "firebase-admin";
 import "mocha";
 import * as sinon from "sinon";
 import {ImplAiApi} from "../aiApi/implAiApi";
-import {getConfig} from "../functionConfig/config";
 import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
 import {initFirebaseTest} from "../utils/firestore.spec";
-import {createReflection, createSuggestion} from "./onCreateMessageAnalysis";
+import {createReflection} from "./onCreateMessageAnalysis";
 import {onSendMessageToBot} from "./onSendMessageToBot";
-it("suggest", async () => {
-  initFirebaseTest("dev");
-  const conf = await getConfig();
-  const completion = await createSuggestion(
-      new ImplAiApi(),
-      "775b19ed",
-      "qpbGMze6PHb1PPDhnrCVoObosGj2",
-      conf.suggestion,
-  );
-  console.log(completion);
-});
 
 it("reflect", async () => {
   initFirebaseTest("dev");
@@ -77,10 +65,14 @@ it("onSendMessageToBot", async () => {
   initFirebaseTest("dev");
   const botSnap = (await admin.firestore().collection("users")
       .withConverter(converter<langame.protobuf.IUser>())
-      .where("human", "==", false).get()).docs[0];
+      .where("bot", "==", true).get()).docs[0];
   expect(botSnap).to.be.not.undefined;
-  const messageSnap = (await admin.firestore().collection("messages")
+  const langamePresences = await admin.firestore()
+      .collection("langame_presences").doc(botSnap.id!).get();
+  const messageSnap = await admin.firestore().collection("messages")
       .withConverter(converter<langame.protobuf.IMessage>())
-      .where("toUid", "==", botSnap.id).get()).docs[0];
-  await onSendMessageToBot((await messageSnap.ref.get()));
+      .where("langameId", "==",
+           langamePresences.data()!.presences[0]).get();
+  const message = await messageSnap.docs[0].ref.get();
+  await onSendMessageToBot(message);
 });

@@ -22,22 +22,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/providers/admin_provider.dart';
-import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/dynamic_links_provider.dart';
 import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
-import 'package:langame/providers/payment_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
-import 'package:langame/providers/readwise_provider.dart';
-import 'package:langame/providers/recording_provider.dart';
 import 'package:langame/providers/remote_config_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/services/http/fake_message_api.dart';
@@ -48,8 +42,6 @@ import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'services/http/firebase.dart';
-import 'services/http/impl_langame_api.dart';
-import 'services/http/impl_payment_api.dart';
 import 'views/colors/colors.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -109,7 +101,8 @@ void main() async {
     dynamicLinks: dynamicLinks,
     useEmulator: useEmulator,
   );
-
+Algolia algolia = Algolia.init(
+      applicationId: 'B1SU8TE6UY', apiKey: 'a2c82fa22a5c4683b3caf14fadf78a33');
   var navigationKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
   var scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>(debugLabel: 'scaffoldKey');
@@ -120,7 +113,7 @@ void main() async {
       firebase.crashlytics, firebase.analytics!, remoteConfig, firebase);
   var authenticationApi = ImplAuthenticationApi(firebase);
   var authenticationProvider = AuthenticationProvider(
-      firebase, authenticationApi, crashAnalyticsProvider, null);
+      firebase, authenticationApi, crashAnalyticsProvider, algolia);
   // Cloud messaging is fucked-up with emulator
   // (something with, messaging stuff have to happen on Google infra)
   // So using fake api when using emulator
@@ -138,48 +131,30 @@ void main() async {
           //   );
           // }
         });
+  
+  var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
+      authenticationProvider, algolia);
   var messageProvider = MessageProvider(
     firebase,
     messageApi,
     crashAnalyticsProvider,
     authenticationProvider,
     contextProvider,
+    langameProvider,
     isLocalConversationApi: false,
   );
   var preferenceProvider = PreferenceProvider(
       firebase, crashAnalyticsProvider, authenticationProvider);
   var remoteConfigProvider =
       RemoteConfigProvider(crashAnalyticsProvider, remoteConfig);
-  var audioProvider = AudioProvider(firebase, crashAnalyticsProvider,
-      remoteConfigProvider, authenticationProvider);
-  var dynamicLinksProvider = DynamicLinksProvider(
-    crashAnalyticsProvider,
-    contextProvider,
-    dynamicLinks,
-    authenticationProvider,
-  );
-  var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
-      authenticationProvider, ImplLangameApi(firebase));
-  final recordingProvider = RecordingProvider(firebase, crashAnalyticsProvider,
-      authenticationProvider, preferenceProvider, null);
-  final readwiseProvider = ReadwiseProvider(
-      firebase, crashAnalyticsProvider, authenticationProvider);
   var newLangameProvider = NewLangameProvider(
       crashAnalyticsProvider, authenticationProvider, firebase);
   var tagProvider =
-      TagProvider(firebase, crashAnalyticsProvider, null, preferenceProvider);
+      TagProvider(firebase, crashAnalyticsProvider, algolia, preferenceProvider);
   var physicalLangameProvider =
-      PhysicalLangameProvider(firebase, crashAnalyticsProvider, null);
-  var adminProvider = AdminProvider(firebase, crashAnalyticsProvider, null);
-  Algolia algolia = Algolia.init(
-      applicationId: 'B1SU8TE6UY', apiKey: 'a2c82fa22a5c4683b3caf14fadf78a33');
+      PhysicalLangameProvider(firebase, crashAnalyticsProvider, algolia);
+  
   remoteConfig?.ensureInitialized();
-  recordingProvider.algolia = algolia;
-  authenticationProvider.algolia = algolia;
-  tagProvider.algolia = algolia;
-  physicalLangameProvider.algolia = algolia;
-  adminProvider.algolia = algolia;
-  // SystemChrome.setEnabledSystemUIOverlays([]);
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(
@@ -221,11 +196,6 @@ void main() async {
               update: (_, cap, ap, pp) => pp!,
               create: (_) => preferenceProvider,
             ),
-            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
-                RemoteConfigProvider, AuthenticationProvider, AudioProvider>(
-              update: (_, cap, rcp, authP, ap) => ap!,
-              create: (_) => audioProvider,
-            ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, MessageProvider>(
               update: (_, cap, ap, mp) => mp!,
@@ -244,20 +214,6 @@ void main() async {
               create: (_) => FeedbackProvider(firebase, crashAnalyticsProvider,
                   contextProvider, preferenceProvider),
             ),
-            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
-                ContextProvider, AuthenticationProvider, PaymentProvider>(
-              update: (_, cap, cp, ap, pp) => pp!,
-              create: (_) => PaymentProvider(
-                  crashAnalyticsProvider,
-                  contextProvider,
-                  authenticationProvider,
-                  ImplPaymentApi(firebase)),
-            ),
-            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
-                ContextProvider, AuthenticationProvider, DynamicLinksProvider>(
-              update: (_, cap, cp, ap, dlp) => dlp!,
-              create: (_) => dynamicLinksProvider,
-            ),
             ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
                 AuthenticationProvider, LangameProvider>(
               update: (_, cap, ap, lp) => lp!,
@@ -267,20 +223,6 @@ void main() async {
                 PhysicalLangameProvider>(
               update: (_, cap, p) => p!,
               create: (_) => physicalLangameProvider,
-            ),
-            ChangeNotifierProxyProvider<CrashAnalyticsProvider, AdminProvider>(
-              update: (_, cap, p) => p!,
-              create: (_) => adminProvider,
-            ),
-            ChangeNotifierProxyProvider3<CrashAnalyticsProvider,
-                AuthenticationProvider, PreferenceProvider, RecordingProvider>(
-              update: (_, cap, ap, pp, p) => p!,
-              create: (_) => recordingProvider,
-            ),
-            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
-                AuthenticationProvider, ReadwiseProvider>(
-              update: (_, cap, ap, p) => p!,
-              create: (_) => readwiseProvider,
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),

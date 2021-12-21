@@ -12,7 +12,7 @@ export const onWritePreference = async (
     langame.protobuf.IUserPreference>>,
     ctx: EventContext) => {
   try {
-    functions.logger.log("hello", ctx, change.after.data());
+    functions.logger.log(ctx);
 
     if (!change.after.exists) {
       functions.logger.log("preferences have been deleted, aborting");

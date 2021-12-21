@@ -15,3 +15,4 @@ export const initFirebaseTest = (env: "prod" | "dev") => {
     // console.log("failed to initialize firebase", e);
   }
 };
+

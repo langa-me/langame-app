@@ -1,13 +1,11 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:langame/providers/audio_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/new_langame_page_view.dart';
 import 'package:langame/views/physical_langame_page_view.dart';
-import 'package:langame/views/recording_page_view.dart';
 import 'package:langame/views/settings_view.dart';
 import 'package:provider/provider.dart';
 
@@ -33,8 +31,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   void afterFirstLayout(BuildContext context) {
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
         .setCurrentScreen('main_view');
-    // TODO: ????
-    Provider.of<AudioProvider>(context, listen: false).leaveChannel();
     var pp = Provider.of<PreferenceProvider>(context, listen: false);
     var cp = Provider.of<ContextProvider>(context, listen: false);
     if (!pp.preference.sawWhatsNew) {
@@ -165,7 +161,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       LangameListView(),
       PhysicalLangamePageView(goToPage),
     ];
-    if (pp.preference.previewMode) child.add(RecordingPageView(goToPage));
 
     return PageView(
       onPageChanged: (i) => setState(() {

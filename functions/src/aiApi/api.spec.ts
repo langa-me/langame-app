@@ -274,7 +274,7 @@ it("conversational2", async () => {
   initFirebaseTest("prod");
   const messages = await admin.firestore()
       .collection("messages")
-      .where("channelName", "==", "caba1d37")
+      .where("langameId", "==", "caba1d37")
       .orderBy("createdAt", "asc")
       .limitToLast(10)
       .get();

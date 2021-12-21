@@ -6,6 +6,8 @@ import 'package:langame/models/extension.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/services/http/firebase.dart';
+import 'package:sortedmap/sortedmap.dart';
+import 'package:tuple/tuple.dart';
 
 import 'crash_analytics_provider.dart';
 
@@ -22,25 +24,27 @@ class NewLangameProvider extends ChangeNotifier {
             .listen((e) async {
           if (e.exists && e.data() != null) {
             _cap.log('new_langame_provider:stream recommendations');
-            _recommendations = (await Future.wait(
-                // TODO: null check
-                (e.data()!['users'] as List<dynamic>)
-                    .map((e) async => (await _firebase.firestore!
-                            .collection('users')
-                            .doc(e)
-                            .withConverter<lg.User>(
-                              fromFirestore: (s, _) =>
-                                  UserExt.fromObject(s.data()!),
-                              toFirestore: (s, _) => s.toMapStringDynamic(),
-                            )
-                            .get())
-                        .data()))).where((e) => e != null).map((e) => e!).toList();
+            final reco = (e.data()!['recommendations'] as Map<String, dynamic>)
+                .entries
+                .map((e) => Tuple2(e.key, e.value));
+            await Future.wait(reco.map((e) async {
+              final user = await _firebase.firestore!
+                  .collection('users')
+                  .doc(e.item1)
+                  .withConverter<lg.User>(
+                    fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
+                    toFirestore: (s, _) => s.toMapStringDynamic(),
+                  )
+                  .get();
+              _recommendations[e.item2] = user;
+            }));
+
             notifyListeners();
           }
         });
       } else if (e.type == UserChangeType.Disconnection) {
         _subReco?.cancel();
-        _recommendations = [];
+        _recommendations = SortedMap(Ordering.byKey());
         notifyListeners();
       }
     });
@@ -52,8 +56,10 @@ class NewLangameProvider extends ChangeNotifier {
   /// Players to be invited
   List<lg.User> _shoppingList = [];
   List<lg.User> get shoppingList => _shoppingList;
-  List<lg.User> _recommendations = [];
-  List<lg.User> get recommendations => _recommendations;
+  SortedMap<int, DocumentSnapshot<lg.User>> _recommendations =
+      SortedMap(Ordering.byKey());
+  SortedMap<int, DocumentSnapshot<lg.User>> get recommendations =>
+      _recommendations;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _subReco;
   DateTime? _selectedDate;
   DateTime? get selectedDate => _selectedDate;

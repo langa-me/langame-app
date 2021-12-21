@@ -49,18 +49,26 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                   lp.recommendations.length > 0
                       ? Expanded(
                           child: ListView(
-                              children: lp.recommendations
-                                  .map((e) => buildUserTile(
-                                      context, lp, e, widget._goToPage))
+                              children: lp.recommendations.entries
+                                  .take(5)
+                                  .map((e) => buildUserTile(context, lp,
+                                      e.value.data()!, widget._goToPage))
+                                  .toList()
+                                  .reversed
                                   .toList()),
                         )
-                      : Column(children: [
-                          Image.asset('images/logo-colourless.png'),
-                          Text(
-                              'After playing some Langames, you will have some recommendations!',
-                              style: Theme.of(context).textTheme.caption,
-                              textAlign: TextAlign.center),
-                        ]),
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                              Image.asset(
+                                'images/logo-colourless.png',
+                                width: AppSize.safeBlockHorizontal * 20,
+                              ),
+                              Text(
+                                  'After playing some Langames, you will have some recommendations!',
+                                  style: Theme.of(context).textTheme.caption,
+                                  textAlign: TextAlign.center),
+                            ]),
                 ],
               )
             : Image.asset('images/logo-colourless.png');
@@ -113,6 +121,7 @@ class _State extends State<SearchPageView>
 
   Widget _buildExpandableBody(
       PreferenceProvider lsp, AuthenticationProvider ap) {
+    final cp = Provider.of<ContextProvider>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Material(
@@ -126,6 +135,7 @@ class _State extends State<SearchPageView>
               height: AppSize.safeBlockVertical * 10,
               width: double.infinity,
               alignment: Alignment.center,
+              padding: EdgeInsets.all(12),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -133,7 +143,7 @@ class _State extends State<SearchPageView>
                       isLight(context)
                           ? 'images/search-by-algolia-light-background.svg'
                           : 'images/search-by-algolia-dark-background.svg',
-                      width: AppSize.safeBlockHorizontal * 20,
+                      width: AppSize.safeBlockHorizontal * 40,
                       height: AppSize.safeBlockVertical * 5,
                     ),
                   ]),
@@ -166,7 +176,6 @@ class _State extends State<SearchPageView>
                   .map(
                     (tag) => ListTile(
                       tileColor: getBlackAndWhite(context, 1, reverse: true),
-
                       title: Text(tag,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -174,7 +183,6 @@ class _State extends State<SearchPageView>
                               TextStyle(
                                   color: getBlackAndWhite(context, 0,
                                       reverse: false)))),
-                      //leading: Icon(Icons.history, color: Colors.black),
                       trailing: IconButton(
                         icon: Icon(Icons.clear,
                             color:
@@ -198,10 +206,7 @@ class _State extends State<SearchPageView>
                           } else {
                             lsp.selectedTag = null;
                             lsp.selectedUser = null;
-                            final snackBar =
-                                SnackBar(content: Text('$tag not found!'));
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
+                            cp.showSnackBar('$tag not found!');
                           }
                         });
                       },
@@ -216,13 +221,16 @@ class _State extends State<SearchPageView>
   }
 
   Widget _buildSearchPageView() => Scaffold(
-      appBar: buildAppBar(context, 'Search people'),
+      backgroundColor: isLightThenDark(context, reverse: true),
+      appBar: buildAppBar(context, ''),
       body: Consumer2<PreferenceProvider, AuthenticationProvider>(
         builder: (context, lsp, ap, _) => FloatingSearchBar(
           queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
               decorationColor: getBlackAndWhite(context, 1, reverse: true),
               backgroundColor: getBlackAndWhite(context, 1, reverse: true),
               color: getBlackAndWhite(context, 0))),
+          clearQueryOnClose: false,
+          width: AppSize.safeBlockHorizontal * (AppSize.isLargeWidth ? 40 : 80),
           backdropColor: getBlackAndWhite(context, 0, reverse: true),
           backgroundColor: getBlackAndWhite(context, 1, reverse: true),
           scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),

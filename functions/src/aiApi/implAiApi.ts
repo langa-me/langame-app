@@ -13,16 +13,6 @@ import {converCamelCaseToSnake} from "../utils/object";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require("node-fetch");
 
-export const defaultCompletionParameters = {
-  model: "davinci",
-  temperature: 0.7,
-  maxTokens: 500,
-  topP: 1,
-  frequencyPenalty: 0,
-  presencePenalty: 0,
-  stop: ["\n"],
-};
-
 
 export const openAIClassifierFiles = {
   first: {
@@ -55,6 +45,8 @@ export class ImplAiApi implements Api {
     this.indexes.set("prod_memes", this.algolia.initIndex("prod_memes"));
     this.indexes.set("dev_topics", this.algolia.initIndex("dev_topics"));
     this.indexes.set("prod_topics", this.algolia.initIndex("prod_topics"));
+    this.indexes.set("dev_langames", this.algolia.initIndex("dev_langames"));
+    this.indexes.set("prod_langames", this.algolia.initIndex("prod_langames"));
     this.translateClient = this.keyFileName ?
       new Translate({keyFilename: this.keyFileName}) :
       new Translate();

@@ -2,50 +2,10 @@ import 'dart:core';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/models/google/protobuf/timestamp.pb.dart' as gg;
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:protobuf/protobuf.dart';
-
-extension interactionExtensions on lg.InteractionLevel {
-  Color toColor() {
-    switch (this) {
-      case lg.InteractionLevel.AVERAGE:
-        return Colors.yellow;
-      case lg.InteractionLevel.GREAT:
-        return Colors.green;
-      case lg.InteractionLevel.LOVE:
-        return Colors.pinkAccent;
-      default:
-        return Colors.red;
-    }
-  }
-
-  FaIcon toFaIcon() {
-    switch (this) {
-      case lg.InteractionLevel.AVERAGE:
-        return FaIcon(FontAwesomeIcons.meh);
-      case lg.InteractionLevel.GREAT:
-        return FaIcon(FontAwesomeIcons.laugh);
-      case lg.InteractionLevel.LOVE:
-        return FaIcon(FontAwesomeIcons.grinHearts);
-      default:
-        return FaIcon(FontAwesomeIcons.frown);
-    }
-  }
-}
-
-extension interactionIntExtensions on int {
-  lg.InteractionLevel toInteractionLevel() {
-    if (this > 10) return lg.InteractionLevel.LOVE;
-    if (this > 5) return lg.InteractionLevel.GREAT;
-    if (this > 2) return lg.InteractionLevel.AVERAGE;
-
-    return lg.InteractionLevel.BAD;
-  }
-}
 
 extension protExt on GeneratedMessage {
   Map<String, dynamic> toMapStringDynamic() =>
@@ -80,6 +40,7 @@ class UserExt {
           (m['devices'] as List<dynamic>?)?.map((e) => DeviceExt.fromObject(e)),
       credits: m['credits'],
       role: m['role'],
+      bot: m['bot'],
     );
   }
 
@@ -110,15 +71,14 @@ class UserPreferenceExt {
     var m = o as Map<String, dynamic>;
     return lg.UserPreference(
       userId: m['userId'],
-      userRecommendations: m['userRecommendations'] is bool ? m['userRecommendations'] : true,
+      userRecommendations:
+          m['userRecommendations'] is bool ? m['userRecommendations'] : true,
       themeIndex: m['themeIndex'],
       hasDoneOnBoarding: m['hasDoneOnBoarding'],
       userSearchHistory:
           (m['userSearchHistory'] as List<dynamic>?)?.map((e) => e as String),
-      shakeToFeedback: m['shakeToFeedback'],
       favoriteTopics:
           (m['favoriteTopics'] as List<dynamic>?)?.map((e) => e as String),
-      speechToTextLocale: m['speechToTextLocale'],
       sawWhatsNew: m['sawWhatsNew'],
       notification: lg.UserPreference_Notification(
         message: lg.UserPreference_Notification_Message(
@@ -149,34 +109,34 @@ class LangameExt {
   static lg.Langame fromObject(Object o) {
     var m = o as Map<String, dynamic>;
     return lg.Langame(
-      channelName: m['channelName'],
-      players: (m['players'] as List<dynamic>?)?.map((e) => e as String),
-      topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
-      memes: (m['memes'] as List<dynamic>?)?.map((e) => MemeExt.fromObject(e)),
+      id: m['id'],
+      players: (m['players'] as List<dynamic>?)?.map((e) => LangamePlayerExt.fromObject(e)),
       initiator: m['initiator'],
       done: dynamicToProtobufTimestamp(m['done']),
-      currentMeme: m['currentMeme'],
-      date: dynamicToProtobufTimestamp(m['date']),
-      started: dynamicToProtobufTimestamp(m['started']),
+      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
       errors: (m['errors'] as List<dynamic>?)?.map((e) =>
           e is Map<String, dynamic>
               ? ErrorExt.fromObject(e)
               : lg.Error(developerMessage: e as String)),
-      nextMeme: dynamicToProtobufTimestamp(m['nextMeme']),
-      memesSeen: m['memesSeen'],
-      memeChanged: dynamicToProtobufTimestamp(m['memeChanged']),
-      link: m['link'],
-      reservedSpots:
-          (m['reservedSpots'] as List<dynamic>?)?.map((e) => e as String),
-      isLocked: m['isLocked'],
-      isText: m['isText'],
       reflections: (m['reflections'] as List<dynamic>?)
               ?.map((e) => ReflectionExt.fromObject(e)) ??
           [],
-      suggestions: (m['suggestions'] as List<dynamic>?)?.map(
-            (e) => SuggestionExt.fromObject(e),
-          ) ??
-          [],
+      tags: (m['tags'] as List<dynamic>?)?.map((e) => e as String),
+      topics: (m['topics'] as List<dynamic>?)?.map((e) => e as String),
+    );
+  }
+}
+
+class LangamePlayerExt {
+  static lg.Langame_Player fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Langame_Player(
+      id: m['id'],
+      tag: m['tag'],
+      photoUrl: m['photoUrl'],
+      bot: m['bot'],
+      locale: m['locale'],
+      email: m['email'],
     );
   }
 }
@@ -192,20 +152,6 @@ class ReflectionExt {
           (m['alternatives'] as List<dynamic>?)?.map((e) => e as String),
       contentFilter: lg.ContentFilter.values[m['contentFilter'] as int? ?? 0],
       userFeedbacks: m['userFeedbacks'] as Map<String, int>?,
-    );
-  }
-}
-
-class SuggestionExt {
-  static lg.Langame_Suggestion fromObject(Object o) {
-    var m = o as Map<Object?, Object?>;
-    return lg.Langame_Suggestion(
-      userId: m['userId'] as String?,
-      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
-      lastMessageId: m['lastMessageId'] as String?,
-      alternatives:
-          (m['alternatives'] as List<dynamic>?)?.map((e) => e as String),
-      contentFilter: lg.ContentFilter.values[m['contentFilter'] as int? ?? 0],
     );
   }
 }
@@ -235,42 +181,6 @@ gg.Timestamp? dynamicToProtobufTimestamp(dynamic something) {
   }
 }
 
-class PlayerExt {
-  static lg.Player fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Player(
-        userId: m['userId'],
-        timeIn: dynamicToProtobufTimestamp(m['timeIn']),
-        timeOut: dynamicToProtobufTimestamp(m['timeOut']),
-        audioId: m['audioId'],
-        audioToken: m['audioToken'],
-        errors: (m['errors'] as List<dynamic>?)?.map((e) =>
-            e is Map<String, dynamic>
-                ? ErrorExt.fromObject(e)
-                : lg.Error(developerMessage: e as String)),
-        notes:
-            (m['notes'] as List<dynamic>?)?.map((e) => NoteExt.fromObject(e)));
-  }
-}
-
-class NoteExt {
-  static lg.Note fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Note(
-      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
-      generic: m['generic'] != null
-          ? lg.Note_Generic(content: m['generic']!['content'])
-          : null,
-      goal: m['goal'] != null
-          ? lg.Note_Goal(content: m['goal']!['content'])
-          : null,
-      definition: m['definition'] != null
-          ? lg.Note_Definition(content: m['definition']!['content'])
-          : null,
-    );
-  }
-}
-
 class MemeExt {
   static lg.Meme fromObject(Object o) {
     var m = o as Map<Object?, Object?>;
@@ -295,43 +205,31 @@ class ErrorExt {
   }
 }
 
-class PromptExt {
-  static lg.Prompt fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Prompt(
-      type: m['type'],
-      template: m['template'],
-      id: m['id'],
-      parameters: m['parameters'],
-    );
-  }
-}
-
-class RecordingExt {
-  static lg.Recording fromObject(Object o) {
-    var m = o as Map<String, dynamic>;
-    return lg.Recording(
-      createdAt: dynamicToProtobufTimestamp(m['createdAt']),
-      text: m['text'],
-      userId: m['userId'],
-      metadata: Map<String, String>.from(m['metadata']),
-      note: m['note'] ?? '',
-    );
-  }
-}
-
 class MessageExt {
   static lg.Message fromObject(Object o) {
     var m = o as Map<String, dynamic>;
     return lg.Message(
       createdAt: dynamicToProtobufTimestamp(m['createdAt']),
-      fromUid: m['fromUid'],
-      toUid: m['toUid'],
-      channelName: m['channelName'],
+      author: MessageAuthorExt.fromObject(m['author']),
+      langameId: m['langameId'],
       type: lg.Message_Type.values[m['type']],
       body: m['body'],
       title: m['title'],
       id: m['id'],
+    );
+  }
+}
+
+class MessageAuthorExt {
+  static lg.Message_Author fromObject(Object o) {
+    var m = o as Map<String, dynamic>;
+    return lg.Message_Author(
+      id: m['id'],
+      tag: m['tag'],
+      photoUrl: m['photoUrl'],
+      bot: m['bot'],
+      locale: m['locale'],
+      email: m['email'],
     );
   }
 }
