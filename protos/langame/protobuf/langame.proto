@@ -94,6 +94,7 @@ message UserPreference {
   bool saw_whats_new = 13;
   Notification notification = 14;
   bool preview_mode = 15;
+  Goals goals = 16;
 
   message Notification {
     Invite invite = 1;
@@ -106,6 +107,14 @@ message UserPreference {
       bool email = 1;
       bool push = 2;
     }
+  }
+  // - Grow relationships (recommendations), meet new people
+  // - Compound relationships (existing friends, contacts), improve current relationships
+  // - Learn (UI changes to focus on learning, i.e. show topics, ask the user, [https://fs.blog/feynman-technique/](https://fs.blog/feynman-technique/), [https://fs.blog/learning/](https://fs.blog/learning/), [https://fs.blog/a-simple-tool-to-help-you-learn-better/](https://fs.blog/a-simple-tool-to-help-you-learn-better/))
+  message Goals {
+    bool grow_relationships = 1;
+    bool compound_relationships = 2;
+    bool learn = 3;
   }
 }
 

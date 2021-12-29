@@ -338,10 +338,6 @@ PODS:
     - abseil/base/base_internal
     - abseil/base/config
     - abseil/meta/type_traits
-  - agora_rtc_engine (4.0.7):
-    - AgoraRtcEngine_iOS (= 3.5.0.3)
-    - Flutter
-  - AgoraRtcEngine_iOS (3.5.0.3)
   - AppAuth (1.4.0):
     - AppAuth/Core (= 1.4.0)
     - AppAuth/ExternalUserAgent (= 1.4.0)
@@ -640,22 +636,12 @@ PODS:
   - speech_to_text (0.0.1):
     - Flutter
     - Try
-  - Stripe (21.7.0):
-    - Stripe/Stripe3DS2 (= 21.7.0)
-    - StripeCore (= 21.7.0)
-  - Stripe/Stripe3DS2 (21.7.0):
-    - StripeCore (= 21.7.0)
-  - stripe_ios (0.0.1):
-    - Flutter
-    - Stripe (~> 21.7.0)
-  - StripeCore (21.7.0)
   - Toast (4.0.0)
   - Try (2.1.1)
   - url_launcher_ios (0.0.1):
     - Flutter
 
 DEPENDENCIES:
-  - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
   - connectivity (from `.symlinks/plugins/connectivity/ios`)
@@ -683,13 +669,11 @@ DEPENDENCIES:
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
   - speech_to_text (from `.symlinks/plugins/speech_to_text/ios`)
-  - stripe_ios (from `.symlinks/plugins/stripe_ios/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
   trunk:
     - abseil
-    - AgoraRtcEngine_iOS
     - AppAuth
     - BoringSSL-GRPC
     - Firebase
@@ -720,14 +704,10 @@ SPEC REPOS:
     - PromisesObjC
     - Reachability
     - Sentry
-    - Stripe
-    - StripeCore
     - Toast
     - Try
 
 EXTERNAL SOURCES:
-  agora_rtc_engine:
-    :path: ".symlinks/plugins/agora_rtc_engine/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   cloud_functions:
@@ -782,15 +762,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sign_in_with_apple/ios"
   speech_to_text:
     :path: ".symlinks/plugins/speech_to_text/ios"
-  stripe_ios:
-    :path: ".symlinks/plugins/stripe_ios/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
-  agora_rtc_engine: 0820b82b3a71a8fcaf8b27c000622e671349f0ba
-  AgoraRtcEngine_iOS: ff8e085161ea98c917173783a899882f884dd9ef
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   cloud_firestore: 0c744725c0d1544d77db2c8eb35ef919cb19a176
@@ -848,9 +824,6 @@ SPEC CHECKSUMS:
   shared_preferences_ios: aef470a42dc4675a1cdd50e3158b42e3d1232b32
   sign_in_with_apple: f3bf75217ea4c2c8b91823f225d70230119b8440
   speech_to_text: b43a7d99aef037bd758ed8e45d79bbac035d2dfe
-  Stripe: 90596971ef49bade169f68bc59369a796b30a045
-  stripe_ios: 669a91fd06d17954dedeaebec35c56bf1c72a602
-  StripeCore: c09b492efc3b269a6ff875ad738ca366db97e03b
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Try: 5ef669ae832617b3cee58cb2c6f99fb767a4ff96
   url_launcher_ios: 02f1989d4e14e998335b02b67a7590fa34f971af

@@ -5,8 +5,7 @@ import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/views/users/shopping_list.dart';
 import 'package:provider/provider.dart';
 
-Widget buildUserTile(BuildContext context, NewLangameProvider lp, lg.User u,
-        void Function(int, {Curve? curve}) goToPage) =>
+Widget buildUserTile(BuildContext context, NewLangameProvider lp, lg.User u) =>
     ListTile(
       leading: u.hasPhotoUrl()
           ? CircleAvatar(
@@ -18,9 +17,9 @@ Widget buildUserTile(BuildContext context, NewLangameProvider lp, lg.User u,
       trailing: MaterialButton(
         onPressed: lp.shoppingList.any((e) => e.uid == u.uid)
             ? onRemoveFromShoppingList(u, lp,
-                Provider.of<ContextProvider>(context, listen: false), goToPage)
+                Provider.of<ContextProvider>(context, listen: false))
             : onAddToShoppingList(u, lp,
-                Provider.of<ContextProvider>(context, listen: false), goToPage),
+                Provider.of<ContextProvider>(context, listen: false)),
         splashColor: Theme.of(context).colorScheme.secondaryVariant,
         color: Theme.of(context).colorScheme.secondary,
         shape: CircleBorder(),

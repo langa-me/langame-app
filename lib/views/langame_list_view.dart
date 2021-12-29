@@ -2,11 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/models/langame/protobuf/langame.pb.dart' as lg;
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
+import 'package:langame/views/new_langame_page.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -100,6 +102,7 @@ class _State extends State<LangameListView> {
 
   Widget buildBody() {
     var p = Provider.of<LangameProvider>(context);
+    final cp = Provider.of<ContextProvider>(context, listen: false);
     var langames = p.langames.values
         .where((e) => controller.query.isNotEmpty ||
                 p.filteredLangameSearchHistory.isNotEmpty
@@ -108,8 +111,8 @@ class _State extends State<LangameListView> {
         .toList();
     return Column(children: [
       Expanded(
-        child: IndexedStack(
-          index: min(index, 2),
+        child: Stack(
+          // index: min(index, 2),
           children: [
             langames.length == 0
                 ? _noLangame()
@@ -124,6 +127,17 @@ class _State extends State<LangameListView> {
                       separatorBuilder: (_, int i) => Divider(),
                     )))
                   ]),
+            Positioned(
+              bottom: AppSize.safeBlockVertical * 5,
+              right: AppSize.safeBlockHorizontal * 5,
+              child: FloatingActionButton(
+                child: Icon(
+                  FontAwesomeIcons.keyboard,
+                  color: getBlackAndWhite(context, 0, reverse: true),
+                ),
+                onPressed: () => cp.push(NewLangamePage()),
+              ),
+            ),
           ],
         ),
       )

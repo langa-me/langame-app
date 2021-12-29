@@ -102,25 +102,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                   style: Theme.of(context).textTheme.headline6),
             ),
             buildRecommendationSetting(context, pp),
-            // ListTile(
-            //   leading: Beta(
-            //     Icon(FontAwesomeIcons.flask,
-            //         color: getBlackAndWhite(context, 0)),
-            //     type: BetaType.NEW,
-            //   ),
-            //   title: Text('Enable preview features',
-            //       style: Theme.of(context).textTheme.headline6),
-            //   onTap: () {
-            //     pp.preference.previewMode = !pp.preference.previewMode;
-            //     pp.refresh();
-            //   },
-            //   trailing: Switch(
-            //       value: pp.preference.previewMode,
-            //       onChanged: (_) {
-            //         pp.preference.previewMode = !pp.preference.previewMode;
-            //         pp.refresh();
-            //       }),
-            // ),
             Divider(),
             ExpansionTile(
                 leading:

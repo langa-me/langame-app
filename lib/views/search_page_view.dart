@@ -18,18 +18,16 @@ import 'users/profile.dart';
 import 'users/shopping_list.dart';
 
 class SearchPageView extends StatefulWidget {
-  final void Function(int, {Curve? curve}) _goToPage;
 
-  SearchPageView(this._goToPage);
+  SearchPageView();
 
   @override
   _State createState() => _State();
 }
 
 class SearchResultsListView extends StatefulWidget {
-  final void Function(int, {Curve? curve}) _goToPage;
 
-  const SearchResultsListView(this._goToPage);
+  const SearchResultsListView();
 
   @override
   _SearchResultsListViewState createState() => _SearchResultsListViewState();
@@ -52,7 +50,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                               children: lp.recommendations.entries
                                   .take(5)
                                   .map((e) => buildUserTile(context, lp,
-                                      e.value.data()!, widget._goToPage))
+                                      e.value.data()!))
                                   .toList()
                                   .reversed
                                   .toList()),
@@ -88,8 +86,8 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
           highlighted: true,
           onPressed: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
               ? onRemoveFromShoppingList(
-                  p.selectedUser!, lp, cp, widget._goToPage)
-              : onAddToShoppingList(p.selectedUser!, lp, cp, widget._goToPage),
+                  p.selectedUser!, lp, cp)
+              : onAddToShoppingList(p.selectedUser!, lp, cp),
         ),
         Spacer(),
       ]);
@@ -243,7 +241,7 @@ class _State extends State<SearchPageView>
               // Padding top of default FloatingSearchBar height (48) + app size * 5
               padding: EdgeInsets.only(top: 48 + AppSize.safeBlockVertical * 5),
               constraints: BoxConstraints.expand(),
-              child: SearchResultsListView(widget._goToPage),
+              child: SearchResultsListView(),
             ),
           ),
           transition: CircularFloatingSearchBarTransition(),

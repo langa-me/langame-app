@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:math';
 
 import 'package:algolia/algolia.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/services/http/firebase.dart';
+import 'package:langame/views/topics/most_popular_topics.dart';
 
 class TagProvider extends ChangeNotifier {
   TagProvider(this.firebase, this._cap, this.algolia, this._pp) {
@@ -29,6 +31,25 @@ class TagProvider extends ChangeNotifier {
   final PreferenceProvider _pp;
   List<String> _availableTopics = [];
   List<String> get availableTopics => _availableTopics;
+  Random _random = new Random(42);
+
+  void setDefaultTopics() {
+    // If the user did not select some topics previously,
+    // add randomly some of his favorite topics
+    // or random most popular ones if he does not have
+    // favorite topics
+    if (_selectedTopics.isEmpty) {
+      final randomNumber = _random.nextInt(3) + 1;
+      final someTopics = this._pp.preference.favoriteTopics.isNotEmpty
+          ? this._pp.preference.favoriteTopics.take(randomNumber).toList()
+          : getMostPopularTopics().take(randomNumber).toList();
+      _selectedTopics.addAll(someTopics);
+      notifyListeners();
+      this
+          ._cap
+          .log('Randomly selected ${someTopics.length} topics: ${someTopics}');
+    }
+  }
 
   void query(String value) async {
     if (value.isEmpty) {
@@ -65,12 +86,14 @@ class TagProvider extends ChangeNotifier {
   void addToSelectedTopic(String v) {
     _cap.sendClickTopic(v);
     _selectedTopics.add(v);
+    _cap.log('tag_provider: added $v to selected topics');
     notifyListeners();
   }
 
   void removeFromSelectedTopic(String v) {
     _cap.sendClickTopic(v);
     _selectedTopics.remove(v);
+    _cap.log('tag_provider: removed $v from selected topics');
     notifyListeners();
   }
 

@@ -361,13 +361,13 @@ class AuthenticationProvider extends ChangeNotifier {
       // [firebase_auth/requires-recent-login] This operation is sensitive
       //  and requires recent authentication. Log in again before
       //retrying this request.
-      final Credential cred = await (user!.google
-          ? _authenticationApi.loginWithGoogle()
-          : user!.apple
-              ? _authenticationApi.loginWithApple()
-              : _authenticationApi.loginWithEmail(null, null));
-      await firebase.auth!.currentUser!
-          .reauthenticateWithCredential(cred.oAuthCrendential!);
+      // final Credential cred = await (user!.google
+      //     ? _authenticationApi.loginWithGoogle()
+      //     : user!.apple
+      //         ? _authenticationApi.loginWithApple()
+      //         : _authenticationApi.loginWithEmail(null, null));
+      // await firebase.auth!.currentUser!
+      //     .reauthenticateWithCredential(cred.oAuthCrendential!);
       await firebase.auth!.currentUser!.delete();
       _cap.log('purging local storage');
       var i = await SharedPreferences.getInstance();
