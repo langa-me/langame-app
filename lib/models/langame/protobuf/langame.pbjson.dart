@@ -74,6 +74,8 @@ const Meme$json = const {
     const {'1': 'id', '3': 7, '4': 1, '5': 9, '10': 'id'},
     const {'1': 'disabled', '3': 8, '4': 1, '5': 8, '10': 'disabled'},
     const {'1': 'tweet', '3': 9, '4': 1, '5': 8, '10': 'tweet'},
+    const {'1': 'state', '3': 10, '4': 1, '5': 9, '10': 'state'},
+    const {'1': 'error', '3': 11, '4': 1, '5': 9, '10': 'error'},
   ],
   '3': const [Meme_TranslatedEntry$json],
 };
@@ -89,7 +91,7 @@ const Meme_TranslatedEntry$json = const {
 };
 
 /// Descriptor for `Meme`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List memeDescriptor = $convert.base64Decode('CgRNZW1lEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZ0b3BpY3MYBCADKAlSBnRvcGljcxIbCglwcm9tcHRfaWQYBSABKAlSCHByb21wdElkEkYKCnRyYW5zbGF0ZWQYBiADKAsyJi5sYW5nYW1lLnByb3RvYnVmLk1lbWUuVHJhbnNsYXRlZEVudHJ5Ugp0cmFuc2xhdGVkEg4KAmlkGAcgASgJUgJpZBIaCghkaXNhYmxlZBgIIAEoCFIIZGlzYWJsZWQSFAoFdHdlZXQYCSABKAhSBXR3ZWV0Gj0KD1RyYW5zbGF0ZWRFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoCVIFdmFsdWU6AjgB');
+final $typed_data.Uint8List memeDescriptor = $convert.base64Decode('CgRNZW1lEjkKCmNyZWF0ZWRfYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgljcmVhdGVkQXQSGAoHY29udGVudBgCIAEoCVIHY29udGVudBIWCgZ0b3BpY3MYBCADKAlSBnRvcGljcxIbCglwcm9tcHRfaWQYBSABKAlSCHByb21wdElkEkYKCnRyYW5zbGF0ZWQYBiADKAsyJi5sYW5nYW1lLnByb3RvYnVmLk1lbWUuVHJhbnNsYXRlZEVudHJ5Ugp0cmFuc2xhdGVkEg4KAmlkGAcgASgJUgJpZBIaCghkaXNhYmxlZBgIIAEoCFIIZGlzYWJsZWQSFAoFdHdlZXQYCSABKAhSBXR3ZWV0EhQKBXN0YXRlGAogASgJUgVzdGF0ZRIUCgVlcnJvchgLIAEoCVIFZXJyb3IaPQoPVHJhbnNsYXRlZEVudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
 @$core.Deprecated('Use userDescriptor instead')
 const User$json = const {
   '1': 'User',

@@ -421,6 +421,12 @@ export namespace langame {
 
             /** Meme tweet */
             tweet?: (boolean|null);
+
+            /** Meme state */
+            state?: (string|null);
+
+            /** Meme error */
+            error?: (string|null);
         }
 
         /** Represents a Meme. */
@@ -455,6 +461,12 @@ export namespace langame {
 
             /** Meme tweet. */
             public tweet: boolean;
+
+            /** Meme state. */
+            public state: string;
+
+            /** Meme error. */
+            public error: string;
 
             /**
              * Creates a new Meme instance using the specified properties.

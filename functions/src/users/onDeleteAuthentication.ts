@@ -10,6 +10,8 @@ import UserRecord = auth.UserRecord;
 import Stripe from "stripe";
 import {reportError} from "../errors";
 import {html} from "../utils/html";
+import {converter} from "../utils/firestore";
+import {langame} from "../langame/protobuf/langame";
 
 
 const title = "Farewell from Langame 😥";
@@ -98,6 +100,25 @@ export const onDeleteAuthentication = async (user: UserRecord,
           reservedSpots: admin.firestore.FieldValue.arrayRemove(user.uid),
         });
       }
+    }
+
+    const presenceInLangamesThree = await db
+        .collection("langame_presences")
+        .doc(user.uid)
+        .get();
+    for (const lgId of presenceInLangamesThree.data()?.presences) {
+      const lgDoc = await db.collection("langames")
+          .withConverter(converter<langame.protobuf.ILangame>())
+          .doc(lgId)
+          .get();
+      // remove all players in this langame from langame_presences
+      lgDoc.data()?.players?.map((p) =>
+        batch.set(
+            db.collection("langame_presences").doc(p.id!), {
+              presences: admin.firestore.FieldValue.arrayRemove(user.uid),
+            }, {merge: true},
+        ),
+      );
     }
 
     const messagesSent = await db

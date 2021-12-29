@@ -33,6 +33,9 @@ message Meme {
   string id = 7;
   bool disabled = 8;
   bool tweet = 9;
+  // "to-process", "processed", "error"
+  string state = 10;
+  string error = 11;
 }
 
 message User {

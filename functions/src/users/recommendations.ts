@@ -44,7 +44,8 @@ export const setRecommendations = (
           .withConverter(converter<langame.protobuf.IUserPreference>())
           .where("favoriteTopics",
               "array-contains-any",
-                    userPreference.data()!.favoriteTopics)
+                    // TODO: limited to 10 elemtn!!!
+                    userPreference.data()!.favoriteTopics!.slice(0, 9))
           .get();
       usersWithSimilarInterests.docs.forEach((e) => {
         // add recommendation score every time has similar interests

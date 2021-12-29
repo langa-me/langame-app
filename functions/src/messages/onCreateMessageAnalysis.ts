@@ -28,6 +28,8 @@ export const onCreateMessageAnalysis = async (
       return Promise.reject(reportError(
           new Error("too many failures, aborting")));
     }
+    // We don't analyse bot messages?
+    if (snap.data()!.author!.bot) return;
     const lg = await admin.firestore().collection("langames")
         .doc(snap.data()!.langameId!)
         .withConverter(converter<langame.protobuf.Langame>()).get();

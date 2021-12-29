@@ -50,9 +50,12 @@ export const onCreateMessage = async (
         .withConverter(converter<langame.protobuf.ILangame>())
         .doc(snap.data()!.langameId!)
         .get();
-    return Promise.all(channel.data()!.players!.map(async (player) => {
-      if (player.bot === true) {
-        return onSendMessageToBot(snap);
+    const toNotify = channel.data()!.players!.filter((e) =>
+      e.id !== snap.data()!.author!.id);
+    return Promise.all(toNotify.map(async (player) => {
+      // Do not answer bots
+      if (snap.data()!.author!.bot === false && player.bot === true) {
+        return onSendMessageToBot(snap, player);
       }
       const to = await db.collection("users").doc(player.id!)
           .withConverter(converter<langame.protobuf.IUser>())

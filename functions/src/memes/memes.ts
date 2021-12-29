@@ -70,3 +70,29 @@ export const offlineMemeSearch =
       return shuffle(flattennedAndEnabled).slice(0, limit);
     };
 
+export const onlineMemeGenerator = async (
+    topics: Array<string>,
+): Promise<admin.firestore.DocumentSnapshot<
+langame.protobuf.IMeme>> => {
+  const starterRef = await admin.firestore().collection("memes")
+      .withConverter(converter<langame.protobuf.IMeme>())
+      .add({
+        state: "to-process",
+        topics: topics,
+        // @ts-ignore
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        disabled: true,
+        tweet: false,
+      });
+  return new Promise<admin.firestore.DocumentSnapshot<
+      langame.protobuf.IMeme>>((resolve, reject) =>
+        starterRef.onSnapshot((snapshot) => {
+          setTimeout(() => reject(new Error("timeout")), 20_000);
+          if (snapshot.data()!.state === "processed" &&
+                  snapshot.data()!.content) {
+            resolve(snapshot);
+          } else if (snapshot.data()!.state === "error") {
+            reject(new Error(snapshot.data()!.error || "unknown"));
+          }
+        }));
+};

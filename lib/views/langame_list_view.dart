@@ -170,7 +170,7 @@ class _State extends State<LangameListView> {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headline4),
             SizedBox(height: AppSize.safeBlockVertical * 5),
-            Text('After participating to a Langame, you will see it here',
+            Text('After participating to a Langame, you will see it here.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.caption),
           ],

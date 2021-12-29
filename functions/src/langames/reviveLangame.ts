@@ -4,6 +4,8 @@ import {createBot} from "../users/bot";
 import {reportError} from "../errors";
 import {converter} from "../utils/firestore";
 import {langame} from "../langame/protobuf/langame";
+import {sample} from "../utils/array";
+import {onlineMemeGenerator} from "../memes/memes";
 /* eslint-disable max-len */
 // This is a bot message to send to the inactive conversation to revive it
 // using, for example, a conversation starter
@@ -38,72 +40,101 @@ const randomLangameConversationReviverOpenings = [
   "I just want to remind you: Don't let this conversation die. Keep them discussions going!",
 ];
 
-export const reviveLangame =
-    async (ctx: functions.EventContext) => {
-      functions.logger.log(ctx);
-      try {
-        const db = admin.firestore();
-        const inactiveLangames = await db
-            .collection("langames")
-            .where("tags", "array-contains", "inactive")
-            .withConverter(converter<langame.protobuf.ILangame>())
-            .get();
-        // get a random bot from bots collection
-        const botDoc = await db.collection("users")
-            .where("disabled", "==", false)
-            .where("bot", "==", true)
-            .limit(1)
-            .withConverter(converter<langame.protobuf.IUser>())
-            .get();
-        let botUser: admin.firestore.DocumentSnapshot<langame.protobuf.IUser>;
-        // if there is no bot, create one
-        if (botDoc.empty) {
-          botUser = await createBot(db);
-        } else {
-          botUser = botDoc.docs[0];
-        }
-        return Promise.all(inactiveLangames.docs.map(async (e) => {
-          // const starterRef = await db.collection("new_memes").add({
-          //   state: "to-process",
-          //   topics: e.data().topics,
-          //   created_at: admin.firestore.FieldValue.serverTimestamp(),
-          // });
-          // const starterDoc =
-          //   await new Promise<admin.firestore.DocumentSnapshot>((resolve, reject) =>
-          //     starterRef.onSnapshot((snapshot) => {
-          //       if (snapshot.data()!.state === "processed" &&
-          //           snapshot.data()!.conversation_starter) {
-          //         resolve(snapshot);
-          //       } else if (snapshot.data()!.state === "error") {
-          //         reject(new Error(snapshot.data()!.error || "unknown"));
-          //       }
-          //     }));
+// This is a list of messages that a bot will pick from to send to users during a dying conversation,
+// to announce that it will end the conversation if there is no more activity
+const conversationClosureMessages = [
+  "Despite my attempts to revive this conversation, it seems to be beyond my power 😢, I will close it in a couple of hours",
+  "I'm afraid I can't do anything to keep this conversation alive, I will close it in a couple of hours 😭",
+  "This conversation does not seem to be interesting enough to keep alive, I will close it in a couple of hours",
+  "I don't see any reason to keep this conversation alive, I will close it in a couple of hours",
+  "I'm afraid there is not much left to talk about, I will close this conversation in a couple of hours",
+  "I believe it is time to end this conversation, I will close in a couple of hours",
+  "Unfortunately, I don't see any reason to keep this conversation alive. I will close it in a couple of hours",
+  "I don't believe there is anything left to learn from this conversation, I will close it in a couple of hours",
+  "This conversation does not seem to still hold any potential, I will close it in a couple of hours",
+  "This conversation seems to be dying quietly, I could even close it in a couple of hours",
+  "It does not seem that this conversation has enough potential to be worth the effort of keeping it alive, I will close it in a couple of hours",
+];
 
-          // TODO: might also offline search
-          // TODO: maybe option to use something else than a conversation starter
-          // TODO: maybe something related to conversation?
-          // pick random opening
-          const botMessage = randomLangameConversationReviverOpenings[
-              Math.floor(
-                  Math.random() *
-                randomLangameConversationReviverOpenings.length)];
-          const author: langame.protobuf.Message.IAuthor = {
-            id: botUser.id,
-            tag: botUser.data()!.tag,
-            photoUrl: botUser.data()!.photoUrl,
-            bot: true,
-            email: botUser.data()!.email,
-          };
-          return db.collection("messages").add({
-            author: author,
-            body: botMessage,
-            type: 1,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            langameId: e.id,
-          });
-        }));
-      } catch (e: any) {
-        await reportError(e, {});
-        return Promise.reject(e);
+export const reviveLangame =
+  async (ctx: functions.EventContext) => {
+    functions.logger.log(ctx);
+    try {
+      const db = admin.firestore();
+      const langames = await db
+          .collection("langames")
+          .where("tags", "array-contains-any", ["inactive", "dead", "to-terminate"])
+          .withConverter(converter<langame.protobuf.ILangame>())
+          .get();
+      // get a random bot from bots collection
+      const botDoc = await db.collection("users")
+          .where("disabled", "==", false)
+          .where("bot", "==", true)
+          .limit(1)
+          .withConverter(converter<langame.protobuf.IUser>())
+          .get();
+      let botUser: admin.firestore.DocumentSnapshot<langame.protobuf.IUser>;
+      // if there is no bot, create one
+      if (botDoc.empty) {
+        botUser = await createBot(db);
+      } else {
+        botUser = botDoc.docs[0];
       }
-    };
+      return Promise.all(langames.docs.map((e) => revive(db, e, botUser)));
+    } catch (e: any) {
+      await reportError(e, {});
+      return Promise.reject(e);
+    }
+  };
+
+
+export const revive = async (
+    db: admin.firestore.Firestore,
+    langame: admin.firestore.QueryDocumentSnapshot<langame.protobuf.ILangame> |
+      admin.firestore.DocumentSnapshot<langame.protobuf.ILangame>,
+    botUser: admin.firestore.DocumentSnapshot<langame.protobuf.IUser>,
+): Promise<any> => {
+  if (langame.data()!.tags?.includes("to-terminate")) {
+    // Remove player from presence
+    return Promise.all<any>(langame.data()!.players!.map((player) =>
+      db.collection("langame_presences").doc(player!.id!).set({
+        presences: admin.firestore.FieldValue.arrayRemove(langame.id),
+      }, {merge: true})));
+  }
+
+  // pick random opening
+  let botMessage;
+  if (langame.data()!.tags?.includes("dead")) {
+    botMessage = sample(conversationClosureMessages);
+  } else if (langame.data()!.tags?.includes("inactive")) {
+    botMessage = sample(randomLangameConversationReviverOpenings);
+    // Try to add a conversation starter, could fail in case of profane
+    // or such online generation error
+    try {
+      // TODO: might also offline search
+      // Maybe classify last messages and create starter accordingly
+      const newConversationStarter = await onlineMemeGenerator(langame.data()!.topics!);
+      botMessage += `\n\n${newConversationStarter.data()!.content!}`;
+    } catch (e: any) {
+      await reportError(e, {});
+    }
+  }
+  if (!botMessage) {
+    functions.logger.log("Conversation is alive, no need to revive");
+    return Promise.resolve();
+  }
+  const author: langame.protobuf.Message.IAuthor = {
+    id: botUser.id,
+    tag: botUser.data()!.tag,
+    photoUrl: botUser.data()!.photoUrl,
+    bot: true,
+    email: botUser.data()!.email,
+  };
+  return db.collection("messages").add({
+    author: author,
+    body: botMessage,
+    type: 1,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    langameId: langame.id,
+  });
+};
