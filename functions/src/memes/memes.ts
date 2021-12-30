@@ -39,7 +39,7 @@ export const offlineMemeSearch =
           // Yes could do disabled:false but
           // just in case we don't have disabled property
           " AND NOT disabled:true" :
-          "NOT disabled:true";
+          "NOT disabled:true"; // TODO: now not sure it works
         if (objectIDsFilteredOut.length > 0) {
           reqOptions.filters +=
           (reqOptions.filters.length > 0 ? " AND " : "") +

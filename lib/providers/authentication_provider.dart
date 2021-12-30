@@ -257,6 +257,9 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       _cap.log('authentication_provider:getUserTag $tag',
           analyticsMessage: 'get_user_by_tag');
+      if (tag.isEmpty) {
+        return LangameResponse.succeed(result: []);
+      }
 
       final objects = await algolia
           .index(AppConst.isDev ? "dev_users" : "prod_users")

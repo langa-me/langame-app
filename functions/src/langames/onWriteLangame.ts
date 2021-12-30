@@ -46,20 +46,18 @@ export const onWriteLangame = async (
     if (!change.after.data()) {
       return reportError(new Error(`${change.after.id} has no data`), ctx);
     }
-    const promises: Promise<any>[] = [];
     if (!change.before.exists) {
-      promises.push(onCreateLangame(change));
+      await onCreateLangame(change);
     }
 
     functions.logger.log("synchronizing langame to algolia",
         change.after.data());
 
-    promises.push(i.saveObject({
+    return i.saveObject({
       ...change.after.data(),
       objectID: change.after.id,
       _tags: [change.after.data()!.tags],
-    }));
-    return Promise.all(promises);
+    });
   } catch (e: any) {
     await Promise.all(handleError(
         change.after.ref, {developerMessage: e}));

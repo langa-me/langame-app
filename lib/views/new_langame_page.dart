@@ -5,22 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/random.dart';
-import 'package:langame/helpers/widget.dart';
-import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
-import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:langame/views/langames/langame_text.dart';
-import 'package:langame/views/topics/most_popular_topics.dart';
 import 'package:langame/views/topics/topic_search_bar.dart';
-import 'package:langame/views/search_page_view.dart';
+import 'package:langame/views/users/user_search_page.dart';
 import 'package:provider/provider.dart';
 
 import 'app_bars/app_bars.dart';
@@ -90,8 +86,7 @@ class _SendLangameState extends State<NewLangamePage>
               ],
             ),
             Container(
-              width: AppSize.safeBlockHorizontal *
-                  (AppSize.isLargeWidth ? 15 : 40),
+              width: AppSize.safeBlockHorizontal * 50,
               child: Consumer<NewLangameProvider>(
                 builder: (c, nlp, child) => ListView(
                   physics: BouncingScrollPhysics(),
@@ -101,7 +96,7 @@ class _SendLangameState extends State<NewLangamePage>
                           LangameButton(
                             FontAwesomeIcons.userPlus,
                             text: 'Invite',
-                            onPressed: () => cp.push(SearchPageView()),
+                            onPressed: () => cp.push(UserSearchPage()),
                             layer: 1,
                             border: false,
                           ),
@@ -110,7 +105,6 @@ class _SendLangameState extends State<NewLangamePage>
                           .map(
                             (e) => buildUserTile(
                               context,
-                              nlp,
                               e,
                             ),
                           )
@@ -170,11 +164,7 @@ class _SendLangameState extends State<NewLangamePage>
         createLangame.result!.data() == null) {
       cp.dialogComplete();
       var msg = '${fp.getFailingRandom()}, please retry later';
-      cp.showFailureDialog(createLangame.error != null
-          ? createLangame.error is LangameException
-              ? (createLangame.error as LangameException).cause
-              : createLangame.error.toString()
-          : msg);
+      cp.showFailureDialog(msg);
       await Future.delayed(Duration(seconds: 2));
       cp.dialogComplete();
       return;
@@ -183,6 +173,8 @@ class _SendLangameState extends State<NewLangamePage>
     var snap = createLangame.result!.data()!;
     cp.dialogComplete();
     snap.id = createLangame.result!.id;
+    // TODO: Any better way to enter the Langame with having as ancestor the main page?
+    cp.pop();
     cp.push(LangameTextView(snap));
   }
 }

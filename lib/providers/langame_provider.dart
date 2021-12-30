@@ -130,21 +130,23 @@ class LangameProvider extends ChangeNotifier {
                   )
                 ],
           ));
-      final snap = await _firebase.firestore!
-          .collection('langames')
-          .withConverter<lg.Langame>(
-            fromFirestore: (s, _) => LangameExt.fromObject(s.data()!),
-            toFirestore: (s, _) => s.toMapStringDynamic(),
-          )
-          .doc(docRef.id)
+
+      // Wait that the Langame is properly created
+      await _firebase.firestore!
+          .collection('langame_presences')
+          .doc(_ap.user!.uid)
           .snapshots()
-          .firstWhere(
-              (e) => e.exists && e.data() != null && e.data()!.errors.isEmpty)
-          .timeout(Duration(seconds: 10));
+          .firstWhere((e) =>
+              e.exists &&
+              e.data() != null &&
+              e.data()!['presences'] != null &&
+              e.data()!['presences'] is List &&
+              (e.data()!['presences'] as List).contains(docRef.id))
+          .timeout(Duration(seconds: 20));
 
       _cap.log(
           'langame_provider:created langame with topics ${topics.join(',')}');
-      return LangameResponse(LangameStatus.succeed, result: snap);
+      return LangameResponse(LangameStatus.succeed, result: await docRef.get());
     } catch (e, s) {
       _cap.log(
           'langame_provider:failed to create langame with topics ${topics.join(',')}');
@@ -166,10 +168,10 @@ class LangameProvider extends ChangeNotifier {
       notifyListeners();
       final o = await i.query('$value').getObjects();
       filteredLangameSearchHistory = o.hits
-              .map((e) => e.data['objectID'] as String)
-              .toList()
-              .reversed
-              .toList();
+          .map((e) => e.data['objectID'] as String)
+          .toList()
+          .reversed
+          .toList();
       _isSearching = false;
       notifyListeners();
     } catch (e, s) {

@@ -14,7 +14,8 @@ import 'package:provider/provider.dart';
 import 'buttons/button.dart';
 import 'colors/colors.dart';
 import 'feature_preview/beta.dart';
-import 'profile_view.dart';
+import 'goals/goals_list_tiles.dart';
+import 'users/self_profile_page.dart';
 
 class SettingsView extends StatefulWidget {
   _SettingsState createState() => _SettingsState();
@@ -83,25 +84,25 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
             ),
             ListTile(
               onTap: () {
-                cp.push(ProfileView());
+                cp.push(SelfProfilePage());
               },
               leading: Icon(FontAwesomeIcons.userCircle,
                   color: getBlackAndWhite(context, 0)),
               title:
                   Text('Profile', style: Theme.of(context).textTheme.headline6),
             ),
+            ...buildGoalsListTiles(context, pp),
             ListTile(
               onTap: () {
                 cp.push(NotificationSettingsView());
               },
-              leading: Beta(
-                  Icon(Icons.notifications_outlined,
-                      color: isLightThenDark(context)),
-                  type: BetaType.NEW),
-              title: Text('Notification',
+              leading: Icon(
+                Icons.notifications_outlined,
+                color: isLightThenDark(context),
+              ),
+              title: Text('Notifications',
                   style: Theme.of(context).textTheme.headline6),
             ),
-            buildRecommendationSetting(context, pp),
             Divider(),
             ExpansionTile(
                 leading:
@@ -183,23 +184,3 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
     });
   }
 }
-
-Widget buildRecommendationSetting(
-        BuildContext context, PreferenceProvider pp) =>
-    ListTile(
-      onTap: () => pp.setRecommendations(!pp.preference.userRecommendations),
-      leading: Icon(FontAwesomeIcons.userFriends,
-          color: getBlackAndWhite(context, 0)),
-      title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text('User recommendations',
-            style: Theme.of(context).textTheme.headline6),
-        Tooltip(
-            message:
-                'Get recommended people with similar conversation interests',
-            child: Icon(FontAwesomeIcons.questionCircle,
-                color: getBlackAndWhite(context, 0))),
-      ]),
-      trailing: Switch(
-          value: pp.preference.userRecommendations,
-          onChanged: (v) => pp.setRecommendations(v)),
-    );

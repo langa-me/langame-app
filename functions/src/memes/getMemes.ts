@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {https} from "firebase-functions";
-import {offlineMemeSearch} from "./memes";
+import {offlineMemeSearch, onlineMemeGenerator} from "./memes";
 import {getPerUserlimiter} from "../utils/firestore";
 
 
@@ -59,13 +59,18 @@ export const getMemes = async (data: any,
 
   // If the user does not provide topics, leave empty string
   // will find all memes
-  const memes = await offlineMemeSearch(
-      data.topics,
+  let memes = await offlineMemeSearch(
+      data.topics || ["ice breaker"],
       // @ts-ignore
       t.parameters.meme_count.defaultValue.value * 1, // Casting to number
       seenMemes!.map((e: any) => e.meme),
       false,
   );
+
+  if (memes.length === 0) {
+    functions.logger.log("could not find a conversation starter, generating");
+    memes = [await onlineMemeGenerator(data.topics || ["ice breaker"])];
+  }
 
   if (memes.length === 0) {
     throw new https.HttpsError(
