@@ -1,14 +1,14 @@
 importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js");
 importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js");
 
-firebase.initializeApp({
-  apiKey: "AIzaSyBA_lBzVBjwkHx8X3PUl6Vz_sA__K8mCF0",
-  authDomain: "langame-dev.firebaseapp.com",
-  projectId: "langame-dev",
-  storageBucket: "langame-dev.appspot.com",
-  messagingSenderId: "388264600961",
-  appId: "1:388264600961:web:1de4223ac5e7a3020cf480",
-  measurementId: "G-MNLV4NH9PP"
+firebase.initializeApp(firebaseConfig = {
+  apiKey: "AIzaSyDxLmqscMfKF6FUd_rXcsJxH--w0PQhVWw",
+  authDomain: "langame-86ac4.firebaseapp.com",
+  projectId: "langame-86ac4",
+  storageBucket: "langame-86ac4.appspot.com",
+  messagingSenderId: "909899959016",
+  appId: "1:909899959016:web:b2bd243695699c9dc0575d",
+  measurementId: "G-EGYQC8EDSH"
 });
 // Necessary to receive background messages:
 const messaging = firebase.messaging();

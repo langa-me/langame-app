@@ -4,6 +4,7 @@ import {ImplAiApi} from "../aiApi/implAiApi";
 import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
 import {shuffle} from "../utils/array";
+import {algoliaPrefix} from "../helpers";
 /**
  * offlineMemeSearch Find memes in topic ordered by score, filtering
  * low scores
@@ -48,7 +49,7 @@ export const offlineMemeSearch =
                   .join(" AND ");
         }
         functions.logger.log("searching topic", reqOptions);
-        const r = await api.getIndex("prod_memes")
+        const r = await api.getIndex(algoliaPrefix+"memes")
             .search("", reqOptions);
         return Promise.all(r.hits.map(async (e) =>
           admin.firestore().collection("memes")

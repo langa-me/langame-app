@@ -1,0 +1,2 @@
+- Interface simplification
+- Introducing goals, grow relationships, compound relationships and learning

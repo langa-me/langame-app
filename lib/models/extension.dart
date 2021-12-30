@@ -92,9 +92,9 @@ class UserPreferenceExt {
       ),
       previewMode: m['previewMode'] ?? false,
       goals: lg.UserPreference_Goals(
-        growRelationships: m['goals']?['growRelationships'] ?? false,
-        compoundRelationships: m['goals']?['compoundRelationships'] ?? false,
-        learn: m['goals']?['learn'] ?? false,
+        growRelationships: m['goals']?['growRelationships'] ?? true,
+        compoundRelationships: m['goals']?['compoundRelationships'] ?? true,
+        learn: m['goals']?['learn'] ?? true,
       )
     );
   }

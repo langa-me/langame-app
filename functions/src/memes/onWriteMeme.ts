@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {handleError} from "../errors";
-import {isDev} from "../helpers";
+import {algoliaPrefix} from "../helpers";
 import {TwitterApi} from "twitter-api-v2";
 import {langame} from "../langame/protobuf/langame";
 
@@ -14,7 +14,7 @@ export const onWriteMeme = async (
   try {
     functions.logger.log("onWriteMeme", change.after);
 
-    const i = api.getIndex(isDev ? "dev_memes" : "prod_memes");
+    const i = api.getIndex(algoliaPrefix+"memes");
     if (!change.after.exists) {
       await i.deleteObject(change.after.id);
       functions.logger.log("deleted", change.after.id);

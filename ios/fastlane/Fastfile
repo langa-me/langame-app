@@ -63,7 +63,8 @@ platform :ios do
       skip_submission: false,
       notify_external_testers: true,
       ipa: "./Runner.ipa",
-      changelog: "Text mode!",
+      changelog: "- Interface simplification
+      - Introducing goals, grow relationships, compound relationships and learning",
       distribute_external: true,
       groups: "public",
     )

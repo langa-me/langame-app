@@ -1,5 +1,12 @@
+Welcome to Langame!
+
+The Internet and computers have brought connectivity, but have not improved conversations. Artificial intelligence is capable of understanding us better than we understand ourselves.
+
+Conversations are what increase transparency, cooperation and therefore prosperity, knowledge and happiness.
+
 Langame is seeking to augment conversations in several directions:
 
-- Help people expanding their knowledge through conversations
+- Help people have deeper conversations
 - Help people to grow and compound their relationships
 - Help people converse, regardless of their native language
+- Help people expanding their knowledge through conversations

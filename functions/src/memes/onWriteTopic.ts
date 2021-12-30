@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {handleError} from "../errors";
-import {isDev} from "../helpers";
+import {algoliaPrefix} from "../helpers";
 
 export const onWriteTopic = async (
     change: Change<admin.firestore.DocumentSnapshot>,
@@ -11,7 +11,7 @@ export const onWriteTopic = async (
   const api = new ImplAiApi();
   try {
     functions.logger.log("onWriteTopic", change.after);
-    const i = api.getIndex(isDev ? "dev_topics" : "prod_topics");
+    const i = api.getIndex(algoliaPrefix+"topics");
     if (!change.after.exists) {
       await i.deleteObject(change.after.id);
       return;
