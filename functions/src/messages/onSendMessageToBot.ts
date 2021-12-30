@@ -5,6 +5,7 @@ import {converter} from "../utils/firestore";
 
 export const onSendMessageToBot = async (
     snap: admin.firestore.DocumentSnapshot<langame.protobuf.IMessage>,
+    player: langame.protobuf.Langame.IPlayer,
 ): Promise<any> => {
   // Get all messages between these two
   const messages = await admin.firestore()
@@ -34,9 +35,7 @@ export const onSendMessageToBot = async (
     type: langame.protobuf.Message.Type.MESSAGE,
     // @ts-ignore
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    author: {
-      id: snap.data()!.author!.id!,
-    },
+    author: player as langame.protobuf.Message.IAuthor,
     langameId: snap.data()!.langameId,
   };
   return admin.firestore().collection("messages")

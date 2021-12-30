@@ -7,7 +7,9 @@ import {algoliaPrefix} from "../helpers";
 import {converter} from "../utils/firestore";
 import {langame} from "../langame/protobuf/langame";
 import {shouldDrop} from "../utils/contexts";
-import {offlineMemeSearch} from "../memes/memes";
+import {offlineMemeSearch, onlineMemeGenerator} from "../memes/memes";
+import {sample} from "../utils/array";
+import {faillingMessages} from "../utils/userMessages";
 
 export const onWriteLangame = async (
     change: Change<admin.firestore.DocumentSnapshot<langame.protobuf.ILangame>>,
@@ -44,20 +46,18 @@ export const onWriteLangame = async (
     if (!change.after.data()) {
       return reportError(new Error(`${change.after.id} has no data`), ctx);
     }
-    const promises: Promise<any>[] = [];
     if (!change.before.exists) {
-      promises.push(onCreateLangame(change));
+      await onCreateLangame(change);
     }
 
     functions.logger.log("synchronizing langame to algolia",
         change.after.data());
 
-    promises.push(i.saveObject({
+    return i.saveObject({
       ...change.after.data(),
       objectID: change.after.id,
       _tags: [change.after.data()!.tags],
-    }));
-    return Promise.all(promises);
+    });
   } catch (e: any) {
     await Promise.all(handleError(
         change.after.ref, {developerMessage: e}));
@@ -84,7 +84,8 @@ const onCreateLangame = async (
       memesSeenDoc.data()!.seen :
       [];
 
-  const memes = await offlineMemeSearch(langameData.topics || ["ice breaker"],
+  functions.logger.log("searching for a conversation starter");
+  let memes = await offlineMemeSearch(langameData.topics || ["ice breaker"],
       1,
       memesToFilter.map((e: any) => e.meme),
       true,
@@ -92,17 +93,19 @@ const onCreateLangame = async (
 
 
   if (memes.length === 0) {
-    await Promise.all(
+    functions.logger.log("could not find a conversation starter, generating");
+    memes = [await onlineMemeGenerator(langameData.topics || ["ice breaker"])];
+  }
+
+  if (memes.length === 0) {
+    return Promise.all(
         handleError(
             change.after.ref, {
               developerMessage:
-            `failed to find meme for topics, ${langameData.topics}`,
+          `failed to find meme for topics, ${langameData.topics}`,
               uid: langameData.initiator!,
-              userMessage:
-            "you have seen already everything in these topics!",
-            })
-    );
-    return;
+              userMessage: sample(faillingMessages),
+            }));
   }
 
 

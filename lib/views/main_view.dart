@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
-import 'package:langame/views/new_langame_page_view.dart';
 import 'package:langame/views/physical_langame_page_view.dart';
 import 'package:langame/views/settings_view.dart';
 import 'package:provider/provider.dart';
@@ -22,9 +21,9 @@ class MainView extends StatefulWidget {
 
 /// Main page of Langame (temporary name...)
 class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   PageController _pageController = PageController(
-    initialPage: 1,
+    initialPage: 0,
   );
 
   @override
@@ -49,14 +48,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    final pp = Provider.of<PreferenceProvider>(context);
-    if (this.mounted && !pp.preference.previewMode && _selectedIndex >= 3) {
-      // Otherwise out of index
-      setState(() {
-        _selectedIndex = 1;
-        _pageController.jumpToPage(1);
-      });
-    }
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: GestureDetector(
@@ -108,14 +99,6 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
     var navBarItems = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         backgroundColor: Colors.transparent,
-        icon: Icon(FontAwesomeIcons.laptopHouse,
-            color: Theme.of(context).iconTheme.color),
-        activeIcon: Icon(FontAwesomeIcons.laptopHouse,
-            color: Theme.of(context).colorScheme.secondary),
-        label: 'Distant',
-      ),
-      BottomNavigationBarItem(
-        backgroundColor: Colors.transparent,
         icon: Icon(FontAwesomeIcons.grinTongue,
             color: Theme.of(context).iconTheme.color),
         activeIcon: Icon(FontAwesomeIcons.grinTongue,
@@ -155,9 +138,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   }
 
   Widget _buildPageView() {
-    var pp = Provider.of<PreferenceProvider>(context, listen: false);
     var child = [
-      NewLangamePageView(goToPage),
       LangameListView(),
       PhysicalLangamePageView(goToPage),
     ];

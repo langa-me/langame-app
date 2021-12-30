@@ -61,7 +61,7 @@ class _State extends State<TopicSearchWidget> {
           ? AppSize.safeBlockHorizontal * 48
           : AppSize.safeBlockHorizontal * 38,
       debounceDelay: const Duration(milliseconds: 500),
-      onQueryChanged: (query){
+      onQueryChanged: (query) {
         tp.query(query);
       },
       onFocusChanged: (focused) =>

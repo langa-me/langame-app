@@ -4,10 +4,8 @@ import "mocha";
 import * as sinon from "sinon";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {langame} from "../langame/protobuf/langame";
-import {converter} from "../utils/firestore";
 import {initFirebaseTest} from "../utils/firestore.spec";
 import {createReflection} from "./onCreateMessageAnalysis";
-import {onSendMessageToBot} from "./onSendMessageToBot";
 
 it("reflect", async () => {
   initFirebaseTest("dev");
@@ -61,18 +59,18 @@ it("onWriteMessageAnalysis should properly add some intelligence to message and 
   expect(err).to.be.not.null;
 });
 
-it("onSendMessageToBot", async () => {
-  initFirebaseTest("dev");
-  const botSnap = (await admin.firestore().collection("users")
-      .withConverter(converter<langame.protobuf.IUser>())
-      .where("bot", "==", true).get()).docs[0];
-  expect(botSnap).to.be.not.undefined;
-  const langamePresences = await admin.firestore()
-      .collection("langame_presences").doc(botSnap.id!).get();
-  const messageSnap = await admin.firestore().collection("messages")
-      .withConverter(converter<langame.protobuf.IMessage>())
-      .where("langameId", "==",
-           langamePresences.data()!.presences[0]).get();
-  const message = await messageSnap.docs[0].ref.get();
-  await onSendMessageToBot(message);
-});
+// it("onSendMessageToBot", async () => {
+//   initFirebaseTest("dev");
+//   const botSnap = (await admin.firestore().collection("users")
+//       .withConverter(converter<langame.protobuf.IUser>())
+//       .where("bot", "==", true).get()).docs[0];
+//   expect(botSnap).to.be.not.undefined;
+//   const langamePresences = await admin.firestore()
+//       .collection("langame_presences").doc(botSnap.id!).get();
+//   const messageSnap = await admin.firestore().collection("messages")
+//       .withConverter(converter<langame.protobuf.IMessage>())
+//       .where("langameId", "==",
+//            langamePresences.data()!.presences[0]).get();
+//   const message = await messageSnap.docs[0].ref.get();
+//   await onSendMessageToBot(message);
+// });

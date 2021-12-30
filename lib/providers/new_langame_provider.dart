@@ -22,21 +22,32 @@ class NewLangameProvider extends ChangeNotifier {
             .doc(e.after!.uid)
             .snapshots()
             .listen((e) async {
+
           if (e.exists && e.data() != null) {
-            _cap.log('new_langame_provider:stream recommendations');
             final reco = (e.data()!['recommendations'] as Map<String, dynamic>)
                 .entries
                 .map((e) => Tuple2(e.key, e.value));
+            // It's forbidden by Google to log user ID
+            _cap.log('new_langame_provider:stream recommendations');
+
             await Future.wait(reco.map((e) async {
-              final user = await _firebase.firestore!
-                  .collection('users')
-                  .doc(e.item1)
-                  .withConverter<lg.User>(
-                    fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
-                    toFirestore: (s, _) => s.toMapStringDynamic(),
-                  )
-                  .get();
-              _recommendations[e.item2] = user;
+              // TODO: until we better handle the use case "somehow user does not exist"
+              try {
+                final user = await _firebase.firestore!
+                    .collection('users')
+                    .doc(e.item1)
+                    .withConverter<lg.User>(
+                      fromFirestore: (s, _) => UserExt.fromObject(s.data()!),
+                      toFirestore: (s, _) => s.toMapStringDynamic(),
+                    )
+                    .get()
+                    .timeout(Duration(seconds: 10));
+                _recommendations[e.item2] = user;
+              } catch (e, s) {
+                _cap.log(
+                    'new_langame_provider: failed to get recommendation user, $e, $s');
+                _cap.recordError(e, s);
+              }
             }));
 
             notifyListeners();

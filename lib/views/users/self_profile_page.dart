@@ -11,13 +11,13 @@ import 'package:langame/views/texts/texts.dart';
 import 'package:langame/views/topics/favorite_topics_widget.dart';
 import 'package:provider/provider.dart';
 
-import 'buttons/button.dart';
+import '../buttons/button.dart';
 
-class ProfileView extends StatefulWidget {
+class SelfProfilePage extends StatefulWidget {
   _State createState() => _State();
 }
 
-class _State extends State<ProfileView> {
+class _State extends State<SelfProfilePage> {
   final _formKey = GlobalKey<FormState>(debugLabel: '_formKey');
 
   @override

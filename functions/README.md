@@ -25,8 +25,10 @@ firebase functions:config:set mailchimp.key="MAILCHIMP KEY"
 firebase functions:config:set mailchimp.list="MAILCHIMP LIST ID"
 firebase functions:config:set stripe.account="ACCOUNT"
 firebase functions:config:set stripe.key="SECRET_KEY"
+# API Key and API Key Secret
 firebase functions:config:set twitter.app_key="SECRET_KEY"
 firebase functions:config:set twitter.app_secret="SECRET_KEY"
+# Access Token and Secret
 firebase functions:config:set twitter.access_token="SECRET_KEY"
 firebase functions:config:set twitter.access_secret="SECRET_KEY"
 firebase functions:config:get > .runtimeconfig.json

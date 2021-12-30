@@ -12,8 +12,12 @@ abstract class PreferenceService {
     previewMode: false,
     notification: lg.UserPreference_Notification(
       invite: lg.UserPreference_Notification_Invite(email: true, push: true),
-      message:
-          lg.UserPreference_Notification_Message(email: true, push: true),
+      message: lg.UserPreference_Notification_Message(email: true, push: true),
+    ),
+    goals: lg.UserPreference_Goals(
+      compoundRelationships: true,
+      growRelationships: true,
+      learn: true,
     ),
   );
   final FirebaseApi firebase;

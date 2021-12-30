@@ -21,7 +21,11 @@ export const onWriteMeme = async (
       return;
     }
 
-    if (!change.after.data()!.disabled === true) {
+    if (change.after.data()!.disabled === true) {
+      if (change.before.data()?.disabled === false) {
+        await i.deleteObject(change.after.id);
+        functions.logger.log("deleted", change.after.id);
+      }
       functions.logger.log("this memes is disabled, skipping", change.after.id);
       return;
     }
@@ -30,15 +34,17 @@ export const onWriteMeme = async (
       throw new Error("topics is not defined");
     }
 
+    const topics = change.after.data()!.topics!.map((e) =>
+      e.toLowerCase().trim());
+
     await i.saveObject({
       ...change.after.data(),
       objectID: change.after.id,
-      _tags: change.after.data()!.topics,
+      _tags: topics,
     });
 
     functions.logger.log(`Updated meme ${change.after.id}`,
         change.after.data());
-    const topics = change.after.data()!.topics!;
     await Promise.all(topics.map((t: string) =>
       admin.firestore().collection("topics").doc(t).set({})));
 

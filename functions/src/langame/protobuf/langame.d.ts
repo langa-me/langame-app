@@ -421,6 +421,12 @@ export namespace langame {
 
             /** Meme tweet */
             tweet?: (boolean|null);
+
+            /** Meme state */
+            state?: (string|null);
+
+            /** Meme error */
+            error?: (string|null);
         }
 
         /** Represents a Meme. */
@@ -455,6 +461,12 @@ export namespace langame {
 
             /** Meme tweet. */
             public tweet: boolean;
+
+            /** Meme state. */
+            public state: string;
+
+            /** Meme error. */
+            public error: string;
 
             /**
              * Creates a new Meme instance using the specified properties.
@@ -865,6 +877,9 @@ export namespace langame {
 
             /** UserPreference previewMode */
             previewMode?: (boolean|null);
+
+            /** UserPreference goals */
+            goals?: (langame.protobuf.UserPreference.IGoals|null);
         }
 
         /** Represents a UserPreference. */
@@ -908,6 +923,9 @@ export namespace langame {
 
             /** UserPreference previewMode. */
             public previewMode: boolean;
+
+            /** UserPreference goals. */
+            public goals?: (langame.protobuf.UserPreference.IGoals|null);
 
             /**
              * Creates a new UserPreference instance using the specified properties.
@@ -1271,6 +1289,108 @@ export namespace langame {
                      */
                     public toJSON(): { [k: string]: any };
                 }
+            }
+
+            /** Properties of a Goals. */
+            interface IGoals {
+
+                /** Goals growRelationships */
+                growRelationships?: (boolean|null);
+
+                /** Goals compoundRelationships */
+                compoundRelationships?: (boolean|null);
+
+                /** Goals learn */
+                learn?: (boolean|null);
+            }
+
+            /** Represents a Goals. */
+            class Goals implements IGoals {
+
+                /**
+                 * Constructs a new Goals.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: langame.protobuf.UserPreference.IGoals);
+
+                /** Goals growRelationships. */
+                public growRelationships: boolean;
+
+                /** Goals compoundRelationships. */
+                public compoundRelationships: boolean;
+
+                /** Goals learn. */
+                public learn: boolean;
+
+                /**
+                 * Creates a new Goals instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns Goals instance
+                 */
+                public static create(properties?: langame.protobuf.UserPreference.IGoals): langame.protobuf.UserPreference.Goals;
+
+                /**
+                 * Encodes the specified Goals message. Does not implicitly {@link langame.protobuf.UserPreference.Goals.verify|verify} messages.
+                 * @param message Goals message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: langame.protobuf.UserPreference.IGoals, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified Goals message, length delimited. Does not implicitly {@link langame.protobuf.UserPreference.Goals.verify|verify} messages.
+                 * @param message Goals message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: langame.protobuf.UserPreference.IGoals, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a Goals message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns Goals
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): langame.protobuf.UserPreference.Goals;
+
+                /**
+                 * Decodes a Goals message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns Goals
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): langame.protobuf.UserPreference.Goals;
+
+                /**
+                 * Verifies a Goals message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a Goals message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns Goals
+                 */
+                public static fromObject(object: { [k: string]: any }): langame.protobuf.UserPreference.Goals;
+
+                /**
+                 * Creates a plain object from a Goals message. Also converts values to other types if specified.
+                 * @param message Goals
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: langame.protobuf.UserPreference.Goals, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this Goals to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
             }
         }
 

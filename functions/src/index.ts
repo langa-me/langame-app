@@ -126,7 +126,7 @@ exports.onWritePreference = functions
     .onWrite(onWritePreference);
 
 
-// Meme //
+// Meme // Conversation starter
 
 
 exports.getMemes = functions

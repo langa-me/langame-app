@@ -269,6 +269,8 @@ class Meme extends $pb.GeneratedMessage {
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
     ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disabled')
     ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tweet')
+    ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'state')
+    ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'error')
     ..hasRequiredFields = false
   ;
 
@@ -282,6 +284,8 @@ class Meme extends $pb.GeneratedMessage {
     $core.String? id,
     $core.bool? disabled,
     $core.bool? tweet,
+    $core.String? state,
+    $core.String? error,
   }) {
     final _result = create();
     if (createdAt != null) {
@@ -307,6 +311,12 @@ class Meme extends $pb.GeneratedMessage {
     }
     if (tweet != null) {
       _result.tweet = tweet;
+    }
+    if (state != null) {
+      _result.state = state;
+    }
+    if (error != null) {
+      _result.error = error;
     }
     return _result;
   }
@@ -392,6 +402,24 @@ class Meme extends $pb.GeneratedMessage {
   $core.bool hasTweet() => $_has(7);
   @$pb.TagNumber(9)
   void clearTweet() => clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.String get state => $_getSZ(8);
+  @$pb.TagNumber(10)
+  set state($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasState() => $_has(8);
+  @$pb.TagNumber(10)
+  void clearState() => clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.String get error => $_getSZ(9);
+  @$pb.TagNumber(11)
+  set error($core.String v) { $_setString(9, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasError() => $_has(9);
+  @$pb.TagNumber(11)
+  void clearError() => clearField(11);
 }
 
 class User_Device extends $pb.GeneratedMessage {
@@ -937,6 +965,81 @@ class UserPreference_Notification extends $pb.GeneratedMessage {
   UserPreference_Notification_Message ensureMessage() => $_ensure(1);
 }
 
+class UserPreference_Goals extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserPreference.Goals', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'growRelationships')
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'compoundRelationships')
+    ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'learn')
+    ..hasRequiredFields = false
+  ;
+
+  UserPreference_Goals._() : super();
+  factory UserPreference_Goals({
+    $core.bool? growRelationships,
+    $core.bool? compoundRelationships,
+    $core.bool? learn,
+  }) {
+    final _result = create();
+    if (growRelationships != null) {
+      _result.growRelationships = growRelationships;
+    }
+    if (compoundRelationships != null) {
+      _result.compoundRelationships = compoundRelationships;
+    }
+    if (learn != null) {
+      _result.learn = learn;
+    }
+    return _result;
+  }
+  factory UserPreference_Goals.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory UserPreference_Goals.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  UserPreference_Goals clone() => UserPreference_Goals()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  UserPreference_Goals copyWith(void Function(UserPreference_Goals) updates) => super.copyWith((message) => updates(message as UserPreference_Goals)) as UserPreference_Goals; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static UserPreference_Goals create() => UserPreference_Goals._();
+  UserPreference_Goals createEmptyInstance() => create();
+  static $pb.PbList<UserPreference_Goals> createRepeated() => $pb.PbList<UserPreference_Goals>();
+  @$core.pragma('dart2js:noInline')
+  static UserPreference_Goals getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UserPreference_Goals>(create);
+  static UserPreference_Goals? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get growRelationships => $_getBF(0);
+  @$pb.TagNumber(1)
+  set growRelationships($core.bool v) { $_setBool(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasGrowRelationships() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearGrowRelationships() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get compoundRelationships => $_getBF(1);
+  @$pb.TagNumber(2)
+  set compoundRelationships($core.bool v) { $_setBool(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasCompoundRelationships() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCompoundRelationships() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get learn => $_getBF(2);
+  @$pb.TagNumber(3)
+  set learn($core.bool v) { $_setBool(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasLearn() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearLearn() => clearField(3);
+}
+
 class UserPreference extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserPreference', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'userId')
@@ -950,6 +1053,7 @@ class UserPreference extends $pb.GeneratedMessage {
     ..aOB(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sawWhatsNew')
     ..aOM<UserPreference_Notification>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'notification', subBuilder: UserPreference_Notification.create)
     ..aOB(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'previewMode')
+    ..aOM<UserPreference_Goals>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'goals', subBuilder: UserPreference_Goals.create)
     ..hasRequiredFields = false
   ;
 
@@ -966,6 +1070,7 @@ class UserPreference extends $pb.GeneratedMessage {
     $core.bool? sawWhatsNew,
     UserPreference_Notification? notification,
     $core.bool? previewMode,
+    UserPreference_Goals? goals,
   }) {
     final _result = create();
     if (userId != null) {
@@ -1000,6 +1105,9 @@ class UserPreference extends $pb.GeneratedMessage {
     }
     if (previewMode != null) {
       _result.previewMode = previewMode;
+    }
+    if (goals != null) {
+      _result.goals = goals;
     }
     return _result;
   }
@@ -1100,6 +1208,17 @@ class UserPreference extends $pb.GeneratedMessage {
   $core.bool hasPreviewMode() => $_has(10);
   @$pb.TagNumber(15)
   void clearPreviewMode() => clearField(15);
+
+  @$pb.TagNumber(16)
+  UserPreference_Goals get goals => $_getN(11);
+  @$pb.TagNumber(16)
+  set goals(UserPreference_Goals v) { setField(16, v); }
+  @$pb.TagNumber(16)
+  $core.bool hasGoals() => $_has(11);
+  @$pb.TagNumber(16)
+  void clearGoals() => clearField(16);
+  @$pb.TagNumber(16)
+  UserPreference_Goals ensureGoals() => $_ensure(11);
 }
 
 class Langame_Player extends $pb.GeneratedMessage {

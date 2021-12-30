@@ -5,100 +5,23 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
-import 'package:langame/views/buttons/button.dart';
-import 'package:langame/views/users/user_tile.dart';
+import 'package:langame/views/users/user_search_result_list.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
-import 'app_bars/app_bars.dart';
-import 'colors/colors.dart';
-import 'users/profile.dart';
-import 'users/shopping_list.dart';
+import '../app_bars/app_bars.dart';
+import '../colors/colors.dart';
 
-class SearchPageView extends StatefulWidget {
-  final void Function(int, {Curve? curve}) _goToPage;
-
-  SearchPageView(this._goToPage);
+class UserSearchPage extends StatefulWidget {
+  UserSearchPage();
 
   @override
   _State createState() => _State();
 }
 
-class SearchResultsListView extends StatefulWidget {
-  final void Function(int, {Curve? curve}) _goToPage;
-
-  const SearchResultsListView(this._goToPage);
-
-  @override
-  _SearchResultsListViewState createState() => _SearchResultsListViewState();
-}
-
-class _SearchResultsListViewState extends State<SearchResultsListView> {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer2<PreferenceProvider, NewLangameProvider>(
-        builder: (c, p, lp, _) {
-      if (p.selectedUser == null) {
-        return p.preference.userRecommendations
-            ? Column(
-                children: [
-                  Text('Recommendations',
-                      style: Theme.of(context).textTheme.headline5),
-                  lp.recommendations.length > 0
-                      ? Expanded(
-                          child: ListView(
-                              children: lp.recommendations.entries
-                                  .take(5)
-                                  .map((e) => buildUserTile(context, lp,
-                                      e.value.data()!, widget._goToPage))
-                                  .toList()
-                                  .reversed
-                                  .toList()),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                              Image.asset(
-                                'images/logo-colourless.png',
-                                width: AppSize.safeBlockHorizontal * 20,
-                              ),
-                              Text(
-                                  'After playing some Langames, you will have some recommendations!',
-                                  style: Theme.of(context).textTheme.caption,
-                                  textAlign: TextAlign.center),
-                            ]),
-                ],
-              )
-            : Image.asset('images/logo-colourless.png');
-      }
-
-      var cp = Provider.of<ContextProvider>(context, listen: false);
-      return Column(children: [
-        Profile(p.selectedUser!),
-        Spacer(),
-        LangameButton(
-          lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-              ? Icons.remove_shopping_cart_outlined
-              : Icons.add_shopping_cart_outlined,
-          text: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-              ? 'Remove'
-              : 'Add',
-          highlighted: true,
-          onPressed: lp.shoppingList.any((e) => e.uid == p.selectedUser!.uid)
-              ? onRemoveFromShoppingList(
-                  p.selectedUser!, lp, cp, widget._goToPage)
-              : onAddToShoppingList(p.selectedUser!, lp, cp, widget._goToPage),
-        ),
-        Spacer(),
-      ]);
-    });
-  }
-}
-
-class _State extends State<SearchPageView>
-    with AfterLayoutMixin<SearchPageView> {
+class _State extends State<UserSearchPage>
+    with AfterLayoutMixin<UserSearchPage> {
   final FloatingSearchBarController _searchBarController =
       FloatingSearchBarController();
 
@@ -143,8 +66,10 @@ class _State extends State<SearchPageView>
                       isLight(context)
                           ? 'images/search-by-algolia-light-background.svg'
                           : 'images/search-by-algolia-dark-background.svg',
-                      width: AppSize.safeBlockHorizontal * 40,
-                      height: AppSize.safeBlockVertical * 5,
+                      width: AppSize.safeBlockHorizontal *
+                          (AppSize.isLargeWidth ? 10 : 40),
+                      height: AppSize.safeBlockVertical *
+                          (AppSize.isLargeWidth ? 3 : 5),
                     ),
                   ]),
             );
@@ -243,7 +168,7 @@ class _State extends State<SearchPageView>
               // Padding top of default FloatingSearchBar height (48) + app size * 5
               padding: EdgeInsets.only(top: 48 + AppSize.safeBlockVertical * 5),
               constraints: BoxConstraints.expand(),
-              child: SearchResultsListView(widget._goToPage),
+              child: SearchResultsListView(),
             ),
           ),
           transition: CircularFloatingSearchBarTransition(),
@@ -252,7 +177,7 @@ class _State extends State<SearchPageView>
             lsp.selectedTag ?? 'Search for people',
             style: Theme.of(context).textTheme.headline6,
           ),
-          hint: 'Search...',
+          // hint: 'Search...',
           actions: [
             FloatingSearchBarAction.searchToClear(
               color: getBlackAndWhite(context, 0, reverse: false),
@@ -267,12 +192,21 @@ class _State extends State<SearchPageView>
                 v.result != null ? v.result!.map((e) => e.tag).toList() : []);
           },
           onSubmitted: (query) {
-            lsp.addUserSearchHistory(query);
             _searchBarController.close();
+            if (query.isEmpty) {
+              lsp.resetFilteredSearchTagHistory();
+              lsp.selectedTag = null;
+              lsp.selectedUser = null;
+              return;
+            }
+            lsp.addUserSearchHistory(query);
             ap.getUserTag(query).then((users) {
               if (users.result != null && users.result!.length > 0) {
                 lsp.selectedTag = query;
                 lsp.selectedUser = users.result!.first;
+              } else {
+                lsp.selectedTag = null;
+                lsp.selectedUser = null;
               }
             });
           },

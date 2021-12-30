@@ -9,9 +9,9 @@ import {setRecommendations} from "./recommendations";
 
 
 describe("user", () => {
-  initFirebaseTest("dev");
-
   it("test recommendations", async () => {
+    initFirebaseTest("dev");
+
     const me = (await admin.firestore().collection("users")
         .withConverter(converter<langame.protobuf.IUser>())
         .where("tag", "==", "lou").get()).docs[0];
@@ -28,6 +28,8 @@ describe("user", () => {
   });
 
   it("onBoardUserWithBot", async () => {
+    initFirebaseTest("dev");
+
     const me = (await admin.firestore().collection("users")
         .withConverter(converter<langame.protobuf.IUser>())
         .where("tag", "==", "lou").get()).docs[0];
@@ -48,15 +50,3 @@ it("search", async () => {
   });
   console.log(result);
 });
-
-
-it("hack", async () => {
-  initFirebaseTest("prod");
-  const users = await admin.firestore().collection("preferences")
-      .withConverter(converter<langame.protobuf.IUserPreference>())
-      .get();
-  await Promise.all(users.docs.map((e) => e.ref.update({
-    hasDoneOnBoarding: false,
-  })));
-});
-

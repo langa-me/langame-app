@@ -257,6 +257,9 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       _cap.log('authentication_provider:getUserTag $tag',
           analyticsMessage: 'get_user_by_tag');
+      if (tag.isEmpty) {
+        return LangameResponse.succeed(result: []);
+      }
 
       final objects = await algolia
           .index(AppConst.isDev ? "dev_users" : "prod_users")
@@ -361,13 +364,13 @@ class AuthenticationProvider extends ChangeNotifier {
       // [firebase_auth/requires-recent-login] This operation is sensitive
       //  and requires recent authentication. Log in again before
       //retrying this request.
-      final Credential cred = await (user!.google
-          ? _authenticationApi.loginWithGoogle()
-          : user!.apple
-              ? _authenticationApi.loginWithApple()
-              : _authenticationApi.loginWithEmail(null, null));
-      await firebase.auth!.currentUser!
-          .reauthenticateWithCredential(cred.oAuthCrendential!);
+      // final Credential cred = await (user!.google
+      //     ? _authenticationApi.loginWithGoogle()
+      //     : user!.apple
+      //         ? _authenticationApi.loginWithApple()
+      //         : _authenticationApi.loginWithEmail(null, null));
+      // await firebase.auth!.currentUser!
+      //     .reauthenticateWithCredential(cred.oAuthCrendential!);
       await firebase.auth!.currentUser!.delete();
       _cap.log('purging local storage');
       var i = await SharedPreferences.getInstance();

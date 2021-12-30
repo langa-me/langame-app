@@ -12,8 +12,8 @@ import 'package:langame/views/feature_preview/beta.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-final _news = [
-  'Text mode!',
+final _news = [ // TODO: should be accessible through remote config / firestore
+  'Simplified interface',
 ];
 
 Widget whatsNew(BuildContext context) {
