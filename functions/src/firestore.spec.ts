@@ -132,9 +132,5 @@ describe("Firestore rules", async () => {
           },
         }));
   });
-
-  it("langames", async () => {
-
-  });
 });
 

@@ -56,15 +56,19 @@ export const onCreateAuthentication = async (user: UserRecord,
         </code>`,
       },
     });
-    return Promise.all<any>([db.collection("mails").add({
-      to: user.email,
-      message: {
-        subject: title,
-        html: `<code>
+    return Promise.all<any>([
+      // We don't send welcome email to Langame team :) (because of bots mainly, fake email)
+      user.email?.includes("@langa.me") ?
+      Promise.resolve() :
+      db.collection("mails").add({
+        to: user.email,
+        message: {
+          subject: title,
+          html: `<code>
           ${html(title, body, "Have a great day 😇.")}
         </code>`,
-      },
-    }), p2]);
+        },
+      }), p2]);
   } catch (e: any) {
     return reportError(e, {user: context.params.userId});
   }

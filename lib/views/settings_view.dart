@@ -13,7 +13,6 @@ import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
-import 'feature_preview/beta.dart';
 import 'goals/goals_list_tiles.dart';
 import 'users/self_profile_page.dart';
 
@@ -54,7 +53,6 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
     var pp = Provider.of<PreferenceProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,

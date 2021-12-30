@@ -6,6 +6,7 @@ import {converter} from "../utils/firestore";
 import {langame} from "../langame/protobuf/langame";
 import {onboardUserWithBot} from "./bot";
 import {setRecommendations} from "./recommendations";
+import {resetOnboarding} from "./resetOnboarding";
 
 
 describe("user", () => {
@@ -49,4 +50,19 @@ it("search", async () => {
     filters: "louu",
   });
   console.log(result);
+});
+
+
+it("resetOnBoarding", async () => {
+  // TODO: run it in emulator? and CI
+  initFirebaseTest("dev");
+  await resetOnboarding();
+  const db = admin.firestore();
+  const preferences = await db.collection("preferences")
+      .withConverter(converter<langame.protobuf.IUserPreference>())
+      .get();
+  // Expect that all are set to false
+  preferences.docs.forEach((doc) => {
+    expect(doc.data().hasDoneOnBoarding).to.be.false;
+  });
 });
