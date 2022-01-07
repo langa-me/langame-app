@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "909899959016",
+    "project_id": "langame-86ac4",
+    "storage_bucket": "langame-86ac4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909899959016:android:e74963d90d60a74cc0575d",
+        "android_client_info": {
+          "package_name": "me.langa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "909899959016-kj98n9fggts44c9cj8ripmjafeev8lok.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.langa",
+            "certificate_hash": "db695df98fa4b9b7658c8a8542f3e915bbdd7fbd"
+          }
+        },
+        {
+          "client_id": "909899959016-pl5a3m10sub4oc4d74val9ta9jtsdo7v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.langa",
+            "certificate_hash": "4c2a4295e4abe0418453b7a3326f23c25e85cb93"
+          }
+        },
+        {
+          "client_id": "909899959016-iqo7u41rd6vavffucu7jpa1959os863q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCr5pzBQ_R07sEk6m5YWdf8qZWJRLiib90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "909899959016-iqo7u41rd6vavffucu7jpa1959os863q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "909899959016-uk3c4h89ipocrkv7dbd1utv70lmjlac8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "me.langa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

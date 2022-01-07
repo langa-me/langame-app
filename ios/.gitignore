@@ -31,7 +31,5 @@ Runner/GeneratedPluginRegistrant.*
 !default.pbxuser
 !default.perspectivev3
 
-# Firebase configs
-Config
-
+# Build
 build

@@ -45,7 +45,6 @@ app.*.map.json
 *.jks
 key.properties
 service_account_key.json
-google-services.json
 release.zip
 *svc*
 # TODO: apple stuff
