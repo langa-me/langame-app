@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>909899959016-4fn6jethkklhm782r6865larjov2u36g.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.909899959016-4fn6jethkklhm782r6865larjov2u36g</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>909899959016-kj98n9fggts44c9cj8ripmjafeev8lok.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCi38oki09o787cSrAq6qHvRFoFay_bGx4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>909899959016</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>me.langa.prod</string>
+	<key>PROJECT_ID</key>
+	<string>langame-86ac4</string>
+	<key>STORAGE_BUCKET</key>
+	<string>langame-86ac4.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:909899959016:ios:47d44be1ab94dfbfc0575d</string>
+</dict>
+</plist>
