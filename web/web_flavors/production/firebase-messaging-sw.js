@@ -3,7 +3,7 @@ importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js")
 
 firebase.initializeApp(firebaseConfig = {
   apiKey: "AIzaSyDxLmqscMfKF6FUd_rXcsJxH--w0PQhVWw",
-  authDomain: "langame-86ac4.firebaseapp.com",
+  authDomain: "app.langa.me",
   projectId: "langame-86ac4",
   storageBucket: "langame-86ac4.appspot.com",
   messagingSenderId: "909899959016",

@@ -22,5 +22,8 @@
     "mochaExplorer.files": "./functions/lib/**/*.js",
     "mochaExplorer.require": "source-map-support/register",
     "mochaExplorer.watch": "./functions/lib/**/*.js",
-    "mochaExplorer.timeout": 50000000
+    "mochaExplorer.timeout": 50000000,
+    "mochaExplorer.env": {
+        "IS_TESTING": "true"
+    }
 }

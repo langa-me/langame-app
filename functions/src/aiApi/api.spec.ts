@@ -2,7 +2,6 @@ import {newFeedback} from "../feedback";
 import "mocha";
 import {expect} from "chai";
 import {ImplAiApi, openAiEndpoint} from "./implAiApi";
-import {offlineMemeSearch} from "../memes/memes";
 import {FakeAiApi} from "./fakeAiApi";
 import {parseHrtimeToSeconds} from "../utils/time";
 import {initFirebaseTest} from "../utils/firestore.spec";
@@ -47,16 +46,6 @@ it("emojis inference", async () => {
 it.skip("insert algolia", async () => {
   const api = new ImplAiApi();
   await api.save("dev_users", [{object: {foo: "bar"}, id: "foo"}]);
-});
-
-it.skip("search algolia", async () => {
-  const out = ["KRSKDgI2rsscN8U38v5V", "kGApNE1CNmEzb5uzFPw7"];
-  let r = await offlineMemeSearch(["biology"], 5, out);
-  expect(r.map((e) => e.id).filter((e) => out.includes(e)).length)
-      .to.be.equal(0);
-  r = await offlineMemeSearch(["biology"], 3,
-      []);
-  expect(r.length).to.be.equal(3);
 });
 
 it.skip("search algolia low level", async () => {

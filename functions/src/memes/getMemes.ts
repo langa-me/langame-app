@@ -3,20 +3,31 @@ import * as admin from "firebase-admin";
 import {https} from "firebase-functions";
 import {offlineMemeSearch, onlineMemeGenerator} from "./memes";
 import {getPerUserlimiter} from "../utils/firestore";
-
-
-export const getMemes = async (data: any,
-    context: functions.https.CallableContext) => {
-  if (!context.auth) {
+const limiter = !process.env.IS_TESTING ?
+  getPerUserlimiter() : undefined;
+interface GetMemesRequest {
+  topics: string[];
+  appId?: string;
+  quantity?: number;
+  translated?: boolean;
+}
+export const getMemes = async (
+    data: GetMemesRequest,
+    context: functions.https.CallableContext
+) => {
+  if (!context.auth && !data.appId) {
     throw new https.HttpsError(
         "unauthenticated",
         "not authenticated",
     );
   }
 
-  const uidQualifier = "u_" + context.auth.uid;
+  // The rate limit identifier is either bound to a client or
+  // to a service.
+  const callerId = context.auth ? context.auth.uid : data.appId!;
+  const uidQualifier = "u_" + callerId;
   const isQuotaExceeded =
-        await getPerUserlimiter().isQuotaAlreadyExceeded(uidQualifier);
+    await limiter!.isQuotaExceededOrRecordUsage(uidQualifier);
   if (isQuotaExceeded) {
     throw new https.HttpsError(
         "resource-exhausted",
@@ -32,44 +43,74 @@ export const getMemes = async (data: any,
   }
   // If the user does provide topics but it's not string[]
   if (data.topics && !Array.isArray(data.topics) ||
-        (data.topics.length > 0 && typeof data.topics[0] !== "string")) {
+    (data.topics.length > 0 && typeof data.topics[0] !== "string")) {
     throw new https.HttpsError(
         "invalid-argument",
         "topics must be an array of strings",
     );
   }
-  const userDoc = await admin.firestore()
-      .collection("users")
-      .doc(context.auth.uid)
-      .get();
-  if (userDoc.data()!.credits <= 0) {
+  if (data.quantity && typeof data.quantity !== "number") {
     throw new https.HttpsError(
         "invalid-argument",
-        "you do not have enough credits",
+        "quantity must be a number",
     );
   }
-  const t = await admin.remoteConfig().getTemplate();
+  // If quantity > 5
+  if (data.quantity && data.quantity > 5) {
+    throw new https.HttpsError(
+        "invalid-argument",
+        "quantity must be less than or equal to 5",
+    );
+  }
+  let callerDoc: admin.firestore.DocumentSnapshot;
+  if (context.auth) {
+    callerDoc = await admin.firestore()
+        .collection("users")
+        .doc(context.auth.uid)
+        .get();
+    if (callerDoc.data()!.credits <= 0) {
+      throw new https.HttpsError(
+          "invalid-argument",
+          "you do not have enough credits",
+      );
+    }
+  } else {
+    callerDoc = await admin.firestore()
+        .collection("api_keys")
+        .doc(data.appId!)
+        .get();
+    // If document does not exist, it means the key is invalid
+    if (!callerDoc.exists) {
+      throw new https.HttpsError(
+          "invalid-argument",
+          "invalid appId",
+      );
+    // TODO: same for API, need to design business model
+    }
+  }
+
   const seenMemesDoc = await admin.firestore()
       .collection("seenMemes")
-      .doc(context.auth.uid)
+      .doc(callerId)
       .get();
   let seenMemes = seenMemesDoc.data() && seenMemesDoc.data()!.seen ?
-      seenMemesDoc.data()!.seen! :
-      [];
+    seenMemesDoc.data()!.seen! :
+    [];
 
   // If the user does not provide topics, leave empty string
   // will find all memes
   let memes = await offlineMemeSearch(
       data.topics || ["ice breaker"],
-      // @ts-ignore
-      t.parameters.meme_count.defaultValue.value * 1, // Casting to number
       seenMemes!.map((e: any) => e.meme),
-      false,
+      data.quantity || 1,
   );
 
   if (memes.length === 0) {
     functions.logger.log("could not find a conversation starter, generating");
-    memes = [await onlineMemeGenerator(data.topics || ["ice breaker"])];
+    memes = await onlineMemeGenerator(data.topics || ["ice breaker"],
+        data.quantity || 1,
+        data.translated || false
+    );
   }
 
   if (memes.length === 0) {
@@ -86,11 +127,10 @@ export const getMemes = async (data: any,
       date: new Date(),
     };
   });
-    // Filter out memes already seen X time ago
-  seenMemes =
-            seenMemes!
-                .filter((e: any) => e.date < oneWeekAgo).concat(newMemesSeen);
-  await userDoc.ref.update({
+  // Filter out memes already seen X time ago
+  seenMemes = seenMemes!
+      .filter((e: any) => e.date < oneWeekAgo).concat(newMemesSeen);
+  await callerDoc.ref.update({
     credits: admin.firestore.FieldValue.increment(-1),
     lastSpent: admin.firestore.FieldValue.serverTimestamp(),
   });
@@ -98,6 +138,8 @@ export const getMemes = async (data: any,
   seenMemesDoc.ref.set({
     seen: seenMemes,
   }, {merge: true});
+
+  // Return the conversation starters
   return {
     memes: memes
         .filter((e) => e.data())
