@@ -28,7 +28,7 @@ export const onWriteToRateLimit = async (
         .doc(change.after.id)
         .set({
           queries: admin.firestore.FieldValue.arrayUnion(
-              admin.firestore.FieldValue.serverTimestamp()
+              admin.firestore.Timestamp.now()
           ),
         }, {merge: true});
   } catch (e: any) {

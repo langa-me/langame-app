@@ -26,7 +26,6 @@ export const onCreateKey = async (
       const key = admin.firestore().collection("api_keys").doc();
       return admin.firestore().runTransaction(async (t) => {
         return t.set(snap.ref, {
-          credits: 200,
           apiKey: key.id,
         }, {merge: true});
       });

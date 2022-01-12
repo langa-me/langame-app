@@ -134,7 +134,7 @@ exports.onCreateKey = functions
     .document("api_keys/{apiKeyId}")
     .onCreate(onCreateKey);
 
-exports.onWriteKey = functions
+exports.onWriteToRateLimit = functions
     .region(region)
     .runWith(runtimeOpts)
     .firestore
