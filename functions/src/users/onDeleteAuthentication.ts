@@ -5,8 +5,6 @@ import {
 } from "../helpers";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import {auth} from "firebase-admin/lib/auth";
-import UserRecord = auth.UserRecord;
 import Stripe from "stripe";
 import {reportError} from "../errors";
 import {html} from "../utils/html";
@@ -27,7 +25,7 @@ Please do not hesitate to give us feedback <a href="https://help.langa.me/feedba
  * @param{UserRecord} user
  * @param{functions.EventContext} context
  */
-export const onDeleteAuthentication = async (user: UserRecord,
+export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
     context: functions.EventContext) => {
   const stripe = new Stripe(functions.config().stripe.key, {
     apiVersion: "2020-08-27",

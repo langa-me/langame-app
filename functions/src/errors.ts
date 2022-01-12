@@ -13,7 +13,7 @@ const logging = process.env.GCLOUD_PROJECT ? new Logging({
 // [START reportError]
 
 export const reportError = (err: Error, context = {}): Promise<Error> => {
-  functions.logger.log(err, context);
+  functions.logger.log(err.message, context);
   // Skip StackDriver in non-production / tests
   if (!logging) {
     return Promise.resolve(err);

@@ -24,6 +24,8 @@ import {onWritePreference} from "./users/onWritePreference";
 import {reviveLangame} from "./langames/reviveLangame";
 import {setTagsLangame} from "./langames/setTagsLangame";
 import {onWriteLangame} from "./langames/onWriteLangame";
+import {onCreateKey} from "./users/b2b/onCreateKey";
+import {onWriteToRateLimit} from "./users/onWriteToRateLimit";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -124,6 +126,20 @@ exports.onWritePreference = functions
     .firestore
     .document("preferences/{preferenceId}")
     .onWrite(onWritePreference);
+
+exports.onCreateKey = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
+    .document("api_keys/{apiKeyId}")
+    .onCreate(onCreateKey);
+
+exports.onWriteKey = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
+    .document("per_user_limiter/{perUserLimiterId}")
+    .onWrite(onWriteToRateLimit);
 
 
 // Meme // Conversation starter

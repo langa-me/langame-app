@@ -7,6 +7,12 @@ service cloud.firestore {
         function getUser(id) {
             return get(/databases/$(database)/documents/users/$(id)).data;
         }
+        function getOrg(id) {
+            return get(/databases/$(database)/documents/organizations/$(id)).data;
+        }
+        function getApiKey(id) {
+            return get(/databases/$(database)/documents/api_keys/$(id)).data;
+        }
         // TODO: overall prevent DDOSes by setting "last update" stuff
         match /users/{userId} {
             // TODO: Maybe more strict
@@ -82,6 +88,37 @@ service cloud.firestore {
         }
         match /apis/{apiId} {
             allow read: if request.auth != null;
+        }
+        match /organizations/{organizationId} {
+            // Can read organizations which I am member of
+            allow read: if request.auth != null &&
+                request.auth.uid in resource.data.members;
+            allow update: if request.auth != null &&
+                request.auth.uid in resource.data.members &&
+                // The member "membersRole" is "owner"
+                resource.data.membersRole[request.auth.uid] == "owner";
+            // Can create organizations if adding oneself in the members
+            allow create: if request.auth != null &&
+                request.resource.data.keys().hasAll(['members', 'membersRole', 'name']) &&
+                // request.auth.uid contained in members
+                request.auth.uid in request.resource.data.members;
+        }
+        match /api_keys/{apiKeyId} {
+            // Can only read API keys where "owner" is an organization
+            // where I am member
+            allow read: if request.auth != null &&
+                request.auth.uid in getOrg(resource.data.owner).members;
+            allow create: if request.auth != null &&
+                request.auth.uid in getOrg(request.resource.data.owner).members;
+                // TODO: max 10 keys smthing
+            // Can only delete API keys if I am the owner of the organization
+            allow delete: if request.auth != null &&
+                request.auth.uid in getOrg(resource.data.owner).members &&
+                getOrg(resource.data.owner).membersRole[request.auth.uid] == "owner";
+        }
+        match /usages/{usageId} {
+            allow read: if request.auth != null &&
+                request.auth.uid in getOrg(getApiKey(usageId).owner).members;
         }
     }
 }

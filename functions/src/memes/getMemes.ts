@@ -25,7 +25,7 @@ export const getMemes = async (
   // The rate limit identifier is either bound to a client or
   // to a service.
   const callerId = context.auth ? context.auth.uid : data.appId!;
-  const uidQualifier = "u_" + callerId;
+  const uidQualifier = callerId;
   const isQuotaExceeded =
     await limiter!.isQuotaExceededOrRecordUsage(uidQualifier);
   if (isQuotaExceeded) {
@@ -68,25 +68,37 @@ export const getMemes = async (
         .collection("users")
         .doc(context.auth.uid)
         .get();
-    if (callerDoc.data()!.credits <= 0) {
-      throw new https.HttpsError(
-          "invalid-argument",
-          "you do not have enough credits",
-      );
-    }
   } else {
-    callerDoc = await admin.firestore()
+    const apiKeyDoc = await admin.firestore()
         .collection("api_keys")
         .doc(data.appId!)
         .get();
     // If document does not exist, it means the key is invalid
-    if (!callerDoc.exists) {
+    if (!apiKeyDoc.exists) {
       throw new https.HttpsError(
           "invalid-argument",
           "invalid appId",
       );
-    // TODO: same for API, need to design business model
     }
+    callerDoc = await admin.firestore()
+        .collection("organizations")
+        .doc(apiKeyDoc.data()!.owner)
+        .get();
+    // The owner does not exist
+    if (!callerDoc.exists) {
+      throw new https.HttpsError(
+          "invalid-argument",
+          "the owner of this key does not exist",
+      );
+    }
+  }
+
+  if (callerDoc.data()!.credits <= 0) {
+    throw new https.HttpsError(
+        "invalid-argument",
+        "you do not have enough credits, " +
+        "please buy more on https://langa.me or contact us at contact@langa.me",
+    );
   }
 
   const seenMemesDoc = await admin.firestore()
@@ -101,8 +113,8 @@ export const getMemes = async (
   // will find all memes
   let memes = await offlineMemeSearch(
       data.topics || ["ice breaker"],
-      seenMemes!.map((e: any) => e.meme),
-      data.quantity || 1,
+    seenMemes!.map((e: any) => e.meme),
+    data.quantity || 1,
   );
 
   if (memes.length === 0) {

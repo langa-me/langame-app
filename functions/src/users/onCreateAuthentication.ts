@@ -1,11 +1,10 @@
 import {
   isDev,
+  isEmulator,
   kUsersCollection,
 } from "../helpers";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import {auth} from "firebase-admin/lib/auth";
-import UserRecord = auth.UserRecord;
 import {reportError} from "../errors";
 import {html} from "../utils/html";
 import {sample} from "../utils/array";
@@ -27,7 +26,7 @@ If you have any question or want to give a feedback, you can find everything <a 
  * @param{UserRecord} user
  * @param{functions.EventContext} context
  */
-export const onCreateAuthentication = async (user: UserRecord,
+export const onCreateAuthentication = async (user: admin.auth.UserRecord,
     context: functions.EventContext) => {
   const db = admin.firestore();
 
@@ -39,11 +38,12 @@ export const onCreateAuthentication = async (user: UserRecord,
     delete clone.passwordSalt;
     delete clone.photoURL;
     clone.photoUrl = photo;
-    clone.credits = 5;
-    clone.human = true;
+    clone.credits = 50;
     await db.runTransaction(async (t) => {
       return t.set(db.collection(kUsersCollection).doc(user.uid), clone, {merge: true});
     });
+
+    if (isEmulator) return;
 
     const teamTitle = `Welcome to ${user.uid} 😋`;
     const teamBody = `<h1>${user.uid} joined Langame 😋</h1><br><p>${JSON.stringify(clone)}</p><br><h2>Give her/him a warm welcome!</h2>`;
