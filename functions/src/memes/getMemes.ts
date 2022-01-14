@@ -3,6 +3,7 @@ import * as admin from "firebase-admin";
 import {https} from "firebase-functions";
 import {offlineMemeSearch, onlineMemeGenerator} from "./memes";
 import {getPerUserlimiter} from "../utils/firestore";
+import {reportError} from "../errors";
 const limiter = !process.env.IS_TESTING ?
   getPerUserlimiter() : undefined;
 interface GetMemesRequest {
@@ -15,7 +16,10 @@ export const getMemes = async (
     data: GetMemesRequest,
     context: functions.https.CallableContext
 ) => {
+  functions.logger.info(context);
   if (!context.auth && !data.appId) {
+    const message = "not authenticated";
+    functions.logger.warn(message, data);
     throw new https.HttpsError(
         "unauthenticated",
         "not authenticated",
@@ -29,37 +33,47 @@ export const getMemes = async (
   const isQuotaExceeded =
     await limiter!.isQuotaExceededOrRecordUsage(uidQualifier);
   if (isQuotaExceeded) {
+    const message = "resource-exhausted";
+    functions.logger.warn(message, data);
     throw new https.HttpsError(
-        "resource-exhausted",
+        message,
         "rate limited",
     );
   }
 
   if (!data) {
+    const message = "must provide a request body";
+    functions.logger.warn(message, data);
     throw new https.HttpsError(
         "invalid-argument",
-        "must provide a request body",
+        message,
     );
   }
   // If the user does provide topics but it's not string[]
   if (data.topics && !Array.isArray(data.topics) ||
     (data.topics.length > 0 && typeof data.topics[0] !== "string")) {
+    const message = "topics must be an array of strings";
+    functions.logger.warn(message, data);
     throw new https.HttpsError(
         "invalid-argument",
-        "topics must be an array of strings",
+        message,
     );
   }
   if (data.quantity && typeof data.quantity !== "number") {
+    const message = "quantity must be a number";
+    functions.logger.warn(message, data);
     throw new https.HttpsError(
         "invalid-argument",
-        "quantity must be a number",
+        message,
     );
   }
   // If quantity > 5
   if (data.quantity && data.quantity > 5) {
+    const message = "quantity must be less than or equal to 5";
+    functions.logger.warn(message, data);
     throw new https.HttpsError(
         "invalid-argument",
-        "quantity must be less than or equal to 5",
+        message,
     );
   }
   let callerDoc: admin.firestore.DocumentSnapshot;
@@ -75,9 +89,11 @@ export const getMemes = async (
         .get();
     // If document does not exist, it means the key is invalid
     if (!apiKeyDoc.exists) {
+      const message = "invalid appId";
+      functions.logger.warn(message, data);
       throw new https.HttpsError(
           "invalid-argument",
-          "invalid appId",
+          message,
       );
     }
     callerDoc = await admin.firestore()
@@ -86,18 +102,24 @@ export const getMemes = async (
         .get();
     // The owner does not exist
     if (!callerDoc.exists) {
+      const message = "the owner of this key does not exist";
+      functions.logger.warn(message, data);
       throw new https.HttpsError(
           "invalid-argument",
-          "the owner of this key does not exist",
+          message,
       );
     }
   }
 
+  functions.logger.log("caller ID", callerDoc.id);
+
   if (callerDoc.data()!.credits <= 0) {
+    const message = "you do not have enough credits, " +
+      "please buy more on https://langa.me or contact us at contact@langa.me";
+    functions.logger.warn(message, data);
     throw new https.HttpsError(
         "invalid-argument",
-        "you do not have enough credits, " +
-        "please buy more on https://langa.me or contact us at contact@langa.me",
+        message,
     );
   }
 
@@ -119,17 +141,32 @@ export const getMemes = async (
 
   if (memes.length === 0) {
     functions.logger.log("could not find a conversation starter, generating");
-    memes = await onlineMemeGenerator(data.topics || ["ice breaker"],
-        data.quantity || 1,
-        data.translated || false
-    );
+    try {
+      memes = await onlineMemeGenerator(data.topics || ["ice breaker"],
+          data.quantity || 1,
+          data.translated || false
+      );
+    } catch (e: any) {
+      const message = e.toString().includes("timeout") ?
+        "the server is overloaded, please try again later" :
+        "an error occurred, please try again later," +
+        " reach out to us at contact@langa.me for further assistance";
+      functions.logger.warn(message, data);
+      throw new https.HttpsError(
+          "internal",
+          message,
+      );
+    }
   }
 
   if (memes.length === 0) {
-    throw new https.HttpsError(
+    const message = "could not find memes";
+    const e = new https.HttpsError(
         "internal",
-        "could not find memes",
+        message,
     );
+    await reportError(e, context);
+    throw e;
   }
   const oneWeek = 7 * 24 * 1000 * 60 * 60;
   const oneWeekAgo = new Date(Date.now() - oneWeek);

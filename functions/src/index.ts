@@ -26,6 +26,7 @@ import {setTagsLangame} from "./langames/setTagsLangame";
 import {onWriteLangame} from "./langames/onWriteLangame";
 import {onCreateKey} from "./users/b2b/onCreateKey";
 import {onWriteToRateLimit} from "./users/onWriteToRateLimit";
+import {onCreateOrganization} from "./users/onCreateOrganization";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -140,6 +141,13 @@ exports.onWriteToRateLimit = functions
     .firestore
     .document("per_user_limiter/{perUserLimiterId}")
     .onWrite(onWriteToRateLimit);
+
+exports.onCreateOrganization = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
+    .document("organizations/{organizationId}")
+    .onCreate(onCreateOrganization);
 
 
 // Meme // Conversation starter
