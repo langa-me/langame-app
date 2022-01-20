@@ -113,8 +113,10 @@ export const revive = async (
     try {
       // TODO: might also offline search
       // Maybe classify last messages and create starter accordingly
-      const newConversationStarter = await onlineMemeGenerator(langame.data()!.topics!);
-      botMessage += `\n\n${newConversationStarter.data()!.content!}`;
+      const newConversationStarter = await onlineMemeGenerator(
+        langame.data()!.topics!, 1, false
+      );
+      botMessage += `\n\n${newConversationStarter[0].data()!.content!}`;
     } catch (e: any) {
       await reportError(e, {});
     }

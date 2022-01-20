@@ -48,3 +48,6 @@ export function groupBy<K, V>(list: Array<V>, keyGetter: (input: V) => K):
 export const algoliaPrefix =
   !process.env.GCLOUD_PROJECT?.includes("dev") ? "prod_" :
     !process.env.FUNCTIONS_EMULATOR ? "dev_" : "emulator_";
+
+
+export const isEmulator = process.env.FUNCTIONS_EMULATOR;

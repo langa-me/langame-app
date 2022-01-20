@@ -86,15 +86,15 @@ const onCreateLangame = async (
 
   functions.logger.log("searching for a conversation starter");
   let memes = await offlineMemeSearch(langameData.topics || ["ice breaker"],
-      1,
       memesToFilter.map((e: any) => e.meme),
-      true,
+      1,
   );
 
 
   if (memes.length === 0) {
     functions.logger.log("could not find a conversation starter, generating");
-    memes = [await onlineMemeGenerator(langameData.topics || ["ice breaker"])];
+    memes = await onlineMemeGenerator(
+        langameData.topics || ["ice breaker"], 1, false);
   }
 
   if (memes.length === 0) {

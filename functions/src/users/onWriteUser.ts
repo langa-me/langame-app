@@ -3,11 +3,12 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {handleError, reportError} from "../errors";
-import {algoliaPrefix} from "../helpers";
+import {algoliaPrefix, isEmulator} from "../helpers";
 import {converter} from "../utils/firestore";
 import {langame} from "../langame/protobuf/langame";
 import {shouldDrop} from "../utils/contexts";
 import {setRecommendations} from "./recommendations";
+import {SearchIndex} from "algoliasearch";
 
 export const onWriteUser = async (
     change: Change<admin.firestore.DocumentSnapshot<langame.protobuf.IUser>>,
@@ -16,10 +17,13 @@ export const onWriteUser = async (
   try {
     functions.logger.log(ctx);
 
-    const i = api.getIndex(algoliaPrefix+"users");
-    if (!change.after.exists) {
-      await i.deleteObject(change.after.id);
-      return;
+    let i: SearchIndex | undefined = undefined;
+    if (!isEmulator) {
+      i = api.getIndex(algoliaPrefix + "users");
+      if (!change.after.exists) {
+        await i.deleteObject(change.after.id);
+        return;
+      }
     }
     if (shouldDrop(ctx)) return;
 
@@ -37,12 +41,14 @@ export const onWriteUser = async (
 
     functions.logger.log("synchronizing user to algolia", change.after.data());
 
-    await i.saveObject({
-      ...change.after.data(),
-      objectID: change.after.id,
-      _tags: [change.after.data()!.tag],
-      favoriteTopics: prefDoc.data()?.favoriteTopics || [],
-    });
+    if (i) {
+      await i.saveObject({
+        ...change.after.data(),
+        objectID: change.after.id,
+        _tags: [change.after.data()!.tag],
+        favoriteTopics: prefDoc.data()?.favoriteTopics || [],
+      });
+    }
 
     // Only run recommendations on new login
     if (

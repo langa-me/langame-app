@@ -38,6 +38,4 @@ export const getPerUserlimiter = () =>
     name: "per_user_limiter",
     maxCalls: 2,
     periodSeconds: 15,
-  },
-  admin.firestore(),
-  );
+  }, admin.firestore());

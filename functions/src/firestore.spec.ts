@@ -1,33 +1,30 @@
 import "mocha";
 import * as firebase from "@firebase/rules-unit-testing";
 import * as fs from "fs";
+import {RulesTestContext, RulesTestEnvironment}
+  from "@firebase/rules-unit-testing";
 
-const admin = firebase.initializeAdminApp({
-  projectId: "langame-dev",
-});
-const alice = firebase.initializeTestApp({
-  projectId: "langame-dev",
-  auth: {uid: "alice", email: "alice@langa.me"},
-});
-const bob = firebase.initializeTestApp({
-  projectId: "langame-dev",
-  auth: {uid: "bob", email: "bob@langa.me"},
-});
-const anonymous = firebase.initializeTestApp({
-  projectId: "langame-dev",
-});
 
 describe("Firestore rules", async () => {
+  let testEnv: RulesTestEnvironment;
+  let alice: RulesTestContext;
+  let bob: RulesTestContext;
+  let anonymous: RulesTestContext;
   before(async () => {
-    await firebase.loadFirestoreRules({
-      projectId: "langame-dev",
-      rules: fs.readFileSync("./firestore.rules", "utf8"),
+    testEnv = await firebase.initializeTestEnvironment({
+      projectId: "fooBar",
+      firestore: {
+        rules: fs.readFileSync("./firestore.rules", "utf8"),
+      },
     });
+    alice = testEnv.authenticatedContext(
+        "alice",
+    );
+    bob = testEnv.authenticatedContext("bob");
+    anonymous = testEnv.unauthenticatedContext();
   });
   after(async () => {
-    await firebase.clearFirestoreData({
-      projectId: "langame-dev",
-    });
+    await testEnv.clearFirestore();
   });
 
   it("users", async () => {
@@ -102,35 +99,6 @@ describe("Firestore rules", async () => {
     firebase.assertFails(anonymous.firestore().collection("users")
         .doc("bob")
         .delete());
-  });
-  it("memes", async () => {
-    firebase.assertSucceeds(alice.firestore().collection("memes")
-        .get());
-    firebase.assertSucceeds(alice.firestore().collectionGroup("tags")
-        .get());
-    const memeRef = await admin.firestore().collection("memes").add({
-      "topics": ["foo", "bar"],
-    });
-    firebase.assertSucceeds(alice.firestore().collection("memes")
-        .doc(memeRef.id).collection("tags").get());
-    firebase.assertSucceeds(alice.firestore().collection("memes")
-        .doc(memeRef.id)
-        .collection("tags")
-        .add({
-          feedback: {
-            userId: "alice",
-          },
-        }));
-    firebase.assertFails(alice.firestore().collection("memes")
-        .add({}));
-    firebase.assertFails(alice.firestore().collection("memes")
-        .doc(memeRef.id)
-        .collection("tags")
-        .add({
-          something_else: {
-            userId: "alice",
-          },
-        }));
   });
 });
 
