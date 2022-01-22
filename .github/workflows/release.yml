@@ -17,16 +17,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Wait for build to succeed
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        id: wait-for-ci
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: ci
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
 
-      - name: Abort when failed CI
-        if: steps.wait-for-build.outputs.conclusion == 'failure'
+      - name: Check CI status
+        run: |
+          output=$(curl -sSL -X GET -G -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GIT_AUTHORIZATION }}" -d "branch=${{ env.GITHUB_REF_SLUG }}" -d "event=push" https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ github.event.inputs.ci }}/runs | jq -r '.workflow_runs[0] | "\(.conclusion)"')
+          echo "::set-output name=status::$output"
+        id: check
+
+      - name: Abort if CI not successful
+        if: steps.check.outputs.status != 'success'
         run: |
           echo ${{ steps.check.outputs.status }}
           exit 1
