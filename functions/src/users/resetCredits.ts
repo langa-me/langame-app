@@ -16,7 +16,7 @@ export const resetCredits =
         const batch = db.batch();
 
         batch.update(db.collection("users").doc(user.id), {
-          credits: 10,
+          credits: 200,
         });
 
         // Commit the batch

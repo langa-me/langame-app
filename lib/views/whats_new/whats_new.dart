@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final _news = [ // TODO: should be accessible through remote config / firestore
-  'Simplified interface',
+  'Regular Langames are now available 😛, check your settings!',
 ];
 
 Widget whatsNew(BuildContext context) {

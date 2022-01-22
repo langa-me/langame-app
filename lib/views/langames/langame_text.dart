@@ -376,7 +376,12 @@ class _State extends State<LangameTextView>
 
   void _onSend() async {
     if (_textEditingController.text.isNotEmpty && _canSend) {
-      debugPrint('send: ' + _textEditingController.text);
+      final cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
+      cap.analytics
+          .logEvent(name: 'send_message', parameters: <String, dynamic>{
+        'length': _textEditingController.text.length,
+      });
+
       // Clear text field
       _textEditingController.clear();
       // Hide keyboard

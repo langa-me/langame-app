@@ -7,6 +7,7 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/popup_menu.dart';
+import 'package:langame/views/langames/langames_schedule_settings_view.dart';
 import 'package:langame/views/notifications/notification_view.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -99,6 +100,17 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                 color: isLightThenDark(context),
               ),
               title: Text('Notifications',
+                  style: Theme.of(context).textTheme.headline6),
+            ),
+            ListTile(
+              onTap: () {
+                cp.push(LangamesScheduleSettingsView());
+              },
+              leading: Icon(
+                FontAwesomeIcons.grinTongue,
+                color: isLightThenDark(context),
+              ),
+              title: Text('Langames schedule',
                   style: Theme.of(context).textTheme.headline6),
             ),
             Divider(),

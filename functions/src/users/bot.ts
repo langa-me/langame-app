@@ -1,40 +1,15 @@
 import {waitUntil} from "async-wait-until";
 import * as admin from "firebase-admin";
-import * as functions from "firebase-functions";
-import {names, uniqueNamesGenerator} from "unique-names-generator";
 import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
+import {generateTag} from "./tag";
+
 
 export const createBot = async (db: admin.firestore.Firestore
 ): Promise<admin.firestore.DocumentSnapshot<langame.protobuf.IUser>> => {
-  let botTag: string | undefined = undefined;
-  let tries = 0;
-  const maxTries = 5;
-  while (!botTag && tries < maxTries) {
-    tries++;
-    botTag =
-      uniqueNamesGenerator({
-        dictionaries: [names],
-        length: 1,
-        style: "lowerCase",
-      });
-
-    functions.logger.log("generated tag for bot", botTag);
-
-    if (botTag.length > 8) continue;
-
-    // Check that this tag is not taken
-    const userWithSameTag =
-      await admin.firestore().collection("users")
-          .where("tag", "==", botTag).get();
-    if (userWithSameTag.empty) {
-      break;
-    }
-    botTag = undefined;
-  }
+  const botTag = await generateTag();
   if (!botTag) {
-    return Promise.reject(
-        new Error("failed to find a tag for bot"));
+    throw new Error("Could not generate bot tag");
   }
   const randomPassword = Math.random().toString(36).slice(-8);
   const bot = await admin.auth().createUser({

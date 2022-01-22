@@ -880,6 +880,9 @@ export namespace langame {
 
             /** UserPreference goals */
             goals?: (langame.protobuf.UserPreference.IGoals|null);
+
+            /** UserPreference langamesSubscriptionFrequency */
+            langamesSubscriptionFrequency?: (string|null);
         }
 
         /** Represents a UserPreference. */
@@ -926,6 +929,9 @@ export namespace langame {
 
             /** UserPreference goals. */
             public goals?: (langame.protobuf.UserPreference.IGoals|null);
+
+            /** UserPreference langamesSubscriptionFrequency. */
+            public langamesSubscriptionFrequency: string;
 
             /**
              * Creates a new UserPreference instance using the specified properties.

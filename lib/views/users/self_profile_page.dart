@@ -161,7 +161,7 @@ class _State extends State<SelfProfilePage> {
                 if (_formKey.currentState!.validate()) {}
               },
               text: 'Change tag',
-              layer: 1,
+              highlighted: true,
             ),
           ),
         ],

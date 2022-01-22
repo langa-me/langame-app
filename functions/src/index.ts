@@ -27,6 +27,7 @@ import {onWriteLangame} from "./langames/onWriteLangame";
 import {onCreateKey} from "./users/b2b/onCreateKey";
 import {onWriteToRateLimit} from "./users/onWriteToRateLimit";
 import {onCreateOrganization} from "./users/onCreateOrganization";
+import {scheduleLangames} from "./langames/scheduleLangames";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -72,6 +73,13 @@ exports.setTagsLangame = functions
     .pubsub
     .schedule("0 1 * * *")
     .onRun(setTagsLangame);
+
+exports.scheduleLangames = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .pubsub
+    .schedule("0 6 * * *")
+    .onRun(scheduleLangames);
 
 // https://firebase.google.com/docs/functions/gcp-storage-events
 exports.onFeedback = functions

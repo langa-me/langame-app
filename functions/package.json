@@ -13,8 +13,8 @@
     "deploy-indexes": "firebase deploy --only firestore:indexes",
     "deploy-remoteconfig": "firebase deploy --only remoteconfig",
     "logs": "firebase functions:log",
-    "set-dev": "firebase use langame-dev && cp ../web/web_flavors/development/* ../web",
-    "set-prod": "firebase use langame-86ac4 && cp ../web/web_flavors/production/* ../web",
+    "set-dev": "gcloud config set project langame-dev && firebase use langame-dev && cp ../web/web_flavors/development/* ../web",
+    "set-prod": "gcloud config set project langame-86ac4 && firebase use langame-86ac4 && cp ../web/web_flavors/production/* ../web",
     "compile": "npm run build -- --declaration --watch",
     "test": "firebase emulators:exec --only firestore \"mocha --timeout 50000 --exit -g '^(Utils|Completion1|Firestore rules)'\""
   },
@@ -31,6 +31,7 @@
     "@sentry/tracing": "^6.10.0",
     "algoliasearch": "^4.10.3",
     "async-wait-until": "^2.0.8",
+    "cron-parser": "^4.2.1",
     "faker": "^5.5.3",
     "firebase-admin": "^10.0.1",
     "firebase-functions": "^3.15.3",

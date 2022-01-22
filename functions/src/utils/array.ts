@@ -38,10 +38,19 @@ export function* chunks<T>(arr: T[], n: number) {
 
 /**
  * sample from array
- * @param{Array<T>} array
- * @return{T}
+ * @param {Array<T>} array
+ * @return {T}
  */
 export function sample<T>(array: T[]): T {
   return array[Math.floor(Math.random()*array.length)];
 }
 
+/**
+ * samples from array
+ * @param {Array<T>} array
+ * @param {number} n
+ * @return {T[]}
+ */
+export function samples<T>(array: T[], n: number): T[] {
+  return shuffle(array).slice(0, n);
+}

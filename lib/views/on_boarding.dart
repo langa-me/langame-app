@@ -9,10 +9,10 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/colors/colors.dart';
+import 'package:langame/views/langames/langames_schedule_settings_widget.dart';
 import 'package:langame/views/languages/language_selection_widget.dart';
 import 'package:langame/views/topics/favorite_topics_widget.dart';
 import 'package:langame/views/topics/most_popular_topics.dart';
@@ -30,8 +30,8 @@ class OnBoarding extends StatefulWidget {
 }
 
 class _OnBoardingState extends State with AfterLayoutMixin {
+  final _introKey = GlobalKey<IntroductionScreenState>();
   final _formKey = GlobalKey<FormState>(debugLabel: '_formKey');
-  bool hasFinishedOnBoarding = false;
   TextEditingController _textEditingController = TextEditingController();
 
   @override
@@ -47,6 +47,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
           body: IntroductionScreen(
+            key: _introKey,
             globalBackgroundColor: getBlackAndWhite(context, 0, reverse: true),
             color: getBlackAndWhite(context, 0),
             done: Icon(FontAwesomeIcons.check,
@@ -55,7 +56,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                 color: Theme.of(context).colorScheme.secondary),
             pages: _buildPageModels(),
             isBottomSafeArea: true,
-            showDoneButton: hasFinishedOnBoarding,
+            showDoneButton: false,
             onDone: _onDone, // TODO: ask permission notification
           ),
         ));
@@ -70,12 +71,15 @@ class _OnBoardingState extends State with AfterLayoutMixin {
       _buildNotificationPreferences(),
       _buildProfilePage(),
       // _buildFindContactPage(), // TODO: implement me
-      // _buildLangameSchedulerPage(), // TODO: design me (notion) and implement me
+      _buildLangameSchedulerPage(),
     ];
   }
 
   PageViewModel _buildPitch() {
     return PageViewModel(
+      decoration: PageDecoration(
+        bodyAlignment: Alignment.center,
+      ),
       titleWidget:
           Text('Why Langame?', style: Theme.of(context).textTheme.headline5),
       bodyWidget: Column(children: [
@@ -122,6 +126,9 @@ class _OnBoardingState extends State with AfterLayoutMixin {
     var pp = Provider.of<PreferenceProvider>(context);
     // TODO: show most popular topics as badges
     return PageViewModel(
+      decoration: PageDecoration(
+        bodyAlignment: Alignment.center,
+      ),
       titleWidget: Text('What are your interests?',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline5),
@@ -174,28 +181,33 @@ class _OnBoardingState extends State with AfterLayoutMixin {
 
   PageViewModel _buildGoalsPage() {
     return PageViewModel(
+      decoration: PageDecoration(
+        bodyAlignment: Alignment.center,
+      ),
       titleWidget: Text('What are your goals with Langame?',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline5),
-      footer: Text('I will customize the app according to your goals.',
+      footer: Text('It will customize the app according to your goals.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline4),
       bodyWidget: Consumer<PreferenceProvider>(
         builder: (context, pp, child) => Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Lottie.asset(
+              'animations/goal.json',
+              height: AppSize.safeBlockVertical * 30,
+              width: AppSize.safeBlockHorizontal * 40,
+              alignment: Alignment.center,
+            ),
             Container(
                 height: AppSize.safeBlockVertical * 40,
                 child: ListView(
-                  physics: BouncingScrollPhysics(),
-                  children: buildGoalsListTiles(context, pp),
-                )),
-            Lottie.asset(
-              'animations/goal.json',
-              height: AppSize.safeBlockVertical * 40,
-              width: AppSize.safeBlockHorizontal * 40,
-              alignment: Alignment.center,
-            )
+                    physics: BouncingScrollPhysics(),
+                    children: ListTile.divideTiles(
+                      context: context,
+                      tiles: buildGoalsListTiles(context, pp, layer: 1),
+                    ).toList())),
           ],
         ),
       ),
@@ -204,6 +216,9 @@ class _OnBoardingState extends State with AfterLayoutMixin {
 
   PageViewModel _buildLanguagePage() {
     return PageViewModel(
+      decoration: PageDecoration(
+        bodyAlignment: Alignment.center,
+      ),
       titleWidget: Text('What is your preferred written language?',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline5),
@@ -213,22 +228,25 @@ class _OnBoardingState extends State with AfterLayoutMixin {
 
   PageViewModel _buildNotificationPreferences() {
     return PageViewModel(
-      titleWidget: Text('Want any notifications?',
+      decoration: PageDecoration(
+        bodyAlignment: Alignment.center,
+      ),
+      titleWidget: Text('How do you want to be notified?',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline5),
       bodyWidget: Consumer<PreferenceProvider>(
         builder: (context, p, child) => Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-                height: AppSize.safeBlockVertical * 40,
-                child: buildNotificationPreferences(context, p)),
             Lottie.asset(
               'animations/notification.json',
               height: AppSize.safeBlockVertical * 40,
               width: AppSize.safeBlockHorizontal * 40,
               alignment: Alignment.center,
-            )
+            ),
+            Container(
+                height: AppSize.safeBlockVertical * 40,
+                child: buildNotificationPreferences(context, p)),
           ],
         ),
       ),
@@ -238,6 +256,9 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   // This is a single page pitching the benefits of Langame and what it brings to the user
   PageViewModel _buildProfilePage() {
     return PageViewModel(
+      decoration: PageDecoration(
+        bodyAlignment: Alignment.center,
+      ),
       titleWidget:
           Text('Choose a tag', style: Theme.of(context).textTheme.headline5),
       footer: Text(
@@ -260,6 +281,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   contentPadding:
                       EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
                   hintText: 'How will people find you?',
+                  fillColor: getBlackAndWhite(context, 1, reverse: true),
                   hintStyle: Theme.of(context).textTheme.headline6,
                   prefixIcon: Icon(
                     Icons.alternate_email_outlined,
@@ -269,7 +291,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp('^[a-zA-Z]*\$')),
                 ],
-                maxLength: 8,
+                maxLength: 12,
                 // The validator receives the text that the user has entered.
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -296,8 +318,11 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                             'Welcome to Langame ${_textEditingController.text}',
                         failedMessage: 'Tag is not available',
                         onSucceed: () {
-                          setState(() => hasFinishedOnBoarding = true);
-                          _onDone();
+                          final currentPage =
+                              _introKey.currentState?.controller.page ?? 0.0;
+
+                          _introKey.currentState
+                              ?.animateScroll(currentPage.toInt() + 1);
                         },
                       );
                     }).whenComplete(() {
@@ -315,22 +340,33 @@ class _OnBoardingState extends State with AfterLayoutMixin {
     );
   }
 
+  PageViewModel _buildLangameSchedulerPage() {
+        final pp = Provider.of<PreferenceProvider>(context, listen: false);
+    var kindOfRelationshipsMessage = LangamesScheduleSettingsWidget.getKindOfRelationshipsMessage(pp);
+
+    return PageViewModel(
+      decoration: PageDecoration(
+        bodyAlignment: Alignment.center,
+      ),
+      titleWidget: Text('Schedule your Langames',
+          style: Theme.of(context).textTheme.headline5),
+      footer: Container(
+        width: AppSize.safeBlockHorizontal * 70,
+        child: Text(
+          kindOfRelationshipsMessage,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.headline5),),
+      bodyWidget: LangamesScheduleSettingsWidget(
+        onDone: _onDone,
+      ),
+    );
+  }
+
   void _onDone() async {
     var cp = Provider.of<ContextProvider>(context, listen: false);
-    var fp = Provider.of<FunnyProvider>(context, listen: false);
-    cp.showLoadingDialog();
-    var showFailure = () async {
-      cp.dialogComplete();
-      cp.showFailureDialog(fp.getFailingRandom());
-      await Future.delayed(Duration(seconds: 2));
-      cp.dialogComplete();
-    };
     var pp = Provider.of<PreferenceProvider>(context, listen: false);
     pp.preference.hasDoneOnBoarding = true;
-    var r = await pp.save();
-    cp.handleLangameResponse(r, onFailure: showFailure, onSucceed: () {
-      cp.dialogComplete();
-      cp.pushReplacement(MainView());
-    });
+    await pp.save();
+    cp.pushReplacement(MainView());
   }
 }

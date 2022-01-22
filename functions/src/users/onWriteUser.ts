@@ -9,6 +9,7 @@ import {langame} from "../langame/protobuf/langame";
 import {shouldDrop} from "../utils/contexts";
 import {setRecommendations} from "./recommendations";
 import {SearchIndex} from "algoliasearch";
+import {generateTag} from "./tag";
 
 export const onWriteUser = async (
     change: Change<admin.firestore.DocumentSnapshot<langame.protobuf.IUser>>,
@@ -39,13 +40,28 @@ export const onWriteUser = async (
         .withConverter(converter<langame.protobuf.IUserPreference>())
         .get();
 
+    // If user has no tag, generate one
+    let tag = change.after.data()!.tag;
+    if (!tag) {
+      functions.logger.log("user has no tag, generating one");
+      tag = await generateTag({maxTries: 10});
+      if (!tag) {
+        throw new Error(`failed to generated tag for ${change.after.id}`);
+      }
+      functions.logger.log("generated tag", tag);
+      await db.runTransaction(async (transaction) => {
+        return transaction.set(change.after.ref, {
+          tag: tag,
+        }, {merge: true});
+      });
+    }
     functions.logger.log("synchronizing user to algolia", change.after.data());
 
     if (i) {
       await i.saveObject({
         ...change.after.data(),
         objectID: change.after.id,
-        _tags: [change.after.data()!.tag],
+        _tags: [tag],
         favoriteTopics: prefDoc.data()?.favoriteTopics || [],
       });
     }

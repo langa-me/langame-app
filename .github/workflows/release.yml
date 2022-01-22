@@ -10,29 +10,6 @@ on:
 
 # TODO: should fail if commit is not of format "[version]+[versionCode]:"
 jobs:
-  deploy_web:
-    name: Deploy web version to Firebase hosting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          flutter-version: 2.8.1
-      - run: flutter pub get
-      - run: cp web/web_flavors/production/* web
-      - run: flutter build web --release
-      - name: Set up Firebase CLI
-        run: curl -sL https://firebase.tools | bash
-      - run: |
-          wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
-          chmod +x /usr/bin/yq
-      - run: firebase use langame-86ac4 --token ${{ secrets.FIREBASE_CLI_TOKEN }}
-      - name: Deploy to Firebase hosting "app.langa.me"
-        run: firebase deploy --only hosting:prod-app --token ${{ secrets.FIREBASE_CLI_TOKEN }}
-
   deploy_android:
     name: Deploy beta to Google Play
     runs-on: ubuntu-latest

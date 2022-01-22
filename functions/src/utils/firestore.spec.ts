@@ -10,9 +10,9 @@ export const initFirebaseTest = (env: "prod" | "dev") => {
     admin.initializeApp({
       credential: cred,
       projectId: env === "prod" ? "langame-86ac4" : "langame-dev",
-    });
+    }, env);
   } catch (e) {
-    // console.log("failed to initialize firebase", e);
+    console.log("failed to initialize firebase", e, process.env.GCLOUD_PROJECT);
   }
 };
 

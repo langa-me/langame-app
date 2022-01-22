@@ -95,6 +95,8 @@ message UserPreference {
   Notification notification = 14;
   bool preview_mode = 15;
   Goals goals = 16;
+  // Cron frequency to start a Langame
+  string langames_subscription_frequency = 17;
 
   message Notification {
     Invite invite = 1;

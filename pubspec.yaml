@@ -1,6 +1,6 @@
 name: langame
 description: Augmented conversations
-version: 1.5.5+90
+version: 1.5.6+91
 homepage: https://github.com/langa-me/langame-app
 
 environment:
@@ -27,6 +27,8 @@ dependencies:
   share: ^2.0.4
   sentry_flutter: ^6.0.0
   grpc: ^3.0.2
+  flutter:
+    sdk: flutter
 
   # Firebase
 
@@ -48,6 +50,12 @@ dependencies:
 
 
   # Other APIs
+
+  algolia: #^1.0.4
+    git:
+      url: https://github.com/aemelyanovff/dart_algolia.git
+      ref: master # branch name
+      # e.g; https://github.com/knoxpo/dart_algolia/pull/73
 
   # pubnub: ^4.0.0-beta.1
   # agora_rtc_engine: ^4.0.7
@@ -87,19 +95,14 @@ dependencies:
   touchable: ^1.0.0
   sortedmap: ^0.5.1
   holding_gesture: ^1.1.0
-  algolia: #^1.0.4
-    git:
-        url: https://github.com/aemelyanovff/dart_algolia.git
-        ref: master # branch name
-        # e.g; https://github.com/knoxpo/dart_algolia/pull/73
-  
-  # international stuff
-  intl: ^0.17.0
   flutter_svg: ^0.22.0
   popover: ^0.2.6+3
-  flutter:
-    sdk: flutter
   url_strategy: ^0.2.0
+
+
+  # international stuff
+  intl: ^0.17.0
+
 
 dev_dependencies:
   firebase_auth_mocks: ^0.8.1

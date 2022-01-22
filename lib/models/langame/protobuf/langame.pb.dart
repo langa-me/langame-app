@@ -1054,6 +1054,7 @@ class UserPreference extends $pb.GeneratedMessage {
     ..aOM<UserPreference_Notification>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'notification', subBuilder: UserPreference_Notification.create)
     ..aOB(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'previewMode')
     ..aOM<UserPreference_Goals>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'goals', subBuilder: UserPreference_Goals.create)
+    ..aOS(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'langamesSubscriptionFrequency')
     ..hasRequiredFields = false
   ;
 
@@ -1071,6 +1072,7 @@ class UserPreference extends $pb.GeneratedMessage {
     UserPreference_Notification? notification,
     $core.bool? previewMode,
     UserPreference_Goals? goals,
+    $core.String? langamesSubscriptionFrequency,
   }) {
     final _result = create();
     if (userId != null) {
@@ -1108,6 +1110,9 @@ class UserPreference extends $pb.GeneratedMessage {
     }
     if (goals != null) {
       _result.goals = goals;
+    }
+    if (langamesSubscriptionFrequency != null) {
+      _result.langamesSubscriptionFrequency = langamesSubscriptionFrequency;
     }
     return _result;
   }
@@ -1219,6 +1224,15 @@ class UserPreference extends $pb.GeneratedMessage {
   void clearGoals() => clearField(16);
   @$pb.TagNumber(16)
   UserPreference_Goals ensureGoals() => $_ensure(11);
+
+  @$pb.TagNumber(17)
+  $core.String get langamesSubscriptionFrequency => $_getSZ(12);
+  @$pb.TagNumber(17)
+  set langamesSubscriptionFrequency($core.String v) { $_setString(12, v); }
+  @$pb.TagNumber(17)
+  $core.bool hasLangamesSubscriptionFrequency() => $_has(12);
+  @$pb.TagNumber(17)
+  void clearLangamesSubscriptionFrequency() => clearField(17);
 }
 
 class Langame_Player extends $pb.GeneratedMessage {

@@ -63,8 +63,7 @@ platform :ios do
       skip_submission: false,
       notify_external_testers: true,
       ipa: "./Runner.ipa",
-      changelog: "- Interface simplification
-      - Introducing goals, grow relationships, compound relationships and learning",
+      changelog: "- Introducing regular Langames",
       distribute_external: true,
       groups: "public",
     )

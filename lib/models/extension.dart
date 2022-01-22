@@ -95,7 +95,10 @@ class UserPreferenceExt {
         growRelationships: m['goals']?['growRelationships'] ?? true,
         compoundRelationships: m['goals']?['compoundRelationships'] ?? true,
         learn: m['goals']?['learn'] ?? true,
-      )
+      ),
+      langamesSubscriptionFrequency: m['langamesSubscriptionFrequency'] ??
+          // 1 time a day as a cron
+          '0 0 * * *',
     );
   }
 }
@@ -115,7 +118,8 @@ class LangameExt {
     var m = o as Map<String, dynamic>;
     return lg.Langame(
       id: m['id'],
-      players: (m['players'] as List<dynamic>?)?.map((e) => LangamePlayerExt.fromObject(e)),
+      players: (m['players'] as List<dynamic>?)
+          ?.map((e) => LangamePlayerExt.fromObject(e)),
       initiator: m['initiator'],
       done: dynamicToProtobufTimestamp(m['done']),
       createdAt: dynamicToProtobufTimestamp(m['createdAt']),

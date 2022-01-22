@@ -32,6 +32,10 @@ buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
       children: [
         TextDivider('Messages'),
         ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          tileColor: getBlackAndWhite(context, 1, reverse: true),
           leading: Icon(
             FontAwesomeIcons.bell,
             color: getBlackAndWhite(context, 0),
@@ -51,6 +55,10 @@ buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
               }),
         ),
         ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          tileColor: getBlackAndWhite(context, 1, reverse: true),
           leading: Icon(
             FontAwesomeIcons.envelope,
             color: getBlackAndWhite(context, 0),
@@ -71,6 +79,10 @@ buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
         ),
         TextDivider('Invitations'),
         ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          tileColor: getBlackAndWhite(context, 1, reverse: true),
           leading: Icon(
             FontAwesomeIcons.bell,
             color: getBlackAndWhite(context, 0),
@@ -90,6 +102,10 @@ buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
               }),
         ),
         ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          tileColor: getBlackAndWhite(context, 1, reverse: true),
           leading: Icon(
             FontAwesomeIcons.envelope,
             color: getBlackAndWhite(context, 0),

@@ -45,10 +45,11 @@ class PhysicalLangameProvider extends ChangeNotifier {
       });
 
       _memes = memes.data['memes']
-              .map<lg.Meme>((e) => MemeExt.fromObject(e))
-              .toList();
+          .map<lg.Meme>((e) => MemeExt.fromObject(e))
+          .toList();
       _currentMeme = 0;
-      _cap.log('getMemes ${topics?.join(',')} -> ${_memes.join(',')}');
+      _cap.log(
+          'getMemes topics: ${topics?.join(',')} memes: ${_memes.map((e) => e.content).join(',')}');
 
       notifyListeners();
       return LangameResponse(LangameStatus.succeed, result: true);

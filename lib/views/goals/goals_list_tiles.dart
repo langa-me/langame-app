@@ -4,9 +4,18 @@ import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/colors/colors.dart';
 
 List<ListTile> buildGoalsListTiles(
-        BuildContext context, PreferenceProvider pp) =>
+  BuildContext context,
+  PreferenceProvider pp, {
+  int? layer,
+}) =>
     [
       ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        tileColor: layer != null
+            ? getBlackAndWhite(context, layer, reverse: true)
+            : null,
         leading: Icon(
           FontAwesomeIcons.dumbbell,
           color: getBlackAndWhite(context, 0),
@@ -22,10 +31,13 @@ List<ListTile> buildGoalsListTiles(
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headline6),
           Tooltip(
-              message:
-                  'Have frequent interactions with your current relationships and get to know them better.',
-              child: Icon(FontAwesomeIcons.questionCircle,
-                  color: getBlackAndWhite(context, 0))),
+            message:
+                'Have frequent interactions with your current relationships and get to know them better.',
+            child: Icon(
+              FontAwesomeIcons.questionCircle,
+              color: getBlackAndWhite(context, 0),
+            ),
+          ),
         ]),
         trailing: Switch(
             value: pp.preference.goals.compoundRelationships,
@@ -36,6 +48,12 @@ List<ListTile> buildGoalsListTiles(
             }),
       ),
       ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        tileColor: layer != null
+            ? getBlackAndWhite(context, layer, reverse: true)
+            : null,
         leading: Icon(
           FontAwesomeIcons.seedling,
           color: getBlackAndWhite(context, 0),
@@ -65,6 +83,12 @@ List<ListTile> buildGoalsListTiles(
             }),
       ),
       ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        tileColor: layer != null
+            ? getBlackAndWhite(context, layer, reverse: true)
+            : null,
         leading: Icon(
           FontAwesomeIcons.brain,
           color: getBlackAndWhite(context, 0),
