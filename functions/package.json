@@ -5,6 +5,7 @@
     "clean": "rm -rf lib/ node_modules/ package-lock.json",
     "lint": "eslint --ext .ts .",
     "build": "tsc",
+    "build-prod": "tsc -p tsconfig-build.json",
     "proto": "tsc -p . && cp -r src/langame lib/",
     "start": "tsc --watch | firebase emulators:start --only auth,firestore,functions",
     "deploy": "firebase deploy",
