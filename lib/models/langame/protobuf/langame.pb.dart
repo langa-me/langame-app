@@ -900,10 +900,72 @@ class UserPreference_Notification_Message extends $pb.GeneratedMessage {
   void clearPush() => clearField(2);
 }
 
+class UserPreference_Notification_NewVersion extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserPreference.Notification.NewVersion', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'email')
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'push')
+    ..hasRequiredFields = false
+  ;
+
+  UserPreference_Notification_NewVersion._() : super();
+  factory UserPreference_Notification_NewVersion({
+    $core.bool? email,
+    $core.bool? push,
+  }) {
+    final _result = create();
+    if (email != null) {
+      _result.email = email;
+    }
+    if (push != null) {
+      _result.push = push;
+    }
+    return _result;
+  }
+  factory UserPreference_Notification_NewVersion.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory UserPreference_Notification_NewVersion.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  UserPreference_Notification_NewVersion clone() => UserPreference_Notification_NewVersion()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  UserPreference_Notification_NewVersion copyWith(void Function(UserPreference_Notification_NewVersion) updates) => super.copyWith((message) => updates(message as UserPreference_Notification_NewVersion)) as UserPreference_Notification_NewVersion; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static UserPreference_Notification_NewVersion create() => UserPreference_Notification_NewVersion._();
+  UserPreference_Notification_NewVersion createEmptyInstance() => create();
+  static $pb.PbList<UserPreference_Notification_NewVersion> createRepeated() => $pb.PbList<UserPreference_Notification_NewVersion>();
+  @$core.pragma('dart2js:noInline')
+  static UserPreference_Notification_NewVersion getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UserPreference_Notification_NewVersion>(create);
+  static UserPreference_Notification_NewVersion? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get email => $_getBF(0);
+  @$pb.TagNumber(1)
+  set email($core.bool v) { $_setBool(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasEmail() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearEmail() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get push => $_getBF(1);
+  @$pb.TagNumber(2)
+  set push($core.bool v) { $_setBool(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasPush() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPush() => clearField(2);
+}
+
 class UserPreference_Notification extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UserPreference.Notification', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'langame.protobuf'), createEmptyInstance: create)
     ..aOM<UserPreference_Notification_Invite>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'invite', subBuilder: UserPreference_Notification_Invite.create)
     ..aOM<UserPreference_Notification_Message>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message', subBuilder: UserPreference_Notification_Message.create)
+    ..aOM<UserPreference_Notification_NewVersion>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'newVersion', subBuilder: UserPreference_Notification_NewVersion.create)
     ..hasRequiredFields = false
   ;
 
@@ -911,6 +973,7 @@ class UserPreference_Notification extends $pb.GeneratedMessage {
   factory UserPreference_Notification({
     UserPreference_Notification_Invite? invite,
     UserPreference_Notification_Message? message,
+    UserPreference_Notification_NewVersion? newVersion,
   }) {
     final _result = create();
     if (invite != null) {
@@ -918,6 +981,9 @@ class UserPreference_Notification extends $pb.GeneratedMessage {
     }
     if (message != null) {
       _result.message = message;
+    }
+    if (newVersion != null) {
+      _result.newVersion = newVersion;
     }
     return _result;
   }
@@ -963,6 +1029,17 @@ class UserPreference_Notification extends $pb.GeneratedMessage {
   void clearMessage() => clearField(2);
   @$pb.TagNumber(2)
   UserPreference_Notification_Message ensureMessage() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  UserPreference_Notification_NewVersion get newVersion => $_getN(2);
+  @$pb.TagNumber(3)
+  set newVersion(UserPreference_Notification_NewVersion v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasNewVersion() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearNewVersion() => clearField(3);
+  @$pb.TagNumber(3)
+  UserPreference_Notification_NewVersion ensureNewVersion() => $_ensure(2);
 }
 
 class UserPreference_Goals extends $pb.GeneratedMessage {

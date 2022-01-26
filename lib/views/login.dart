@@ -240,7 +240,7 @@ class _LoginViewState extends State<LoginView> {
                 },
                 layer: 1,
                 fixedSize: Size(
-                  AppSize.safeBlockHorizontal * 20,
+                  AppSize.safeBlockHorizontal * 20 * (AppSize.isLargeWidth ? 1 : 2),
                   AppSize.safeBlockVertical * 8,
                 ),
               ),
@@ -256,7 +256,7 @@ class _LoginViewState extends State<LoginView> {
                 },
                 layer: 1,
                 fixedSize: Size(
-                  AppSize.safeBlockHorizontal * 20,
+                  AppSize.safeBlockHorizontal * 20 * (AppSize.isLargeWidth ? 1 : 2),
                   AppSize.safeBlockVertical * 8,
                 ),
               ),
@@ -271,7 +271,7 @@ class _LoginViewState extends State<LoginView> {
           FontAwesomeIcons.envelope,
           text: 'Email',
           fixedSize: Size(
-            AppSize.safeBlockHorizontal * 20,
+            AppSize.safeBlockHorizontal * 20 * (AppSize.isLargeWidth ? 1 : 2),
             AppSize.safeBlockVertical * 8,
           ),
           onPressed: () async {

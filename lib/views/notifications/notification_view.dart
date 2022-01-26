@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/app_bars/app_bars.dart';
 import 'package:langame/views/colors/colors.dart';
-import 'package:langame/views/texts/texts.dart';
+import 'package:langame/views/dividers/text_divider.dart';
 import 'package:provider/provider.dart';
 
 /// This is Flutter Widget that display a page to manage user notification settings
@@ -30,7 +30,11 @@ buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
     ListView(
       physics: BouncingScrollPhysics(),
       children: [
-        TextDivider('Messages'),
+        TextDivider(
+          'Messages',
+          tooltip: 'All messages that are not invitations to a Langame',
+          dividerThickness: 0,
+        ),
         ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -77,7 +81,11 @@ buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
                 pp.refresh();
               }),
         ),
-        TextDivider('Invitations'),
+        TextDivider(
+          'Invitations',
+          tooltip: 'All messages that are invitations to a Langame',
+          dividerThickness: 0,
+        ),
         ListTile(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -121,6 +129,57 @@ buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
               onChanged: (_) {
                 pp.preference.notification.invite.email =
                     !pp.preference.notification.invite.email;
+                pp.refresh();
+              }),
+        ),
+        TextDivider(
+          'New versions',
+          tooltip: 'New Langame versions',
+          dividerThickness: 0,
+        ),
+        ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          tileColor: getBlackAndWhite(context, 1, reverse: true),
+          leading: Icon(
+            FontAwesomeIcons.bell,
+            color: getBlackAndWhite(context, 0),
+          ),
+          onTap: () {
+            pp.preference.notification.newVersion.push =
+                !pp.preference.notification.newVersion.push;
+            pp.refresh();
+          },
+          title: Text('Push', style: Theme.of(context).textTheme.headline6),
+          trailing: Switch(
+              value: pp.preference.notification.newVersion.push,
+              onChanged: (_) {
+                pp.preference.notification.newVersion.push =
+                    !pp.preference.notification.newVersion.push;
+                pp.refresh();
+              }),
+        ),
+        ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          tileColor: getBlackAndWhite(context, 1, reverse: true),
+          leading: Icon(
+            FontAwesomeIcons.envelope,
+            color: getBlackAndWhite(context, 0),
+          ),
+          onTap: () {
+            pp.preference.notification.newVersion.email =
+                !pp.preference.notification.newVersion.email;
+            pp.refresh();
+          },
+          title: Text('Email', style: Theme.of(context).textTheme.headline6),
+          trailing: Switch(
+              value: pp.preference.notification.newVersion.email,
+              onChanged: (_) {
+                pp.preference.notification.newVersion.email =
+                    !pp.preference.notification.newVersion.email;
                 pp.refresh();
               }),
         ),

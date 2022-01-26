@@ -89,6 +89,10 @@ class UserPreferenceExt {
           email: m['notification']?['invite']?['email'] ?? false,
           push: m['notification']?['invite']?['push'] ?? false,
         ),
+        newVersion: lg.UserPreference_Notification_NewVersion(
+          email: m['notification']?['newVersion']?['email'] ?? false,
+          push: m['notification']?['newVersion']?['push'] ?? false,
+        ),
       ),
       previewMode: m['previewMode'] ?? false,
       goals: lg.UserPreference_Goals(

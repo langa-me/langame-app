@@ -56,7 +56,9 @@ it("search", async () => {
 it("release", async () => {
   // TODO: run it in emulator? and CI
   initFirebaseTest("dev");
-  await release();
+  await release({
+    sendMail: false,
+  });
   const db = admin.firestore();
   const preferences = await db.collection("preferences")
       .withConverter(converter<langame.protobuf.IUserPreference>())

@@ -101,11 +101,16 @@ message UserPreference {
   message Notification {
     Invite invite = 1;
     Message message = 2;
+    NewVersion new_version = 3;
     message Invite {
       bool email = 1;
       bool push = 2;
     }
     message Message {
+      bool email = 1;
+      bool push = 2;
+    }
+    message NewVersion {
       bool email = 1;
       bool push = 2;
     }

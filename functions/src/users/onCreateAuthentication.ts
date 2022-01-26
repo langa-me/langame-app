@@ -14,7 +14,7 @@ const title = "Welcome to Langame 👋";
 /* eslint-disable max-len */
 const body = `Thank a lot for joining us 😋, start some <strong>Langames</strong> now with your friends!
 <br>
-If you have any question or want to give a feedback, you can find everything <a href="https://help.langa.me/welcome">here.</a>
+Please do not hesitate to give us feedback <a href="https://help.langa.me/feedback">here.</a>
 <br>
 <em>${sample(welcomeMessages)}</em>
 `;
