@@ -52,10 +52,12 @@ class _SendLangameState extends State<NewLangamePage>
       resizeToAvoidBottomInset: false,
       appBar: buildAppBar(context, 'Start a new Langame'),
       body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Stack(
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                     height: AppSize.safeBlockVertical * 20,
@@ -67,39 +69,50 @@ class _SendLangameState extends State<NewLangamePage>
                       }
                       tp.addToSelectedTopic(topic);
                     })),
-                Positioned(
-                    top: 0,
-                    right: AppSize.safeBlockHorizontal * 5,
-                    child: Container(
-                        width: AppSize.safeBlockHorizontal *
-                            (isPortrait ? 40 : 20),
-                        child: Wrap(
-                          children: tp.selectedTopics
-                              .map((e) => LangameButton(FontAwesomeIcons.times,
-                                  // fixedSize: Size(AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
-                                  layer: 1,
-                                  text: e,
-                                  onPressed: () =>
-                                      tp.removeFromSelectedTopic(e)))
-                              .toList(),
-                        ))),
+                Container(
+                  width: AppSize.safeBlockHorizontal * 90,
+                  child: Wrap(
+                    children: tp.selectedTopics
+                        .map((e) => LangameButton(FontAwesomeIcons.times,
+                            // fixedSize: Size(AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
+                            layer: 1,
+                            text: e,
+                            onPressed: () => tp.removeFromSelectedTopic(e)))
+                        .toList(),
+                  ),
+                ),
               ],
             ),
+            SizedBox(
+              height: AppSize.safeBlockVertical * 5,
+            ),
             Container(
-              width: AppSize.safeBlockHorizontal * 50,
+              width: AppSize.safeBlockHorizontal * 90,
               child: Consumer<NewLangameProvider>(
                 builder: (c, nlp, child) => ListView(
                   physics: BouncingScrollPhysics(),
                   shrinkWrap: true,
                   children: nlp.shoppingList.isEmpty
                       ? [
-                          LangameButton(
-                            FontAwesomeIcons.userPlus,
-                            text: 'Invite',
-                            onPressed: () => cp.push(UserSearchPage()),
-                            layer: 1,
-                            border: false,
-                          ),
+                          ListTile(
+                            leading: Icon(FontAwesomeIcons.plusCircle),
+                            title: Text('Add people...',
+                                style: Theme.of(context).textTheme.headline6),
+                            onTap: () => cp.push(
+                              UserSearchPage(),
+                            ),
+                          )
+                          // LangameButton(
+                          //   FontAwesomeIcons.userPlus,
+                          //   text: 'Invite',
+                          //   onPressed: () => cp.push(UserSearchPage()),
+                          //   layer: 0,
+                          //   border: false,
+                          //   fixedSize: Size(
+                          //       AppSize.safeBlockHorizontal * 100,
+                          //       AppSize.safeBlockVertical * 10,
+                          //   ),
+                          // ),
                         ]
                       : nlp.shoppingList
                           .map(
@@ -112,16 +125,20 @@ class _SendLangameState extends State<NewLangamePage>
                 ),
               ),
             ),
+            Spacer(),
             LangameButton(
-              FontAwesomeIcons.grinTongue,
+              FontAwesomeIcons.checkCircle,
               onPressed: () => onPressedNewLangame(cp, nlp),
-              text: 'Go',
+              text: 'Start a new Langame',
               highlighted: true,
               layer: 1,
               padding: EdgeInsets.symmetric(
                   vertical: 10,
                   horizontal: AppSize.safeBlockHorizontal *
                       (AppSize.isLargeWidth ? 5 : 20)),
+            ),
+            SizedBox(
+              height: AppSize.safeBlockVertical * 5,
             ),
           ]),
     );

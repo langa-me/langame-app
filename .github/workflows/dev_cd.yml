@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          # Uses branch from workflow_run
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -51,6 +54,9 @@ jobs:
     steps:
       - name: Checkout code from ref
         uses: actions/checkout@v2
+        with:
+          # Uses branch from workflow_run
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Decrypt iOS keys
         run: sh ./ios/decrypt.sh
         env:
@@ -92,6 +98,9 @@ jobs:
     steps:
       - name: Checkout code from ref
         uses: actions/checkout@v2
+        with:
+          # Uses branch from workflow_run
+          ref: ${{ github.event.workflow_run.head_branch }}
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
@@ -105,6 +114,6 @@ jobs:
           wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
           chmod +x /usr/bin/yq
       - name: Deploy to Firebase hosting channel
-        run: firebase hosting:channel:deploy $(cat pubspec.yaml | yq e '.version' - | sed 's/+/./g') --only dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --expires 7d
+        run: firebase hosting:channel:deploy $(cat pubspec.yaml | yq e '.version' - | sed 's/+/./g') --only dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --expires 7d --project langame-dev
       - name: Deploy to Firebase hosting "dev.langa.me"
-        run: firebase deploy --only hosting:dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }}
+        run: firebase deploy --only hosting:dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --project langame-dev

@@ -14,7 +14,7 @@ const title = "Welcome to Langame 👋";
 /* eslint-disable max-len */
 const body = `Thank a lot for joining us 😋, start some <strong>Langames</strong> now with your friends!
 <br>
-If you have any question or want to give a feedback, you can find everything <a href="https://help.langa.me/welcome">here.</a>
+Please do not hesitate to give us feedback <a href="https://help.langa.me/feedback">here.</a>
 <br>
 <em>${sample(welcomeMessages)}</em>
 `;
@@ -47,7 +47,7 @@ export const onCreateAuthentication = async (user: admin.auth.UserRecord,
 
     const teamTitle = `Welcome to ${user.uid} 😋`;
     const teamBody = `<h1>${user.uid} joined Langame 😋</h1><br><p>${JSON.stringify(clone)}</p><br><h2>Give her/him a warm welcome!</h2>`;
-    const p2 = isDev ? Promise.resolve() : db.collection("mails").add({
+    const p2 = isDev || user.email?.includes("@langa.me") ? Promise.resolve() : db.collection("mails").add({
       to: "louis.beaumont@langa.me",
       message: {
         subject: teamTitle,

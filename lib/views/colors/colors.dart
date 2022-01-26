@@ -3,15 +3,6 @@ import 'package:flutter/material.dart';
 bool isLight(BuildContext context) =>
     Theme.of(context).brightness == Brightness.light;
 
-Color isLightThenDark(BuildContext context, {bool reverse = false}) =>
-    isLight(context)
-        ? reverse
-            ? Colors.white
-            : Colors.black
-        : reverse
-            ? Colors.black
-            : Colors.white;
-
 Color getBlackAndWhite(BuildContext context, int layer,
     {bool reverse = false}) {
   if (isLight(context)) {

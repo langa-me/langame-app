@@ -1,3 +1,5 @@
+import {appleTestFlightApp, googlePlayApp, webApp} from "./links";
+
 /* eslint-disable max-len */
 export const html = (title: string, body: string, bye: string) => {
   return `
@@ -277,4 +279,15 @@ export const html = (title: string, body: string, bye: string) => {
 </div>
 `;
 };
-/* eslint-disable max-len */
+
+// TODO: fix images broken in gmail :)
+export const getAppleHtmlButtonWithBase64Image = async () => {
+  //   const imageLink = "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1406073600&h=56f9327554e3f4a3efa25cd1a21dcc2f";
+  // Download image and turn to base64
+  //   const image = await fetch(imageLink).then((r: any) => r.buffer()).then((buf: any) => "data:image/svg;base64," + buf.toString("base64"));
+  //   const img = `<img src="data:image/svg;base64,${image}" alt="Download on the App Store" style="border-radius: 13px; width: 250px; height: 83px;">`;
+  return `<a href="${appleTestFlightApp}">Apple Store</a>`;
+};
+// const googlePlayImg = `<img style="width: 170px; height: 50px;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/2560px-Google_Play_Store_badge_EN.svg.png" alt="Google Play"/>`;
+export const googleHtmlButton = `<a href="${googlePlayApp}">Google Play</a>`;
+export const webHtmlButton = `<a href="${webApp}">Try directly in the web</a>`;

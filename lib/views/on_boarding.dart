@@ -1,8 +1,6 @@
 import 'package:after_layout/after_layout.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:langame/helpers/constants.dart';
@@ -58,6 +56,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
             isBottomSafeArea: true,
             showDoneButton: false,
             onDone: _onDone, // TODO: ask permission notification
+            dotsFlex: 2,
           ),
         ));
   }
@@ -85,7 +84,9 @@ class _OnBoardingState extends State with AfterLayoutMixin {
       bodyWidget: Column(children: [
         Lottie.asset(
           'animations/conversation.json',
-          height: AppSize.safeBlockVertical * 40,
+          height: AppSize.safeBlockVertical *
+              40 *
+              (AppSize.isLargeWidth ? 1 : 0.75),
           width: AppSize.safeBlockHorizontal * 70,
           alignment: Alignment.center,
         ),
@@ -124,7 +125,6 @@ class _OnBoardingState extends State with AfterLayoutMixin {
 
   PageViewModel _buildFavoriteTopicsPage() {
     var pp = Provider.of<PreferenceProvider>(context);
-    // TODO: show most popular topics as badges
     return PageViewModel(
       decoration: PageDecoration(
         bodyAlignment: Alignment.center,
@@ -133,10 +133,13 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline5),
       bodyWidget: Container(
-        child:
-            Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        width: AppSize.safeBlockHorizontal * 80,
+        height: AppSize.safeBlockVertical * 80,
+        child: ListView(physics: BouncingScrollPhysics(), children: [
           Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             Wrap(
+              spacing: 2,
+              runSpacing: 2,
               children: getMostPopularTopics()
                   .map(
                     (e) => ChoiceChip(
@@ -159,22 +162,25 @@ class _OnBoardingState extends State with AfterLayoutMixin {
                   )
                   .toList(),
             ),
-            SizedBox(height: AppSize.safeBlockVertical * 2),
+            SizedBox(height: AppSize.safeBlockVertical * 5),
             Text('Popular topics',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.caption),
           ]),
-          Spacer(),
+          SizedBox(height: AppSize.safeBlockVertical * 5),
           Text(
             'You can also search',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headline5,
           ),
-          SizedBox(height: AppSize.safeBlockVertical * 2),
-          Expanded(child: FavoriteTopicsWidget()),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 20),
+            width: AppSize.safeBlockHorizontal * 100,
+            height: AppSize.safeBlockVertical * 50,
+            child: FavoriteTopicsWidget(),
+          ),
+          SizedBox(height: AppSize.safeBlockVertical * 20),
         ]),
-        height: AppSize.safeBlockVertical * 70,
-        width: AppSize.safeBlockHorizontal * 80,
       ),
     );
   }
@@ -341,8 +347,9 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   }
 
   PageViewModel _buildLangameSchedulerPage() {
-        final pp = Provider.of<PreferenceProvider>(context, listen: false);
-    var kindOfRelationshipsMessage = LangamesScheduleSettingsWidget.getKindOfRelationshipsMessage(pp);
+    final pp = Provider.of<PreferenceProvider>(context, listen: false);
+    var kindOfRelationshipsMessage =
+        LangamesScheduleSettingsWidget.getKindOfRelationshipsMessage(pp);
 
     return PageViewModel(
       decoration: PageDecoration(
@@ -352,10 +359,10 @@ class _OnBoardingState extends State with AfterLayoutMixin {
           style: Theme.of(context).textTheme.headline5),
       footer: Container(
         width: AppSize.safeBlockHorizontal * 70,
-        child: Text(
-          kindOfRelationshipsMessage,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headline5),),
+        child: Text(kindOfRelationshipsMessage,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headline5),
+      ),
       bodyWidget: LangamesScheduleSettingsWidget(
         onDone: _onDone,
       ),

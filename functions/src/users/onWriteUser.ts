@@ -55,6 +55,17 @@ export const onWriteUser = async (
         }, {merge: true});
       });
     }
+    let bot = change.after.data()!.bot;
+    // If user has not "bot" property, set it to false
+    if (bot === undefined) {
+      functions.logger.log("user has no bot property, setting it to false");
+      await db.runTransaction(async (transaction) => {
+        return transaction.set(change.after.ref, {
+          bot: false,
+        }, {merge: true});
+      });
+      bot = false;
+    }
     functions.logger.log("synchronizing user to algolia", change.after.data());
 
     if (i) {
@@ -69,7 +80,7 @@ export const onWriteUser = async (
     // Only run recommendations on new login
     if (
       // Ignore bots
-      !change.after.data()!.bot &&
+      bot === false &&
       change.before.data()?.lastLogin !== change.after.data()?.lastLogin
     ) {
       return setRecommendations(

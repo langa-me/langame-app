@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
   return PopupMenuButton(
-    icon: Icon(Icons.more_vert_outlined, color: isLightThenDark(context)),
+    icon: Icon(Icons.more_vert_outlined, color: getBlackAndWhite(context, 0)),
     itemBuilder: (context) {
       return [
         PopupMenuItem(
@@ -30,7 +30,7 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
               }
             },
             leading: Icon(Icons.help_center_outlined,
-                color: isLightThenDark(context)),
+                color: getBlackAndWhite(context, 0)),
             title: Text('Help', style: Theme.of(context).textTheme.headline6),
           ),
         ),
@@ -41,7 +41,7 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
             onTap: () => Provider.of<FeedbackProvider>(context, listen: false)
                 .show(fromShaking: false),
             leading:
-                Icon(Icons.feedback_outlined, color: isLightThenDark(context)),
+                Icon(Icons.feedback_outlined, color: getBlackAndWhite(context, 0)),
             title:
                 Text('Feedback', style: Theme.of(context).textTheme.headline6),
           ),
@@ -63,7 +63,7 @@ Widget buildPopupMenuWithHelpAndFeedback(BuildContext context) {
               }
             },
             leading:
-                Icon(FontAwesomeIcons.poll, color: isLightThenDark(context)),
+                Icon(FontAwesomeIcons.poll, color: getBlackAndWhite(context, 0)),
             title: Text('Vote for features',
                 style: Theme.of(context).textTheme.headline6),
           ),

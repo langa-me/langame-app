@@ -8,7 +8,6 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/views/buttons/button.dart';
-import 'package:langame/views/feature_preview/beta.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,10 +19,9 @@ Widget whatsNew(BuildContext context) {
   return Column(
     children: _news
             .map<Widget>((e) => ListTile(
-                leading: Beta(null, type: BetaType.PREVIEW),
                 title: Text(
                   e,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.headline6,
                   textAlign: TextAlign.center,
                 )))
             .toList() +

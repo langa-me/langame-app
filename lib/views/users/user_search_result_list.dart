@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
-import 'package:langame/views/buttons/button.dart';
+import 'package:langame/views/colors/colors.dart';
 import 'package:langame/views/users/user_tile.dart';
 import 'package:provider/provider.dart';
 
-import 'other_profile_widget.dart';
 
 class SearchResultsListView extends StatefulWidget {
   const SearchResultsListView();
@@ -26,15 +24,31 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
         return p.preference.goals.growRelationships
             ? Column(
                 children: [
-                  Text('Recommendations',
-                      style: Theme.of(context).textTheme.headline5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Recommendations',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headline5),
+                      SizedBox(
+                        width: AppSize.safeBlockHorizontal * 2,
+                      ),
+                      Tooltip(
+                          message:
+                              'Recommended according to your favorite topics and your recent activities',
+                          child: Icon(FontAwesomeIcons.questionCircle,
+                              color: getBlackAndWhite(context, 0))),
+                    ],
+                  ),
                   lp.recommendations.length > 0
-                      ? Expanded(
+                      ? Container(
+                          width: AppSize.safeBlockHorizontal * 90,
+                          height: AppSize.safeBlockHorizontal * 50,
                           child: ListView(
                               children: lp.recommendations.entries
                                   .take(5)
-                                  .map((e) => buildUserTile(
-                                      context, e.value.data()!))
+                                  .map((e) =>
+                                      buildUserTile(context, e.value.data()!))
                                   .toList()
                                   .reversed
                                   .toList()),
@@ -56,23 +70,12 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
             : Image.asset('images/logo-colourless.png');
       }
 
-      var cp = Provider.of<ContextProvider>(context, listen: false);
-      return Stack(
-        alignment: AlignmentDirectional.topCenter,
-        children: [
-        OtherProfileWidget(p.selectedUser!),
-        Positioned(
-          bottom: AppSize.safeBlockVertical * 15,
-          child: LangameButton(
-          FontAwesomeIcons.grinTongue,
-          text: 'Select',
-          highlighted: true,
-          onPressed: () {
-            lp.addPlayer(p.selectedUser!);
-            cp.pop();
-          },
-        ),),
-      ]);
+      return Container(
+        width: AppSize.safeBlockHorizontal * 90,
+        height: AppSize.safeBlockHorizontal * 50,
+        margin: EdgeInsets.symmetric(horizontal: 30),
+        child: ListView(children: [buildUserTile(context, p.selectedUser!)]),
+      );
     });
   }
 }

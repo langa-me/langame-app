@@ -6,7 +6,7 @@ import {converter} from "../utils/firestore";
 import {langame} from "../langame/protobuf/langame";
 import {onboardUserWithBot} from "./bot";
 import {setRecommendations} from "./recommendations";
-import {resetOnboarding} from "./resetOnboarding";
+import {release} from "../scripts/newRelease";
 
 
 describe("user", () => {
@@ -53,10 +53,12 @@ it("search", async () => {
 });
 
 
-it("resetOnBoarding", async () => {
+it("release", async () => {
   // TODO: run it in emulator? and CI
   initFirebaseTest("dev");
-  await resetOnboarding();
+  await release({
+    sendMail: false,
+  });
   const db = admin.firestore();
   const preferences = await db.collection("preferences")
       .withConverter(converter<langame.protobuf.IUserPreference>())

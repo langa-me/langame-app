@@ -7,20 +7,41 @@ export const resetCredits =
       const users = await db
           .collection("users")
           .listDocuments();
+      const organizations = await db
+          .collection("organizations")
+          .listDocuments();
+      const serverConfig = await db
+          .collection("configs")
+          .doc("business")
+          .get();
 
-      const promises = [];
-      functions.logger.log("bulk credit reset size", users.length);
-
-      for (const user of users) {
-      // Get a new write batch
-        const batch = db.batch();
-
-        batch.update(db.collection("users").doc(user.id), {
-          credits: 200,
-        });
-
-        // Commit the batch
-        promises.push(batch.commit());
+      if (!serverConfig.data() ||
+          !serverConfig.data()!.base_user_credits ||
+          !serverConfig.data()!.base_organization_credits
+      ) {
+        throw new Error("Server config is invalid, "+
+          "please check collection configs/business");
       }
-      return Promise.all(promises);
+
+      functions.logger.log("resetting credits", {
+        users: users.length,
+        organizations: organizations.length,
+        base_user_credits: serverConfig.data()!.base_user_credits,
+        base_organization_credits:
+          serverConfig.data()!.base_organization_credits,
+      });
+
+      // Get a new write batch
+      const batch = db.batch();
+      for (const user of users) {
+        batch.update(db.collection("users").doc(user.id), {
+          credits: serverConfig.data()!.base_user_credits,
+        });
+      }
+      for (const organization of organizations) {
+        batch.update(db.collection("organizations").doc(organization.id), {
+          credits: serverConfig.data()!.base_organization_credits,
+        });
+      }
+      await batch.commit();
     };

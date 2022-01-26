@@ -47,9 +47,10 @@ class _State extends State<LangamesScheduleSettingsWidget> {
     postFrameCallback(
       (_) => setState(
         () {
+          if (langamesSubscriptionFrequency.isEmpty) return;
           if (langamesSubscriptionFrequency == '0 0 5 31 2') {
             _noFrequentLangames = true;
-          } else {
+          } else if (langamesSubscriptionFrequency.contains('/')) {
             final everyXHours = int.parse(
                 langamesSubscriptionFrequency.split(' ')[1].split('/')[1]);
             _langameFrequencyCountPerDay = (24 / everyXHours).floor();
@@ -194,8 +195,11 @@ class _State extends State<LangamesScheduleSettingsWidget> {
             SizedBox.fromSize(
               size: Size.fromHeight(AppSize.safeBlockVertical * 10),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            Wrap(
+              spacing: 2,
+              runSpacing: 2,
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
               children: [
                 LangameButton(
                   FontAwesomeIcons.ban,

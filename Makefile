@@ -34,8 +34,10 @@ android_sync: ## [Local development] Android configuration.
 
 deploy_web: ## [Local development] Manually deploy Firebase hosting dev.
 	firebase use langame-dev
+	# firebase use langame-86ac4
 	flutter build web --release
 	firebase deploy --only hosting:dev-app
+	# firebase deploy --only hosting:prod-app
 
 .PHONY: help
 
