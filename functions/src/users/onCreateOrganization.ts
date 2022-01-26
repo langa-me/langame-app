@@ -23,7 +23,7 @@ export const onCreateOrganization = async (
     }
     return admin.firestore().runTransaction(async (t) => {
       return t.set(snap.ref, {
-        credits: 200,
+        credits: 2000,
       }, {merge: true});
     });
   } catch (e: any) {

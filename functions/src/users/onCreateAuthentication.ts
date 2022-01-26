@@ -47,7 +47,7 @@ export const onCreateAuthentication = async (user: admin.auth.UserRecord,
 
     const teamTitle = `Welcome to ${user.uid} 😋`;
     const teamBody = `<h1>${user.uid} joined Langame 😋</h1><br><p>${JSON.stringify(clone)}</p><br><h2>Give her/him a warm welcome!</h2>`;
-    const p2 = isDev ? Promise.resolve() : db.collection("mails").add({
+    const p2 = isDev || user.email?.includes("@langa.me") ? Promise.resolve() : db.collection("mails").add({
       to: "louis.beaumont@langa.me",
       message: {
         subject: teamTitle,

@@ -114,8 +114,11 @@ const onCreateLangame = async (
       .info("found memes for topics", langameData.topics, memes);
 
 
-  const toNotify = langameData.players!.filter((e: any) =>
-    e.uid !== langameData.initiator);
+  const toNotify = langameData.tags?.includes("schedule") ?
+    // If it's a schedule langame, we need to notify the initiator
+    langameData.players! :
+    langameData.players!.filter((e: any) =>
+      e.uid !== langameData.initiator);
   const senderData = toNotify.find((e) => e.id === langameData.initiator!)!;
   const title =
       `${senderData.tag} invited you to play a Langame`;
@@ -130,7 +133,7 @@ const onCreateLangame = async (
         type: langame.protobuf.Message.Type.INVITE,
         title: title,
         // eslint-disable-next-line max-len
-        body: `Topics:${memes[0].data()!.topics!.join(", ")}\n${memes[0].data()!.content}`,
+        body: `Topics:${memes[0].data()!.topics!.join(", ")}\n\n${memes[0].data()!.content}`,
       }));
 
 

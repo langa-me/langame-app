@@ -27,9 +27,11 @@ List<ListTile> buildGoalsListTiles(
         },
         title:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('Strengthen your relationships',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headline6),
+          Expanded(
+            child: Text('Strengthen your relationships',
+                textAlign: TextAlign.left,
+                style: Theme.of(context).textTheme.headline6),
+          ),
           Tooltip(
             message:
                 'Have frequent interactions with your current relationships and get to know them better.',
@@ -65,9 +67,10 @@ List<ListTile> buildGoalsListTiles(
         },
         title:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('Forge new relationships',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headline6),
+          Expanded(
+            child: Text('Forge new relationships',
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.headline6),),
           Tooltip(
               message:
                   'Get recommendations for new people to meet and establish new relationships.',
@@ -99,9 +102,10 @@ List<ListTile> buildGoalsListTiles(
         },
         title:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('Learn new things',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headline6),
+          Expanded(
+            child: Text('Learn new things',
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.headline6),),
           Tooltip(
               message: 'Challenge what you know and learn new things.',
               child: Icon(FontAwesomeIcons.questionCircle,

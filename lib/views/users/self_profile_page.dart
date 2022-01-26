@@ -5,10 +5,9 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/funny_sentence_provider.dart';
 import 'package:langame/views/colors/colors.dart';
-import 'package:langame/views/texts/texts.dart';
 import 'package:langame/views/topics/favorite_topics_widget.dart';
+import 'package:langame/views/users/user_circle.dart';
 import 'package:provider/provider.dart';
 
 import '../buttons/button.dart';
@@ -26,7 +25,7 @@ class _State extends State<SelfProfilePage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: isLightThenDark(context, reverse: true),
+      backgroundColor: getBlackAndWhite(context, 0, reverse: true),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(
@@ -38,10 +37,7 @@ class _State extends State<SelfProfilePage> {
         children: [
           _buildProfileImage(),
           _buildTagForm(),
-          TextDivider(
-            'Interests',
-            height: AppSize.safeBlockVertical*10,
-          ),
+          
           Container(
             child: FavoriteTopicsWidget(),
             height: AppSize.safeBlockVertical * 40,
@@ -60,36 +56,9 @@ class _State extends State<SelfProfilePage> {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     var cap = Provider.of<CrashAnalyticsProvider>(context, listen: false);
 
-    var img = ap.user!.hasPhotoUrl()
-        ? CircleAvatar(
-            backgroundImage: NetworkImage(ap.user!.photoUrl),
-          )
-        : CircleAvatar(
-            child: Text(ap.user!.tag),
-          );
+    var img = buildUserCircle(context, ap.user);
     return Stack(alignment: AlignmentDirectional.center, children: [
-      Container(
-          width: AppSize.safeBlockHorizontal * 30,
-          height: AppSize.safeBlockVertical * 30,
-          child: Align(
-              alignment: Alignment.topRight,
-              child: IconButton(
-                icon: Icon(
-                  FontAwesomeIcons.times,
-                  color: getBlackAndWhite(context, 1),
-                ),
-                onPressed: () async {
-                  var r = await ap.removePhoto();
-                  cp.handleLangameResponse(
-                    r,
-                    succeedMessage: 'successfully deleted image',
-                    // onSucceed: setState,
-                    failedMessage:
-                        Provider.of<FunnyProvider>(context, listen: false)
-                            .getFailingRandom(),
-                  );
-                },
-              ))),
+      
       Container(
           width: AppSize.safeBlockHorizontal * 20,
           height: AppSize.safeBlockVertical * 20,

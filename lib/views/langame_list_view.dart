@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,8 +10,10 @@ import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
 import 'package:langame/providers/langame_provider.dart';
 import 'package:langame/views/new_langame_page.dart';
+import 'package:langame/views/users/user_circle.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:langame/helpers/random.dart';
 
 import 'colors/colors.dart';
 import 'langames/langame_text.dart';
@@ -33,7 +36,6 @@ class _State extends State<LangameListView> {
 
   @override
   Widget build(BuildContext context) {
-    final lp = Provider.of<LangameProvider>(context);
     if (!kIsWeb &&
         WidgetsBinding.instance!.window.viewInsets.bottom == 0.0 &&
         !controller.isClosed) {
@@ -41,7 +43,7 @@ class _State extends State<LangameListView> {
       controller.close();
     }
     return Scaffold(
-      backgroundColor: isLightThenDark(context, reverse: true),
+      backgroundColor: getBlackAndWhite(context, 0, reverse: true),
       resizeToAvoidBottomInset: false,
       drawer: Drawer(
         child: Container(
@@ -63,11 +65,16 @@ class _State extends State<LangameListView> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final lp = Provider.of<LangameProvider>(context);
+    final hints = lp.langames.values
+        .map((e) => e.players.map((e) => e.tag).toList() + e.topics)
+        // flatten
+        .expand((e) => e)
+        .toList();
     return FloatingSearchBar(
       automaticallyImplyBackButton: false,
       controller: controller,
       clearQueryOnClose: false,
-      hint: 'Search',
+      hint: 'Search "${hints.pickAny()}"',
       queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
           decorationColor: getBlackAndWhite(context, 1, reverse: true),
           backgroundColor: getBlackAndWhite(context, 1, reverse: true),
@@ -94,7 +101,7 @@ class _State extends State<LangameListView> {
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: lp.search,
       transition: CircularFloatingSearchBarTransition(spacing: 16),
-      builder: (context, _) => SizedBox.shrink(), // buildExpandableBody(),
+      builder: (context, _) => SizedBox.shrink(),
       body: buildBody(),
       height: AppSize.safeBlockVertical * 5,
     );
@@ -148,21 +155,22 @@ class _State extends State<LangameListView> {
     var cp = Provider.of<ContextProvider>(context, listen: false);
     return ListTile(
       tileColor: getBlackAndWhite(context, 1, reverse: true),
-      trailing: Text(
-        l.topics.join(','),
-        style: Theme.of(context).textTheme.headline6,
-        textAlign: TextAlign.center,
-      ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+      trailing: SizedBox(
+          height: AppSize.safeBlockVertical * 2.5,
+          width: AppSize.safeBlockHorizontal * 50,
+          child: Text(
+            l.topics.join(','),
+            style: Theme.of(context).textTheme.headline6,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis, // TODO: custom overflow show "+4" ...
+            textAlign: TextAlign.right,
+          )),
+      title: RowSuper(
+        innerDistance: -20.0,
         children: l.players
-            .map<Widget>((e) => e.hasPhotoUrl() && e.photoUrl.isNotEmpty
-                ? CircleAvatar(
-                    backgroundImage: NetworkImage(e.photoUrl),
-                  )
-                : CircleAvatar(
-                    child: Text(e.tag),
-                  ))
+            .map<Widget>(
+              (p) => buildUserCircle(context, p),
+            )
             .toList(),
       ),
       onTap: () => cp.push(
@@ -176,10 +184,10 @@ class _State extends State<LangameListView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image(
-              width: AppSize.blockSizeHorizontal * 30,
+              width: AppSize.blockSizeHorizontal * 50,
               image: AssetImage('images/logo-colourless.png'),
             ),
-            SizedBox(height: AppSize.safeBlockVertical * 10),
+            SizedBox(height: AppSize.safeBlockVertical * 5),
             Text('All caught up!',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headline4),

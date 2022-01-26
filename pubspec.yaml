@@ -1,6 +1,6 @@
 name: langame
 description: Augmented conversations
-version: 1.5.6+91
+version: 1.5.7+92
 homepage: https://github.com/langa-me/langame-app
 
 environment:
@@ -98,7 +98,7 @@ dependencies:
   flutter_svg: ^0.22.0
   popover: ^0.2.6+3
   url_strategy: ^0.2.0
-
+  assorted_layout_widgets: ^5.5.0
 
   # international stuff
   intl: ^0.17.0

@@ -119,7 +119,7 @@ class _LangameButtonState extends State<LangameButton> {
 
     if (widget.highlighted) {
       bg = Theme.of(context).colorScheme.secondary;
-      fg = isLightThenDark(context, reverse: true);
+      fg = getBlackAndWhite(context, 0, reverse: true);
     }
     final b = ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
@@ -139,7 +139,9 @@ class _LangameButtonState extends State<LangameButton> {
             : null,
         padding: widget.text == null
             ? EdgeInsets.fromLTRB(10, 0, 0, 0)
-            : widget.padding,
+            : widget.padding != null ?
+            widget.padding :
+            EdgeInsets.fromLTRB(16, 12, 16, 12),
       ),
       onPressed: () async {
         if (disabled) return;

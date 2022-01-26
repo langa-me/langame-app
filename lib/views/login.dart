@@ -195,23 +195,27 @@ class _LoginViewState extends State<LoginView> {
           backgroundColor: getBlackAndWhite(context, 0, reverse: true),
           body: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [cp.buildLoadingWidget(text: 'Offline', last: true)]));
     }
 
     if (!_isVersionCheckOk) {
       return Scaffold(
           backgroundColor: getBlackAndWhite(context, 0, reverse: true),
-          body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Image(
-              width: AppSize.blockSizeHorizontal * 30,
-              image: AssetImage('images/logo-colourless.png'),
-            ),
-            SizedBox(height: AppSize.safeBlockVertical * 20),
-            cp.buildLoadingWidget(
-                text: Provider.of<FunnyProvider>(context, listen: false)
-                    .getLoadingRandom(last: true),
-                last: true)
-          ]));
+          body: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image(
+                  width: AppSize.blockSizeHorizontal * 30,
+                  image: AssetImage('images/logo-colourless.png'),
+                ),
+                SizedBox(height: AppSize.safeBlockVertical * 20),
+                cp.buildLoadingWidget(
+                    text: Provider.of<FunnyProvider>(context, listen: false)
+                        .getLoadingRandom(last: true),
+                    last: true)
+              ]));
     }
 
     setState(() => isAuthenticating = false);
@@ -226,27 +230,35 @@ class _LoginViewState extends State<LoginView> {
       // We disable Google Auth on Langame Web dev, since it's internal only
       UniversalPlatform.isWeb && AppConst.isDev && kReleaseMode
           ? SizedBox.shrink()
-          : _buildButtonParent(LangameButton(
-              FontAwesomeIcons.google,
-              fixedSize: Size(AppSize.safeBlockHorizontal * 20,
-                  AppSize.safeBlockVertical * 5),
-              onPressed: () async {
-                if (isAuthenticating) return;
-                await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
-              },
-              layer: 1,
-            )),
+          : _buildButtonParent(
+              LangameButton(
+                FontAwesomeIcons.google,
+                text: 'Google',
+                onPressed: () async {
+                  if (isAuthenticating) return;
+                  await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
+                },
+                layer: 1,
+                fixedSize: Size(
+                  AppSize.safeBlockHorizontal * 20,
+                  AppSize.safeBlockVertical * 8,
+                ),
+              ),
+            ),
       UniversalPlatform.isIOS
           ? _buildButtonParent(
               LangameButton(
                 FontAwesomeIcons.apple,
+                text: 'Apple',
                 onPressed: () async {
                   if (isAuthenticating) return;
                   await _handleOnPressedLogin(ap.loginWithApple, 'Apple');
                 },
                 layer: 1,
-                fixedSize: Size(AppSize.safeBlockHorizontal * 20,
-                    AppSize.safeBlockVertical * 5),
+                fixedSize: Size(
+                  AppSize.safeBlockHorizontal * 20,
+                  AppSize.safeBlockVertical * 8,
+                ),
               ),
             )
           : SizedBox.shrink()
@@ -257,8 +269,11 @@ class _LoginViewState extends State<LoginView> {
       logins.addAll([
         _buildButtonParent(LangameButton(
           FontAwesomeIcons.envelope,
+          text: 'Email',
           fixedSize: Size(
-              AppSize.safeBlockHorizontal * 20, AppSize.safeBlockVertical * 5),
+            AppSize.safeBlockHorizontal * 20,
+            AppSize.safeBlockVertical * 8,
+          ),
           onPressed: () async {
             if (isAuthenticating) return;
             var cp = Provider.of<ContextProvider>(context, listen: false);
@@ -335,15 +350,14 @@ class _LoginViewState extends State<LoginView> {
               child: GestureDetector(
             onLongPress: _onLongPressLogo,
             child: Container(
-              width: AppSize.safeBlockHorizontal * 30,
-              height: AppSize.safeBlockVertical * 30,
+              width: AppSize.safeBlockHorizontal * 50,
+              height: AppSize.safeBlockVertical * 50,
               child: Image.asset('images/logo-colourless.png',
                   color: Theme.of(context).brightness == Brightness.light
                       ? Colors.black
                       : Colors.white),
             ),
           )),
-          SizedBox(height: AppSize.safeBlockVertical * 10),
           Column(
               children: logins,
               mainAxisAlignment: MainAxisAlignment.spaceBetween),

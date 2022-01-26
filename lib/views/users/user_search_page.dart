@@ -56,7 +56,7 @@ class _State extends State<UserSearchPage>
               _searchBarController.query.isEmpty) {
             return Container(
               height: AppSize.safeBlockVertical * 10,
-              width: double.infinity,
+              width: AppSize.safeBlockHorizontal * 90,
               alignment: Alignment.center,
               padding: EdgeInsets.all(12),
               child: Row(
@@ -146,7 +146,7 @@ class _State extends State<UserSearchPage>
   }
 
   Widget _buildSearchPageView() => Scaffold(
-      backgroundColor: isLightThenDark(context, reverse: true),
+      backgroundColor: getBlackAndWhite(context, 0, reverse: true),
       appBar: buildAppBar(context, ''),
       body: Consumer2<PreferenceProvider, AuthenticationProvider>(
         builder: (context, lsp, ap, _) => FloatingSearchBar(
@@ -155,7 +155,7 @@ class _State extends State<UserSearchPage>
               backgroundColor: getBlackAndWhite(context, 1, reverse: true),
               color: getBlackAndWhite(context, 0))),
           clearQueryOnClose: false,
-          width: AppSize.safeBlockHorizontal * (AppSize.isLargeWidth ? 40 : 80),
+          width: AppSize.safeBlockHorizontal * 90,
           backdropColor: getBlackAndWhite(context, 0, reverse: true),
           backgroundColor: getBlackAndWhite(context, 1, reverse: true),
           scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),

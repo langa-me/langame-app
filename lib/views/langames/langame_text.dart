@@ -37,7 +37,7 @@ class _State extends State<LangameTextView>
     with AfterLayoutMixin<LangameTextView> {
   TextEditingController _textEditingController = TextEditingController();
   String _currentText = '';
-  final f = new DateFormat('hh:mm');
+  final f = new DateFormat('MM/dd hh:mm a');
   final ScrollController _scrollController = ScrollController();
   MagnificationResponse_Sentiment? _currentSentiment;
   bool _canSend = true;
@@ -148,7 +148,6 @@ class _State extends State<LangameTextView>
                           Expanded(
                             child: TextField(
                               style: Theme.of(context).textTheme.headline6,
-                              // cursorColor: getBlackAndWhite(context, 0),
                               onChanged: (e) async {
                                 setState(() => _currentText = e);
                                 // Check every new word
@@ -168,6 +167,8 @@ class _State extends State<LangameTextView>
                                 hintText: 'Type a message...',
                                 border: InputBorder.none,
                               ),
+                              keyboardType: TextInputType.multiline,
+                              maxLines: null,
                             ),
                           ),
                           _currentText.isEmpty
@@ -208,7 +209,7 @@ class _State extends State<LangameTextView>
                   (AppSize.isLargeWidth ? 50 : 70),
               // nb lines
               // height: AppSize.safeBlockVertical * ((m.body.length / 20) + 10) * 2,
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(20.0)),
                 border: Border.all(

@@ -59,7 +59,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         iconTheme: IconThemeData(
-          color: isLightThenDark(context), //change your color here
+          color: getBlackAndWhite(context, 0), //change your color here
         ),
         backgroundColor: Colors.transparent,
         actions: [
@@ -97,7 +97,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               },
               leading: Icon(
                 Icons.notifications_outlined,
-                color: isLightThenDark(context),
+                color: getBlackAndWhite(context, 0),
               ),
               title: Text('Notifications',
                   style: Theme.of(context).textTheme.headline6),
@@ -108,7 +108,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
               },
               leading: Icon(
                 FontAwesomeIcons.grinTongue,
-                color: isLightThenDark(context),
+                color: getBlackAndWhite(context, 0),
               ),
               title: Text('Langames schedule',
                   style: Theme.of(context).textTheme.headline6),
@@ -134,7 +134,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                       cp.showSuccessDialog('You will miss us! 😞');
                     },
                     leading: Icon(Icons.login_outlined,
-                        color: isLightThenDark(context)),
+                        color: getBlackAndWhite(context, 0)),
                     title: Text('Log out',
                         style: Theme.of(context).textTheme.headline6),
                   ),
@@ -166,7 +166,7 @@ class _SettingsState extends State<SettingsView> with WidgetsBindingObserver {
                       ], canBack: true);
                     },
                     leading: Icon(Icons.whatshot_outlined,
-                        color: isLightThenDark(context)),
+                        color: getBlackAndWhite(context, 0)),
                     title: Text('Delete my account and all my data',
                         style: Theme.of(context).textTheme.headline6),
                   ),

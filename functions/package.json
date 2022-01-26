@@ -17,7 +17,8 @@
     "set-dev": "gcloud config set project langame-dev && firebase use langame-dev && cp ../web/web_flavors/development/* ../web",
     "set-prod": "gcloud config set project langame-86ac4 && firebase use langame-86ac4 && cp ../web/web_flavors/production/* ../web",
     "compile": "npm run build -- --declaration --watch",
-    "test": "firebase emulators:exec --only firestore \"mocha --timeout 50000 --exit -g '^(Utils|Completion1|Firestore rules)'\""
+    "test": "firebase emulators:exec --only firestore \"mocha --timeout 50000 --exit -g '^(Utils|Completion1|Firestore rules)'\"",
+    "release": "npx ts-node src/scripts/newRelease.ts"
   },
   "engines": {
     "node": "14"

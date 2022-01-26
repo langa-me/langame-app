@@ -4,14 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
-import 'package:langame/helpers/messages.dart';
-import 'package:langame/helpers/random.dart';
 import 'package:langame/helpers/widget.dart';
 import 'package:langame/models/errors.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
-import 'package:langame/providers/feedback_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/views/buttons/button.dart';
@@ -99,51 +96,23 @@ class _State extends State<PhysicalLangamePageView>
         ),
         plp.memes.length != 0
             ? Stack(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LangameButton(
-                      FontAwesomeIcons.arrowAltCircleLeft,
-                      disableForFewMs: 2000,
-                      onPressed: () {
-                        plp.previous();
-                        setState(() {
-                          _languageSelected = 'us';
-                        });
-                      },
-                    ),
-                    LangameButton(
-                      FontAwesomeIcons.arrowAltCircleRight,
-                      disableForFewMs: 2000,
-                      onPressed: () {
-                        plp.next();
-                        setState(() {
-                          _languageSelected = 'us';
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                plp.memes.length > 0
-                    ? Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                            padding: EdgeInsets.all(20),
-                            child: LangameButton(
-                              FontAwesomeIcons.headphonesAlt,
-                              disableForFewMs: 2000,
-                              onPressed: () async {
-                                final tts = FlutterTts();
-                                tts.stop();
-                                var memeText = getMeme(plp);
-                                await tts.setLanguage(
-                                    _languages[_languageSelected]!['code']!);
-                                tts.speak(memeText);
-                              },
-                            )))
-                    : SizedBox.shrink(),
-                plp.memes.length > 0 &&
-                        plp.memes[plp.currentMeme].translated.isNotEmpty
+                Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: LangameButton(
+                          FontAwesomeIcons.headphonesAlt,
+                          disableForFewMs: 2000,
+                          onPressed: () async {
+                            final tts = FlutterTts();
+                            tts.stop();
+                            var memeText = getMeme(plp);
+                            await tts.setLanguage(
+                                _languages[_languageSelected]!['code']!);
+                            tts.speak(memeText);
+                          },
+                        ))),
+                plp.memes[plp.currentMeme].translated.isNotEmpty
                     ? Align(
                         alignment: Alignment.centerLeft,
                         child: Padding(
@@ -171,11 +140,9 @@ class _State extends State<PhysicalLangamePageView>
                     : SizedBox.shrink(),
               ])
             : SizedBox.shrink(),
-
-        // SizedBox(height: AppSize.safeBlockVertical * 5),
         plp.memes.length == 0
             ? Image.asset('images/logo-colourless.png',
-                height: AppSize.safeBlockVertical * 20)
+                height: AppSize.safeBlockVertical * 40)
             : Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -184,33 +151,11 @@ class _State extends State<PhysicalLangamePageView>
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline6!.merge(
                         TextStyle(
-                            color: isLightThenDark(context, reverse: false))),
+                            color:
+                                getBlackAndWhite(context, 0, reverse: false))),
                   ),
                 ),
               ),
-
-        plp.memes.length > 0
-            ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                LangameButton(
-                  FontAwesomeIcons.solidThumbsDown,
-                  disableForFewMs: 200,
-                  onPressed: () => Provider.of<FeedbackProvider>(context,
-                          listen: false)
-                      .sendMemeLike(plp.memes[plp.currentMeme].id, false)
-                      .whenComplete(
-                          () => cp.showSnackBar(gratitudeMessages.pickAny()!)),
-                ),
-                LangameButton(
-                  FontAwesomeIcons.solidThumbsUp,
-                  disableForFewMs: 200,
-                  onPressed: () => Provider.of<FeedbackProvider>(context,
-                          listen: false)
-                      .sendMemeLike(plp.memes[plp.currentMeme].id, true)
-                      .whenComplete(
-                          () => cp.showSnackBar(gratitudeMessages.pickAny()!)),
-                ),
-              ])
-            : SizedBox.shrink(),
         Padding(
             padding: EdgeInsets.all(30),
             child: Stack(alignment: Alignment.center, children: [
@@ -229,18 +174,7 @@ class _State extends State<PhysicalLangamePageView>
                       ),
                     )
                   : SizedBox.shrink(),
-              Positioned(
-                  right: AppSize.safeBlockHorizontal * 5,
-                  child: Tooltip(
-                      message: 'You are given 200 credits a day',
-                      child: Row(children: [
-                        Text('${ap.user != null ? ap.user!.credits : 0}',
-                            style: Theme.of(context).textTheme.caption),
-                        Icon(FontAwesomeIcons.bitcoin,
-                            color: ap.user?.credits == 0
-                                ? Colors.red
-                                : getBlackAndWhite(context, 0))
-                      ]))),
+
               Align(
                   alignment: Alignment.center,
                   child: LangameButton(

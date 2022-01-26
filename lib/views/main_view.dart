@@ -53,7 +53,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
-          backgroundColor: isLightThenDark(context, reverse: true),
+          backgroundColor: getBlackAndWhite(context, 0, reverse: true),
           resizeToAvoidBottomInset: false,
           appBar: _buildAppBar(),
           body: _buildPageView(),
@@ -87,7 +87,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
           onPressed: () => cp.push(SettingsView()),
           icon: Icon(
             Icons.settings_outlined,
-            color: isLightThenDark(context),
+            color: getBlackAndWhite(context, 0),
           ),
         ),
       ],

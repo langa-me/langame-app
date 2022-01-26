@@ -105,6 +105,6 @@ jobs:
           wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
           chmod +x /usr/bin/yq
       - name: Deploy to Firebase hosting channel
-        run: firebase hosting:channel:deploy $(cat pubspec.yaml | yq e '.version' - | sed 's/+/./g') --only dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --expires 7d
+        run: firebase hosting:channel:deploy $(cat pubspec.yaml | yq e '.version' - | sed 's/+/./g') --only dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --expires 7d --project langame-dev
       - name: Deploy to Firebase hosting "dev.langa.me"
-        run: firebase deploy --only hosting:dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }}
+        run: firebase deploy --only hosting:dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --project langame-dev

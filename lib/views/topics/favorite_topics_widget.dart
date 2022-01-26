@@ -26,6 +26,7 @@ class _State extends State<FavoriteTopicsWidget> {
       children: [
         Container(
             height: AppSize.safeBlockVertical * 20,
+            margin: EdgeInsets.only(bottom: AppSize.safeBlockVertical * 5),
             child: TopicSearchWidget(
               onTopicSelected: (topic) {
                 if (pp.preference.favoriteTopics.length >= 9) {
@@ -40,6 +41,8 @@ class _State extends State<FavoriteTopicsWidget> {
             )),
         Expanded(
             child: Wrap(
+              spacing: 2,
+              runSpacing: 2,
           children: pp.preference.favoriteTopics
               .map((e) => LangameButton(FontAwesomeIcons.times,
                   layer: 1,
