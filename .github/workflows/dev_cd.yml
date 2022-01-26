@@ -16,8 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          # Uses branch from workflow_run
-          ref: ${{ github.event.workflow_run.head_branch }}
+          ref: dev
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -55,8 +54,7 @@ jobs:
       - name: Checkout code from ref
         uses: actions/checkout@v2
         with:
-          # Uses branch from workflow_run
-          ref: ${{ github.event.workflow_run.head_branch }}
+          ref: dev
       - name: Decrypt iOS keys
         run: sh ./ios/decrypt.sh
         env:
@@ -99,8 +97,7 @@ jobs:
       - name: Checkout code from ref
         uses: actions/checkout@v2
         with:
-          # Uses branch from workflow_run
-          ref: ${{ github.event.workflow_run.head_branch }}
+          ref: dev
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
