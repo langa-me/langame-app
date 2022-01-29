@@ -43,7 +43,7 @@ class _SearchResultsListViewState extends State<SearchResultsListView> {
                   lp.recommendations.length > 0
                       ? Container(
                           width: AppSize.safeBlockHorizontal * 90,
-                          height: AppSize.safeBlockHorizontal * 50,
+                          height: AppSize.safeBlockVertical * 40,
                           child: ListView(
                               children: lp.recommendations.entries
                                   .take(5)

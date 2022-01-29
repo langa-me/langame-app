@@ -3,7 +3,6 @@ import {langame} from "../langame/protobuf/langame";
 import {welcomeMessages} from "../users/welcomeMessages";
 import {sample} from "../utils/array";
 import {converter} from "../utils/firestore";
-import {initFirebaseTest} from "../utils/firestore.spec";
 import {getAppleHtmlButtonWithBase64Image, googleHtmlButton, html,
   webHtmlButton} from "../utils/html";
 
@@ -90,9 +89,10 @@ export const release = async ({sendMail = false}: ReleaseOptions) => {
     }
     return Promise.all(promises);
   }));
+  console.log(`Done, new version released, ${users.length} users notified`);
 };
 
-initFirebaseTest("dev", "./");
-release({
-  sendMail: true,
-});
+// initFirebaseTest("prod", ".");
+// release({
+//   sendMail: true,
+// });

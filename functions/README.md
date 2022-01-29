@@ -31,6 +31,8 @@ firebase functions:config:set twitter.app_secret="SECRET_KEY"
 # Access Token and Secret
 firebase functions:config:set twitter.access_token="SECRET_KEY"
 firebase functions:config:set twitter.access_secret="SECRET_KEY"
+# Ava
+firebase functions:config:set ava.workers="0 or 1 or 2"
 firebase functions:config:get > .runtimeconfig.json
 ```
 

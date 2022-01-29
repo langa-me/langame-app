@@ -31,17 +31,18 @@ class PhysicalLangameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<LangameResponse<bool>> getMemes({List<String>? topics}) async {
+  Future<LangameResponse<bool>> getMemes({List<String>? topics, int quantity = 1}) async {
     try {
       var memes = await _firebase.functions!
           .httpsCallable(
         'getMemes',
         options: HttpsCallableOptions(
-          timeout: Duration(seconds: 20),
+          timeout: Duration(seconds: 40),
         ),
       )
           .call(<String, dynamic>{
         'topics': topics ?? [],
+        'quantity': quantity,
       });
 
       _memes = memes.data['memes']

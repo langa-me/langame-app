@@ -37,7 +37,8 @@ export const getMemes = async (
     functions.logger.warn(message, data);
     throw new https.HttpsError(
         message,
-        "rate limited",
+        "You have been rate limited, " +
+      "please reach out at contact@langa.me if you want an increase.",
     );
   }
 

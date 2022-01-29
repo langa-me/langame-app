@@ -36,9 +36,12 @@ export const onlineMemeGenerator = async (
     limit: number = 1,
     translated: boolean = false,
 ): Promise<admin.firestore.DocumentSnapshot<
-langame.protobuf.IMeme>[]> => {
-  // eslint-disable-next-line max-len
-  functions.logger.log(`generating memes ${topics.join(",")}, limit: ${limit}, translated:${translated}`);
+  langame.protobuf.IMeme>[]> => {
+  functions.logger.log(`generating memes ${topics.join(",")},` +
+    ` limit: ${limit}, translated:${translated}`);
+
+  // In a distributed ava scenario, need to know how many workers there is
+  const avaWorkers = functions.config().ava?.workers * 1;
 
   // For number "limit" generate
   return Promise.all(Array.from({length: limit}, async () => {
@@ -51,6 +54,8 @@ langame.protobuf.IMeme>[]> => {
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           disabled: true,
           tweet: false,
+          // If the config is set, assign to a random worker
+          shard: avaWorkers ? Math.floor(Math.random() * avaWorkers) : 0,
         });
     return new Promise<admin.firestore.DocumentSnapshot<
       langame.protobuf.IMeme>>((resolve, reject) => {
@@ -58,8 +63,8 @@ langame.protobuf.IMeme>[]> => {
             20_000 * (translated ? 2 : 1)); // Wait more for translations
         starterRef.onSnapshot((snapshot) => {
           if (
-                snapshot.data()!.state === "processed" &&
-                snapshot.data()!.content
+            snapshot.data()!.state === "processed" &&
+            snapshot.data()!.content
           ) {
             if (translated && !snapshot.data()!.translated) return;
             resolve(snapshot);

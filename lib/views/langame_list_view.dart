@@ -75,6 +75,7 @@ class _State extends State<LangameListView> {
       controller: controller,
       clearQueryOnClose: false,
       hint: 'Search "${hints.pickAny()}"',
+      showCursor: true,
       queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
           decorationColor: getBlackAndWhite(context, 1, reverse: true),
           backgroundColor: getBlackAndWhite(context, 1, reverse: true),
@@ -103,7 +104,7 @@ class _State extends State<LangameListView> {
       transition: CircularFloatingSearchBarTransition(spacing: 16),
       builder: (context, _) => SizedBox.shrink(),
       body: buildBody(),
-      height: AppSize.safeBlockVertical * 5,
+      height: AppSize.safeBlockVertical * 7,
     );
   }
 
@@ -122,7 +123,7 @@ class _State extends State<LangameListView> {
           // index: min(index, 2),
           children: [
             langames.length == 0
-                ? _noLangame()
+                ? _noLangame(p)
                 : Column(children: [
                     SizedBox(height: AppSize.safeBlockVertical * 10),
                     Expanded(
@@ -162,7 +163,8 @@ class _State extends State<LangameListView> {
             l.topics.join(','),
             style: Theme.of(context).textTheme.headline6,
             maxLines: 1,
-            overflow: TextOverflow.ellipsis, // TODO: custom overflow show "+4" ...
+            overflow:
+                TextOverflow.ellipsis, // TODO: custom overflow show "+4" ...
             textAlign: TextAlign.right,
           )),
       title: RowSuper(
@@ -179,22 +181,24 @@ class _State extends State<LangameListView> {
     );
   }
 
-  Widget _noLangame() => Center(
+  Widget _noLangame(LangameProvider lp) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image(
-              width: AppSize.blockSizeHorizontal * 50,
+              width: AppSize.blockSizeHorizontal * 40,
               image: AssetImage('images/logo-colourless.png'),
             ),
             SizedBox(height: AppSize.safeBlockVertical * 5),
-            Text('All caught up!',
+            Text('No Langames found',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headline4),
-            SizedBox(height: AppSize.safeBlockVertical * 5),
-            Text('After participating to a Langame, you will see it here.',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.caption),
+            lp.isSearching
+                ? Text(
+                    'After participating to a Langame, you will see it here.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.caption)
+                : SizedBox.shrink(),
           ],
         ),
       );

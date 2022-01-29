@@ -3,6 +3,16 @@ FUNCTIONS_PATH ?= ./functions
 GOOGLE_PROTO_SUBPATH ?= google/protobuf
 LANGAME_PROTO_SUBPATH ?= langame/protobuf
 
+set_prod: ## Set the GCP project to prod
+	@gcloud config set project langame-86ac4 2>/dev/null
+	@firebase use langame-86ac4 2>/dev/null
+	@echo "Configured GCP and Firebase project"
+
+set_dev: ## Set the GCP project to dev
+	@gcloud config set project langame-dev 2>/dev/null
+	@firebase use langame-dev 2>/dev/null
+	@echo "Configured GCP and Firebase project"
+
 proto: ## [Local development] Build protobuf stubs.
 	protoc -I protos --dart_out=./lib/models langame/protobuf/langame.proto protos/google/protobuf/*.proto
 
@@ -33,11 +43,11 @@ android_sync: ## [Local development] Android configuration.
 	cp android/app/src/prod/AndroidManifest.xml android/app/src/profile/AndroidManifest.xml
 
 deploy_web: ## [Local development] Manually deploy Firebase hosting dev.
-	firebase use langame-dev
+	# firebase use langame-dev
 	# firebase use langame-86ac4
 	flutter build web --release
-	firebase deploy --only hosting:dev-app
-	# firebase deploy --only hosting:prod-app
+	# firebase deploy --only hosting:dev-app
+	firebase deploy --only hosting:prod-app --project langame-86ac4
 
 .PHONY: help
 

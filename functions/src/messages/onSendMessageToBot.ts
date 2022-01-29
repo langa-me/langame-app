@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {langame} from "../langame/protobuf/langame";
 import {converter} from "../utils/firestore";
+import {promiseRetry} from "../utils/promises";
 
 export const onSendMessageToBot = async (
     snap: admin.firestore.DocumentSnapshot<langame.protobuf.IMessage>,
@@ -17,7 +18,7 @@ export const onSendMessageToBot = async (
       .get();
 
   const api = new ImplAiApi();
-  const alternative = await api.conversational(
+  const alternative = await promiseRetry(() => api.conversational(
       messages.docs
           .filter((e) => e.data()!.author!.bot! == false)
           .map((e) => e.data()!.body!),
@@ -25,7 +26,7 @@ export const onSendMessageToBot = async (
           .filter((e) => e.data()!.author!.bot! == true)
           .map((e) => e.data()!.body!),
         snap.data()!.body!,
-  );
+  ), 5, 1000, undefined);
 
   if (!alternative) return Promise.resolve(undefined);
   const filter = await api.filter({prompt: alternative});

@@ -55,8 +55,6 @@ class _State extends State<TopicSearchWidget> {
       transitionDuration: const Duration(milliseconds: 400),
       transitionCurve: Curves.easeInOut,
       physics: const BouncingScrollPhysics(),
-      // axisAlignment: tp.selectedTopics.isEmpty ? 0.0 : -1.0,
-      // openAxisAlignment: tp.selectedTopics.isEmpty ? 0 : -1.0,
       width: AppSize.safeBlockHorizontal * 90,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
@@ -74,6 +72,7 @@ class _State extends State<TopicSearchWidget> {
         ),
       ],
       builder: (context, transition) => _buildExpandableBody(tp),
+      height: AppSize.safeBlockVertical * 7,
     );
   }
 

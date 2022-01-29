@@ -240,7 +240,7 @@ class ContextProvider extends ChangeNotifier {
                 children: actions,
               )
             : SizedBox.shrink()
-      ]);
+      ], height: 80);
 
   void handleLangameResponse(LangameResponse res,
       {String? succeedMessage,

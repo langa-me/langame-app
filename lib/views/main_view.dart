@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 
 import 'buttons/button.dart';
 import 'colors/colors.dart';
-import 'feature_preview/beta.dart';
 import 'langame_list_view.dart';
 import 'whats_new/whats_new.dart';
 
@@ -104,6 +103,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
         activeIcon: Icon(FontAwesomeIcons.grinTongue,
             color: Theme.of(context).colorScheme.secondary),
         label: 'Langames',
+        tooltip: 'Remote Langames',
       ),
       BottomNavigationBarItem(
         backgroundColor: Colors.transparent,
@@ -112,19 +112,9 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
         activeIcon: Icon(FontAwesomeIcons.peopleArrows,
             color: Theme.of(context).colorScheme.secondary),
         label: 'Face-to-face',
+        tooltip: 'Physical Langames',
       ),
     ];
-    var pp = Provider.of<PreferenceProvider>(context);
-    if (pp.preference.previewMode) {
-      navBarItems.add(BottomNavigationBarItem(
-        backgroundColor: Colors.transparent,
-        icon: Beta(Icon(FontAwesomeIcons.brain,
-            color: Theme.of(context).iconTheme.color)),
-        activeIcon: Beta(Icon(FontAwesomeIcons.brain,
-            color: Theme.of(context).colorScheme.secondary)),
-        label: 'Meme',
-      ));
-    }
 
     return BottomNavigationBar(
       elevation: 0,
@@ -140,7 +130,7 @@ class _MainViewState extends State<MainView> with AfterLayoutMixin<MainView> {
   Widget _buildPageView() {
     var child = [
       LangameListView(),
-      PhysicalLangamePageView(goToPage),
+      PhysicalLangamePageView(),
     ];
 
     return PageView(

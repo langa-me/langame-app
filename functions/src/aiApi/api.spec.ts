@@ -6,6 +6,7 @@ import {FakeAiApi} from "./fakeAiApi";
 import {parseHrtimeToSeconds} from "../utils/time";
 import {initFirebaseTest} from "../utils/firestore.spec";
 import * as admin from "firebase-admin";
+import {promiseRetry} from "../utils/promises";
 
 
 it.skip("create Github issue", async () => {
@@ -249,36 +250,38 @@ describe("Completion1", () => {
   });
 });
 
-it("conversational", async () => {
-  const api = new ImplAiApi();
-  const res = await api.conversational(
-      ["Hi I'm from mars", "How are you?"],
-      ["Hello I'm from moon", "I'm fine"],
-      "How old are you?",
-  );
-  console.log(res);
-});
+describe("conversational", () => {
+  it("conversational", async () => {
+    const api = new ImplAiApi();
+    const res = await promiseRetry(() => api.conversational(
+        ["Hi I'm from mars", "How are you?"],
+        ["Hello I'm from moon", "I'm fine"],
+        "How old are you?",
+    ), 5, 1000, undefined);
+    expect(res).to.exist;
+  });
 
-it("conversational2", async () => {
-  initFirebaseTest("prod");
-  const messages = await admin.firestore()
-      .collection("messages")
-      .where("langameId", "==", "caba1d37")
-      .orderBy("createdAt", "asc")
-      .limitToLast(10)
-      .get();
-  const lastMessage = messages.docs[0];
-  const api = new ImplAiApi();
-  const pastUserInputs = messages.docs
-      .filter((e) => e.data()!.toUid === lastMessage.data()!.fromUid)
-      .map((e) => e.data()!.body);
-  const generatedResponses = messages.docs
-      .filter((e) => e.data()!.toUid === lastMessage.data()!.toUid)
-      .map((e) => e.data()!.body);
-  const alternative = await api.conversational(
-      pastUserInputs,
-      generatedResponses,
+  it("conversational2", async () => {
+    initFirebaseTest("prod");
+    const messages = await admin.firestore()
+        .collection("messages")
+        .where("langameId", "==", "caba1d37")
+        .orderBy("createdAt", "asc")
+        .limitToLast(10)
+        .get();
+    const lastMessage = messages.docs[0];
+    const api = new ImplAiApi();
+    const pastUserInputs = messages.docs
+        .filter((e) => e.data()!.toUid === lastMessage.data()!.fromUid)
+        .map((e) => e.data()!.body);
+    const generatedResponses = messages.docs
+        .filter((e) => e.data()!.toUid === lastMessage.data()!.toUid)
+        .map((e) => e.data()!.body);
+    const alternative = await api.conversational(
+        pastUserInputs,
+        generatedResponses,
       lastMessage.data()!.body!,
-  );
-  console.log(alternative);
+    );
+    console.log(alternative);
+  });
 });

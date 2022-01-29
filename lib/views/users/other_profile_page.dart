@@ -25,6 +25,8 @@ class OtherProfilePage extends StatefulWidget {
 class _State extends State<OtherProfilePage> {
   lg.User? _user = null;
   lg.UserPreference? _userPreference = null;
+  // Bots have no preferences
+  bool _hasNoPreferences = false;
 
   @override
   void initState() {
@@ -61,13 +63,17 @@ class _State extends State<OtherProfilePage> {
             setState(() {
               _userPreference = value.data();
             });
+          } else {
+            setState(() {
+              _hasNoPreferences = true;
+            });
           }
         }));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_user == null || _userPreference == null) {
+    if (_user == null || (!_hasNoPreferences && _userPreference == null)) {
       final cp = Provider.of<ContextProvider>(context, listen: false);
       return Scaffold(
           backgroundColor: getBlackAndWhite(context, 0, reverse: true),
@@ -128,20 +134,22 @@ class _State extends State<OtherProfilePage> {
           SizedBox(
             height: AppSize.safeBlockVertical * 5,
           ),
-          Expanded(
-            child: Wrap(
-              children: _userPreference!.favoriteTopics
-                  .map(
-                    (e) => Chip(
-                        label: Text(
-                      e,
-                      style: Theme.of(context).textTheme.headline6,
-                      textAlign: TextAlign.center,
-                    )),
-                  )
-                  .toList(),
-            ),
-          ),
+          _hasNoPreferences
+              ? SizedBox.shrink()
+              : Expanded(
+                  child: Wrap(
+                    children: _userPreference!.favoriteTopics
+                        .map(
+                          (e) => Chip(
+                              label: Text(
+                            e,
+                            style: Theme.of(context).textTheme.headline6,
+                            textAlign: TextAlign.center,
+                          )),
+                        )
+                        .toList(),
+                  ),
+                ),
         ],
       ),
     );

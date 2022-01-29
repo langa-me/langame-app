@@ -41,8 +41,8 @@ class _State extends State<FavoriteTopicsWidget> {
             )),
         Expanded(
             child: Wrap(
-              spacing: 2,
-              runSpacing: 2,
+          spacing: 2,
+          runSpacing: 2,
           children: pp.preference.favoriteTopics
               .map((e) => LangameButton(FontAwesomeIcons.times,
                   layer: 1,

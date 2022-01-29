@@ -63,7 +63,10 @@ platform :ios do
       skip_submission: false,
       notify_external_testers: true,
       ipa: "./Runner.ipa",
-      changelog: "- Minor interface improvements and bug fixes.
+      changelog: "- Increase text size on large screen
+      - Get 3 face-to-face conversation starters at once
+      - Minor interface improvements
+      - Remove unnecessary Google contact permission
       - Introducing regular Langames",
       distribute_external: true,
       groups: "public",

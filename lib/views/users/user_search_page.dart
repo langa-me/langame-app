@@ -1,4 +1,4 @@
-import 'package:after_layout/after_layout.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:langame/helpers/constants.dart';
@@ -20,21 +20,97 @@ class UserSearchPage extends StatefulWidget {
   _State createState() => _State();
 }
 
-class _State extends State<UserSearchPage>
-    with AfterLayoutMixin<UserSearchPage> {
+class _State extends State<UserSearchPage> {
   final FloatingSearchBarController _searchBarController =
       FloatingSearchBarController();
 
   _State();
 
   @override
-  void afterFirstLayout(BuildContext context) {
+  void initState() {
+    super.initState();
     Provider.of<CrashAnalyticsProvider>(context, listen: false)
-        .setCurrentScreen('search_page_view');
+        .setCurrentScreen('user_search_page');
   }
 
   @override
-  Widget build(BuildContext context) => _buildSearchPageView();
+  Widget build(BuildContext context) {
+    if (!kIsWeb &&
+        WidgetsBinding.instance!.window.viewInsets.bottom == 0.0 &&
+        !_searchBarController.isClosed) {
+      //Keyboard is not visible, so we can close the search bar.
+      _searchBarController.close();
+    }
+    return Scaffold(
+        backgroundColor: getBlackAndWhite(context, 0, reverse: true),
+        appBar: buildAppBar(context, ''),
+        body: Consumer2<PreferenceProvider, AuthenticationProvider>(
+          builder: (context, lsp, ap, _) => FloatingSearchBar(
+            queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
+                decorationColor: getBlackAndWhite(context, 1, reverse: true),
+                backgroundColor: getBlackAndWhite(context, 1, reverse: true),
+                color: getBlackAndWhite(context, 0))),
+            clearQueryOnClose: false,
+            width: AppSize.safeBlockHorizontal * 90,
+            backdropColor: getBlackAndWhite(context, 0, reverse: true),
+            backgroundColor: getBlackAndWhite(context, 1, reverse: true),
+            scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+            accentColor: getBlackAndWhite(context, 1, reverse: true),
+            shadowColor: getBlackAndWhite(context, 1, reverse: true),
+            controller: _searchBarController,
+            automaticallyImplyBackButton: false,
+            onFocusChanged: (focused) => !focused ? _searchBarController.close() : null,
+
+            openAxisAlignment: 0.0,
+            body: FloatingSearchBarScrollNotifier(
+              child: Container(
+                // Padding top of default FloatingSearchBar height (48) + app size * 5
+                padding:
+                    EdgeInsets.only(top: 48 + AppSize.safeBlockVertical * 5),
+                constraints: BoxConstraints.expand(),
+                child: SearchResultsListView(),
+              ),
+            ),
+            transition: CircularFloatingSearchBarTransition(),
+            physics: BouncingScrollPhysics(),
+            hint: 'Search someone\'s tag',
+            actions: [
+              FloatingSearchBarAction.searchToClear(
+                color: getBlackAndWhite(context, 0, reverse: false),
+              ),
+            ],
+            onQueryChanged: (query) async {
+              if (query.isEmpty) {
+                lsp.resetFilteredSearchTagHistory();
+                lsp.selectedUser = null;
+                return;
+              }
+              ap.getUserTag(query).then((v) => lsp.filteredUserSearchHistory =
+                  v.result != null ? v.result!.map((e) => e.tag).toList() : []);
+            },
+            onSubmitted: (query) {
+              _searchBarController.close();
+              if (query.isEmpty) {
+                lsp.resetFilteredSearchTagHistory();
+                lsp.selectedTag = null;
+                lsp.selectedUser = null;
+                return;
+              }
+              lsp.addUserSearchHistory(query);
+              ap.getUserTag(query).then((users) {
+                if (users.result != null && users.result!.length > 0) {
+                  lsp.selectedTag = query;
+                  lsp.selectedUser = users.result!.first;
+                } else {
+                  lsp.selectedTag = null;
+                  lsp.selectedUser = null;
+                }
+              });
+            },
+            builder: (context, transition) => _buildExpandableBody(lsp, ap),
+          ),
+        ));
+  }
 
   @override
   void dispose() {
@@ -144,73 +220,4 @@ class _State extends State<UserSearchPage>
       ),
     );
   }
-
-  Widget _buildSearchPageView() => Scaffold(
-      backgroundColor: getBlackAndWhite(context, 0, reverse: true),
-      appBar: buildAppBar(context, ''),
-      body: Consumer2<PreferenceProvider, AuthenticationProvider>(
-        builder: (context, lsp, ap, _) => FloatingSearchBar(
-          queryStyle: Theme.of(context).textTheme.headline6!.merge(TextStyle(
-              decorationColor: getBlackAndWhite(context, 1, reverse: true),
-              backgroundColor: getBlackAndWhite(context, 1, reverse: true),
-              color: getBlackAndWhite(context, 0))),
-          clearQueryOnClose: false,
-          width: AppSize.safeBlockHorizontal * 90,
-          backdropColor: getBlackAndWhite(context, 0, reverse: true),
-          backgroundColor: getBlackAndWhite(context, 1, reverse: true),
-          scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-          accentColor: getBlackAndWhite(context, 1, reverse: true),
-          shadowColor: getBlackAndWhite(context, 1, reverse: true),
-          controller: _searchBarController,
-          automaticallyImplyBackButton: false,
-          body: FloatingSearchBarScrollNotifier(
-            child: Container(
-              // Padding top of default FloatingSearchBar height (48) + app size * 5
-              padding: EdgeInsets.only(top: 48 + AppSize.safeBlockVertical * 5),
-              constraints: BoxConstraints.expand(),
-              child: SearchResultsListView(),
-            ),
-          ),
-          transition: CircularFloatingSearchBarTransition(),
-          physics: BouncingScrollPhysics(),
-          title: Text(
-            lsp.selectedTag ?? 'Search for people',
-            style: Theme.of(context).textTheme.headline6,
-          ),
-          // hint: 'Search...',
-          actions: [
-            FloatingSearchBarAction.searchToClear(
-              color: getBlackAndWhite(context, 0, reverse: false),
-            ),
-          ],
-          onQueryChanged: (query) async {
-            if (query.isEmpty) {
-              lsp.resetFilteredSearchTagHistory();
-              return;
-            }
-            ap.getUserTag(query).then((v) => lsp.filteredUserSearchHistory =
-                v.result != null ? v.result!.map((e) => e.tag).toList() : []);
-          },
-          onSubmitted: (query) {
-            _searchBarController.close();
-            if (query.isEmpty) {
-              lsp.resetFilteredSearchTagHistory();
-              lsp.selectedTag = null;
-              lsp.selectedUser = null;
-              return;
-            }
-            lsp.addUserSearchHistory(query);
-            ap.getUserTag(query).then((users) {
-              if (users.result != null && users.result!.length > 0) {
-                lsp.selectedTag = query;
-                lsp.selectedUser = users.result!.first;
-              } else {
-                lsp.selectedTag = null;
-                lsp.selectedUser = null;
-              }
-            });
-          },
-          builder: (context, transition) => _buildExpandableBody(lsp, ap),
-        ),
-      ));
 }
