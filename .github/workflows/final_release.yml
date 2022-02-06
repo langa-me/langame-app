@@ -49,7 +49,7 @@ jobs:
           wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
           chmod +x /usr/bin/yq
       - name: Deploy to Firebase hosting "app.langa.me"
-        run: firebase deploy --only hosting:prod-app --token ${{ secrets.FIREBASE_CLI_TOKEN }}
+        run: firebase deploy --only hosting:prod-app --token ${{ secrets.FIREBASE_CLI_TOKEN }} --project langame-86ac4
 
   backend:
     runs-on: ubuntu-latest
@@ -73,9 +73,8 @@ jobs:
         env:
           SVC: ${{ secrets.FIREBASE_SVC_PROD }}
       - run: |
-          npm ci
-          npm run lint
-          npm run build
+          npm i
+          npm run build-prod
           curl -sL https://firebase.tools | bash
           # npm test # TODO: fucking protobuf break things
         working-directory: functions
@@ -87,9 +86,8 @@ jobs:
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('~/.cache/firebase/emulators/**') }}
-      - run: firebase use langame-86ac4
       - name: Deploy
-        run: firebase deploy --token "${{ secrets.FIREBASE_CLI_TOKEN }}" --only firestore,functions -m "${{ github.event.head_commit.message }}"
+        run: firebase deploy --token "${{ secrets.FIREBASE_CLI_TOKEN }}" --only firestore,functions -m "${{ github.event.head_commit.message }}" --project langame-86ac4
       - name: Discord notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
