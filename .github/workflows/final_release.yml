@@ -1,0 +1,107 @@
+name: Synchronized release of platform and back-end
+on:
+  workflow_dispatch:
+    inputs:
+      ci:
+        description: "CI pipeline name"
+        required: false
+        default: "ci.yml"
+      skip_backend:
+        description: "Whether to skip the backend deployment"
+        required: false
+        default: "false"
+      skip_web:
+        description: "Whether to skip the web deployment"
+        required: false
+        default: "false"
+
+jobs:
+  init_notify_discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '😛 A new version of Langame platform is being released and deployed 😛.\nhttps://github.com/${{github.repository}}/actions/runs/${{github.run_id}}'
+
+  deploy_web:
+    name: Deploy web version to Firebase hosting
+    # run only if skip_web is false
+    if: ${{ github.event.inputs.skip_web }} == "false"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: 2.8.1
+      - run: flutter pub get
+      - run: cp web/web_flavors/production/* web
+      - run: flutter build web --release
+      - name: Set up Firebase CLI
+        run: curl -sL https://firebase.tools | bash
+      - run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
+          chmod +x /usr/bin/yq
+      - name: Deploy to Firebase hosting "app.langa.me"
+        run: firebase deploy --only hosting:prod-app --token ${{ secrets.FIREBASE_CLI_TOKEN }}
+
+  backend:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.skip_backend }} == "false"
+    strategy:
+      matrix:
+        node: [14]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Cache npm
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Generate service account
+        run: 'echo "$SVC" > functions/svc.prod.json'
+        shell: bash
+        env:
+          SVC: ${{ secrets.FIREBASE_SVC_PROD }}
+      - run: |
+          npm ci
+          npm run lint
+          npm run build
+          curl -sL https://firebase.tools | bash
+          # npm test # TODO: fucking protobuf break things
+        working-directory: functions
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Cache firebase emulators
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('~/.cache/firebase/emulators/**') }}
+      - run: firebase use langame-86ac4
+      - name: Deploy
+        run: firebase deploy --token "${{ secrets.FIREBASE_CLI_TOKEN }}" --only firestore,functions -m "${{ github.event.head_commit.message }}"
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '🤖 Production Langame back-end has been deployed with version ${{ github.event.outputs.VERSION }}. 🤖\nCommit: ${{ github.event.head_commit.message }}'
+      - name: Generate Changelog
+        # TODO: should get all commit messages from the PR
+        run: git log | head > ${{ github.workspace }}-CHANGELOG.txt
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: ${{ github.workspace }}-CHANGELOG.txt
+        env:
+          GITHUB_REPOSITORY: langame/langame-app

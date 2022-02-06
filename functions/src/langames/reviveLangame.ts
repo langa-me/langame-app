@@ -6,6 +6,7 @@ import {converter} from "../utils/firestore";
 import {langame} from "../langame/protobuf/langame";
 import {sample} from "../utils/array";
 import {onlineMemeGenerator} from "../memes/memes";
+import {promiseRetry} from "../utils/promises";
 /* eslint-disable max-len */
 // This is a bot message to send to the inactive conversation to revive it
 // using, for example, a conversation starter
@@ -113,9 +114,9 @@ export const revive = async (
     try {
       // TODO: might also offline search
       // Maybe classify last messages and create starter accordingly
-      const newConversationStarter = await onlineMemeGenerator(
+      const newConversationStarter = await promiseRetry(() => onlineMemeGenerator(
         langame.data()!.topics!, 1, false
-      );
+      ), 5, 1000, undefined);
       botMessage += `\n\n${newConversationStarter[0].data()!.content!}`;
     } catch (e: any) {
       await reportError(e, {});

@@ -125,12 +125,9 @@ class PreferenceProvider extends ChangeNotifier {
   void addUserSearchHistory(String tag) {
     _preference.userSearchHistory.add(tag);
     if (_preference.userSearchHistory.length > _historyLength) {
-      for (var i = _preference.userSearchHistory.length;
-          i > _historyLength;
-          i--) {
-        _preference.userSearchHistory
-            .remove(_preference.userSearchHistory.elementAt(i));
-      }
+      // remove all oldest
+      _preference.userSearchHistory.removeRange(0,
+          _preference.userSearchHistory.length - _historyLength);
     }
     _cap.log('preference_provider: adduserSearchHistory');
 

@@ -7,6 +7,7 @@ import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/authentication_provider.dart';
 import 'package:langame/providers/context_provider.dart';
 import 'package:langame/providers/crash_analytics_provider.dart';
+import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/colors/colors.dart';
@@ -233,6 +234,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
   }
 
   PageViewModel _buildNotificationPreferences() {
+    final mp = Provider.of<MessageProvider>(context);
     return PageViewModel(
       decoration: PageDecoration(
         bodyAlignment: Alignment.center,
@@ -252,7 +254,7 @@ class _OnBoardingState extends State with AfterLayoutMixin {
             ),
             Container(
                 height: AppSize.safeBlockVertical * 40,
-                child: buildNotificationPreferences(context, p)),
+                child: buildNotificationPreferences(context, p, mp)),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
@@ -36,6 +37,11 @@ class MessageProvider extends ChangeNotifier {
 
   /// Messages, notifications ///
   ///
+  ///
+
+  bool _hasPermissions = false;
+  bool get hasPermissions => _hasPermissions;
+
 
   MessageApi _messageApi;
 
@@ -43,11 +49,18 @@ class MessageProvider extends ChangeNotifier {
   MessageProvider(
       this.firebase, this._messageApi, this._cap, this._ap, this._cp, this._lp,
       {bool isLocalConversationApi = false}) {
+    firebase.messaging!.getNotificationSettings().then((value) {
+      if (value.authorizationStatus == AuthorizationStatus.authorized) {
+        _hasPermissions = true;
+      } else {
+        _hasPermissions = false;
+      }
+      notifyListeners();
+    });
     _ap.userStream.listen((e) async {
       if (e.type == UserChangeType.NewAuthentication) {
         await _messageApi.cancel();
         try {
-          await _messageApi.initializePermissions();
           await _messageApi.listen(null);
         } catch (e, s) {
           _cap.log(
@@ -68,6 +81,10 @@ class MessageProvider extends ChangeNotifier {
         terminateConversationClient();
       }
     });
+  }
+
+  void askPermissions() async {
+    await _messageApi.initializePermissions();
   }
 
   void terminateConversationClient() {

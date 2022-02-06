@@ -48,6 +48,7 @@ jobs:
           ANDROID_PACKAGE_NAME: "me.langa.dev"
 
   # TODO: does not work, see https://github.com/langa-me/langame-app/issues/233       
+  # TODO: also github action macos is fucking expensive (x100 linux)
   # deploy_ios:
   #   name: Deploy to beta dev ios
   #   runs-on: macos-latest
@@ -119,3 +120,45 @@ jobs:
         run: firebase hosting:channel:deploy $(cat pubspec.yaml | yq e '.version' - | sed 's/+/./g') --only dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --expires 7d --project langame-dev
       - name: Deploy to Firebase hosting "dev.langa.me"
         run: firebase deploy --only hosting:dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --project langame-dev
+
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [14]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Cache npm
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Generate service account
+        run: 'echo "$SVC" > functions/svc.dev.json'
+        shell: bash
+        env:
+          SVC: ${{ secrets.FIREBASE_SVC_DEV }}
+      - run: |
+          npm ci
+          npm run lint
+          npm run build
+          curl -sL https://firebase.tools | bash
+          # npm test # TODO: fucking protobuf break things
+        working-directory: functions
+      - name: Cache firebase emulators
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('~/.cache/firebase/emulators/**') }}
+      - run: firebase use langame-dev
+      - name: Deploy
+        run: firebase deploy --token "${{ secrets.FIREBASE_CLI_TOKEN_DEV }}" --only firestore,functions -m "${{ github.event.head_commit.message }}"
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '🤖 Development Langame back-end has been deployed. 🤖\nCommit: ${{ github.event.head_commit.message }}'

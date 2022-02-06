@@ -62,6 +62,7 @@ export const tagLangame = (
       MINUTES_THRESHOLD_TO_CONSIDER_INACTIVE * 60 * 1000;
 
   if (lastMessage &&
+      isInactive &&
       langame.data() &&
       langame.data()!.tags &&
       langame.data()!.tags!.includes("dead") &&

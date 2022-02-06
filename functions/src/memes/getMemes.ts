@@ -4,6 +4,7 @@ import {https} from "firebase-functions";
 import {offlineMemeSearch, onlineMemeGenerator} from "./memes";
 import {getPerUserlimiter} from "../utils/firestore";
 import {reportError} from "../errors";
+import {promiseRetry} from "../utils/promises";
 const limiter = !process.env.IS_TESTING ?
   getPerUserlimiter() : undefined;
 interface GetMemesRequest {
@@ -143,10 +144,11 @@ export const getMemes = async (
   if (memes.length === 0) {
     functions.logger.log("could not find a conversation starter, generating");
     try {
-      memes = await onlineMemeGenerator(data.topics || ["ice breaker"],
-          data.quantity || 1,
-          data.translated || false
-      );
+      memes = await promiseRetry(() =>
+        onlineMemeGenerator(data.topics || ["ice breaker"],
+            data.quantity || 1,
+            data.translated || false
+        ), 5, 1000, undefined);
     } catch (e: any) {
       const message = e.toString().includes("timeout") ?
         "the server is overloaded, please try again later" :

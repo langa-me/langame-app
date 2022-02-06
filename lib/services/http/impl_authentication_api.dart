@@ -47,13 +47,15 @@ class ImplAuthenticationApi extends AuthenticationApi {
         nonce: nonce,
       );
 
+      final p = OAuthProvider('apple.com');
+
+      final c = p.credential(
+        idToken: _apple!.identityToken,
+        rawNonce: rawNonce,
+      );
+
       // Create an `OAuthCredential` from the credential returned by Apple.
-      return Credential(
-          OAuthProvider('apple.com').credential(
-            idToken: _apple!.identityToken,
-            rawNonce: rawNonce,
-          ),
-          null);
+      return Credential(c, null);
     } catch (e) {
       throw LangameAppleSignInException(
           'authentication failed ${e.toString()}');
@@ -212,5 +214,4 @@ class ImplAuthenticationApi extends AuthenticationApi {
             e.data()['interactions'] as int))
         .toList();
   }
-      
 }

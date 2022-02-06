@@ -196,7 +196,7 @@ class _State extends State<UserSearchPage> {
                         _searchBarController.close();
                         ap.getUserTag(tag).then((users) {
                           if (users.result != null &&
-                              users.result!.length == 1) {
+                              users.result!.length >= 1) {
                             lsp.selectedTag = users.result?.first.tag;
                             lsp.selectedUser = users.result?.first;
                             lsp.addUserSearchHistory(users.result!.first.tag);

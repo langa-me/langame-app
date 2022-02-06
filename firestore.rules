@@ -67,6 +67,10 @@ service cloud.firestore {
             allow read, write: if request.auth != null &&
                 isAdmin(request);
         }
+        match /deleted_memes/{memeId} {
+            allow read, write: if request.auth != null &&
+                isAdmin(request);
+        }
         match /messages/{messageId} {
             function isRateLimited(request) {
                 let user = getUser(request.auth.uid);

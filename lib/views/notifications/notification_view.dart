@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:langame/helpers/constants.dart';
+import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/app_bars/app_bars.dart';
+import 'package:langame/views/buttons/button.dart';
 import 'package:langame/views/colors/colors.dart';
 import 'package:langame/views/dividers/text_divider.dart';
 import 'package:provider/provider.dart';
@@ -18,15 +21,17 @@ class _State extends State<NotificationSettingsView> {
   @override
   Widget build(BuildContext context) {
     var pp = Provider.of<PreferenceProvider>(context);
+    var mp = Provider.of<MessageProvider>(context);
 
     return Scaffold(
       appBar: buildAppBar(context, 'Notification settings'),
-      body: buildNotificationPreferences(context, pp),
+      body: buildNotificationPreferences(context, pp, mp),
     );
   }
 }
 
-buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
+buildNotificationPreferences(
+        BuildContext context, PreferenceProvider pp, MessageProvider mp) =>
     ListView(
       physics: BouncingScrollPhysics(),
       children: [
@@ -183,5 +188,18 @@ buildNotificationPreferences(BuildContext context, PreferenceProvider pp) =>
                 pp.refresh();
               }),
         ),
+        !mp.hasPermissions
+            ? Container(
+                child: LangameButton(
+                  FontAwesomeIcons.check,
+                  onPressed: mp.askPermissions,
+                  text: 'Allow notifiations',
+                  fixedSize: Size(
+                    AppSize.safeBlockHorizontal * 50,
+                    AppSize.safeBlockVertical * 5,
+                  ),
+                ),
+              )
+            : SizedBox.shrink()
       ],
     );

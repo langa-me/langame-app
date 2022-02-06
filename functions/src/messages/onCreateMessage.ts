@@ -118,9 +118,9 @@ export const onCreateMessage = async (
             body: message!.body!,
             title: title!,
           };
+          functions.logger.log("sending notification");
         }
-        functions.logger.log("sending message",
-      "data" in payload ? "silently, as user has push notification off": "");
+        functions.logger.log("sending message");
         messagingResponse = await admin.messaging().sendToDevice(
       to.data()!.tokens!,
       payload,
