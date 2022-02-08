@@ -194,10 +194,7 @@ buildNotificationPreferences(
                   FontAwesomeIcons.check,
                   onPressed: mp.askPermissions,
                   text: 'Allow notifiations',
-                  fixedSize: Size(
-                    AppSize.safeBlockHorizontal * 50,
-                    AppSize.safeBlockVertical * 5,
-                  ),
+                  highlighted: true,
                 ),
               )
             : SizedBox.shrink()

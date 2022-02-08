@@ -42,21 +42,13 @@ class MessageProvider extends ChangeNotifier {
   bool _hasPermissions = false;
   bool get hasPermissions => _hasPermissions;
 
-
   MessageApi _messageApi;
 
   /// Create an authentication provider, and
   MessageProvider(
       this.firebase, this._messageApi, this._cap, this._ap, this._cp, this._lp,
       {bool isLocalConversationApi = false}) {
-    firebase.messaging!.getNotificationSettings().then((value) {
-      if (value.authorizationStatus == AuthorizationStatus.authorized) {
-        _hasPermissions = true;
-      } else {
-        _hasPermissions = false;
-      }
-      notifyListeners();
-    });
+    _checkPermissions();
     _ap.userStream.listen((e) async {
       if (e.type == UserChangeType.NewAuthentication) {
         await _messageApi.cancel();
@@ -83,8 +75,20 @@ class MessageProvider extends ChangeNotifier {
     });
   }
 
+  void _checkPermissions() {
+    firebase.messaging!.getNotificationSettings().then((value) {
+      if (value.authorizationStatus == AuthorizationStatus.authorized) {
+        _hasPermissions = true;
+      } else {
+        _hasPermissions = false;
+      }
+      notifyListeners();
+    });
+  }
+
   void askPermissions() async {
     await _messageApi.initializePermissions();
+    _checkPermissions();
   }
 
   void terminateConversationClient() {

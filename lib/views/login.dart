@@ -4,6 +4,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterfire_ui/auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langame/helpers/constants.dart';
 import 'package:langame/helpers/future.dart';
@@ -224,43 +225,27 @@ class _LoginViewState extends State<LoginView> {
 
     var _buildButtonParent = (Widget child) => Container(
           child: child,
+          width: AppSize.safeBlockHorizontal * (40 * (AppSize.isLargeWidth ? 1 : 1.5)),
           padding: EdgeInsets.all(12),
         );
     var logins = [
       // We disable Google Auth on Langame Web dev, since it's internal only
       UniversalPlatform.isWeb && AppConst.isDev && kReleaseMode
           ? SizedBox.shrink()
-          : _buildButtonParent(
-              LangameButton(
-                FontAwesomeIcons.google,
-                text: 'Google',
-                onPressed: () async {
+          : _buildButtonParent(GoogleSignInButton(
+            clientId: AppConst.googleClientId,
+              onTap: () async {
                   if (isAuthenticating) return;
                   await _handleOnPressedLogin(ap.loginWithGoogle, 'Google');
                 },
-                layer: 1,
-                fixedSize: Size(
-                  AppSize.safeBlockHorizontal * 20 * (AppSize.isLargeWidth ? 1 : 2),
-                  AppSize.safeBlockVertical * 8,
-                ),
-              ),
-            ),
+            )),
       UniversalPlatform.isIOS
-          ? _buildButtonParent(
-              LangameButton(
-                FontAwesomeIcons.apple,
-                text: 'Apple',
-                onPressed: () async {
-                  if (isAuthenticating) return;
-                  await _handleOnPressedLogin(ap.loginWithApple, 'Apple');
-                },
-                layer: 1,
-                fixedSize: Size(
-                  AppSize.safeBlockHorizontal * 20 * (AppSize.isLargeWidth ? 1 : 2),
-                  AppSize.safeBlockVertical * 8,
-                ),
-              ),
-            )
+          ? _buildButtonParent(AppleSignInButton(
+              onTap: () async {
+                if (isAuthenticating) return;
+                await _handleOnPressedLogin(ap.loginWithApple, 'Apple');
+              },
+            ))
           : SizedBox.shrink()
     ];
 

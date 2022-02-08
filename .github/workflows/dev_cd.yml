@@ -27,7 +27,7 @@ jobs:
         env:
           RELEASE_SECRET_PASSPHRASE: ${{ secrets.RELEASE_SECRET_PASSPHRASE }}
       # Hack because somehow refuse building if not in root (works in debug though)
-      - run: cp android/app/src/main/google-services.json android/app
+      - run: cp android/app/src/dev/google-services.json android/app
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
@@ -142,7 +142,7 @@ jobs:
           SVC: ${{ secrets.FIREBASE_SVC_DEV }}
       - run: |
           npm i
-          npm run build-prod
+          npm run build
           curl -sL https://firebase.tools | bash
           # npm test # TODO: fucking protobuf break things
         working-directory: functions

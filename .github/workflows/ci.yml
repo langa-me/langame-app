@@ -35,7 +35,7 @@ jobs:
         run: |
           cd ./functions
           npm i
-          npm run build-prod
+          npm run build
           # TODO test
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

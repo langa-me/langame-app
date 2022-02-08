@@ -20,9 +20,6 @@ class AppConst {
   // Whether to log debug settings events
   static const bool debugSettings = false;
 
-  /// Define App ID and Token
-  static const String agoraAppID = '04dbfdb7d4a349bf9b02758aabd97c78';
-
   static const String firestoreUsersCollection = 'users';
   static const String firestoreLangamesCollection = 'langames';
   static const String firestoreMemesCollection = 'memes';
@@ -41,6 +38,9 @@ class AppConst {
   static const String googlePlayUrl =
       'https://play.google.com/store/apps/details?id=me.langa';
   static bool isDev = Firebase.apps[0].options.projectId.contains('dev');
+  static String googleClientId = isDev
+      ? '909899959016-kj98n9fggts44c9cj8ripmjafeev8lok.apps.googleusercontent.com'
+      : '388264600961-a39i4rp111jtg6t7cuuberofifcdsbb1.apps.googleusercontent.com';
 }
 
 /// Fonts assets used in this application,

@@ -3,9 +3,11 @@ import * as admin from "firebase-admin";
 import "mocha";
 import * as sinon from "sinon";
 import {ImplAiApi} from "../aiApi/implAiApi";
-import {langame} from "../langame/protobuf/langame";
+import {google, langame} from "../langame/protobuf/langame";
 import {initFirebaseTest} from "../utils/firestore.spec";
 import {createReflection} from "./onCreateMessageAnalysis";
+import {sendPushNotification} from "./messages";
+import { converter } from "../utils/firestore";
 
 it("reflect", async () => {
   initFirebaseTest("dev");
@@ -74,3 +76,24 @@ it("onWriteMessageAnalysis should properly add some intelligence to message and 
 //   const message = await messageSnap.docs[0].ref.get();
 //   await onSendMessageToBot(message);
 // });
+
+
+describe("Notifications", () => {
+  it("should send a push notification to the user", async () => {
+    initFirebaseTest("prod");
+    const louis = await admin.firestore().collection("users")
+      .where("tag", "==", "lou")
+      .withConverter(converter<langame.protobuf.IUser>())
+      .get();
+    const louisData = louis.docs[0].data();
+    await sendPushNotification("test", {
+      author: {
+        id: "foo",
+      },
+      langameId: "bar",
+      type: langame.protobuf.Message.Type.MESSAGE,
+      body: "test",
+      createdAt: new google.protobuf.Timestamp()
+    }, true, louisData.tokens!);
+  });
+});
