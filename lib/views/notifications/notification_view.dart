@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:langame/helpers/constants.dart';
 import 'package:langame/providers/message_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/views/app_bars/app_bars.dart';

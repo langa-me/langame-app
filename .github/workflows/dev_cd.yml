@@ -34,7 +34,7 @@ jobs:
           flutter-version: 2.8.1
       - name: Install Flutter dependencies
         run: flutter pub get
-      - run: flutter build apk --release --flavor dev
+      - run: flutter build apk --flavor dev
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "2.7.2"
@@ -51,10 +51,9 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '😛 Development Langame Android app has been deployed, update it through Firebase app distribution. Commit: ${{ github.event.head_commit.message }}'
+          args: "😛 Development Langame Android app has been deployed, update it through Firebase app distribution."
 
-
-  # TODO: does not work, see https://github.com/langa-me/langame-app/issues/233       
+  # TODO: does not work, see https://github.com/langa-me/langame-app/issues/233
   # TODO: also github action macos is fucking expensive (x100 linux)
   # deploy_ios:
   #   name: Deploy to beta dev ios
@@ -131,7 +130,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '😛 Development Langame web app has been deployed at https://dev.langa.me. Commit: ${{ github.event.head_commit.message }}'
+          args: "😛 Development Langame web app has been deployed at https://dev.langa.me."
 
   backend:
     runs-on: ubuntu-latest
@@ -171,4 +170,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '😛 Development Langame back-end has been deployed. Commit: ${{ github.event.head_commit.message }}'
+          args: "😛 Development Langame back-end has been deployed."

@@ -32,7 +32,6 @@ jobs:
     if: ${{ github.event.inputs.skip_web }} == "false"
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -55,7 +54,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '😛 Production Langame web app has been deployed at https://app.langa.me. Commit: ${{ github.event.head_commit.message }}'
+          args: "😛 Production Langame web app has been deployed at https://app.langa.me."
 
   backend:
     runs-on: ubuntu-latest
@@ -99,7 +98,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '😛 Production Langame back-end has been deployed with version ${{ github.event.outputs.VERSION }}. Commit: ${{ github.event.head_commit.message }}'
+          args: "😛 Production Langame back-end has been deployed with version ${{ github.event.outputs.VERSION }}."
       - name: Generate Changelog
         # TODO: should get all commit messages from the PR
         run: git log | head > ${{ github.workspace }}-CHANGELOG.txt
