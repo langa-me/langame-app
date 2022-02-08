@@ -51,7 +51,7 @@ class ImplMessageApi extends MessageApi {
           android: AndroidNotificationDetails(
             channel.id,
             channel.name,
-            channel.description,
+            channelDescription: channel.description,
             // TODO add a proper drawable resource to android, for now using
             //      one that already exists in example app.
             icon: '@mipmap/ic_launcher',
