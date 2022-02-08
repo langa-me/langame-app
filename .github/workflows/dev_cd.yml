@@ -46,6 +46,13 @@ jobs:
         env:
           FIREBASE_CLI_TOKEN_DEV: "${{ secrets.FIREBASE_CLI_TOKEN_DEV }}"
           ANDROID_PACKAGE_NAME: "me.langa.dev"
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '😛 Development Langame Android app has been deployed, update it through Firebase app distribution. Commit: ${{ github.event.head_commit.message }}'
+
 
   # TODO: does not work, see https://github.com/langa-me/langame-app/issues/233       
   # TODO: also github action macos is fucking expensive (x100 linux)
@@ -119,6 +126,12 @@ jobs:
         run: firebase hosting:channel:deploy $(cat pubspec.yaml | yq e '.version' - | sed 's/+/./g') --only dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --expires 7d --project langame-dev
       - name: Deploy to Firebase hosting "dev.langa.me"
         run: firebase deploy --only hosting:dev-app --token ${{ secrets.FIREBASE_CLI_TOKEN_DEV }} --project langame-dev
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '😛 Development Langame web app has been deployed at https://dev.langa.me. Commit: ${{ github.event.head_commit.message }}'
 
   backend:
     runs-on: ubuntu-latest
@@ -158,4 +171,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '🤖 Development Langame back-end has been deployed. 🤖\nCommit: ${{ github.event.head_commit.message }}'
+          args: '😛 Development Langame back-end has been deployed. Commit: ${{ github.event.head_commit.message }}'

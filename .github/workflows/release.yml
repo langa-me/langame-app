@@ -60,6 +60,13 @@ jobs:
         env:
           FIREBASE_CLI_TOKEN: "${{ secrets.FIREBASE_CLI_TOKEN }}"
           ANDROID_PACKAGE_NAME: "me.langa"
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '😛 Product Langame Android app has been put in review for the [Google Play Store](https://play.google.com/console/u/0/developers/7062994257192247132/app/4973334539422918917/publishing). Commit: ${{ github.event.head_commit.message }}'
+
 
   deploy_ios:
     name: Deploy beta build to TestFlight
@@ -116,3 +123,9 @@ jobs:
           TEMP_KEYCHAIN_PASSWORD: "${{ secrets.TEMP_KEYCHAIN_PASSWORD }}"
           TEMP_KEYCHAIN_USER: "${{ secrets.TEMP_KEYCHAIN_USER }}"
           FIREBASE_CLI_TOKEN: "${{ secrets.FIREBASE_CLI_TOKEN }}"
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '😛 Product Langame iOS app has been put in review for the [Apple Store](https://appstoreconnect.apple.com/apps/1564745604/testflight/ios). Commit: ${{ github.event.head_commit.message }}'

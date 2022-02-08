@@ -50,6 +50,12 @@ jobs:
           chmod +x /usr/bin/yq
       - name: Deploy to Firebase hosting "app.langa.me"
         run: firebase deploy --only hosting:prod-app --token ${{ secrets.FIREBASE_CLI_TOKEN }} --project langame-86ac4
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '😛 Production Langame web app has been deployed at https://app.langa.me. Commit: ${{ github.event.head_commit.message }}'
 
   backend:
     runs-on: ubuntu-latest
@@ -93,7 +99,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: '🤖 Production Langame back-end has been deployed with version ${{ github.event.outputs.VERSION }}. 🤖\nCommit: ${{ github.event.head_commit.message }}'
+          args: '😛 Production Langame back-end has been deployed with version ${{ github.event.outputs.VERSION }}. Commit: ${{ github.event.head_commit.message }}'
       - name: Generate Changelog
         # TODO: should get all commit messages from the PR
         run: git log | head > ${{ github.workspace }}-CHANGELOG.txt

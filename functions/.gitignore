@@ -2,7 +2,9 @@ node_modules/
 .runtimeconfig.json
 
 # Builds
-lib
+lib/*
+# except protobuf
+!/lib/langame
 
 # Service account
 langame*.json
