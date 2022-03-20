@@ -67,7 +67,7 @@ flutter pub upgrade
 
 ### How to release
 
-1. bump pubspec.yaml version number and version code
+1. bump pubspec.yaml version number and version code, also web/web_flavors/*/index.html version (used in caching)
 2. update changelogs in fastlane (android/fastlane/changelogs and ios/fastlane/Fastfile)
 3. commit (x.x.x+x: new features...) & push
 4. once CI/CD is done

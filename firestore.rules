@@ -95,8 +95,9 @@ service cloud.firestore {
         }
         match /organizations/{organizationId} {
             // Can read organizations which I am member of
-            allow read: if request.auth != null &&
-                request.auth.uid in resource.data.members;
+            allow read: if isAdmin(request) ||
+                (request.auth != null &&
+                request.auth.uid in resource.data.members);
             allow update: if request.auth != null &&
                 request.auth.uid in resource.data.members &&
                 // The member "membersRole" is "owner"
@@ -122,7 +123,20 @@ service cloud.firestore {
         }
         match /usages/{usageId} {
             allow read: if request.auth != null &&
-                request.auth.uid in getOrg(getApiKey(usageId).owner).members;
+                request.auth.uid in getOrg(getApiKey(usageId).owner).members ||
+                request.auth != null && isAdmin(request);
+        }
+        match /social_interactions/{socialInteractionsId} {
+            allow read: if request.auth != null && isAdmin(request);
+        }
+        match /configs/{configId} {
+            allow read: if request.auth != null && isAdmin(request);
+        }
+        match /discord_users/{discordUserId} {
+            allow read: if request.auth != null && isAdmin(request);
+        }
+        match /conversations/{discordUserId} {
+            allow read, write: if request.auth != null && isAdmin(request);
         }
     }
 }

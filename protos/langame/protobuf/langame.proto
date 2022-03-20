@@ -36,6 +36,7 @@ message Meme {
   // "to-process", "processed", "error"
   string state = 10;
   string error = 11;
+  repeated string tags = 12;
 }
 
 message User {

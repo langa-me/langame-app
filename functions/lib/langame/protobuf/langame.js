@@ -917,6 +917,7 @@ $root.langame = (function() {
              * @property {boolean|null} [tweet] Meme tweet
              * @property {string|null} [state] Meme state
              * @property {string|null} [error] Meme error
+             * @property {Array.<string>|null} [tags] Meme tags
              */
 
             /**
@@ -930,6 +931,7 @@ $root.langame = (function() {
             function Meme(properties) {
                 this.topics = [];
                 this.translated = {};
+                this.tags = [];
                 if (properties)
                     for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
@@ -1017,6 +1019,14 @@ $root.langame = (function() {
             Meme.prototype.error = "";
 
             /**
+             * Meme tags.
+             * @member {Array.<string>} tags
+             * @memberof langame.protobuf.Meme
+             * @instance
+             */
+            Meme.prototype.tags = $util.emptyArray;
+
+            /**
              * Creates a new Meme instance using the specified properties.
              * @function create
              * @memberof langame.protobuf.Meme
@@ -1062,6 +1072,9 @@ $root.langame = (function() {
                     writer.uint32(/* id 10, wireType 2 =*/82).string(message.state);
                 if (message.error != null && Object.hasOwnProperty.call(message, "error"))
                     writer.uint32(/* id 11, wireType 2 =*/90).string(message.error);
+                if (message.tags != null && message.tags.length)
+                    for (var i = 0; i < message.tags.length; ++i)
+                        writer.uint32(/* id 12, wireType 2 =*/98).string(message.tags[i]);
                 return writer;
             };
 
@@ -1147,6 +1160,11 @@ $root.langame = (function() {
                     case 11:
                         message.error = reader.string();
                         break;
+                    case 12:
+                        if (!(message.tags && message.tags.length))
+                            message.tags = [];
+                        message.tags.push(reader.string());
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -1223,6 +1241,13 @@ $root.langame = (function() {
                 if (message.error != null && message.hasOwnProperty("error"))
                     if (!$util.isString(message.error))
                         return "error: string expected";
+                if (message.tags != null && message.hasOwnProperty("tags")) {
+                    if (!Array.isArray(message.tags))
+                        return "tags: array expected";
+                    for (var i = 0; i < message.tags.length; ++i)
+                        if (!$util.isString(message.tags[i]))
+                            return "tags: string[] expected";
+                }
                 return null;
             };
 
@@ -1271,6 +1296,13 @@ $root.langame = (function() {
                     message.state = String(object.state);
                 if (object.error != null)
                     message.error = String(object.error);
+                if (object.tags) {
+                    if (!Array.isArray(object.tags))
+                        throw TypeError(".langame.protobuf.Meme.tags: array expected");
+                    message.tags = [];
+                    for (var i = 0; i < object.tags.length; ++i)
+                        message.tags[i] = String(object.tags[i]);
+                }
                 return message;
             };
 
@@ -1287,8 +1319,10 @@ $root.langame = (function() {
                 if (!options)
                     options = {};
                 var object = {};
-                if (options.arrays || options.defaults)
+                if (options.arrays || options.defaults) {
                     object.topics = [];
+                    object.tags = [];
+                }
                 if (options.objects || options.defaults)
                     object.translated = {};
                 if (options.defaults) {
@@ -1328,6 +1362,11 @@ $root.langame = (function() {
                     object.state = message.state;
                 if (message.error != null && message.hasOwnProperty("error"))
                     object.error = message.error;
+                if (message.tags && message.tags.length) {
+                    object.tags = [];
+                    for (var j = 0; j < message.tags.length; ++j)
+                        object.tags[j] = message.tags[j];
+                }
                 return object;
             };
 

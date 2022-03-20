@@ -76,13 +76,13 @@ const onCreateLangame = async (
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   });
   const memesSeenDoc =
-      await admin.firestore()
-          .collection("seenMemes")
-          .doc(langameData.initiator!)
-          .get();
+    await admin.firestore()
+        .collection("seenMemes")
+        .doc(langameData.initiator!)
+        .get();
   let memesToFilter = memesSeenDoc.data() && memesSeenDoc.data()!.seen ?
-      memesSeenDoc.data()!.seen :
-      [];
+    memesSeenDoc.data()!.seen :
+    [];
 
   functions.logger.log("searching for a conversation starter");
   let memes = await offlineMemeSearch(langameData.topics || ["ice breaker"],
@@ -94,7 +94,8 @@ const onCreateLangame = async (
   if (memes.length === 0) {
     functions.logger.log("could not find a conversation starter, generating");
     memes = await onlineMemeGenerator(
-        langameData.topics || ["ice breaker"], 1, false);
+        langameData.topics || ["ice breaker"], 1, false, false, 3, 80_000,
+    );
   }
 
   if (memes.length === 0) {
@@ -121,7 +122,7 @@ const onCreateLangame = async (
       e.uid !== langameData.initiator);
   const senderData = toNotify.find((e) => e.id === langameData.initiator!)!;
   const title =
-      `${senderData.tag} invited you to play a Langame`;
+    `${senderData.tag} invited you to play a Langame`;
   let promises: Promise<any>[] = [];
   promises.push(admin.firestore().collection("messages")
       .withConverter(converter<langame.protobuf.IMessage>())
@@ -145,11 +146,11 @@ const onCreateLangame = async (
       date: new Date(),
     };
   });
-    // Filter out memes already seen X time ago
-    // TODO: currently only support initiator
+  // Filter out memes already seen X time ago
+  // TODO: currently only support initiator
   memesToFilter =
-      memesToFilter!
-          .filter((e: any) => e.date < oneWeekAgo).concat(newMemesSeen);
+    memesToFilter!
+        .filter((e: any) => e.date < oneWeekAgo).concat(newMemesSeen);
   promises = [
     db.collection("users").doc(senderData.id!).update({
       credits: admin.firestore.FieldValue.increment(-1),
@@ -159,9 +160,9 @@ const onCreateLangame = async (
     seen: memesToFilter,
   }, {merge: true}));
 
-    langameData.players!.map((e) =>
-      promises.push(db.collection("langame_presences").doc(e.id!).set({
-        presences: admin.firestore.FieldValue.arrayUnion(change.after.id),
-      }, {merge: true})));
-    return Promise.all(promises);
+  langameData.players!.map((e) =>
+    promises.push(db.collection("langame_presences").doc(e.id!).set({
+      presences: admin.firestore.FieldValue.arrayUnion(change.after.id),
+    }, {merge: true})));
+  return Promise.all(promises);
 };

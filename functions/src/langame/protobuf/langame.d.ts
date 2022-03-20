@@ -427,6 +427,9 @@ export namespace langame {
 
             /** Meme error */
             error?: (string|null);
+
+            /** Meme tags */
+            tags?: (string[]|null);
         }
 
         /** Represents a Meme. */
@@ -467,6 +470,9 @@ export namespace langame {
 
             /** Meme error. */
             public error: string;
+
+            /** Meme tags. */
+            public tags: string[];
 
             /**
              * Creates a new Meme instance using the specified properties.

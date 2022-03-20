@@ -57,7 +57,8 @@ export const onWriteUser = async (
     }
     let bot = change.after.data()!.bot;
     // If user has not "bot" property, set it to false
-    if (bot === undefined) {
+    if (bot === undefined &&
+        !change.after.data()?.email?.includes("@langa.me")) {
       functions.logger.log("user has no bot property, setting it to false");
       await db.runTransaction(async (transaction) => {
         return transaction.set(change.after.ref, {

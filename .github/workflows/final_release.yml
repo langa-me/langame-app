@@ -99,12 +99,3 @@ jobs:
         uses: Ilshidur/action-discord@master
         with:
           args: "😛 Production Langame back-end has been deployed with version ${{ github.event.outputs.VERSION }}."
-      - name: Generate Changelog
-        # TODO: should get all commit messages from the PR
-        run: git log | head > ${{ github.workspace }}-CHANGELOG.txt
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: ${{ github.workspace }}-CHANGELOG.txt
-        env:
-          GITHUB_REPOSITORY: langame/langame-app

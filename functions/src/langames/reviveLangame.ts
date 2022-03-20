@@ -81,7 +81,24 @@ export const reviveLangame =
       } else {
         botUser = botDoc.docs[0];
       }
-      return Promise.all(langames.docs.map((e) => revive(db, e, botUser)));
+
+
+      for (const e of langames.docs) {
+        const presences = await db
+            .collection("langame_presences")
+            .where("presences", "array-contains", e.data().players?.map((e) => e.id))
+            .get();
+        if (presences.empty) {
+          functions.logger.info(`No presences for langame ${e.id}, skipping`);
+          continue;
+        }
+        const hasGenerated = await revive(db, e, botUser);
+        // if has generated add a bit of delay
+        if (hasGenerated) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
+      }
+      return Promise.resolve();
     } catch (e: any) {
       await reportError(e, {});
       return Promise.reject(e);
@@ -94,13 +111,20 @@ export const revive = async (
     langame: admin.firestore.QueryDocumentSnapshot<langame.protobuf.ILangame> |
       admin.firestore.DocumentSnapshot<langame.protobuf.ILangame>,
     botUser: admin.firestore.DocumentSnapshot<langame.protobuf.IUser>,
-): Promise<any> => {
+): Promise<boolean> => {
+  let hasGenerated = false;
   if (langame.data()!.tags?.includes("to-terminate")) {
+    functions.logger.log(`langame ${langame.id} is tagged as to-terminate`,
+        ", terminating it");
     // Remove player from presence
-    return Promise.all<any>(langame.data()!.players!.map((player) =>
+    await Promise.all(langame.data()!.players!.map((player) =>
       db.collection("langame_presences").doc(player!.id!).set({
         presences: admin.firestore.FieldValue.arrayRemove(langame.id),
       }, {merge: true})));
+    await langame.ref.set({
+      tags: ["terminated"],
+    }, {merge: true});
+    return hasGenerated;
   }
 
   // pick random opening
@@ -108,23 +132,24 @@ export const revive = async (
   if (langame.data()!.tags?.includes("dead")) {
     botMessage = sample(conversationClosureMessages);
   } else if (langame.data()!.tags?.includes("inactive")) {
-    botMessage = sample(randomLangameConversationReviverOpenings);
+    hasGenerated = true;
     // Try to add a conversation starter, could fail in case of profane
     // or such online generation error
     try {
       // TODO: might also offline search
       // Maybe classify last messages and create starter accordingly
       const newConversationStarter = await promiseRetry(() => onlineMemeGenerator(
-        langame.data()!.topics!, 1, false
-      ), 5, 1000, undefined);
-      botMessage += `\n\n${newConversationStarter[0].data()!.content!}`;
+        langame.data()!.topics!, 1, false, false, 3, 80_000
+      ), 2, 3000, undefined);
+      botMessage = sample(randomLangameConversationReviverOpenings)+
+       `\n\n${newConversationStarter[0].data()!.content!}`;
     } catch (e: any) {
       await reportError(e, {});
     }
   }
   if (!botMessage) {
     functions.logger.log("Conversation is alive, no need to revive");
-    return Promise.resolve();
+    return Promise.resolve(hasGenerated);
   }
   const author: langame.protobuf.Message.IAuthor = {
     id: botUser.id,
@@ -133,11 +158,12 @@ export const revive = async (
     bot: true,
     email: botUser.data()!.email,
   };
-  return db.collection("messages").add({
+  await db.collection("messages").add({
     author: author,
     body: botMessage,
     type: 1,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     langameId: langame.id,
   });
+  return Promise.resolve(hasGenerated);
 };

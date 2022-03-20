@@ -54,43 +54,27 @@ export const tagLangame = (
     messages: admin.firestore.QuerySnapshot<langame.protobuf.IMessage>,
 ): Promise<any> => {
   if (messages.empty) return Promise.resolve();
-  const lastMessage = messages.docs[0];
+  if (langame.data()?.tags?.includes("terminated")) return Promise.resolve();
+  const lastMessageByAHuman = messages.docs.find((e) =>
+    e.data().author?.bot !== true);
   let tag = "active";
 
-  const isInactive =
-      Date.now() - lastMessage.createTime.toDate().getTime() >
-      MINUTES_THRESHOLD_TO_CONSIDER_INACTIVE * 60 * 1000;
-
-  if (lastMessage &&
-      isInactive &&
-      langame.data() &&
-      langame.data()!.tags &&
-      langame.data()!.tags!.includes("dead") &&
-      lastMessage.data() &&
-      lastMessage.data().author &&
-      lastMessage.data()!.author!.bot === true) {
-    // If last message is an announcement
-    // of the deadness of the langame
-    // set it to to-terminate
+  // TODO?
+  if (!lastMessageByAHuman) return Promise.resolve();
+  const noMessageFor = Date.now() -
+    lastMessageByAHuman!.createTime.toDate().getTime();
+  const diffStage = MINUTES_THRESHOLD_TO_CONSIDER_INACTIVE * 60 * 1000;
+  if (noMessageFor > diffStage * 3) {
     tag = "to-terminate";
-  } else if (lastMessage &&
-      langame.data() &&
-      langame.data()!.tags &&
-      langame.data()!.tags!.includes("inactive") &&
-      lastMessage.data() &&
-      lastMessage.data().author &&
-      lastMessage.data()!.author!.bot === true) {
-    // If last message is an attempt to revive
-    // the conversation by a bot
-    // and still no messages have been sent, then the langame is dead
+  } else if (noMessageFor > diffStage * 2) {
     tag = "dead";
-  } else if (lastMessage &&
-      isInactive &&
-      lastMessage.data() &&
-      lastMessage.data().author &&
-      lastMessage.data()!.author!.bot === false) {
+  } else if (noMessageFor > diffStage) {
     tag = "inactive";
   }
+
+  functions.logger.log(
+      `Setting tag ${tag} to langame ${langame.id}`);
+
   return db.runTransaction(async (transaction) => {
     return transaction.update(langame.ref, {
       // TODO: currently only overwrite everything

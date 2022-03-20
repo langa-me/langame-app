@@ -57,19 +57,25 @@ exports.resetCredits = functions
     .region(region)
     .runWith(runtimeOpts)
     .pubsub
-    .schedule("0 1 * * *") // 1 am every day
+    .schedule("0 * 1 * *") // At minute 0 on day-of-month 1.
     .onRun(resetCredits);
 
 exports.reviveLangame = functions
     .region(region)
-    .runWith(runtimeOpts)
+    .runWith({
+      ...runtimeOpts,
+      timeoutSeconds: 540,
+    })
     .pubsub
     .schedule("0 18 * * *")
     .onRun(reviveLangame);
 
 exports.setTagsLangame = functions
     .region(region)
-    .runWith(runtimeOpts)
+    .runWith({
+      ...runtimeOpts,
+      timeoutSeconds: 540,
+    })
     .pubsub
     .schedule("0 1 * * *")
     .onRun(setTagsLangame);
@@ -101,7 +107,10 @@ exports.onFeedback = functions
 
 exports.onWriteLangame = functions
     .region(region)
-    .runWith(runtimeOpts)
+    .runWith({
+      ...runtimeOpts,
+      timeoutSeconds: 240,
+    })
     .firestore
     .document(`${kLangamesCollection}/{pushId}`)
     .onWrite(onWriteLangame);
@@ -163,7 +172,10 @@ exports.onCreateOrganization = functions
 
 exports.getMemes = functions
     .region(region)
-    .runWith(runtimeOpts)
+    .runWith({
+      ...runtimeOpts,
+      timeoutSeconds: 240,
+    })
     .https
     .onCall(getMemes);
 

@@ -3,11 +3,15 @@ import {langame} from "../langame/protobuf/langame";
 import {welcomeMessages} from "../users/welcomeMessages";
 import {sample} from "../utils/array";
 import {converter} from "../utils/firestore";
-import {getAppleHtmlButtonWithBase64Image, googleHtmlButton, html,
-  webHtmlButton} from "../utils/html";
-
+import {
+  getAppleHtmlButtonWithBase64Image, googleHtmlButton, html,
+  webHtmlButton,
+} from "../utils/html";
+// import {initFirebaseTest} from "../utils/firestore.spec";
 interface ReleaseOptions {
   sendMail?: boolean;
+  resetOnboarding?: boolean;
+  resetSawWhatsNew?: boolean;
 }
 /* eslint-disable max-len */
 // Show a list of the buttons to get the new version (Google, Apple, Web)
@@ -37,7 +41,11 @@ Please do not hesitate to give us feedback <a href="https://help.langa.me/feedba
 `;
 /* eslint-disable max-len */
 
-export const release = async ({sendMail = false}: ReleaseOptions) => {
+export const release = async ({
+  sendMail = false,
+  resetOnboarding = false,
+  resetSawWhatsNew = false,
+}: ReleaseOptions) => {
   const db = admin.firestore();
   // TODO: notify email new version
   const preferencesDocs = await db.collection("preferences")
@@ -48,13 +56,13 @@ export const release = async ({sendMail = false}: ReleaseOptions) => {
       .get();
   // List of {user, preference}
   const users = preferencesDocs.docs
-      // It's inefficient but ok for now
+  // It's inefficient but ok for now
       .filter((doc) => {
         const user = usersDocs.docs.find((u) => u.id === doc.id);
         return (user &&
           user.data() &&
           doc.data() &&
-          user.data().bot === false
+          !user.data().email?.includes("langa.me")
         );
       })
       .map((doc) => {
@@ -64,16 +72,33 @@ export const release = async ({sendMail = false}: ReleaseOptions) => {
           preferenceDoc: doc,
         };
       });
+  console.log(`${users.length} users`);
+  if (sendMail) {
+    console.log("Will notify by mail",
+        // Count users with email preference
+        users.filter((u) =>
+          u.preferenceDoc.data()!.notification?.newVersion?.email === true)
+            .length,
+        "users",
+    );
+  }
+
+  if (resetOnboarding) console.log("Will reset onboarding");
+  if (resetSawWhatsNew) console.log("Will reset sawWhatsNew");
   await Promise.all(users.map(async (user) => {
     const promises = [];
+    const propertyToUpdate: any = {};
+    if (resetOnboarding) propertyToUpdate.hasDoneOnBoarding = false;
+    if (resetSawWhatsNew) propertyToUpdate.sawWhatsNew = false;
     // check has the property hasDoneOnboarding
-    if (user.preferenceDoc.data().hasDoneOnBoarding !== undefined) {
+    if (
+      // If propertyToUpdate has any key
+      Object.keys(propertyToUpdate).length > 0 &&
+      user.preferenceDoc.data().hasDoneOnBoarding !== undefined) {
       // set to false
-      promises.push(user.preferenceDoc.ref.update({
-        hasDoneOnBoarding: false,
-        sawWhatsNew: false,
-      }));
+      promises.push(user.preferenceDoc.ref.update(propertyToUpdate));
     }
+    // TODO: PUSH
     if (sendMail && user.preferenceDoc.data()!.notification?.newVersion?.email === true) {
       const appleButton = await getAppleHtmlButtonWithBase64Image();
       const title = "A new version of Langame is available!";
@@ -92,6 +117,7 @@ export const release = async ({sendMail = false}: ReleaseOptions) => {
   console.log(`Done, new version released, ${users.length} users notified`);
 };
 
+// TODO:
 // initFirebaseTest("prod", ".");
 // release({
 //   sendMail: true,

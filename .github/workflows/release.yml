@@ -122,9 +122,7 @@ jobs:
           TEMP_KEYCHAIN_PASSWORD: "${{ secrets.TEMP_KEYCHAIN_PASSWORD }}"
           TEMP_KEYCHAIN_USER: "${{ secrets.TEMP_KEYCHAIN_USER }}"
           FIREBASE_CLI_TOKEN: "${{ secrets.FIREBASE_CLI_TOKEN }}"
+      # Discord action does not work on macos
       - name: Discord notification
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        uses: Ilshidur/action-discord@master
-        with:
-          args: "😛 Product Langame iOS app has been put in review for the [Apple Store](https://appstoreconnect.apple.com/apps/1564745604/testflight/ios)."
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{"content":"😛 Product Langame iOS app has been put in review for the [Apple Store](https://appstoreconnect.apple.com/apps/1564745604/testflight/ios)."}' ${{ secrets.DISCORD_WEBHOOK }}
