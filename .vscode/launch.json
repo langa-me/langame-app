@@ -1,6 +1,28 @@
 {
     "configurations": [
         {
+            "name": "dev-flutter",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+            ],
+            "flutterMode": "debug",
+        },
+        {
+            "name": "prod-flutter",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+            ],
+            "flutterMode": "debug",
+        },
+        {
             "name": "dev-pocophone",
             "type": "dart",
             "request": "launch",
@@ -56,7 +78,7 @@
             ],
             // Set to run a Flutter app on a specific device, ignoring the device selected
             // in the status bar.
-            "deviceId": "547F920B-591E-4B7D-9D66-5D09A5C72C72",
+            "deviceId": "71E02523-5BC3-40B5-92D0-2A5B63E6F571",
             // "debug", "profile" or "release".
             "flutterMode": "debug",
         },
@@ -71,7 +93,37 @@
             ],
             // Set to run a Flutter app on a specific device, ignoring the device selected
             // in the status bar.
-            "deviceId": "547F920B-591E-4B7D-9D66-5D09A5C72C72",
+            "deviceId": "71E02523-5BC3-40B5-92D0-2A5B63E6F571",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "prod-android-simulator",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "prod",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "emulator-5554",
+            // "debug", "profile" or "release".
+            "flutterMode": "debug",
+        },
+        {
+            "name": "dev-android-simulator",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+                "--flavor",
+                "dev",
+            ],
+            // Set to run a Flutter app on a specific device, ignoring the device selected
+            // in the status bar.
+            "deviceId": "emulator-5554",
             // "debug", "profile" or "release".
             "flutterMode": "debug",
         },

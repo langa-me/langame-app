@@ -32,6 +32,7 @@ import 'package:langame/providers/new_langame_provider.dart';
 import 'package:langame/providers/physical_langame_provider.dart';
 import 'package:langame/providers/preference_provider.dart';
 import 'package:langame/providers/remote_config_provider.dart';
+import 'package:langame/providers/soclialis_provider.dart';
 import 'package:langame/providers/tag_provider.dart';
 import 'package:langame/services/http/fake_message_api.dart';
 import 'package:langame/services/http/impl_authentication_api.dart';
@@ -100,7 +101,7 @@ void main() async {
     dynamicLinks: dynamicLinks,
     useEmulator: useEmulator,
   );
-Algolia algolia = Algolia.init(
+  Algolia algolia = Algolia.init(
       applicationId: 'B1SU8TE6UY', apiKey: 'a2c82fa22a5c4683b3caf14fadf78a33');
   var navigationKey = GlobalKey<NavigatorState>(debugLabel: 'navKey');
   var scaffoldMessengerKey =
@@ -130,9 +131,9 @@ Algolia algolia = Algolia.init(
           //   );
           // }
         });
-  
-  var langameProvider = LangameProvider(firebase, crashAnalyticsProvider,
-      authenticationProvider, algolia);
+
+  var langameProvider = LangameProvider(
+      firebase, crashAnalyticsProvider, authenticationProvider, algolia);
   var messageProvider = MessageProvider(
     firebase,
     messageApi,
@@ -148,11 +149,16 @@ Algolia algolia = Algolia.init(
       RemoteConfigProvider(crashAnalyticsProvider, remoteConfig);
   var newLangameProvider = NewLangameProvider(
       crashAnalyticsProvider, authenticationProvider, firebase);
-  var tagProvider =
-      TagProvider(firebase, crashAnalyticsProvider, algolia, preferenceProvider);
+  var tagProvider = TagProvider(
+      firebase, crashAnalyticsProvider, algolia, preferenceProvider);
   var physicalLangameProvider =
       PhysicalLangameProvider(firebase, crashAnalyticsProvider, algolia);
-  
+  var socialisProvider = SocialisProvider(
+    firebase,
+    crashAnalyticsProvider,
+    authenticationProvider,
+    true,
+  );
   remoteConfig?.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
@@ -222,6 +228,11 @@ Algolia algolia = Algolia.init(
                 PhysicalLangameProvider>(
               update: (_, cap, p) => p!,
               create: (_) => physicalLangameProvider,
+            ),
+            ChangeNotifierProxyProvider2<CrashAnalyticsProvider,
+                AuthenticationProvider, SocialisProvider>(
+              update: (_, cap, ap, sp) => sp!,
+              create: (_) => socialisProvider,
             ),
           ],
           child: MyApp(analytics, navigationKey, scaffoldMessengerKey),
