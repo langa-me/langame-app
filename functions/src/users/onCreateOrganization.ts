@@ -21,6 +21,10 @@ export const onCreateOrganization = async (
       functions.logger.log("organization have no data, deleting");
       return snap.ref.delete();
     }
+    // Update preferences for the user (might have a b2c account)
+    await admin.firestore().collection("preferences").doc(data.members[0]).set({
+      currentOrganization: snap.id,
+    }, {merge: true});
     return admin.firestore().runTransaction(async (t) => {
       return t.set(snap.ref, {
         credits: 2000,

@@ -5,7 +5,6 @@ import {
 } from "../helpers";
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import Stripe from "stripe";
 import {reportError} from "../errors";
 import {html} from "../utils/html";
 import {converter} from "../utils/firestore";
@@ -27,13 +26,7 @@ Please do not hesitate to give us feedback <a href="https://help.langa.me/feedba
  */
 export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
     context: functions.EventContext) => {
-  const stripe = new Stripe(functions.config().stripe.key, {
-    apiVersion: "2020-08-27",
-  });
   const db = admin.firestore();
-  const customerCollection = db.collection("stripe_customers");
-  const customerDoc = customerCollection.doc(user.uid);
-  const customer = (await customerDoc.get()).data();
   const userDocToDelete = db
       .collection(kUsersCollection)
       .doc(user.uid);
@@ -41,24 +34,6 @@ export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
   const batch = db.batch();
   // TODO: shouldn't we use transaction for read too?
   try {
-    if (customer) {
-      functions.logger.info("preparing customer deletion", customerDoc.id);
-      await stripe.customers.del(customer.customer_id);
-      // Delete the customers payments & payment methods in firestore.
-      const paymentsMethodsSnapshot = await customerDoc
-          .collection("payment_methods")
-          .get();
-      paymentsMethodsSnapshot.forEach((snap) => batch.delete(snap.ref));
-      const paymentsSnapshot = await customerDoc
-          .collection("payments")
-          .get();
-      paymentsSnapshot.forEach((snap) => batch.delete(snap.ref));
-      const subscriptionsSnapshot = await customerDoc
-          .collection("subscriptions")
-          .get();
-      subscriptionsSnapshot.forEach((snap) => batch.delete(snap.ref));
-      batch.delete(customerDoc);
-    }
     const interactionsToDelete = await db
         .collection(kInteractionsCollection)
         .where("usersArray", "array-contains", user.uid)
@@ -69,6 +44,8 @@ export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
         .where("userId", "==", user.uid)
         .get();
 
+    functions.logger.log("interactions to delete", interactionsToDelete.size);
+    functions.logger.log("preferences to delete", preferencesToDelete.size);
     for (const interactionToDelete of interactionsToDelete.docs) {
       batch.delete(interactionToDelete.ref);
     }
@@ -80,6 +57,7 @@ export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
         .collectionGroup("players")
         .where("userId", "==", user.uid).get();
 
+    functions.logger.log("presence in langames", presenceInLangames.size);
     for (const p of presenceInLangames.docs) {
       batch.delete(p.ref);
     }
@@ -88,6 +66,8 @@ export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
         .collection("langames")
         .where("reservedSpots", "array-contains", user.uid).get();
 
+    functions.logger.log("presence in langames two",
+        presenceInLangamesTwo.size);
     for (const p of presenceInLangamesTwo.docs) {
       if (p.data().isText) {
         batch.delete(p.ref);
@@ -104,7 +84,9 @@ export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
         .collection("langame_presences")
         .doc(user.uid)
         .get();
-    for (const lgId of presenceInLangamesThree.data()?.presences) {
+    functions.logger.log("presence in langames three",
+        presenceInLangamesThree.exists);
+    for (const lgId of presenceInLangamesThree.data()?.presences || []) {
       const lgDoc = await db.collection("langames")
           .withConverter(converter<langame.protobuf.ILangame>())
           .doc(lgId)
@@ -123,6 +105,7 @@ export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
         .collection("messages")
         .where("author.id", "==", user.uid).get();
 
+    functions.logger.log("messages sent", messagesSent.size);
     for (const message of messagesSent.docs) {
       batch.delete(message.ref);
     }
@@ -138,7 +121,7 @@ export const onDeleteAuthentication = async (user: admin.auth.UserRecord,
         "recommendations, seenMemes, user deletion"
     );
 
-    batch.delete(userDocToDelete).commit();
+    await batch.delete(userDocToDelete).commit();
     return db.collection("mails").add({
       to: user.email,
       message: {

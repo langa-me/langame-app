@@ -11,6 +11,12 @@ firebase remoteconfig:get > remoteconfig.template.json
 ```
 
 
+### First time deployment of HTTP unauthenticated functions
+
+```bash
+gcloud functions add-iam-policy-binding FUNCTION_NAME  --member="allUsers"  --role="roles/cloudfunctions.invoker"
+```
+
 ### Secrets
 
 ```bash
@@ -33,6 +39,7 @@ firebase functions:config:set twitter.access_token="SECRET_KEY"
 firebase functions:config:set twitter.access_secret="SECRET_KEY"
 # Ava
 firebase functions:config:set ava.workers="0 or 1 or 2"
+firebase functions:config:set discord.bot.token="DISCORD_BOT_TOKEN"
 firebase functions:config:get > .runtimeconfig.json
 ```
 

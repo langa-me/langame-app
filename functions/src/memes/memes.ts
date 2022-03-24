@@ -35,13 +35,13 @@ export const onlineMemeGenerator = async (
     topics: string[],
     limit: number = 1,
     translated: boolean = false,
-    grammar: boolean = false,
+    fixGrammar: boolean = false,
     parallelCompletions: number = 3,
     timeout: number = 40_000,
 ): Promise<admin.firestore.DocumentSnapshot<
   langame.protobuf.IMeme>[]> => {
   functions.logger.log(`generating memes ${topics.join(",")},` +
-    ` limit: ${limit}, translated:${translated}, grammar:${grammar}` +
+    ` limit: ${limit}, translated:${translated}, fixGrammar:${fixGrammar}` +
     ` parallelCompletions:${parallelCompletions}, timeout:${timeout}`);
 
   // In a distributed ava scenario, need to know how many workers there is
@@ -61,14 +61,14 @@ export const onlineMemeGenerator = async (
           tweet: false,
           // If the config is set, assign to a random worker
           shard: Math.floor(Math.random() * avaWorkers),
-          fixGrammar: grammar,
+          fixGrammar: fixGrammar,
           parallelCompletions,
         });
     return new Promise<admin.firestore.DocumentSnapshot<
       langame.protobuf.IMeme>>((resolve, reject) => {
         setTimeout(() => reject(new Error("timeout")),
             timeout *
-            (translated || grammar ? 2 : 1)); // Wait more
+            (translated || fixGrammar ? 2 : 1)); // Wait more
         starterRef.onSnapshot((snapshot) => {
           if (
             snapshot.data()!.state === "processed" &&

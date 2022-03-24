@@ -9,6 +9,8 @@ import {reportError} from "../errors";
 import {html} from "../utils/html";
 import {sample} from "../utils/array";
 import {welcomeMessages} from "./welcomeMessages";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fetch = require("node-fetch");
 
 const title = "Welcome to Langame 👋";
 /* eslint-disable max-len */
@@ -22,13 +24,14 @@ Please do not hesitate to give us feedback <a href="https://help.langa.me/feedba
 
 
 /**
- * When a user deletes their account, clean up after them
+ * When a user creates their account, clean up after them
  * @param{UserRecord} user
  * @param{functions.EventContext} context
  */
 export const onCreateAuthentication = async (user: admin.auth.UserRecord,
-    context: functions.EventContext) => {
+    context?: functions.EventContext) => {
   const db = admin.firestore();
+  functions.logger.log("new user", user.uid);
 
   try {
     const clone = JSON.parse(JSON.stringify(user));
@@ -38,11 +41,83 @@ export const onCreateAuthentication = async (user: admin.auth.UserRecord,
     delete clone.passwordSalt;
     delete clone.photoURL;
     clone.photoUrl = photo;
-    clone.credits = 50;
-    await db.runTransaction(async (t) => {
-      return t.set(db.collection(kUsersCollection).doc(user.uid), clone, {merge: true});
-    });
+    const configDoc = await admin.firestore().collection("configs")
+        .doc("business").get();
+    clone.credits = configDoc.data()?.base_user_credits || 2000;
+    const batch = db.batch();
+    const discordGuild = await admin.firestore().collection("discords").doc(user.uid).get();
+    if (discordGuild.exists) {
+      functions.logger.log("discord guild exists");
+      // get discord bot token from function config
+      const discordToken = functions.config().discord.bot.token;
+      // const discordAppId = functions.config().discord.appId;
+      // gather information about the discord guild into the user
+      const url = "https://discord.com/api/v8/guilds/"+user.uid;
+      const guildInfo = await fetch(url, {
+        headers: {
+          Authorization: `Bot ${discordToken}`,
+        },
+      });
+      const guildInfoJson = await guildInfo.json();
+      clone.discord = {
+        ...guildInfoJson,
+      };
+      // create organization
+      batch.set(db.collection("organizations").doc(user.uid), {
+        credits: clone.credits,
+        members: [user.uid],
+        membersRole: {
+          [user.uid]: "owner",
+        },
+        name: guildInfoJson.name,
+      });
+      functions.logger.log("organization created, key now");
+      batch.set(db.collection("api_keys").doc(), {
+        owner: user.uid,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
+      // const dm = await fetch(
+      //     "https://discord.com/api/v8/users/@me/channels",
+      //     {
+      //       method: "POST",
+      //       headers: {
+      //         "Content-Type": "application/json",
+      //       },
+      //       body: JSON.stringify({
+      //         recipient_id: guildInfoJson.owner_id,
+      //       }),
+      //     },
+      // );
+      // // POST/channels/{channel.id}/messages
+      // const dmJson = await dm.json();
+      // functions.logger.log("created dm channel", dmJson);
+      // const dmId = dmJson.id;
+      // const dmMessage = await fetch(
+      //     "https://discord.com/api/v8/channels/"+dmId+"/messages",
+      //     {
+      //       method: "POST",
+      //       headers: {
+      //         "Content-Type": "application/json",
+      //       },
+      //       body: JSON.stringify({
+      //         content: "Thank you for inviting me to the party 😛!\n\n"+
+      //             "I'm a bot that helps you to get into wonderful conversations.\n\n"+
+      //             "You can learn more about me using /about or by heading to https://langa.me.",
+      //       }),
+      //     },
+      // );
+      // const dmMessageJson = await dmMessage.json();
+      // functions.logger.log("dmed Discord owner", dmMessageJson);
+    }
+
+
+    batch.set(db.collection(kUsersCollection).doc(user.uid), clone, {merge: true});
+    await batch.commit();
+    if (!user.email) {
+      functions.logger.log("user has no email, aborting");
+      return;
+    }
     if (isEmulator) return;
 
     const teamTitle = `Welcome to ${user.uid} 😋`;
@@ -70,6 +145,6 @@ export const onCreateAuthentication = async (user: admin.auth.UserRecord,
         },
       }), p2]);
   } catch (e: any) {
-    return reportError(e, {user: context.params.userId});
+    return reportError(e, {user: context?.params.userId});
   }
 };

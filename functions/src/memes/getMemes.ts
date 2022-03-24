@@ -11,6 +11,8 @@ interface GetMemesRequest {
   appId?: string;
   quantity?: number;
   translated?: boolean;
+  fixGrammar?: boolean;
+  parallelCompletions?: number;
 }
 export const getMemes = async (
     data: GetMemesRequest,
@@ -146,8 +148,8 @@ export const getMemes = async (
       memes = await onlineMemeGenerator(data.topics || ["ice breaker"],
           data.quantity || 1,
           data.translated || false,
-          false,
-          1,
+          data.fixGrammar || false,
+          data.parallelCompletions || 1,
           240_000,
       );
     } catch (e: any) {

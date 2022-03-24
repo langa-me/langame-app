@@ -28,6 +28,7 @@ import {onCreateKey} from "./users/b2b/onCreateKey";
 import {onWriteToRateLimit} from "./users/onWriteToRateLimit";
 import {onCreateOrganization} from "./users/onCreateOrganization";
 import {scheduleLangames} from "./langames/scheduleLangames";
+import {discordAuthentication} from "./users/b2b/discordAuthentication";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -166,6 +167,15 @@ exports.onCreateOrganization = functions
     .document("organizations/{organizationId}")
     .onCreate(onCreateOrganization);
 
+
+exports.discordAuthentication = functions
+    .region(region)
+    .runWith({
+      ...runtimeOpts,
+      timeoutSeconds: 240,
+    })
+    .https
+    .onCall(discordAuthentication);
 
 // Meme // Conversation starter
 

@@ -13,6 +13,7 @@ service cloud.firestore {
         function getApiKey(id) {
             return get(/databases/$(database)/documents/api_keys/$(id)).data;
         }
+
         // TODO: overall prevent DDOSes by setting "last update" stuff
         match /users/{userId} {
             // TODO: Maybe more strict
@@ -104,6 +105,8 @@ service cloud.firestore {
                 resource.data.membersRole[request.auth.uid] == "owner";
             // Can create organizations if adding oneself in the members
             allow create: if request.auth != null &&
+                // just in case (discord auth...)
+                get(/databases/$(database)/documents/users/$(request.auth.uid)).data != null &&
                 request.resource.data.keys().hasAll(['members', 'membersRole', 'name']) &&
                 // request.auth.uid contained in members
                 request.auth.uid in request.resource.data.members;

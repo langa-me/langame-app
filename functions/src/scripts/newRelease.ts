@@ -3,6 +3,7 @@ import {langame} from "../langame/protobuf/langame";
 import {welcomeMessages} from "../users/welcomeMessages";
 import {sample} from "../utils/array";
 import {converter} from "../utils/firestore";
+import {initFirebaseTest} from "../utils/firestore.spec";
 import {
   getAppleHtmlButtonWithBase64Image, googleHtmlButton, html,
   webHtmlButton,
@@ -47,7 +48,6 @@ export const release = async ({
   resetSawWhatsNew = false,
 }: ReleaseOptions) => {
   const db = admin.firestore();
-  // TODO: notify email new version
   const preferencesDocs = await db.collection("preferences")
       .withConverter(converter<langame.protobuf.IUserPreference>())
       .get();
@@ -117,8 +117,10 @@ export const release = async ({
   console.log(`Done, new version released, ${users.length} users notified`);
 };
 
-// TODO:
-// initFirebaseTest("prod", ".");
-// release({
-//   sendMail: true,
-// });
+
+if (process.argv[2] === "execute") {
+  initFirebaseTest("prod", ".");
+  release({
+    sendMail: false,
+  });
+}
