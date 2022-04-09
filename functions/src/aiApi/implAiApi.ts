@@ -9,6 +9,7 @@ import {sleep} from "../utils/time";
 import {Translate} from "@google-cloud/translate/build/src/v2";
 import {langame} from "../langame/protobuf/langame";
 import {converCamelCaseToSnake} from "../utils/object";
+import {algoliaPrefix} from "../helpers";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require("node-fetch");
@@ -39,14 +40,12 @@ export class ImplAiApi implements Api {
    */
   constructor(keyFileName?: string) {
     this.algolia = algoliasearch(algoliaId(), algoliaKey());
-    this.indexes.set("dev_users", this.algolia.initIndex("dev_users"));
-    this.indexes.set("prod_users", this.algolia.initIndex("prod_users"));
-    this.indexes.set("dev_memes", this.algolia.initIndex("dev_memes"));
-    this.indexes.set("prod_memes", this.algolia.initIndex("prod_memes"));
-    this.indexes.set("dev_topics", this.algolia.initIndex("dev_topics"));
-    this.indexes.set("prod_topics", this.algolia.initIndex("prod_topics"));
-    this.indexes.set("dev_langames", this.algolia.initIndex("dev_langames"));
-    this.indexes.set("prod_langames", this.algolia.initIndex("prod_langames"));
+    const existingIndexes = ["users", "memes", "topics", "langames",
+      "saved_conversations"];
+    existingIndexes.forEach((indexName) => {
+      const i = algoliaPrefix + indexName;
+      this.indexes.set(i, this.algolia.initIndex(i));
+    });
     this.translateClient = this.keyFileName ?
       new Translate({keyFilename: this.keyFileName}) :
       new Translate();

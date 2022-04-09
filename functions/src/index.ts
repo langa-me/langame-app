@@ -29,6 +29,8 @@ import {onWriteToRateLimit} from "./users/onWriteToRateLimit";
 import {onCreateOrganization} from "./users/onCreateOrganization";
 import {scheduleLangames} from "./langames/scheduleLangames";
 import {discordAuthentication} from "./users/b2b/discordAuthentication";
+import {onWriteSavedConversation}
+  from "./conversations/onWriteSavedConversation";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -222,3 +224,13 @@ exports.onCreateMessageAnalysis = functions
     })
     .firestore.document("messages/{messageId}")
     .onCreate(onCreateMessageAnalysis);
+
+
+// Conversation //
+
+exports.onWriteSavedConversation = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
+    .document("saved_conversations/{savedConversationid}")
+    .onWrite(onWriteSavedConversation);
