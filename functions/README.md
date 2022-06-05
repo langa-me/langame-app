@@ -40,6 +40,9 @@ firebase functions:config:set twitter.access_secret="SECRET_KEY"
 # Ava
 firebase functions:config:set ava.workers="0 or 1 or 2"
 firebase functions:config:set discord.bot.token="DISCORD_BOT_TOKEN"
+# Notion
+firebase functions:config:set notion.client_id="NOTION_CLIENT_ID"
+firebase functions:config:set notion.client_secret="NOTION_CLIENT_ID"
 firebase functions:config:get > .runtimeconfig.json
 ```
 

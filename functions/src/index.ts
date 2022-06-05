@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-if (admin.apps.length === 0) {
+if (!process.env.IS_TESTING) {
   admin.initializeApp();
   admin.firestore().settings({ignoreUndefinedProperties: true});
 }
@@ -31,6 +31,7 @@ import {scheduleLangames} from "./langames/scheduleLangames";
 import {discordAuthentication} from "./users/b2b/discordAuthentication";
 import {onWriteSavedConversation}
   from "./conversations/onWriteSavedConversation";
+import {onWriteConfig} from "./config/onWriteConfig";
 
 // see https://firebase.google.com/docs/reference/functions/function_configuration_.runtimeoptions
 const runtimeOpts = {
@@ -234,3 +235,10 @@ exports.onWriteSavedConversation = functions
     .firestore
     .document("saved_conversations/{savedConversationid}")
     .onWrite(onWriteSavedConversation);
+
+exports.onWriteConfig = functions
+    .region(region)
+    .runWith(runtimeOpts)
+    .firestore
+    .document("configs/{configId}")
+    .onWrite(onWriteConfig);

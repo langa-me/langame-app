@@ -5,7 +5,7 @@ import {Api, HuggingFaceCompletionParameters,
   OpenaiCompletionParameters} from "../aiApi/aiApi";
 import {ImplAiApi} from "../aiApi/implAiApi";
 import {reportError} from "../errors";
-import {getConfig} from "../functionConfig/config";
+import {getConfig} from "../config/config";
 import {langame} from "../langame/protobuf/langame";
 import {shouldDrop} from "../utils/contexts";
 import {converter} from "../utils/firestore";

@@ -59,7 +59,7 @@ class PhysicalLangameProvider extends ChangeNotifier {
         // No more memes in this topic
         return LangameResponse(LangameStatus.succeed, result: false);
       }
-      _cap.log('failed to getMemes');
+      _cap.log('failed to getMemes $e $s');
       _cap.recordError(e, s);
       return LangameResponse(LangameStatus.failed);
     }
